@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
+import { useMemo, useState } from "react";
 
 type Recipient = "Mom" | "Dad" | "Grandma" | "Grandpa" | "Partner" | "Friend";
 type Theme = "Warm, sentimental" | "Minimal, modern" | "Classic portrait" | "Playful, cute";
-
 type ProductId = "card" | "tee" | "mug" | "hoodie";
 
 type Product = {
@@ -22,78 +21,72 @@ const PRODUCTS: Product[] = [
   { id: "hoodie", name: "Hoodie", fromText: "from", priceFrom: 40 },
 ];
 
+const INK = "#2C2A28";
+const MUTED = "rgba(44,42,40,0.62)";
+const BORDER = "rgba(44,42,40,0.12)";
+const pastelGradient =
+  "linear-gradient(90deg, rgba(124,199,230,0.95) 0%, rgba(169,210,176,0.95) 25%, rgba(241,197,141,0.95) 55%, rgba(233,156,150,0.95) 75%, rgba(176,132,200,0.95) 100%)";
+
 function moneyGBP(n: number) {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n);
 }
 
-const INK = "#2C2A28";
-const MUTED = "rgba(44,42,40,0.62)";
-const BORDER = "rgba(44,42,40,0.10)";
+function SoftCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="rounded-3xl border p-6 shadow-[0_30px_80px_rgba(44,42,40,0.06)]"
+      style={{ background: "rgba(255,255,255,0.58)", borderColor: BORDER, backdropFilter: "blur(10px)" }}
+    >
+      {children}
+    </div>
+  );
+}
 
-const pastelGradient =
-  "linear-gradient(90deg, rgba(124,199,230,0.95) 0%, rgba(169,210,176,0.95) 25%, rgba(241,197,141,0.95) 55%, rgba(233,156,150,0.95) 75%, rgba(176,132,200,0.95) 100%)";
-
-function PillButton({
+function GradientButton({
   children,
   onClick,
-  variant = "solid",
   disabled,
+  className = "",
 }: {
   children: React.ReactNode;
   onClick?: () => void;
-  variant?: "solid" | "outline" | "dark";
   disabled?: boolean;
+  className?: string;
 }) {
-  if (variant === "solid") {
-    return (
-      <button
-        onClick={onClick}
-        disabled={disabled}
-        className="rounded-full px-5 py-3 text-sm font-semibold text-white shadow-sm disabled:opacity-60"
-        style={{ backgroundImage: pastelGradient }}
-      >
-        {children}
-      </button>
-    );
-  }
-
-  if (variant === "dark") {
-    return (
-      <button
-        onClick={onClick}
-        disabled={disabled}
-        className="rounded-full px-5 py-3 text-sm font-semibold text-white shadow-sm disabled:opacity-60"
-        style={{ background: "rgba(44,42,40,0.18)" }}
-      >
-        {children}
-      </button>
-    );
-  }
-
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className="rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-60"
-      style={{
-        background: "rgba(255,255,255,0.55)",
-        border: `1px solid ${BORDER}`,
-        color: INK,
-      }}
+      className={`rounded-full px-5 py-3 text-sm font-semibold text-white shadow-sm disabled:opacity-60 ${className}`}
+      style={{ backgroundImage: pastelGradient }}
     >
       {children}
     </button>
   );
 }
 
-/**
- * Real photo tile + dynamic overlay
- * Uses files in /public/product-tiles/{id}.jpg:
- * card.jpg, tee.jpg, mug.jpg, hoodie.jpg
- */
+function OutlineButton({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="rounded-full px-5 py-3 text-sm font-semibold"
+      style={{ background: "rgba(255,255,255,0.55)", border: `1px solid ${BORDER}`, color: INK }}
+    >
+      {children}
+    </button>
+  );
+}
+
 function ProductTile({ id, imageSrc }: { id: ProductId; imageSrc: string | null }) {
   const base = `/product-tiles/${id}.jpg`;
 
+  // overlay placement (good default). We can calibrate per photo later if needed.
   const overlayById: Record<ProductId, CSSProperties> = {
     card: { top: "20%", left: "28%", width: "44%", height: "52%" },
     tee: { top: "26%", left: "33%", width: "34%", height: "40%" },
@@ -101,10 +94,25 @@ function ProductTile({ id, imageSrc }: { id: ProductId; imageSrc: string | null 
     hoodie: { top: "28%", left: "33%", width: "34%", height: "40%" },
   };
 
+  const [missingBase, setMissingBase] = useState(false);
+
   return (
-    <div className="relative h-[170px] w-full overflow-hidden rounded-2xl">
-      <img src={base} className="absolute inset-0 h-full w-full object-cover" alt="" />
-      {imageSrc && (
+    <div className="relative h-[190px] w-full overflow-hidden rounded-2xl border" style={{ borderColor: BORDER }}>
+      {!missingBase ? (
+        <img
+          src={base}
+          className="absolute inset-0 h-full w-full object-cover"
+          alt=""
+          onError={() => setMissingBase(true)}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/60 px-4 text-center text-xs" style={{ color: MUTED }}>
+          Missing image: <span className="font-mono ml-1">{base}</span>
+          <div className="mt-2">Make sure it exists in <span className="font-mono">/public/product-tiles/</span> and is committed to GitHub.</div>
+        </div>
+      )}
+
+      {imageSrc && !missingBase && (
         <img
           src={imageSrc}
           alt="Design preview"
@@ -142,12 +150,11 @@ export default function Page() {
     setLoading(true);
     setImageDataUrl(null);
     try {
-      const prompt = buildPrompt();
       const res = await fetch("/api/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt,
+          prompt: buildPrompt(),
           style: theme.includes("Minimal") ? "minimal" : theme.includes("Classic") ? "oil" : "watercolor",
           quality: "high",
         }),
@@ -171,11 +178,7 @@ export default function Page() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          product: {
-            id: "bundle",
-            name: `Keepsy order (${cart.length} item${cart.length > 1 ? "s" : ""})`,
-            priceGBP: cartTotal,
-          },
+          product: { id: "bundle", name: `Keepsy order (${cart.length} items)`, priceGBP: cartTotal },
           prompt: buildPrompt(),
           imageDataUrl,
           currency: "gbp",
@@ -194,7 +197,7 @@ export default function Page() {
   return (
     <main className="min-h-screen" style={{ background: "var(--bg)", color: INK }}>
       <div className="mx-auto max-w-[1120px] px-6 py-10">
-        {/* Top bar */}
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img
@@ -209,15 +212,9 @@ export default function Page() {
           </div>
 
           <div className="flex items-center gap-2">
+            <OutlineButton onClick={() => alert("MVP: Sign in later.")}>Sign in</OutlineButton>
             <button
-              className="rounded-full px-5 py-2 text-sm font-medium"
-              style={{ background: "rgba(255,255,255,0.55)", border: `1px solid ${BORDER}` }}
-              onClick={() => alert("MVP: Sign in later.")}
-            >
-              Sign in
-            </button>
-            <button
-              className="rounded-full px-5 py-2 text-sm font-semibold text-white shadow-sm"
+              className="rounded-full px-5 py-3 text-sm font-semibold text-white shadow-sm"
               style={{ background: "rgba(44,42,40,0.18)" }}
               onClick={() => document.getElementById("create")?.scrollIntoView({ behavior: "smooth" })}
             >
@@ -226,169 +223,118 @@ export default function Page() {
           </div>
         </div>
 
-        {/* Hero + Creator */}
-        <section className="mt-16 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-start">
+        {/* Hero + Create */}
+        <section className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-[1.1fr_0.9fr] items-start">
           <div>
-            <h1 className="text-[44px] leading-[1.05] font-semibold tracking-tight">
+            <h1 className="text-[46px] leading-[1.05] font-semibold tracking-tight">
               Keep what matters — <br />
               turn it into a gift.
             </h1>
 
-            <p className="mt-4 max-w-[520px] text-[15px] leading-7" style={{ color: MUTED }}>
+            <p className="mt-4 max-w-[560px] text-[15px] leading-7" style={{ color: MUTED }}>
               Generate a heartfelt image that tells a story — families, pets, and more. Print it onto cards, mugs, tees,
               hoodies — and deliver to their door.
             </p>
 
             <div className="mt-8 flex gap-3">
-              <PillButton onClick={() => alert("MVP: Examples gallery later.")}>AI examples</PillButton>
-              <PillButton variant="outline" onClick={() => alert("MVP: ‘Sue examples’ later.")}>
-                Sue examples
-              </PillButton>
+              <GradientButton onClick={() => alert("MVP: examples gallery next.")}>AI examples</GradientButton>
+              <OutlineButton onClick={() => alert("MVP: example set next.")}>Sue examples</OutlineButton>
             </div>
 
-            <div
-              className="mt-10 rounded-2xl p-5"
-              style={{ background: "rgba(255,255,255,0.55)", border: `1px solid ${BORDER}` }}
-            >
-              <div className="text-sm font-semibold">Holiday shop: Mother’s Day</div>
-              <div className="mt-2 text-sm leading-6" style={{ color: MUTED }}>
-                Mother’s Day orders ship in time for U.K. Mother’s Day (shared marketing window for 3–4 weeks before).
+            {/* Preview section (always visible, so you can see what's happening) */}
+            <div className="mt-10">
+              <div className="mb-3 text-sm font-semibold">Live preview</div>
+              <div className="rounded-3xl border p-4" style={{ borderColor: BORDER, background: "rgba(255,255,255,0.50)" }}>
+                {!imageDataUrl ? (
+                  <div className="text-sm" style={{ color: MUTED }}>
+                    Generate an image to see it previewed here, and applied to the products below.
+                  </div>
+                ) : (
+                  <img
+                    src={imageDataUrl}
+                    alt="Generated preview"
+                    className="h-[280px] w-full rounded-2xl object-contain bg-white"
+                    style={{ border: `1px solid ${BORDER}` }}
+                  />
+                )}
               </div>
             </div>
           </div>
 
-          {/* Creator Card */}
-          <div
-            id="create"
-            className="rounded-3xl p-6"
-            style={{
-              background: "rgba(255,255,255,0.55)",
-              border: `1px solid ${BORDER}`,
-              boxShadow: "0 24px 60px rgba(44,42,40,0.06)",
-            }}
-          >
-            <div className="text-sm font-semibold">Create your design</div>
+          <div id="create">
+            <SoftCard>
+              <div className="text-sm font-semibold">Create your design</div>
 
-            <div className="mt-4 grid gap-4">
-              <label className="grid gap-2">
-                <div className="text-xs font-medium" style={{ color: MUTED }}>
-                  Who is your gift for?
-                </div>
-                <select
-                  value={recipient}
-                  onChange={(e) => setRecipient(e.target.value as Recipient)}
-                  className="w-full rounded-xl px-4 py-3 text-sm outline-none"
-                  style={{ background: "rgba(255,255,255,0.75)", border: `1px solid ${BORDER}` }}
-                >
-                  {(["Mom", "Dad", "Grandma", "Grandpa", "Partner", "Friend"] as Recipient[]).map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="grid gap-2">
-                <div className="text-xs font-medium" style={{ color: MUTED }}>
-                  Style / or theme
-                </div>
-                <select
-                  value={theme}
-                  onChange={(e) => setTheme(e.target.value as Theme)}
-                  className="w-full rounded-xl px-4 py-3 text-sm outline-none"
-                  style={{ background: "rgba(255,255,255,0.75)", border: `1px solid ${BORDER}` }}
-                >
-                  {(["Warm, sentimental", "Minimal, modern", "Classic portrait", "Playful, cute"] as Theme[]).map(
-                    (t) => (
-                      <option key={t} value={t}>
-                        {t}
+              <div className="mt-5 grid gap-4">
+                <label className="grid gap-2">
+                  <div className="text-xs font-medium" style={{ color: MUTED }}>
+                    Who is your gift for?
+                  </div>
+                  <select
+                    value={recipient}
+                    onChange={(e) => setRecipient(e.target.value as Recipient)}
+                    className="w-full rounded-xl px-4 py-3 text-sm outline-none"
+                    style={{ background: "rgba(255,255,255,0.78)", border: `1px solid ${BORDER}` }}
+                  >
+                    {(["Mom", "Dad", "Grandma", "Grandpa", "Partner", "Friend"] as Recipient[]).map((r) => (
+                      <option key={r} value={r}>
+                        {r}
                       </option>
-                    )
-                  )}
-                </select>
-              </label>
+                    ))}
+                  </select>
+                </label>
 
-              <label className="grid gap-2">
-                <div className="text-xs font-medium" style={{ color: MUTED }}>
-                  Tell me what makes this person special…
-                </div>
-                <textarea
-                  value={details}
-                  onChange={(e) => setDetails(e.target.value)}
-                  className="min-h-[120px] w-full rounded-xl px-4 py-3 text-sm outline-none"
-                  style={{ background: "rgba(255,255,255,0.75)", border: `1px solid ${BORDER}` }}
-                />
-              </label>
+                <label className="grid gap-2">
+                  <div className="text-xs font-medium" style={{ color: MUTED }}>
+                    Style / theme
+                  </div>
+                  <select
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value as Theme)}
+                    className="w-full rounded-xl px-4 py-3 text-sm outline-none"
+                    style={{ background: "rgba(255,255,255,0.78)", border: `1px solid ${BORDER}` }}
+                  >
+                    {(["Warm, sentimental", "Minimal, modern", "Classic portrait", "Playful, cute"] as Theme[]).map(
+                      (t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </label>
 
-              <button
-                className="w-full rounded-full px-5 py-3 text-sm font-semibold text-white shadow-sm disabled:opacity-60"
-                style={{ backgroundImage: pastelGradient }}
-                disabled={loading}
-                onClick={generate}
-              >
-                {loading ? "Generating…" : "Continue"}
-              </button>
-
-              {imageDataUrl && (
-                <div
-                  className="rounded-2xl p-3"
-                  style={{ background: "rgba(255,255,255,0.65)", border: `1px solid ${BORDER}` }}
-                >
-                  <img
-                    src={imageDataUrl}
-                    alt="Generated"
-                    className="h-[180px] w-full rounded-xl object-contain"
-                    style={{ background: "#fff" }}
+                <label className="grid gap-2">
+                  <div className="text-xs font-medium" style={{ color: MUTED }}>
+                    Tell me what makes them special…
+                  </div>
+                  <textarea
+                    value={details}
+                    onChange={(e) => setDetails(e.target.value)}
+                    className="min-h-[130px] w-full rounded-xl px-4 py-3 text-sm outline-none"
+                    style={{ background: "rgba(255,255,255,0.78)", border: `1px solid ${BORDER}` }}
                   />
-                </div>
-              )}
-            </div>
+                </label>
+
+                <GradientButton disabled={loading} onClick={generate} className="w-full">
+                  {loading ? "Generating…" : "Continue"}
+                </GradientButton>
+              </div>
+            </SoftCard>
           </div>
         </section>
 
         {/* Products */}
-        <section className="mt-16">
-          <h2 className="text-[22px] font-semibold">Put it on something</h2>
-
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {PRODUCTS.map((p) => (
-              <div
-                key={p.id}
-                className="rounded-2xl overflow-hidden"
-                style={{ background: "rgba(255,255,255,0.55)", border: `1px solid ${BORDER}` }}
-              >
-                <div className="p-3">
-                  <ProductTile id={p.id} imageSrc={imageDataUrl} />
-                </div>
-
-                <div className="px-4 pb-4">
-                  <div className="mt-1 flex items-end justify-between gap-2">
-                    <div>
-                      <div className="text-sm font-semibold">{p.name}</div>
-                      <div className="text-xs" style={{ color: MUTED }}>
-                        {p.fromText} {moneyGBP(p.priceFrom)}
-                      </div>
-                    </div>
-                    <button
-                      className="rounded-full px-3 py-2 text-xs font-semibold text-white shadow-sm"
-                      style={{ backgroundImage: pastelGradient }}
-                      onClick={() => setCart((c) => [...c, p])}
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
+        <section className="mt-14">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-[22px] font-semibold">Put it on something</h2>
+              <div className="mt-1 text-sm" style={{ color: MUTED }}>
+                Your generated image is applied as a live preview on each product.
               </div>
-            ))}
-          </div>
-
-          {/* Bottom bar */}
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-xs" style={{ color: MUTED }}>
-              Free U.K. shipping · 100% happiness guarantee
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-3">
               <div
                 className="rounded-full px-4 py-3 text-sm"
                 style={{ background: "rgba(255,255,255,0.55)", border: `1px solid ${BORDER}` }}
@@ -407,9 +353,70 @@ export default function Page() {
                 disabled={loading || cart.length === 0 || !imageDataUrl}
                 onClick={checkout}
               >
-                View cart
+                Checkout
               </button>
             </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {PRODUCTS.map((p) => (
+              <div
+                key={p.id}
+                className="rounded-3xl border overflow-hidden"
+                style={{ background: "rgba(255,255,255,0.58)", borderColor: BORDER }}
+              >
+                <div className="p-4">
+                  <ProductTile id={p.id} imageSrc={imageDataUrl} />
+                </div>
+
+                <div className="px-5 pb-5">
+                  <div className="flex items-end justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold">{p.name}</div>
+                      <div className="text-xs" style={{ color: MUTED }}>
+                        {p.fromText} {moneyGBP(p.priceFrom)}
+                      </div>
+                    </div>
+
+                    <button
+                      className="rounded-full px-4 py-2 text-xs font-semibold text-white shadow-sm"
+                      style={{ backgroundImage: pastelGradient }}
+                      onClick={() => setCart((c) => [...c, p])}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile checkout bar */}
+          <div className="mt-6 sm:hidden flex items-center justify-between gap-3">
+            <div
+              className="rounded-full px-4 py-3 text-sm"
+              style={{ background: "rgba(255,255,255,0.55)", border: `1px solid ${BORDER}` }}
+            >
+              <span style={{ color: MUTED }}>Cart:</span>{" "}
+              <span className="font-semibold">{cart.length} item{cart.length === 1 ? "" : "s"}</span>{" "}
+              <span className="mx-2" style={{ color: "rgba(44,42,40,0.20)" }}>
+                ·
+              </span>{" "}
+              <span className="font-semibold">{moneyGBP(cartTotal)}</span>
+            </div>
+
+            <button
+              className="rounded-full px-5 py-3 text-sm font-semibold text-white shadow-sm disabled:opacity-60"
+              style={{ background: "rgba(44,42,40,0.18)" }}
+              disabled={loading || cart.length === 0 || !imageDataUrl}
+              onClick={checkout}
+            >
+              Checkout
+            </button>
+          </div>
+
+          <div className="mt-6 text-xs" style={{ color: MUTED }}>
+            Free U.K. shipping · 100% happiness guarantee
           </div>
         </section>
 
@@ -417,15 +424,9 @@ export default function Page() {
         <footer className="mt-16 flex items-center justify-between text-xs" style={{ color: MUTED }}>
           <div className="font-medium">Keepsy 2024</div>
           <div className="flex items-center gap-5">
-            <a href="#" className="hover:opacity-80">
-              About
-            </a>
-            <a href="#" className="hover:opacity-80">
-              Support
-            </a>
-            <a href="#" className="hover:opacity-80">
-              Privacy
-            </a>
+            <a href="#" className="hover:opacity-80">About</a>
+            <a href="#" className="hover:opacity-80">Support</a>
+            <a href="#" className="hover:opacity-80">Privacy</a>
           </div>
         </footer>
       </div>

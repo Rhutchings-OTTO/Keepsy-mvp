@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import {
   Sparkles,
   ShoppingCart,
@@ -156,7 +157,7 @@ function RealProductPreview({
 
   return (
     <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-2xl border border-black/10 bg-white">
-      <img src={fileMap[type]} className="absolute inset-0 w-full h-full object-cover" alt="Product mockup" />
+      <Image src={fileMap[type]} className="absolute inset-0 w-full h-full object-cover" alt="Product mockup" fill />
       {imageDataUrl && (
         <motion.img
           key={imageDataUrl}
@@ -166,7 +167,7 @@ function RealProductPreview({
           src={imageDataUrl}
           alt="Applied design"
           className="absolute rounded-xl shadow-xl border border-black/10 bg-white"
-          style={{ ...(overlay[type] as any), objectFit: "cover" }}
+          style={{ ...overlay[type], objectFit: "cover" }}
         />
       )}
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/0 via-black/0 to-black/10" />
@@ -191,7 +192,7 @@ export default function MerchGeneratorPlatform() {
   const [selectedColor, setSelectedColor] = useState(PRODUCTS[2].colors[0]);
 
   const [cartCount, setCartCount] = useState(0);
-  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [checkoutSuccess] = useState(false);
 
   const handleGenerate = async () => {
     if (!prompt) return;
@@ -274,7 +275,13 @@ export default function MerchGeneratorPlatform() {
           }}
         >
           {/* YOUR REAL LOGO */}
-          <img src="/logo.png" alt="Keepsy" className="w-10 h-10 rounded-xl shadow-sm border border-black/5 bg-white" />
+          <Image
+            src="/logo.png"
+            alt="Keepsy"
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-xl shadow-sm border border-black/5 bg-white"
+          />
           <span className="font-extrabold text-2xl tracking-tight">keepsy</span>
         </motion.div>
 
@@ -592,7 +599,9 @@ export default function MerchGeneratorPlatform() {
                     <h3 className="text-xl font-black mb-4">Order Summary</h3>
                     <div className="flex items-center gap-4">
                       <div className="w-20 h-20 rounded-2xl overflow-hidden border border-black/10 bg-white">
-                        {generatedImage ? <img src={generatedImage} className="w-full h-full object-cover" alt="thumb" /> : null}
+                        {generatedImage ? (
+                          <Image src={generatedImage} className="w-full h-full object-cover" alt="thumb" fill />
+                        ) : null}
                       </div>
                       <div>
                         <div className="font-extrabold">{selectedProduct.name}</div>

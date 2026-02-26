@@ -1,4 +1,3 @@
-console.log("KEY:", process.env.OPENAI_API_KEY?.slice(0, 10));
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -39,7 +38,8 @@ export async function POST(req: Request) {
 
     const imageDataUrl = `data:image/png;base64,${b64}`;
     return NextResponse.json({ imageDataUrl });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Server error" }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -1,12 +1,24 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  // Must match the Stripe SDK's pinned type in your installed version
-  apiVersion: "2026-02-25.clover",
-});
-
 export async function POST(req: Request) {
   try {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+
+    if (!secretKey) {
+      return new Response(
+        JSON.stringify({
+          error:
+            "STRIPE_SECRET_KEY is missing. Add it in Vercel → Project → Settings → Environment Variables, then redeploy.",
+        }),
+        { status: 500 }
+      );
+    }
+
+    // Create Stripe INSIDE the handler so builds don't crash if env vars aren't set yet
+    const stripe = new Stripe(secretKey, {
+      apiVersion: "2026-02-25.clover",
+    });
+
     const body = await req.json();
 
     const cart = Array.isArray(body?.cart) ? body.cart : [];
@@ -19,9 +31,7 @@ export async function POST(req: Request) {
       return new Response(JSON.stringify({ error: "Invalid cart total." }), { status: 400 });
     }
 
-    // Convert pounds to pence
-    const amount = Math.round(totalGBP * 100);
-
+    const amount = Math.round(totalGBP * 100); // pounds → pence
     const origin = req.headers.get("origin") || "http://localhost:3000";
 
     const session = await stripe.checkout.sessions.create({

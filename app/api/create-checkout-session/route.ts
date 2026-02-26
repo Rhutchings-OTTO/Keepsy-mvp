@@ -1,52 +1,54 @@
-import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-06-20",
+  // Must match the Stripe SDK's pinned type in your installed version
+  apiVersion: "2026-02-25.clover",
 });
 
 export async function POST(req: Request) {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json({ error: "Missing STRIPE_SECRET_KEY" }, { status: 500 });
+    const body = await req.json();
+
+    const cart = Array.isArray(body?.cart) ? body.cart : [];
+    const totalGBP =
+      typeof body?.product?.priceGBP === "number"
+        ? body.product.priceGBP
+        : cart.reduce((sum: number, item: any) => sum + (Number(item?.priceGBP) || 0), 0);
+
+    if (!totalGBP || totalGBP <= 0) {
+      return new Response(JSON.stringify({ error: "Invalid cart total." }), { status: 400 });
     }
 
-    const { product, prompt, imageDataUrl, currency } = await req.json();
+    // Convert pounds to pence
+    const amount = Math.round(totalGBP * 100);
 
-    if (!product?.name || !product?.priceGBP || !imageDataUrl) {
-      return NextResponse.json({ error: "Missing product or image" }, { status: 400 });
-    }
+    const origin = req.headers.get("origin") || "http://localhost:3000";
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
-    // Stripe Checkout session create. :contentReference[oaicite:6]{index=6}
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/`,
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
-            currency: currency || "gbp",
+            currency: "gbp",
             product_data: {
-              name: product.name,
-              images: [imageDataUrl], // for Stripe display (works best with hosted URLs; data URL may not show everywhere)
+              name: body?.product?.name || "Keepsy order",
+              description: "Custom AI keepsake print",
             },
-            unit_amount: Math.round(Number(product.priceGBP) * 100),
+            unit_amount: amount,
           },
           quantity: 1,
         },
       ],
+      success_url: `${origin}/?success=1`,
+      cancel_url: `${origin}/?canceled=1`,
       metadata: {
-        product_id: product.id,
-        prompt: String(prompt || "").slice(0, 450),
-        // In production, store image in S3/R2 and pass a real URL here.
-        image_data_url: imageDataUrl.slice(0, 450),
+        prompt: String(body?.prompt || "").slice(0, 450),
       },
     });
 
-    return NextResponse.json({ url: session.url });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Stripe error" }, { status: 500 });
+    return new Response(JSON.stringify({ url: session.url }), { status: 200 });
+  } catch (err: any) {
+    return new Response(JSON.stringify({ error: err?.message || "Checkout error" }), { status: 500 });
   }
 }

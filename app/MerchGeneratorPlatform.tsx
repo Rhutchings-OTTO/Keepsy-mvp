@@ -77,6 +77,13 @@ const PRESET_PROMPTS = [
   "A romantic anniversary keepsake illustration, tasteful and modern",
 ];
 
+const COMMUNITY_DESIGNS = [
+  "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=400&q=80",
+  "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&q=80",
+  "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&q=80",
+  "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=400&q=80",
+];
+
 const fadeInUp = {
   initial: { opacity: 0, y: 18 },
   animate: { opacity: 1, y: 0 },
@@ -176,7 +183,7 @@ function RealProductPreview({
 }
 
 export default function MerchGeneratorPlatform() {
-  const [view, setView] = useState<"home" | "catalog">("home");
+  const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   const [prompt, setPrompt] = useState("");
@@ -288,10 +295,13 @@ export default function MerchGeneratorPlatform() {
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-black/60">
             <button onClick={() => setView("home")} className={view === "home" ? "text-black" : ""}>
-              Create
+              How it works
             </button>
             <button onClick={() => setView("catalog")} className={view === "catalog" ? "text-black" : ""}>
               Catalog
+            </button>
+            <button onClick={() => setView("community")} className={view === "community" ? "text-black" : ""}>
+              Community
             </button>
           </div>
 
@@ -333,10 +343,10 @@ export default function MerchGeneratorPlatform() {
                   </motion.div>
 
                   <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-black mb-6 leading-[1.05]">
-                    Keep what matters —
+                    Imagine it. Generate it.
                     <br />
                     <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)" }}>
-                      turn it into a gift.
+                      Cherish it.
                     </span>
                   </motion.h1>
 
@@ -388,7 +398,7 @@ export default function MerchGeneratorPlatform() {
                             </>
                           ) : (
                             <>
-                              Generate <ArrowRight size={20} />
+                              Generate Design <ArrowRight size={20} />
                             </>
                           )}
                         </motion.button>
@@ -593,6 +603,13 @@ export default function MerchGeneratorPlatform() {
                     <button onClick={() => setStep(2)} className="mt-4 text-sm font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2">
                       <ChevronLeft size={16} /> Back
                     </button>
+                    <p className="mt-4 text-xs text-black/45">
+                      By placing your order, you agree to our{" "}
+                      <button className="underline hover:text-black" onClick={() => setView("legal")}>
+                        Terms of Service
+                      </button>
+                      .
+                    </p>
                   </div>
 
                   <div className="bg-white/70 border border-black/10 rounded-[32px] p-7 shadow-sm">
@@ -653,8 +670,69 @@ export default function MerchGeneratorPlatform() {
               </div>
             </motion.div>
           )}
+
+          {view === "community" && (
+            <motion.div key="community" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
+              <div className="text-center max-w-2xl mx-auto">
+                <h1 className="text-5xl font-black mb-3">Community Showcase</h1>
+                <p className="text-black/55 font-semibold">
+                  See what other creators are making and get inspiration for your next keepsake.
+                </p>
+              </div>
+              <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+                {COMMUNITY_DESIGNS.map((img, idx) => (
+                  <motion.div key={`${img}-${idx}`} whileHover={{ scale: 1.01 }} className="break-inside-avoid rounded-2xl overflow-hidden bg-white border border-black/10">
+                    <img src={img} alt="Community design" className="w-full h-auto" />
+                    <div className="p-3 text-sm font-semibold text-black/55">@creator_{idx + 1}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {view === "legal" && (
+            <motion.div key="legal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto space-y-6">
+              <h1 className="text-4xl font-black">Terms & Conditions</h1>
+              <section className="space-y-2 text-black/70">
+                <h2 className="text-xl font-bold text-black">1. Intellectual Property</h2>
+                <p>
+                  AI-generated designs created on Keepsy remain the property of the creator. By placing an order, you grant Keepsy
+                  permission to produce and ship products featuring that design.
+                </p>
+              </section>
+              <section className="space-y-2 text-black/70">
+                <h2 className="text-xl font-bold text-black">2. Usage Policy</h2>
+                <p>
+                  Users are responsible for uploaded and generated content. Content must not violate copyright, trademark, or contain
+                  illegal or harmful material.
+                </p>
+              </section>
+              <section className="space-y-2 text-black/70">
+                <h2 className="text-xl font-bold text-black">3. Payments & Refunds</h2>
+                <p>
+                  Payments are processed securely by Stripe. Because products are custom-made, refunds are only offered for damaged or
+                  defective items.
+                </p>
+              </section>
+              <button onClick={() => setView("home")} className="inline-flex items-center gap-2 font-bold text-black/70 hover:text-black">
+                <ChevronLeft size={16} /> Back to creation
+              </button>
+            </motion.div>
+          )}
         </AnimatePresence>
       </main>
+
+      <footer className="mt-16 py-10 px-6 border-t border-black/10 bg-white/60">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm">
+          <div className="font-semibold text-black/55">© 2026 Keepsy</div>
+          <div className="flex items-center gap-5 text-black/60">
+            <button onClick={() => setView("catalog")} className="hover:text-black">Catalog</button>
+            <button onClick={() => setView("community")} className="hover:text-black">Community</button>
+            <button onClick={() => setView("legal")} className="hover:text-black">Terms of Service</button>
+            <button onClick={() => setView("legal")} className="hover:text-black">Privacy Policy</button>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

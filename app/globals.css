@@ -4,9 +4,9 @@
 
 :root {
   --bg: #f7f1eb;
-  --ink: #2c2a28;
-  --muted: rgba(44, 42, 40, 0.62);
-  --border: rgba(44, 42, 40, 0.12);
+  --ink: #23211f;
+  --muted: rgba(35, 33, 31, 0.62);
+  --border: rgba(35, 33, 31, 0.12);
 }
 
 html,
@@ -18,9 +18,10 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* nicer defaults */
 ::selection {
   background: rgba(124, 199, 230, 0.35);
 }
@@ -28,4 +29,9 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Smooth scrolling for “Start” button */
+html {
+  scroll-behavior: smooth;
 }

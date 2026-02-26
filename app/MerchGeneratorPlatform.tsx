@@ -32,6 +32,13 @@ interface Product {
   description: string;
   colors: string[];
 }
+interface CartItem {
+  id: string;
+  product: Product;
+  imageDataUrl: string | null;
+  prompt: string;
+  quantity: number;
+}
 
 /** Match your real products */
 const PRODUCTS: Product[] = [
@@ -116,7 +123,13 @@ async function checkoutViaKeepsyAPI(args: {
   selectedProduct: Product;
   prompt: string;
   imageDataUrl: string;
+  cart?: Array<{ id: string; name: string; priceGBP: number; quantity: number }>;
 }) {
+  const normalizedCart =
+    args.cart && args.cart.length > 0
+      ? args.cart
+      : [{ id: args.selectedProduct.id, name: args.selectedProduct.name, priceGBP: args.selectedProduct.price, quantity: 1 }];
+
   const res = await fetch("/api/create-checkout-session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -129,7 +142,7 @@ async function checkoutViaKeepsyAPI(args: {
       currency: "gbp",
       prompt: args.prompt,
       imageDataUrl: args.imageDataUrl,
-      cart: [{ id: args.selectedProduct.id, name: args.selectedProduct.name, priceGBP: args.selectedProduct.price }],
+      cart: normalizedCart,
     }),
   });
 
@@ -197,9 +210,11 @@ export default function MerchGeneratorPlatform() {
 
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[2]); // default: card
   const [selectedColor, setSelectedColor] = useState(PRODUCTS[2].colors[0]);
-
-  const [cartCount, setCartCount] = useState(0);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutSuccess] = useState(false);
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const cartSubtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   const handleGenerate = async () => {
     if (!prompt && !uploadedImage) return;
@@ -219,8 +234,41 @@ export default function MerchGeneratorPlatform() {
   };
 
   const handleAddToCart = () => {
-    setCartCount((p) => p + 1);
+    const nextItemId = `${selectedProduct.id}-${generatedImage ?? "no-image"}`;
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.id === nextItemId);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === nextItemId ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: nextItemId,
+          product: selectedProduct,
+          imageDataUrl: generatedImage,
+          prompt,
+          quantity: 1,
+        },
+      ];
+    });
+    setIsCartOpen(true);
     setStep(3);
+  };
+
+  const handleRemoveCartItem = (id: string) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleAdjustQuantity = (id: string, delta: number) => {
+    setCartItems((prev) =>
+      prev
+        .map((item) =>
+          item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
   };
 
   const handleCheckout = async () => {
@@ -233,6 +281,34 @@ export default function MerchGeneratorPlatform() {
         imageDataUrl: generatedImage,
       });
       // redirect to Stripe Checkout
+      window.location.href = url;
+    } catch (e) {
+      console.error(e);
+      alert(e instanceof Error ? e.message : "Checkout failed");
+      setIsBusy(false);
+    }
+  };
+
+  const handleCartCheckout = async () => {
+    if (cartItems.length === 0) return;
+    const firstItem = cartItems[0];
+    if (!firstItem.imageDataUrl) {
+      alert("Please generate a design before checking out.");
+      return;
+    }
+    setIsBusy(true);
+    try {
+      const url = await checkoutViaKeepsyAPI({
+        selectedProduct: firstItem.product,
+        prompt: firstItem.prompt,
+        imageDataUrl: firstItem.imageDataUrl,
+        cart: cartItems.map((item) => ({
+          id: item.product.id,
+          name: item.product.name,
+          priceGBP: item.product.price * item.quantity,
+          quantity: item.quantity,
+        })),
+      });
       window.location.href = url;
     } catch (e) {
       console.error(e);
@@ -285,9 +361,9 @@ export default function MerchGeneratorPlatform() {
           <Image
             src="/keepsy-logo.png"
             alt="Keepsy"
-            width={210}
-            height={60}
-            className="h-10 w-auto object-contain"
+            width={320}
+            height={92}
+            className="h-14 w-auto object-contain"
           />
         </motion.div>
 
@@ -304,7 +380,10 @@ export default function MerchGeneratorPlatform() {
             </button>
           </div>
 
-          <div className="flex items-center gap-2 bg-black/5 hover:bg-black/10 transition-all px-4 py-2 rounded-full">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="flex items-center gap-2 bg-black/5 hover:bg-black/10 transition-all px-4 py-2 rounded-full"
+          >
             <ShoppingCart size={18} className="text-black/70" />
             <motion.span
               key={cartCount}
@@ -314,7 +393,7 @@ export default function MerchGeneratorPlatform() {
             >
               {cartCount}
             </motion.span>
-          </div>
+          </button>
         </div>
       </nav>
 
@@ -458,17 +537,34 @@ export default function MerchGeneratorPlatform() {
                       { Icon: CreditCard, label: "Cards" },
                       { Icon: Layout, label: "Hoodies" },
                     ].map(({ Icon, label }) => (
-                      <motion.div key={label} whileHover={{ scale: 1.06, opacity: 1 }} className="flex flex-col items-center gap-2">
+                      <motion.button
+                        key={label}
+                        whileHover={{ scale: 1.06, opacity: 1 }}
+                        className="flex flex-col items-center gap-2"
+                        onClick={() => {
+                          const typeMap: Record<string, MerchType> = {
+                            "T-Shirts": "tshirt",
+                            Mugs: "mug",
+                            Cards: "card",
+                            Hoodies: "hoodie",
+                          };
+                          const product = PRODUCTS.find((p) => p.type === typeMap[label]);
+                          if (!product) return;
+                          setSelectedProduct(product);
+                          setSelectedColor(product.colors[0]);
+                          setStep(2);
+                        }}
+                      >
                         <Icon size={28} />
                         <span className="font-extrabold text-xs uppercase tracking-widest">{label}</span>
-                      </motion.div>
+                      </motion.button>
                     ))}
                   </motion.div>
                 </motion.div>
               )}
 
               {/* STEP 2 */}
-              {step === 2 && generatedImage && (
+              {step === 2 && (
                 <motion.div
                   key="step2"
                   initial={{ opacity: 0, x: 40 }}
@@ -663,7 +759,7 @@ export default function MerchGeneratorPlatform() {
                     onClick={() => {
                       setSelectedProduct(p);
                       setView("home");
-                      setStep(1);
+                      setStep(2);
                     }}
                   >
                     <div className="text-lg font-black">{p.name}</div>
@@ -686,7 +782,7 @@ export default function MerchGeneratorPlatform() {
               <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
                 {COMMUNITY_DESIGNS.map((img, idx) => (
                   <motion.div key={`${img}-${idx}`} whileHover={{ scale: 1.01 }} className="break-inside-avoid rounded-2xl overflow-hidden bg-white border border-black/10">
-                    <img src={img} alt="Community design" className="w-full h-auto" />
+                    <Image src={img} alt="Community design" width={400} height={500} className="w-full h-auto" />
                     <div className="p-3 text-sm font-semibold text-black/55">@creator_{idx + 1}</div>
                   </motion.div>
                 ))}
@@ -726,9 +822,90 @@ export default function MerchGeneratorPlatform() {
         </AnimatePresence>
       </main>
 
+      <AnimatePresence>
+        {isCartOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/30 z-50"
+              onClick={() => setIsCartOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: 420 }}
+              animate={{ x: 0 }}
+              exit={{ x: 420 }}
+              transition={{ type: "spring", stiffness: 260, damping: 28 }}
+              className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 border-l border-black/10 shadow-2xl p-6 flex flex-col"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-2xl font-black">Your Cart</h3>
+                <button onClick={() => setIsCartOpen(false)} className="text-black/50 hover:text-black">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-auto space-y-4 pr-1">
+                {cartItems.length === 0 ? (
+                  <p className="text-black/55">Your cart is empty.</p>
+                ) : (
+                  cartItems.map((item) => (
+                    <div key={item.id} className="border border-black/10 rounded-2xl p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-black/5 border border-black/10">
+                          {item.imageDataUrl ? (
+                            <Image src={item.imageDataUrl} alt={item.product.name} fill className="object-cover" />
+                          ) : (
+                            <Image src="/keepsy-logo.png" alt={item.product.name} fill className="object-contain p-2" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-bold text-sm">{item.product.name}</div>
+                          <div className="text-black/55 text-sm">{gbp(item.product.price)}</div>
+                        </div>
+                        <button onClick={() => handleRemoveCartItem(item.id)} className="text-black/40 hover:text-red-600">
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleAdjustQuantity(item.id, -1)} className="px-2 py-1 border border-black/10 rounded-md">
+                            -
+                          </button>
+                          <span className="font-semibold text-sm w-6 text-center">{item.quantity}</span>
+                          <button onClick={() => handleAdjustQuantity(item.id, 1)} className="px-2 py-1 border border-black/10 rounded-md">
+                            +
+                          </button>
+                        </div>
+                        <div className="font-bold">{gbp(item.product.price * item.quantity)}</div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="pt-4 border-t border-black/10">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-black/55 font-semibold">Subtotal</span>
+                  <span className="text-xl font-black">{gbp(cartSubtotal)}</span>
+                </div>
+                <button
+                  onClick={handleCartCheckout}
+                  disabled={isBusy || cartItems.length === 0}
+                  className="w-full py-3 rounded-xl bg-black text-white font-extrabold disabled:opacity-40"
+                >
+                  {isBusy ? "Redirecting..." : "Checkout"}
+                </button>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
       <footer className="py-10 px-6 border-t border-black/10 bg-white/60">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm">
-          <div className="font-semibold text-black/55">© 2026 Keepsy</div>
+          <div className="font-semibold text-black/55">
+            © 2026 Keepsy Ltd. All designs generated are owned by the creator. Powered by OpenAI & Stripe
+          </div>
           <div className="flex items-center gap-5 text-black/60">
             <button onClick={() => setView("catalog")} className="hover:text-black">Catalog</button>
             <button onClick={() => setView("community")} className="hover:text-black">Community</button>

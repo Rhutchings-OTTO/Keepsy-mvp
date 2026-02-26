@@ -434,7 +434,7 @@ export default function MerchGeneratorPlatform() {
                   </motion.h1>
 
                   <motion.p variants={fadeInUp} className="text-lg text-black/55 mb-10 max-w-2xl leading-relaxed">
-                    Describe a memory or upload a photo. Keepsy generates a beautiful keepsake and applies it to real product mockups instantly.
+                    Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
                   </motion.p>
 
                   <motion.div variants={fadeInUp} className="w-full relative group">

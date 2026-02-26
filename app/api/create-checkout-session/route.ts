@@ -64,8 +64,8 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      success_url: `${baseUrl}/?success=1`,
-      cancel_url: `${baseUrl}/?canceled=1`,
+      success_url: `${baseUrl}/create?success=1`,
+      cancel_url: `${baseUrl}/create?canceled=1`,
       metadata: {
         prompt: String(body?.prompt || "").slice(0, 450),
       },

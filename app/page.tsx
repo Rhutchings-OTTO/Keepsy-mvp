@@ -1,5 +1,5 @@
-import MerchGeneratorPlatform from "./MerchGeneratorPlatform";
+import LandingPage from "./LandingPage";
 
 export default function Page() {
-  return <MerchGeneratorPlatform />;
+  return <LandingPage />;
 }

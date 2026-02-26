@@ -202,10 +202,11 @@ export default function MerchGeneratorPlatform() {
   const [checkoutSuccess] = useState(false);
 
   const handleGenerate = async () => {
-    if (!prompt) return;
+    if (!prompt && !uploadedImage) return;
     setIsBusy(true);
     try {
-      const imageDataUrl = await generateViaKeepsyAPI(prompt);
+      const effectivePrompt = prompt || "Create a polished keepsake design from this uploaded image.";
+      const imageDataUrl = await generateViaKeepsyAPI(effectivePrompt);
       setGeneratedImage(imageDataUrl);
       setStep(2);
       setView("home");
@@ -255,7 +256,7 @@ export default function MerchGeneratorPlatform() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F1EB] text-[#23211F] selection:bg-indigo-100 overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-[#F7F1EB] text-[#23211F] selection:bg-indigo-100 overflow-x-hidden">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
         <motion.div
@@ -281,15 +282,13 @@ export default function MerchGeneratorPlatform() {
             setStep(1);
           }}
         >
-          {/* YOUR REAL LOGO */}
           <Image
-            src="/logo.png"
+            src="/keepsy-logo.png"
             alt="Keepsy"
-            width={40}
-            height={40}
-            className="w-10 h-10 rounded-xl shadow-sm border border-black/5 bg-white"
+            width={210}
+            height={60}
+            className="h-10 w-auto object-contain"
           />
-          <span className="font-extrabold text-2xl tracking-tight">keepsy</span>
         </motion.div>
 
         <div className="flex items-center gap-4">
@@ -319,7 +318,7 @@ export default function MerchGeneratorPlatform() {
         </div>
       </nav>
 
-      <main className="pt-24 pb-16 px-6 max-w-7xl mx-auto">
+      <main className="flex-1 pt-24 pb-16 px-6 max-w-7xl mx-auto w-full">
         <AnimatePresence mode="wait">
           {view === "home" && (
             <div className="space-y-20">
@@ -345,9 +344,14 @@ export default function MerchGeneratorPlatform() {
                   <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-black mb-6 leading-[1.05]">
                     Imagine it. Generate it.
                     <br />
-                    <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)" }}>
+                    <motion.span
+                      className="bg-clip-text text-transparent"
+                      style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)", backgroundSize: "200% auto" }}
+                      animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                      transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                    >
                       Cherish it.
-                    </span>
+                    </motion.span>
                   </motion.h1>
 
                   <motion.p variants={fadeInUp} className="text-lg text-black/55 mb-10 max-w-2xl leading-relaxed">
@@ -386,7 +390,7 @@ export default function MerchGeneratorPlatform() {
 
                         <motion.button
                           onClick={handleGenerate}
-                          disabled={!prompt || isBusy}
+                          disabled={(!prompt && !uploadedImage) || isBusy}
                           className={`px-8 py-4 rounded-xl font-extrabold text-white flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 ${
                             isBusy ? "bg-black/35 cursor-not-allowed" : "bg-black hover:bg-black/90"
                           }`}
@@ -722,7 +726,7 @@ export default function MerchGeneratorPlatform() {
         </AnimatePresence>
       </main>
 
-      <footer className="mt-16 py-10 px-6 border-t border-black/10 bg-white/60">
+      <footer className="py-10 px-6 border-t border-black/10 bg-white/60">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm">
           <div className="font-semibold text-black/55">© 2026 Keepsy</div>
           <div className="flex items-center gap-5 text-black/60">

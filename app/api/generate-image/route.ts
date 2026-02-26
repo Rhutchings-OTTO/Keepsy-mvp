@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import {
+  enforceUsageGuards,
+  fetchWithBackoff,
+  sanitizePrompt,
+} from "./guardrails";
 
 export async function POST(req: Request) {
   try {
@@ -11,18 +16,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid prompt" }, { status: 400 });
     }
 
-    // Using OpenAI Images API (base64 output)
-    // Docs: Image generation guide + Images methods. :contentReference[oaicite:4]{index=4}
-    const resp = await fetch("https://api.openai.com/v1/images/generations", {
+    const usageCheck = await enforceUsageGuards(req);
+    if (!usageCheck.ok) {
+      return NextResponse.json({ error: usageCheck.error }, { status: usageCheck.status });
+    }
+
+    const promptCheck = sanitizePrompt(prompt);
+    if (!promptCheck.ok) {
+      return NextResponse.json({ error: promptCheck.error }, { status: 400 });
+    }
+
+    // Using OpenAI Images API (base64 output) with retries/backoff for 429s/timeouts.
+    const resp = await fetchWithBackoff("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        // Use a supported image model for your account (example shown in docs includes GPT image models). :contentReference[oaicite:5]{index=5}
         model: "gpt-image-1",
-        prompt,
+        prompt: promptCheck.prompt,
         size: "1024x1024",
       }),
     });

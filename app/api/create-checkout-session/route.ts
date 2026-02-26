@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { createHash } from "crypto";
 
 type CheckoutBody = {
   cart?: Array<{ priceGBP?: unknown }>;
@@ -47,29 +48,39 @@ export async function POST(req: Request) {
     const baseUrl = (requestOrigin || configuredSiteUrl).replace(/\/$/, "");
 
     const productName = typeof body?.product?.name === "string" ? body.product.name : "Keepsy order";
-
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "gbp",
-            product_data: {
-              name: productName,
-              description: "Custom AI keepsake print",
-            },
-            unit_amount: amount,
-          },
-          quantity: 1,
-        },
-      ],
-      success_url: `${baseUrl}/create?success=1`,
-      cancel_url: `${baseUrl}/create?canceled=1`,
-      metadata: {
-        prompt: String(body?.prompt || "").slice(0, 450),
-      },
+    const idempotencySource = JSON.stringify({
+      productName,
+      totalGBP,
+      prompt: String(body?.prompt || "").slice(0, 450),
+      date: new Date().toISOString().slice(0, 10),
     });
+    const idempotencyKey = createHash("sha256").update(idempotencySource).digest("hex").slice(0, 32);
+
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: "payment",
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "gbp",
+              product_data: {
+                name: productName,
+                description: "Custom AI keepsake print",
+              },
+              unit_amount: amount,
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: `${baseUrl}/create?success=1`,
+        cancel_url: `${baseUrl}/create?canceled=1`,
+        metadata: {
+          prompt: String(body?.prompt || "").slice(0, 450),
+        },
+      },
+      { idempotencyKey }
+    );
 
     return new Response(JSON.stringify({ url: session.url }), { status: 200 });
   } catch (err: unknown) {

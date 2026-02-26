@@ -101,11 +101,24 @@ function gbp(n: number) {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n);
 }
 
+function getVisitorId(): string {
+  if (typeof window === "undefined") return "server";
+  const storageKey = "keepsy_visitor_id";
+  const existing = window.localStorage.getItem(storageKey);
+  if (existing) return existing;
+  const created = window.crypto?.randomUUID?.() || `visitor-${Date.now()}`;
+  window.localStorage.setItem(storageKey, created);
+  return created;
+}
+
 /** Uses YOUR real API route */
 async function generateViaKeepsyAPI(prompt: string) {
   const res = await fetch("/api/generate-image", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-visitor-id": getVisitorId(),
+    },
     body: JSON.stringify({
       prompt,
       style: "watercolor",
@@ -159,25 +172,68 @@ function RealProductPreview({
   type: MerchType;
   imageDataUrl: string | null;
 }) {
-  // map to your actual filenames
-  const fileMap: Record<MerchType, string> = {
-    tshirt: "/product-tiles/tee.jpg",
-    mug: "/product-tiles/mug.jpg",
-    card: "/product-tiles/card.jpg",
-    hoodie: "/product-tiles/hoodie.jpg",
+  type ImageFormat = "portrait" | "landscape" | "square";
+
+  // Use format-aware base mockups so previews look natural for each generated image shape.
+  const fileMap: Record<MerchType, Record<ImageFormat, string>> = {
+    tshirt: {
+      square: "/product-tiles/tee.jpg",
+      landscape: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1200&q=80",
+      portrait: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&q=80",
+    },
+    mug: {
+      square: "/product-tiles/mug.jpg",
+      landscape: "https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?w=1200&q=80",
+      portrait: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=80",
+    },
+    card: {
+      square: "/product-tiles/card.jpg",
+      landscape: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1200&q=80",
+      portrait: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=1200&q=80",
+    },
+    hoodie: {
+      square: "/product-tiles/hoodie.jpg",
+      landscape: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=1200&q=80",
+      portrait: "https://images.unsplash.com/photo-1618354691415-0f45f9d6f68f?w=1200&q=80",
+    },
   };
 
-  // overlay placements (tweak later if needed)
-  const overlay: Record<MerchType, React.CSSProperties> = {
-    card: { top: "23%", left: "36%", width: "28%", height: "52%" },
-    tshirt: { top: "30%", left: "34%", width: "32%", height: "38%" },
-    mug: { top: "32%", left: "35%", width: "30%", height: "33%" },
-    hoodie: { top: "30%", left: "34%", width: "32%", height: "38%" },
+  const [imageFormat, setImageFormat] = useState<ImageFormat>("square");
+
+  // Fit presets by product + generated image format.
+  const overlayByFormat: Record<MerchType, Record<ImageFormat, React.CSSProperties>> = {
+    card: {
+      landscape: { top: "31%", left: "29%", width: "42%", height: "30%" },
+      portrait: { top: "23%", left: "35%", width: "30%", height: "52%" },
+      square: { top: "29%", left: "33%", width: "34%", height: "38%" },
+    },
+    tshirt: {
+      landscape: { top: "36%", left: "30%", width: "40%", height: "22%" },
+      portrait: { top: "29%", left: "35%", width: "30%", height: "43%" },
+      square: { top: "32%", left: "33%", width: "34%", height: "33%" },
+    },
+    mug: {
+      landscape: { top: "38%", left: "31%", width: "38%", height: "19%" },
+      portrait: { top: "32%", left: "37%", width: "25%", height: "35%" },
+      square: { top: "35%", left: "35%", width: "30%", height: "28%" },
+    },
+    hoodie: {
+      landscape: { top: "35%", left: "30%", width: "40%", height: "24%" },
+      portrait: { top: "29%", left: "35%", width: "30%", height: "43%" },
+      square: { top: "32%", left: "33%", width: "34%", height: "33%" },
+    },
   };
+
+  const currentFormat: ImageFormat = imageDataUrl ? imageFormat : "square";
 
   return (
     <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-2xl border border-black/10 bg-white">
-      <Image src={fileMap[type]} className="absolute inset-0 w-full h-full object-cover" alt="Product mockup" fill />
+      <Image
+        src={fileMap[type][currentFormat]}
+        className="absolute inset-0 w-full h-full object-cover"
+        alt="Product mockup"
+        fill
+      />
       {imageDataUrl && (
         <motion.img
           key={imageDataUrl}
@@ -185,9 +241,15 @@ function RealProductPreview({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
           src={imageDataUrl}
+          onLoad={(event) => {
+            const ratio = event.currentTarget.naturalWidth / event.currentTarget.naturalHeight;
+            if (ratio > 1.2) setImageFormat("landscape");
+            else if (ratio < 0.8) setImageFormat("portrait");
+            else setImageFormat("square");
+          }}
           alt="Applied design"
           className="absolute rounded-xl shadow-xl border border-black/10 bg-white"
-          style={{ ...overlay[type], objectFit: "cover" }}
+          style={{ ...overlayByFormat[type][currentFormat], objectFit: "cover" }}
         />
       )}
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/0 via-black/0 to-black/10" />
@@ -320,9 +382,40 @@ export default function MerchGeneratorPlatform() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const validTypes = ["image/jpeg", "image/png"];
+    const maxFileSizeBytes = 5 * 1024 * 1024;
+
+    if (!validTypes.includes(file.type)) {
+      alert("Please upload a JPG or PNG image.");
+      return;
+    }
+    if (file.size > maxFileSizeBytes) {
+      alert("Please upload an image under 5MB.");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => setUploadedImage(reader.result as string);
     reader.readAsDataURL(file);
+  };
+
+  const handleDeleteMyData = async () => {
+    const email = window.prompt("Optional: enter your email for the deletion confirmation");
+    try {
+      const response = await fetch("/api/delete-my-data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-visitor-id": getVisitorId(),
+        },
+        body: JSON.stringify({ email: email || undefined }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || "Failed to submit request.");
+      alert("Your delete request has been submitted.");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to submit request.");
+    }
   };
 
   const clearUploadedImage = (e: React.MouseEvent) => {
@@ -911,6 +1004,9 @@ export default function MerchGeneratorPlatform() {
             <button onClick={() => setView("community")} className="hover:text-black">Community</button>
             <button onClick={() => setView("legal")} className="hover:text-black">Terms of Service</button>
             <button onClick={() => setView("legal")} className="hover:text-black">Privacy Policy</button>
+            <button className="hover:text-black" onClick={handleDeleteMyData}>
+              Delete My Data
+            </button>
           </div>
         </div>
       </footer>

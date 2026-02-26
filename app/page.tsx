@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 
 type Recipient = "Mom" | "Dad" | "Grandma" | "Grandpa" | "Partner" | "Friend";
 type Theme = "Warm, sentimental" | "Minimal, modern" | "Classic portrait" | "Playful, cute";
@@ -87,14 +88,13 @@ function PillButton({
 
 /**
  * Real photo tile + dynamic overlay
- * Uses files in /public/product-tiles/{id}.jpg
+ * Uses files in /public/product-tiles/{id}.jpg:
+ * card.jpg, tee.jpg, mug.jpg, hoodie.jpg
  */
 function ProductTile({ id, imageSrc }: { id: ProductId; imageSrc: string | null }) {
   const base = `/product-tiles/${id}.jpg`;
 
-  // overlay placement tuned for “generic product tile with blank print space”
-  // if you want PERFECT placement per photo, tell me and I’ll calibrate each.
-  const overlayById: Record<ProductId, React.CSSProperties> = {
+  const overlayById: Record<ProductId, CSSProperties> = {
     card: { top: "20%", left: "28%", width: "44%", height: "52%" },
     tee: { top: "26%", left: "33%", width: "34%", height: "40%" },
     mug: { top: "26%", left: "30%", width: "40%", height: "44%" },
@@ -110,7 +110,7 @@ function ProductTile({ id, imageSrc }: { id: ProductId; imageSrc: string | null 
           alt="Design preview"
           className="absolute rounded-lg shadow-lg"
           style={{
-            ...overlayById[id],
+            ...(overlayById[id] as CSSProperties),
             objectFit: "cover",
             border: "1px solid rgba(0,0,0,0.10)",
             background: "white",

@@ -91,6 +91,24 @@ const COMMUNITY_DESIGNS = [
   "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=400&q=80",
 ];
 
+const CREATOR_TESTIMONIALS = [
+  {
+    name: "Sarah J.",
+    quote: "The AI generated exactly what I was looking for! The t-shirt quality is superb.",
+    initials: "SJ",
+  },
+  {
+    name: "Marcus L.",
+    quote: "Uploaded a photo of my dog and the AI turned it into a masterpiece on a mug.",
+    initials: "ML",
+  },
+  {
+    name: "Elena R.",
+    quote: "Fast shipping and beautiful packaging. Will definitely order again.",
+    initials: "ER",
+  },
+];
+
 const fadeInUp = {
   initial: { opacity: 0, y: 18 },
   animate: { opacity: 1, y: 0 },
@@ -441,7 +459,7 @@ export default function MerchGeneratorPlatform() {
       </div>
 
       {/* NAV */}
-      <nav className="fixed top-0 w-full z-50 bg-white/75 backdrop-blur-md border-b border-black/5 px-6 py-4 flex items-center justify-between">
+      <nav className="fixed top-16 w-full z-40 bg-white/75 backdrop-blur-md border-b border-black/5 px-6 py-4 flex items-center justify-between">
         <motion.div
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
@@ -490,7 +508,7 @@ export default function MerchGeneratorPlatform() {
         </div>
       </nav>
 
-      <main className="flex-1 pt-24 pb-16 px-6 max-w-7xl mx-auto w-full">
+      <main className="flex-1 pt-40 pb-16 px-6 max-w-7xl mx-auto w-full">
         <AnimatePresence mode="wait">
           {view === "home" && (
             <div className="space-y-20">
@@ -653,6 +671,29 @@ export default function MerchGeneratorPlatform() {
                       </motion.button>
                     ))}
                   </motion.div>
+
+                  <motion.section variants={fadeInUp} className="mt-16 w-full">
+                    <h2 className="text-4xl md:text-5xl font-black text-center mb-8">What our creators say</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                      {CREATOR_TESTIMONIALS.map((testimonial) => (
+                        <article
+                          key={testimonial.name}
+                          className="rounded-3xl border border-black/10 bg-white/80 p-6 text-center shadow-sm"
+                        >
+                          <div className="mx-auto h-14 w-14 rounded-full bg-gradient-to-br from-[#7DB9E8]/80 to-[#F8C8DC]/80 text-white font-black flex items-center justify-center border border-white">
+                            {testimonial.initials}
+                          </div>
+                          <div className="mt-4 flex items-center justify-center gap-1">
+                            {Array.from({ length: 5 }).map((_, index) => (
+                              <Star key={`${testimonial.name}-${index}`} size={15} className="text-yellow-500 fill-yellow-500" />
+                            ))}
+                          </div>
+                          <p className="mt-4 text-lg italic text-black/70">&quot;{testimonial.quote}&quot;</p>
+                          <p className="mt-4 text-2xl font-black">{testimonial.name}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </motion.section>
                 </motion.div>
               )}
 

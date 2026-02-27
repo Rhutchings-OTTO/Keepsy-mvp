@@ -543,8 +543,18 @@ export default function MerchGeneratorPlatform() {
             alt="Keepsy"
             width={420}
             height={120}
-            className="h-16 w-auto object-contain"
+            className="hidden h-16 w-auto object-contain sm:block"
           />
+          <span
+            className="text-3xl font-black tracking-tight text-transparent sm:hidden"
+            style={{
+              backgroundImage: "linear-gradient(90deg,#5FA8E8,#88C6D8,#F2B287,#9F82C7)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+            }}
+          >
+            keepsy
+          </span>
         </motion.div>
 
         <div className="flex items-center gap-4">

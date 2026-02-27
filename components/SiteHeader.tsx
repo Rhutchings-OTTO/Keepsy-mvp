@@ -33,7 +33,23 @@ export function SiteHeader() {
           })}
         </nav>
         <Link href="/" aria-label="Go to homepage">
-          <Image src="/keepsy-logo.svg" alt="Keepsy" width={280} height={80} className="h-11 w-auto object-contain sm:h-12" />
+          <Image
+            src="/keepsy-logo.svg"
+            alt="Keepsy"
+            width={280}
+            height={80}
+            className="hidden h-11 w-auto object-contain sm:block sm:h-12"
+          />
+          <span
+            className="text-2xl font-black tracking-tight text-transparent sm:hidden"
+            style={{
+              backgroundImage: "linear-gradient(90deg,#5FA8E8,#88C6D8,#F2B287,#9F82C7)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+            }}
+          >
+            keepsy
+          </span>
         </Link>
       </div>
     </header>

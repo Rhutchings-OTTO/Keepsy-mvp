@@ -133,11 +133,17 @@ export function sanitizePrompt(input: string): { ok: true; prompt: string } | { 
   return { ok: true, prompt: safePrompt };
 }
 
-export async function fetchWithBackoff(url: string, init: RequestInit, retries = 3): Promise<Response> {
+export async function fetchWithBackoff(
+  url: string,
+  init: RequestInit,
+  options?: { retries?: number; timeoutMs?: number }
+): Promise<Response> {
+  const retries = options?.retries ?? 3;
+  const timeoutMs = options?.timeoutMs ?? 25_000;
   let lastError: unknown = null;
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25_000);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const response = await fetch(url, { ...init, signal: controller.signal });
       clearTimeout(timeout);

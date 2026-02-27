@@ -12,7 +12,7 @@ const FLOATING_EXAMPLES = [
     product: "T-Shirt",
     image:
       "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&q=80",
-    className: "top-[12%] left-[6%] w-40",
+    className: "hidden xl:block top-[10%] left-[2%] w-36 2xl:w-40",
   },
   {
     id: "pet-mug",
@@ -20,7 +20,7 @@ const FLOATING_EXAMPLES = [
     product: "Mug",
     image:
       "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&q=80",
-    className: "top-[24%] right-[8%] w-44",
+    className: "hidden xl:block top-[12%] right-[2%] w-40 2xl:w-44",
   },
   {
     id: "cartoon-hoodie",
@@ -28,7 +28,7 @@ const FLOATING_EXAMPLES = [
     product: "Hoodie",
     image:
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80",
-    className: "bottom-[25%] left-[12%] w-48",
+    className: "hidden xl:block bottom-[14%] left-[3%] w-44 2xl:w-48",
   },
   {
     id: "kids-card",
@@ -36,7 +36,7 @@ const FLOATING_EXAMPLES = [
     product: "Card",
     image:
       "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=600&q=80",
-    className: "bottom-[12%] right-[12%] w-40",
+    className: "hidden xl:block bottom-[14%] right-[3%] w-36 2xl:w-40",
   },
   {
     id: "anniversary-card",
@@ -44,7 +44,7 @@ const FLOATING_EXAMPLES = [
     product: "Card",
     image:
       "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&q=80",
-    className: "top-[10%] right-[28%] w-36",
+    className: "hidden 2xl:block top-[6%] right-[20%] w-36",
   },
   {
     id: "baby-tee",
@@ -52,7 +52,7 @@ const FLOATING_EXAMPLES = [
     product: "T-Shirt",
     image:
       "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=600&q=80",
-    className: "top-[36%] left-[2%] w-32",
+    className: "hidden 2xl:block top-[38%] left-[0.5%] w-32",
   },
   {
     id: "dog-hoodie",
@@ -60,7 +60,7 @@ const FLOATING_EXAMPLES = [
     product: "Hoodie",
     image:
       "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=600&q=80",
-    className: "bottom-[10%] left-[32%] w-44",
+    className: "hidden 2xl:block bottom-[4%] left-[20%] w-44",
   },
   {
     id: "holiday-mug",
@@ -68,7 +68,7 @@ const FLOATING_EXAMPLES = [
     product: "Mug",
     image:
       "https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=600&q=80",
-    className: "top-[52%] right-[22%] w-36",
+    className: "hidden 2xl:block top-[44%] right-[15%] w-36",
   },
   {
     id: "kids-art-card",
@@ -76,7 +76,7 @@ const FLOATING_EXAMPLES = [
     product: "Card",
     image:
       "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=600&q=80",
-    className: "bottom-[24%] right-[4%] w-28",
+    className: "hidden 2xl:block bottom-[32%] right-[0.5%] w-28",
   },
   {
     id: "family-hoodie",
@@ -84,7 +84,7 @@ const FLOATING_EXAMPLES = [
     product: "Hoodie",
     image:
       "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
-    className: "top-[20%] left-[22%] w-52",
+    className: "hidden 2xl:block top-[26%] left-[16%] w-52",
   },
 ];
 
@@ -134,7 +134,7 @@ export default function LandingPage() {
       </header>
 
       <main className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
-        <div className="max-w-4xl text-center">
+        <div className="relative z-20 max-w-4xl text-center">
           <p className="mb-4 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
             AI-powered creativity
           </p>
@@ -171,7 +171,7 @@ export default function LandingPage() {
           </motion.p>
         </div>
 
-        <div className="pointer-events-none absolute inset-0 hidden lg:block">
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           {FLOATING_EXAMPLES.map((example, i) => (
             <motion.div
               key={example.id}

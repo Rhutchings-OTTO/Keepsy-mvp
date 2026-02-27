@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -129,23 +129,49 @@ function getVisitorId(): string {
   return created;
 }
 
+function getFriendlyGenerationError(error: unknown): string {
+  if (!(error instanceof Error)) return "Failed to generate. Please try again.";
+  const message = error.message || "Failed to generate. Please try again.";
+  const lower = message.toLowerCase();
+
+  if (lower.includes("safety system") || lower.includes("content policy")) {
+    return "That image or prompt was blocked by safety checks. Please try a different photo or wording.";
+  }
+
+  if (lower.includes("daily generation limit")) {
+    return "You reached today's generation limit. Please try again tomorrow.";
+  }
+
+  return message;
+}
+
 /** Uses YOUR real API route */
-async function generateViaKeepsyAPI(prompt: string) {
+async function generateViaKeepsyAPI(args: {
+  prompt: string;
+  sourceImageDataUrl?: string | null;
+  signal?: AbortSignal;
+}) {
   const res = await fetch("/api/generate-image", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-visitor-id": getVisitorId(),
     },
+    signal: args.signal,
     body: JSON.stringify({
-      prompt,
+      prompt: args.prompt,
+      sourceImageDataUrl: args.sourceImageDataUrl ?? null,
       style: "watercolor",
       quality: "high",
     }),
   });
 
   const data = await res.json();
-  if (!res.ok) throw new Error(data?.error || "Failed to generate image");
+  if (!res.ok) {
+    const error = new Error(data?.error || "Failed to generate image") as Error & { status?: number };
+    error.status = res.status;
+    throw error;
+  }
   return data.imageDataUrl as string; // IMPORTANT: this is a data URL
 }
 
@@ -283,10 +309,11 @@ export default function MerchGeneratorPlatform() {
   const [isBusy, setIsBusy] = useState(false);
 
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
 
-  // We keep upload UI for later, but generation uses prompt only (to avoid rewriting your API route today).
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const generateAbortRef = useRef<AbortController | null>(null);
 
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[2]); // default: card
   const [selectedColor, setSelectedColor] = useState(PRODUCTS[2].colors[0]);
@@ -296,19 +323,57 @@ export default function MerchGeneratorPlatform() {
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartSubtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
+  useEffect(() => {
+    return () => {
+      generateAbortRef.current?.abort();
+      generateAbortRef.current = null;
+    };
+  }, []);
+
   const handleGenerate = async () => {
     if (!prompt && !uploadedImage) return;
+    generateAbortRef.current?.abort();
+    const controller = new AbortController();
+    generateAbortRef.current = controller;
+    const timeout = window.setTimeout(() => controller.abort(), 120_000);
+    setGenerationError(null);
     setIsBusy(true);
     try {
       const effectivePrompt = prompt || "Create a polished keepsake design from this uploaded image.";
-      const imageDataUrl = await generateViaKeepsyAPI(effectivePrompt);
+      let imageDataUrl: string | null = null;
+      const maxAttempts = 2;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        try {
+          imageDataUrl = await generateViaKeepsyAPI({
+            prompt: effectivePrompt,
+            sourceImageDataUrl: uploadedImage,
+            signal: controller.signal,
+          });
+          break;
+        } catch (error) {
+          const status = (error as Error & { status?: number })?.status;
+          const retryable = status === 429 || status === 503;
+          const isLastAttempt = attempt === maxAttempts - 1;
+          if (!retryable || isLastAttempt) throw error;
+          await new Promise((resolve) => setTimeout(resolve, 600 * (attempt + 1)));
+        }
+      }
+
+      if (!imageDataUrl) throw new Error("Failed to generate image");
       setGeneratedImage(imageDataUrl);
+      setGenerationError(null);
       setStep(2);
       setView("home");
     } catch (e) {
       console.error(e);
-      alert(e instanceof Error ? e.message : "Failed to generate");
+      const aborted = e instanceof Error && e.name === "AbortError";
+      setGenerationError(aborted ? "Generation timed out. Please try again." : getFriendlyGenerationError(e));
     } finally {
+      clearTimeout(timeout);
+      if (generateAbortRef.current === controller) {
+        generateAbortRef.current = null;
+      }
       setIsBusy(false);
     }
   };
@@ -413,7 +478,10 @@ export default function MerchGeneratorPlatform() {
     }
 
     const reader = new FileReader();
-    reader.onloadend = () => setUploadedImage(reader.result as string);
+    reader.onloadend = () => {
+      setUploadedImage(reader.result as string);
+      setGenerationError(null);
+    };
     reader.readAsDataURL(file);
   };
 
@@ -439,6 +507,7 @@ export default function MerchGeneratorPlatform() {
   const clearUploadedImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     setUploadedImage(null);
+    setGenerationError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -558,7 +627,10 @@ export default function MerchGeneratorPlatform() {
                           <input
                             type="text"
                             value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
+                            onChange={(e) => {
+                              setPrompt(e.target.value);
+                              if (generationError) setGenerationError(null);
+                            }}
                             placeholder={uploadedImage ? "Add instructions for your photo..." : "Describe your gift image…"}
                             className="flex-1 py-4 outline-none text-base md:text-lg placeholder:text-black/25 font-semibold bg-transparent"
                           />
@@ -570,7 +642,7 @@ export default function MerchGeneratorPlatform() {
                               className={`p-3 rounded-xl transition-all flex items-center gap-2 ${
                                 uploadedImage ? "bg-black/5 text-black" : "text-black/45 hover:bg-black/5 hover:text-black"
                               }`}
-                              title="Upload a photo (UI only for now)"
+                              title="Upload a photo"
                             >
                               <Upload size={20} />
                               {uploadedImage && <span className="text-xs font-extrabold hidden sm:inline">Photo added</span>}
@@ -599,6 +671,19 @@ export default function MerchGeneratorPlatform() {
                       </div>
 
                       <AnimatePresence>
+                        {generationError && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            className="mx-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
+                          >
+                            {generationError}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+
+                      <AnimatePresence>
                         {uploadedImage && (
                           <motion.div
                             initial={{ opacity: 0, height: 0, scale: 0.98 }}
@@ -618,7 +703,7 @@ export default function MerchGeneratorPlatform() {
                               </motion.button>
                             </div>
                             <p className="text-[10px] text-black/45 mt-1 font-semibold italic">
-                              Upload UI is enabled — we’ll wire photo-to-image properly next.
+                              Uploaded photo will be used as the generation source.
                             </p>
                           </motion.div>
                         )}

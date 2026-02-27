@@ -33,7 +33,7 @@ export function SiteHeader() {
           })}
         </nav>
         <Link href="/" aria-label="Go to homepage">
-          <Image src="/keepsy-logo.png" alt="Keepsy" width={180} height={50} className="h-9 w-auto object-contain sm:h-10" />
+          <Image src="/keepsy-logo.svg" alt="Keepsy" width={280} height={80} className="h-11 w-auto object-contain sm:h-12" />
         </Link>
       </div>
     </header>

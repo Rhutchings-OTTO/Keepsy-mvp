@@ -452,11 +452,11 @@ export default function MerchGeneratorPlatform() {
           }}
         >
           <Image
-            src="/keepsy-logo.png"
+            src="/keepsy-logo.svg"
             alt="Keepsy"
-            width={320}
-            height={92}
-            className="h-14 w-auto object-contain"
+            width={420}
+            height={120}
+            className="h-16 w-auto object-contain"
           />
         </motion.div>
 
@@ -949,7 +949,7 @@ export default function MerchGeneratorPlatform() {
                           {item.imageDataUrl ? (
                             <Image src={item.imageDataUrl} alt={item.product.name} fill className="object-cover" />
                           ) : (
-                            <Image src="/keepsy-logo.png" alt={item.product.name} fill className="object-contain p-2" />
+                            <Image src="/keepsy-logo.svg" alt={item.product.name} fill className="object-contain p-2" />
                           )}
                         </div>
                         <div className="flex-1">

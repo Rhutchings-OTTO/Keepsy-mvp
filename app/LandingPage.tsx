@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const FLOATING_EXAMPLES = [
   {
@@ -38,9 +38,58 @@ const FLOATING_EXAMPLES = [
       "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=600&q=80",
     className: "bottom-[12%] right-[12%] w-40",
   },
+  {
+    id: "anniversary-card",
+    label: "Anniversary Card",
+    product: "Card",
+    image:
+      "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&q=80",
+    className: "top-[10%] right-[28%] w-36",
+  },
+  {
+    id: "baby-tee",
+    label: "Baby Memory Tee",
+    product: "T-Shirt",
+    image:
+      "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=600&q=80",
+    className: "top-[36%] left-[2%] w-32",
+  },
+  {
+    id: "dog-hoodie",
+    label: "Pet Hoodie",
+    product: "Hoodie",
+    image:
+      "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=600&q=80",
+    className: "bottom-[10%] left-[32%] w-44",
+  },
+  {
+    id: "holiday-mug",
+    label: "Holiday Mug",
+    product: "Mug",
+    image:
+      "https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=600&q=80",
+    className: "top-[52%] right-[22%] w-36",
+  },
+  {
+    id: "kids-art-card",
+    label: "Kids Art Card",
+    product: "Card",
+    image:
+      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=600&q=80",
+    className: "bottom-[24%] right-[4%] w-28",
+  },
+  {
+    id: "family-hoodie",
+    label: "Family Hoodie",
+    product: "Hoodie",
+    image:
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
+    className: "top-[20%] left-[22%] w-52",
+  },
 ];
 
 export default function LandingPage() {
+  const router = useRouter();
   const [cursorOffset, setCursorOffset] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
@@ -48,6 +97,16 @@ export default function LandingPage() {
   return (
     <div
       className="relative min-h-screen overflow-hidden bg-[#FDFCFB] text-[#23211F]"
+      role="button"
+      tabIndex={0}
+      aria-label="Enter Keepsy creation studio"
+      onClick={() => router.push("/create")}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          router.push("/create");
+        }
+      }}
       onMouseMove={(event) => {
         const { innerWidth, innerHeight } = window;
         const x = ((event.clientX / innerWidth) * 100 - 50) * pointerScale;
@@ -70,11 +129,8 @@ export default function LandingPage() {
         />
       </div>
 
-      <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-        <Image src="/keepsy-logo.png" alt="Keepsy" width={300} height={86} className="h-14 w-auto object-contain" />
-        <Link href="/create" className="rounded-full bg-black px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-black/90">
-          Enter studio
-        </Link>
+      <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-center px-6 py-8">
+        <Image src="/keepsy-logo.svg" alt="Keepsy" width={480} height={128} className="h-24 w-auto object-contain" />
       </header>
 
       <main className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
@@ -101,9 +157,18 @@ export default function LandingPage() {
           <p className="mx-auto mt-6 max-w-3xl text-xl font-medium text-black/60">
             Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
           </p>
-          <Link href="/create" className="mt-9 inline-block rounded-2xl bg-black px-7 py-4 font-extrabold text-white shadow-lg hover:bg-black/90">
-            Create your gift
-          </Link>
+          <motion.p
+            className="mx-auto mt-9 inline-block bg-clip-text text-lg font-extrabold text-transparent md:text-2xl"
+            style={{
+              backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)",
+              backgroundSize: "220% auto",
+              backgroundPosition: `${cursorOffset.x * 1.25}px ${cursorOffset.y * 1.25}px`,
+            }}
+            animate={{ backgroundSize: ["220% auto", "245% auto", "220% auto"] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          >
+            Tap anywhere to start creating
+          </motion.p>
         </div>
 
         <div className="pointer-events-none absolute inset-0 hidden lg:block">
@@ -112,8 +177,8 @@ export default function LandingPage() {
               key={example.id}
               className={`absolute ${example.className} rounded-2xl border border-black/10 bg-white/80 p-2 shadow-xl backdrop-blur`}
               style={{
-                x: cursorOffset.x * (0.08 + i * 0.01),
-                y: cursorOffset.y * (0.08 + i * 0.01),
+                x: cursorOffset.x * (0.24 + i * 0.015),
+                y: cursorOffset.y * (0.24 + i * 0.015),
               }}
               animate={{ y: [0, i % 2 === 0 ? -12 : 12, 0], rotate: [0, i % 2 === 0 ? 1.4 : -1.4, 0] }}
               transition={{ duration: 6 + i, repeat: Infinity, ease: "easeInOut" }}

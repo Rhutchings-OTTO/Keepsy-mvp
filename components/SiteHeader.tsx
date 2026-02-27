@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { href: "/gift-ideas", label: "Gift Ideas" },
   { href: "/create", label: "Create" },
-  { href: "/home#reviews", label: "Reviews" },
+  { href: "/#reviews", label: "Reviews" },
   { href: "mailto:support@keepsy.store", label: "Support" },
 ];
 
@@ -18,8 +18,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <nav className="flex items-center gap-1 sm:gap-3" aria-label="Primary">
           {NAV_ITEMS.map((item) => {
-            const active =
-              item.href !== "/home#reviews" && item.href.startsWith("/") && pathname === item.href;
+            const active = item.href !== "/#reviews" && item.href.startsWith("/") && pathname === item.href;
             return (
               <Link
                 key={item.href}
@@ -33,7 +32,7 @@ export function SiteHeader() {
             );
           })}
         </nav>
-        <Link href="/home" aria-label="Go to homepage">
+        <Link href="/" aria-label="Go to homepage">
           <Image src="/keepsy-logo.png" alt="Keepsy" width={180} height={50} className="h-9 w-auto object-contain sm:h-10" />
         </Link>
       </div>

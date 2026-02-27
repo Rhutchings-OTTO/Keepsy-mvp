@@ -4,19 +4,23 @@ import { usePathname } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
-type AppShellProps = {
+type SiteChromeProps = {
   children: React.ReactNode;
 };
 
-export function AppShell({ children }: AppShellProps) {
+export function SiteChrome({ children }: SiteChromeProps) {
   const pathname = usePathname();
-  const showChrome = pathname !== "/";
+  const isEntryLanding = pathname === "/";
+
+  if (isEntryLanding) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
-      {showChrome ? <SiteHeader /> : null}
+      <SiteHeader />
       <main className="flex-1">{children}</main>
-      {showChrome ? <SiteFooter /> : null}
+      <SiteFooter />
     </div>
   );
 }

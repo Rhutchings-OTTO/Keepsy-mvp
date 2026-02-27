@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 
 const FLOATING_EXAMPLES = [
@@ -40,16 +41,30 @@ const FLOATING_EXAMPLES = [
 ];
 
 export default function LandingPage() {
+  const [cursorOffset, setCursorOffset] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#F7F1EB] text-[#23211F]">
+    <div
+      className="relative min-h-screen overflow-hidden bg-[#FDFCFB] text-[#23211F]"
+      onMouseMove={(event) => {
+        const { innerWidth, innerHeight } = window;
+        const x = ((event.clientX / innerWidth) * 100 - 50) * pointerScale;
+        const y = ((event.clientY / innerHeight) * 100 - 50) * pointerScale;
+        setCursorOffset({ x, y });
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
-          className="absolute -top-24 -left-20 h-80 w-80 rounded-full bg-sky-300/25 blur-3xl"
+          className="absolute -top-24 -left-20 h-80 w-80 rounded-full bg-sky-300/20 blur-3xl"
           animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute top-20 right-0 h-96 w-96 rounded-full bg-pink-300/25 blur-3xl"
+          className="absolute top-20 right-0 h-96 w-96 rounded-full bg-pink-300/22 blur-3xl"
           animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
           transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -57,40 +72,50 @@ export default function LandingPage() {
 
       <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
         <Image src="/keepsy-logo.png" alt="Keepsy" width={300} height={86} className="h-14 w-auto object-contain" />
-        <Link href="/create" className="rounded-full bg-black px-5 py-2 text-sm font-bold text-white hover:bg-black/90">
-          Start Creating
+        <Link href="/create" className="rounded-full bg-black px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-black/90">
+          Enter studio
         </Link>
       </header>
 
-      <main className="relative z-10 mx-auto flex min-h-[80vh] max-w-7xl items-center px-6 pb-14">
-        <div className="max-w-3xl">
-          <p className="mb-4 inline-block rounded-full bg-white/80 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-black/60">
-            AI Image Generation for Gifts
+      <main className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
+        <div className="max-w-4xl text-center">
+          <p className="mb-4 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
+            AI-powered creativity
           </p>
-          <h1 className="text-5xl font-black leading-tight md:text-7xl">
-            The world is your oyster.
+          <h1 className="text-5xl font-black leading-[1.05] md:text-7xl">
+            Imagine it. Generate it.
             <br />
-            Turn any memory into a masterpiece.
+            <motion.span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)",
+                backgroundSize: "220% auto",
+                backgroundPosition: `${cursorOffset.x}px ${cursorOffset.y}px`,
+              }}
+              animate={{ backgroundSize: ["220% auto", "240% auto", "220% auto"] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              Cherish it.
+            </motion.span>
           </h1>
-          <p className="mt-6 max-w-2xl text-lg font-semibold text-black/60">
-            Generate stunning family portraits, pet art, and cartoon creations, then instantly preview them on hoodies, cards, mugs, and t-shirts.
+          <p className="mx-auto mt-6 max-w-3xl text-xl font-medium text-black/60">
+            Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
           </p>
-          <div className="mt-8 flex gap-3">
-            <Link href="/create" className="rounded-2xl bg-black px-7 py-4 font-extrabold text-white shadow-lg hover:bg-black/90">
-              Enter Image Studio
-            </Link>
-            <a href="#examples" className="rounded-2xl border border-black/15 bg-white/80 px-7 py-4 font-extrabold hover:bg-white">
-              See Live Examples
-            </a>
-          </div>
+          <Link href="/create" className="mt-9 inline-block rounded-2xl bg-black px-7 py-4 font-extrabold text-white shadow-lg hover:bg-black/90">
+            Create your gift
+          </Link>
         </div>
 
-        <div id="examples" className="pointer-events-none absolute inset-0 hidden lg:block">
+        <div className="pointer-events-none absolute inset-0 hidden lg:block">
           {FLOATING_EXAMPLES.map((example, i) => (
             <motion.div
               key={example.id}
               className={`absolute ${example.className} rounded-2xl border border-black/10 bg-white/80 p-2 shadow-xl backdrop-blur`}
-              animate={{ y: [0, i % 2 === 0 ? -12 : 12, 0], rotate: [0, i % 2 === 0 ? 1.2 : -1.2, 0] }}
+              style={{
+                x: cursorOffset.x * (0.08 + i * 0.01),
+                y: cursorOffset.y * (0.08 + i * 0.01),
+              }}
+              animate={{ y: [0, i % 2 === 0 ? -12 : 12, 0], rotate: [0, i % 2 === 0 ? 1.4 : -1.4, 0] }}
               transition={{ duration: 6 + i, repeat: Infinity, ease: "easeInOut" }}
             >
               <Image

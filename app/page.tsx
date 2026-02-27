@@ -1,5 +1,5 @@
-import { SplashLanding } from "@/components/SplashLanding";
+import LandingPage from "./LandingPage";
 
 export default function Page() {
-  return <SplashLanding />;
+  return <LandingPage />;
 }

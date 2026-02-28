@@ -629,7 +629,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       </div>
 
       {/* NAV */}
-      <nav className="fixed top-16 z-40 flex w-full items-center justify-between border-b border-black/5 bg-[#F7F1EB] px-6 py-4">
+      <nav className="fixed top-0 z-40 flex w-full items-center justify-between border-b border-black/10 bg-[#F7F1EB]/78 backdrop-blur-md px-6 py-4">
         <motion.div
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
@@ -640,11 +640,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           }}
         >
           <Image
-            src="/keepsy-logo.png"
+            src="/keepsy-logo-transparent.png"
             alt="Keepsy"
-            width={420}
-            height={120}
-            className="h-12 w-auto object-contain sm:h-16"
+            width={640}
+            height={190}
+            className="h-16 w-auto object-contain sm:h-20"
           />
         </motion.div>
 
@@ -678,7 +678,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         </div>
       </nav>
 
-      <main className="flex-1 pt-40 pb-16 px-6 max-w-7xl mx-auto w-full">
+      <main className="flex-1 pt-32 pb-16 px-6 max-w-7xl mx-auto w-full">
         <AnimatePresence mode="wait">
           {view === "home" && (
             <div className="space-y-20">
@@ -1275,7 +1275,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           {item.imageDataUrl ? (
                             <Image src={item.imageDataUrl} alt={item.product.name} fill className="object-cover" />
                           ) : (
-                            <Image src="/keepsy-logo.png" alt={item.product.name} fill className="object-contain p-2" />
+                            <Image src="/keepsy-logo-transparent.png" alt={item.product.name} fill className="object-contain p-2" />
                           )}
                         </div>
                         <div className="flex-1">

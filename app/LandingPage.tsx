@@ -82,11 +82,26 @@ export default function LandingPage() {
   const router = useRouter();
   const [cursorOffset, setCursorOffset] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const [ripple, setRipple] = useState<{ active: boolean; x: number; y: number; to: string }>({
+    active: false,
+    x: 0,
+    y: 0,
+    to: "/create",
+  });
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
+
+  const navigateWithRipple = (event: React.MouseEvent<HTMLButtonElement>, to: string) => {
+    const x = event.clientX;
+    const y = event.clientY;
+    setRipple({ active: true, x, y, to });
+    window.setTimeout(() => {
+      router.push(to);
+    }, 420);
+  };
 
   return (
     <div
-      className="relative min-h-screen overflow-hidden bg-[#FDFCFB] text-[#23211F]"
+      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#FDFCFB] via-[#F8F2FB] to-[#EEF7FF] text-[#23211F]"
       onMouseMove={(event) => {
         const { innerWidth, innerHeight } = window;
         const x = ((event.clientX / innerWidth) * 100 - 50) * pointerScale;
@@ -98,19 +113,30 @@ export default function LandingPage() {
     >
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
-          className="absolute -top-24 -left-20 h-80 w-80 rounded-full bg-sky-300/20 blur-3xl"
+          className="absolute -top-28 -left-24 h-[28rem] w-[28rem] rounded-full bg-sky-300/35 blur-3xl"
           animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute top-20 right-0 h-96 w-96 rounded-full bg-pink-300/22 blur-3xl"
+          className="absolute top-10 right-[-2%] h-[32rem] w-[32rem] rounded-full bg-pink-300/32 blur-3xl"
           animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
           transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-[-10%] left-[20%] h-[26rem] w-[26rem] rounded-full bg-amber-200/24 blur-3xl"
+          animate={{ x: [0, 24, 0], y: [0, -24, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
 
       <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-center px-6 py-8">
-        <Image src="/keepsy-logo.png" alt="Keepsy" width={480} height={128} className="h-24 w-auto object-contain" />
+        <Image
+          src="/keepsy-logo-transparent.png"
+          alt="Keepsy"
+          width={760}
+          height={220}
+          className="h-28 w-auto object-contain sm:h-32"
+        />
       </header>
 
       <main className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
@@ -139,7 +165,7 @@ export default function LandingPage() {
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <button
-              onClick={() => router.push("/create")}
+              onClick={(event) => navigateWithRipple(event, "/create")}
               className="rounded-2xl bg-black px-6 py-3 text-base font-black text-white shadow-lg transition hover:bg-black/90"
             >
               Start creating
@@ -178,6 +204,15 @@ export default function LandingPage() {
           ))}
         </div>
       </main>
+
+      {ripple.active && (
+        <motion.div
+          className="pointer-events-none fixed inset-0 z-[90] bg-[#F7F1EB]"
+          initial={{ clipPath: `circle(0px at ${ripple.x}px ${ripple.y}px)` }}
+          animate={{ clipPath: `circle(220vmax at ${ripple.x}px ${ripple.y}px)` }}
+          transition={{ duration: 0.5, ease: [0.2, 0.9, 0.2, 1] }}
+        />
+      )}
     </div>
   );
 }

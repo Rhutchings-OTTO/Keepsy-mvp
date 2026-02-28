@@ -15,7 +15,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-[#F7F1EB]">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4">
         <nav className="flex items-center gap-1 sm:gap-3" aria-label="Primary">
           {NAV_ITEMS.map((item) => {
             const active = item.href !== "/#reviews" && item.href.startsWith("/") && pathname === item.href;
@@ -34,11 +34,11 @@ export function SiteHeader() {
         </nav>
         <Link href="/" aria-label="Go to homepage">
           <Image
-            src="/keepsy-logo.png"
+            src="/keepsy-logo-transparent.png"
             alt="Keepsy"
-            width={280}
-            height={80}
-            className="h-9 w-auto object-contain sm:h-12"
+            width={560}
+            height={160}
+            className="h-12 w-auto object-contain sm:h-14"
           />
         </Link>
       </div>

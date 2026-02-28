@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -48,7 +48,7 @@ const PRODUCTS: Product[] = [
     name: "Premium tee",
     price: 29,
     description: "Soft, heavyweight premium tee.",
-    colors: ["#FFFFFF", "#111827", "#4B5563"],
+    colors: ["#FFFFFF"],
   },
   {
     id: "mug",
@@ -72,23 +72,23 @@ const PRODUCTS: Product[] = [
     name: "Hoodie",
     price: 40,
     description: "Soft fleece hoodie, gift-ready print.",
-    colors: ["#FFFFFF", "#111827"],
+    colors: ["#FFFFFF"],
   },
 ];
 
 const PRESET_PROMPTS = [
-  "Turn my child's crayon drawing into a warm watercolor keepsake, clean background, gift-ready",
-  "A cozy family portrait illustration in soft pastel tones, simple background",
-  "A cute pet illustration, clean white background, print-ready",
-  "A minimal line-art portrait with a warm, sentimental feel",
-  "A romantic anniversary keepsake illustration, tasteful and modern",
+  "Photoreal family Christmas scene in a snowy village with warm lights, print-ready",
+  "Thanksgiving cartoon family dinner scene with pumpkins and autumn leaves",
+  "Fourth of July backyard scene with fireworks, flags, and a barbecue at dusk",
+  "Romantic anniversary watercolor scene with champagne, roses, and candlelight",
+  "Lifelike pet portrait with soft natural window light and clean background",
 ];
 
 const COMMUNITY_DESIGNS = [
-  "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=400&q=80",
-  "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&q=80",
-  "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&q=80",
-  "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=400&q=80",
+  "/occasion-tiles/christmas-scene.png",
+  "/occasion-tiles/thanksgiving-cartoon.png",
+  "/occasion-tiles/fourth-july-photo.png",
+  "/occasion-tiles/anniversary-watercolor.png",
 ];
 
 const CREATOR_TESTIMONIALS = [
@@ -115,8 +115,13 @@ const fadeInUp = {
   transition: { duration: 0.45, ease: "easeOut" },
 };
 
+const GBP_FORMATTER = new Intl.NumberFormat("en-GB", {
+  style: "currency",
+  currency: "GBP",
+});
+
 function gbp(n: number) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n);
+  return GBP_FORMATTER.format(n);
 }
 
 function getVisitorId(): string {
@@ -161,8 +166,6 @@ async function generateViaKeepsyAPI(args: {
     body: JSON.stringify({
       prompt: args.prompt,
       sourceImageDataUrl: args.sourceImageDataUrl ?? null,
-      style: "watercolor",
-      quality: "high",
     }),
   });
 
@@ -209,7 +212,7 @@ async function checkoutViaKeepsyAPI(args: {
 }
 
 /** Realistic mockup using YOUR photos in /public/product-tiles */
-function RealProductPreview({
+const RealProductPreview = React.memo(function RealProductPreview({
   type,
   imageDataUrl,
 }: {
@@ -218,65 +221,49 @@ function RealProductPreview({
 }) {
   type ImageFormat = "portrait" | "landscape" | "square";
 
-  // Use format-aware base mockups so previews look natural for each generated image shape.
-  const fileMap: Record<MerchType, Record<ImageFormat, string>> = {
-    tshirt: {
-      square: "/product-tiles/tee.jpg",
-      landscape: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1200&q=80",
-      portrait: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&q=80",
-    },
-    mug: {
-      square: "/product-tiles/mug.jpg",
-      landscape: "https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?w=1200&q=80",
-      portrait: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=80",
-    },
-    card: {
-      square: "/product-tiles/card.jpg",
-      landscape: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1200&q=80",
-      portrait: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=1200&q=80",
-    },
-    hoodie: {
-      square: "/product-tiles/hoodie.jpg",
-      landscape: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=1200&q=80",
-      portrait: "https://images.unsplash.com/photo-1618354691415-0f45f9d6f68f?w=1200&q=80",
-    },
-  };
-
   const [imageFormat, setImageFormat] = useState<ImageFormat>("square");
 
-  // Fit presets by product + generated image format.
+  // Fit presets by product + generated image format on realistic plain mockups.
   const overlayByFormat: Record<MerchType, Record<ImageFormat, React.CSSProperties>> = {
     card: {
-      landscape: { top: "31%", left: "29%", width: "42%", height: "30%" },
-      portrait: { top: "23%", left: "35%", width: "30%", height: "52%" },
-      square: { top: "29%", left: "33%", width: "34%", height: "38%" },
+      landscape: { top: "35%", left: "22%", width: "56%", height: "26%" },
+      portrait: { top: "26%", left: "30%", width: "40%", height: "48%" },
+      square: { top: "31%", left: "26%", width: "48%", height: "36%" },
     },
     tshirt: {
-      landscape: { top: "36%", left: "30%", width: "40%", height: "22%" },
-      portrait: { top: "29%", left: "35%", width: "30%", height: "43%" },
-      square: { top: "32%", left: "33%", width: "34%", height: "33%" },
+      landscape: { top: "40%", left: "26%", width: "48%", height: "20%" },
+      portrait: { top: "30%", left: "33%", width: "34%", height: "44%" },
+      square: { top: "34%", left: "29%", width: "42%", height: "34%" },
     },
     mug: {
-      landscape: { top: "38%", left: "31%", width: "38%", height: "19%" },
-      portrait: { top: "32%", left: "37%", width: "25%", height: "35%" },
-      square: { top: "35%", left: "35%", width: "30%", height: "28%" },
+      landscape: { top: "40%", left: "27%", width: "46%", height: "18%" },
+      portrait: { top: "31%", left: "35%", width: "30%", height: "40%" },
+      square: { top: "35%", left: "31%", width: "38%", height: "30%" },
     },
     hoodie: {
-      landscape: { top: "35%", left: "30%", width: "40%", height: "24%" },
-      portrait: { top: "29%", left: "35%", width: "30%", height: "43%" },
-      square: { top: "32%", left: "33%", width: "34%", height: "33%" },
+      landscape: { top: "42%", left: "27%", width: "46%", height: "19%" },
+      portrait: { top: "31%", left: "34%", width: "32%", height: "43%" },
+      square: { top: "36%", left: "30%", width: "40%", height: "33%" },
     },
+  };
+  const productImageByType: Record<MerchType, string> = {
+    tshirt: "/product-tiles/plain-tee.png",
+    mug: "/product-tiles/plain-mug.png",
+    card: "/product-tiles/plain-card.png",
+    hoodie: "/product-tiles/plain-hoodie.png",
   };
 
   const currentFormat: ImageFormat = imageDataUrl ? imageFormat : "square";
 
   return (
-    <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-2xl border border-black/10 bg-white">
+    <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-2xl border border-black/10 bg-[#F5F5F6]">
+      <div className="absolute inset-0 bg-gradient-to-b from-white/60 to-black/[0.03]" />
       <Image
-        src={fileMap[type][currentFormat]}
-        className="absolute inset-0 w-full h-full object-cover"
-        alt="Product mockup"
+        src={productImageByType[type]}
+        alt={`${type} mockup`}
         fill
+        className="object-cover"
+        sizes="(max-width: 1024px) 100vw, 700px"
       />
       {imageDataUrl && (
         <motion.img
@@ -296,10 +283,10 @@ function RealProductPreview({
           style={{ ...overlayByFormat[type][currentFormat], objectFit: "cover" }}
         />
       )}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/0 via-black/0 to-black/10" />
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/0 via-black/0 to-black/[0.08]" />
     </div>
   );
-}
+});
 
 export default function MerchGeneratorPlatform() {
   const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
@@ -320,8 +307,14 @@ export default function MerchGeneratorPlatform() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutSuccess] = useState(false);
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartSubtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const cartCount = useMemo(
+    () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
+    [cartItems]
+  );
+  const cartSubtotal = useMemo(
+    () => cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
+    [cartItems]
+  );
 
   useEffect(() => {
     return () => {
@@ -339,14 +332,15 @@ export default function MerchGeneratorPlatform() {
     setGenerationError(null);
     setIsBusy(true);
     try {
-      const effectivePrompt = prompt || "Create a polished keepsake design from this uploaded image.";
+      const basePrompt = prompt || "Create a polished lifelike keepsake design from this uploaded image.";
+      const promptWithQualityGuide = `${basePrompt}. High-quality production-ready design image. Avoid words, letters, logos, and typographic word-art unless explicitly requested. Use realistic lighting, depth, and texture.`;
       let imageDataUrl: string | null = null;
       const maxAttempts = 2;
 
       for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
         try {
           imageDataUrl = await generateViaKeepsyAPI({
-            prompt: effectivePrompt,
+            prompt: promptWithQualityGuide,
             sourceImageDataUrl: uploadedImage,
             signal: controller.signal,
           });
@@ -802,7 +796,10 @@ export default function MerchGeneratorPlatform() {
                   className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
                 >
                   <div className="lg:col-span-7 sticky top-24">
-                    <RealProductPreview type={selectedProduct.type} imageDataUrl={generatedImage} />
+                    <RealProductPreview
+                      type={selectedProduct.type}
+                      imageDataUrl={generatedImage}
+                    />
                     <div className="mt-6 flex gap-3 items-center">
                       <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">
                         <Sparkles size={14} /> Applied to real mockups

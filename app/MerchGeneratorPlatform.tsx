@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { MockupRenderer } from "@/components/MockupRenderer";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
+import type { Placement } from "@/lib/mockups/placements";
 import {
   Sparkles,
   ShoppingCart,
@@ -57,6 +58,8 @@ type InitialCreateQuery = {
   success?: boolean;
   canceled?: boolean;
 };
+
+type DesignShape = "square" | "portrait" | "landscape";
 
 /** Match your real products */
 const PRODUCTS: Product[] = [
@@ -185,6 +188,10 @@ function getMockupColor(hex: string): MockupColor {
   return "white";
 }
 
+function getPlacementOverrideKey(productType: MockupProductType, color: MockupColor) {
+  return `${productType}-${color}`;
+}
+
 function getVisitorId(): string {
   if (typeof window === "undefined") return "server";
   const storageKey = "keepsy_visitor_id";
@@ -215,6 +222,7 @@ function getFriendlyGenerationError(error: unknown): string {
 async function generateViaKeepsyAPI(args: {
   prompt: string;
   sourceImageDataUrl?: string | null;
+  designShape: DesignShape;
   signal?: AbortSignal;
 }) {
   const res = await fetch("/api/generate-image", {
@@ -227,6 +235,7 @@ async function generateViaKeepsyAPI(args: {
     body: JSON.stringify({
       prompt: args.prompt,
       sourceImageDataUrl: args.sourceImageDataUrl ?? null,
+      designShape: args.designShape,
     }),
   });
 
@@ -276,6 +285,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   const [prompt, setPrompt] = useState("");
+  const [designShape, setDesignShape] = useState<DesignShape>("square");
   const [isBusy, setIsBusy] = useState(false);
 
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -287,6 +297,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[2]); // default: card
   const [selectedColor, setSelectedColor] = useState(PRODUCTS[2].colors[0]);
+  const [isDesignFormatMode, setIsDesignFormatMode] = useState(false);
+  const [placementOverrides, setPlacementOverrides] = useState<Record<string, Placement>>({});
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutSuccess] = useState(false);
@@ -309,6 +321,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const canProceedToCheckout = hasCartItems
     ? cartItems.length > 0 && cartItems.every((item) => Boolean(item.imageDataUrl))
     : Boolean(generatedImage);
+  const selectedMockupProductType = getMockupProductType(selectedProduct.type);
+  const selectedMockupColor = getMockupColor(selectedColor);
+  const selectedPlacementKey = getPlacementOverrideKey(selectedMockupProductType, selectedMockupColor);
+  const selectedPlacementOverride = placementOverrides[selectedPlacementKey] ?? null;
 
   useEffect(() => {
     return () => {
@@ -337,6 +353,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       // ignore storage write failures in restricted environments
     }
   }, [cartItems]);
+
+  useEffect(() => {
+    if (!generatedImage && isDesignFormatMode) {
+      setIsDesignFormatMode(false);
+    }
+  }, [generatedImage, isDesignFormatMode]);
 
   useEffect(() => {
     if (!initialQuery || didApplyInitialQuery.current) return;
@@ -390,7 +412,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     setIsBusy(true);
     try {
       const basePrompt = prompt || "Create a polished lifelike keepsake design from this uploaded image.";
-      const promptWithQualityGuide = `${basePrompt}. High-quality production-ready design image. Avoid words, letters, logos, and typographic word-art unless explicitly requested. Use realistic lighting, depth, and texture.`;
+      const shapeGuide =
+        designShape === "portrait"
+          ? "Use a portrait composition."
+          : designShape === "landscape"
+            ? "Use a landscape composition."
+            : "Use a square composition.";
+      const promptWithQualityGuide = `${basePrompt}. ${shapeGuide} High-quality production-ready design image. Avoid words, letters, logos, and typographic word-art unless explicitly requested. Use realistic lighting, depth, and texture.`;
       let imageDataUrl: string | null = null;
       const maxAttempts = 2;
 
@@ -399,6 +427,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           imageDataUrl = await generateViaKeepsyAPI({
             prompt: promptWithQualityGuide,
             sourceImageDataUrl: uploadedImage,
+            designShape,
             signal: controller.signal,
           });
           break;
@@ -470,6 +499,21 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         )
         .filter((item) => item.quantity > 0)
     );
+  };
+
+  const handlePlacementChange = (placement: Placement) => {
+    setPlacementOverrides((prev) => ({
+      ...prev,
+      [selectedPlacementKey]: placement,
+    }));
+  };
+
+  const handleResetPlacement = () => {
+    setPlacementOverrides((prev) => {
+      const next = { ...prev };
+      delete next[selectedPlacementKey];
+      return next;
+    });
   };
 
   const handleCheckout = async () => {
@@ -703,6 +747,19 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             className="flex-1 bg-transparent py-4 text-base font-semibold outline-none placeholder:text-black/40 md:text-lg"
                           />
 
+                          <div className="ml-2 hidden sm:block">
+                            <select
+                              value={designShape}
+                              onChange={(e) => setDesignShape(e.target.value as DesignShape)}
+                              className="rounded-lg border border-black/10 bg-white px-3 py-2 text-xs font-bold text-black/70"
+                              aria-label="Design shape"
+                            >
+                              <option value="square">Square</option>
+                              <option value="portrait">Portrait</option>
+                              <option value="landscape">Landscape</option>
+                            </select>
+                          </div>
+
                           <div className="flex items-center gap-2 border-l border-black/5 pl-4 ml-2">
                             <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
                             <button
@@ -736,6 +793,22 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             </>
                           )}
                         </motion.button>
+                      </div>
+
+                      <div className="px-4 pb-1 sm:hidden">
+                        <label className="mb-1 block text-[10px] font-extrabold uppercase tracking-wider text-black/45">
+                          Design shape
+                        </label>
+                        <select
+                          value={designShape}
+                          onChange={(e) => setDesignShape(e.target.value as DesignShape)}
+                          className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-xs font-bold text-black/70"
+                          aria-label="Design shape"
+                        >
+                          <option value="square">Square</option>
+                          <option value="portrait">Portrait</option>
+                          <option value="landscape">Landscape</option>
+                        </select>
                       </div>
 
                       <AnimatePresence>
@@ -883,14 +956,44 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 >
                   <div className="lg:col-span-7 sticky top-24">
                     <MockupRenderer
-                      productType={getMockupProductType(selectedProduct.type)}
-                      color={getMockupColor(selectedColor)}
+                      productType={selectedMockupProductType}
+                      color={selectedMockupColor}
                       generatedImage={generatedImage}
+                      editable={isDesignFormatMode}
+                      placementOverride={selectedPlacementOverride}
+                      onPlacementChange={handlePlacementChange}
                     />
                     <div className="mt-6 flex gap-3 items-center">
                       <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">
                         <Sparkles size={14} /> Applied to real mockups
                       </div>
+                      {generatedImage && (
+                        <>
+                          {!isDesignFormatMode ? (
+                            <button
+                              onClick={() => setIsDesignFormatMode(true)}
+                              className="rounded-full border border-black/10 bg-white/80 px-3 py-2 text-xs font-extrabold text-black/70 hover:text-black"
+                            >
+                              Format design
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => setIsDesignFormatMode(false)}
+                                className="rounded-full border border-black/10 bg-black px-3 py-2 text-xs font-extrabold text-white"
+                              >
+                                Done
+                              </button>
+                              <button
+                                onClick={handleResetPlacement}
+                                className="rounded-full border border-black/10 bg-white/80 px-3 py-2 text-xs font-extrabold text-black/70 hover:text-black"
+                              >
+                                Reset corners
+                              </button>
+                            </>
+                          )}
+                        </>
+                      )}
                       <button
                         onClick={() => setStep(1)}
                         className="text-xs font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2"

@@ -23,7 +23,16 @@ type CachedGeneration = {
 type GenerationRequestBody = {
   prompt?: unknown;
   sourceImageDataUrl?: unknown;
+  designShape?: unknown;
 };
+
+type DesignShape = "square" | "portrait" | "landscape";
+
+function getImageSizeForShape(shape: DesignShape): "1024x1024" | "1024x1536" | "1536x1024" {
+  if (shape === "portrait") return "1024x1536";
+  if (shape === "landscape") return "1536x1024";
+  return "1024x1024";
+}
 
 const generationCache = new Map<string, CachedGeneration>();
 const inflightByPrompt = new Map<string, Promise<string>>();
@@ -53,7 +62,7 @@ function readCachedGeneration(promptKey: string): string | null {
   return hit.imageDataUrl;
 }
 
-async function generateImage(prompt: string): Promise<string> {
+async function generateImage(prompt: string, size: "1024x1024" | "1024x1536" | "1536x1024"): Promise<string> {
   const resp = await fetchWithBackoff("https://api.openai.com/v1/images/generations", {
     method: "POST",
     headers: {
@@ -63,7 +72,7 @@ async function generateImage(prompt: string): Promise<string> {
     body: JSON.stringify({
       model: "gpt-image-1",
       prompt,
-      size: "1024x1024",
+      size,
     }),
   }, { retries: 2, timeoutMs: 90_000 });
 
@@ -92,7 +101,11 @@ function parseDataUrl(dataUrl: string): { mimeType: string; imageBuffer: ArrayBu
   }
 }
 
-async function editImage(prompt: string, sourceImageDataUrl: string): Promise<string> {
+async function editImage(
+  prompt: string,
+  sourceImageDataUrl: string,
+  size: "1024x1024" | "1024x1536" | "1536x1024"
+): Promise<string> {
   const parsed = parseDataUrl(sourceImageDataUrl);
   if (!parsed) {
     throw new Error("Invalid uploaded image format. Please use JPG or PNG.");
@@ -102,7 +115,7 @@ async function editImage(prompt: string, sourceImageDataUrl: string): Promise<st
   const formData = new FormData();
   formData.set("model", "gpt-image-1");
   formData.set("prompt", prompt);
-  formData.set("size", "1024x1024");
+  formData.set("size", size);
   formData.set("image", new Blob([parsed.imageBuffer], { type: parsed.mimeType }), `upload.${extension}`);
 
   const resp = await fetchWithBackoff(
@@ -139,6 +152,11 @@ export async function POST(req: Request) {
     const prompt = body?.prompt;
     const sourceImageDataUrl =
       typeof body?.sourceImageDataUrl === "string" ? body.sourceImageDataUrl : null;
+    const designShape: DesignShape =
+      body?.designShape === "portrait" || body?.designShape === "landscape" || body?.designShape === "square"
+        ? body.designShape
+        : "square";
+    const generationSize = getImageSizeForShape(designShape);
 
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({ error: "Missing OPENAI_API_KEY" }, { status: 500 });
@@ -164,7 +182,7 @@ export async function POST(req: Request) {
     }
 
     const startedAt = Date.now();
-    const promptKey = getPromptKey(promptCheck.prompt);
+    const promptKey = getPromptKey(`${promptCheck.prompt}::${generationSize}`);
     const cached = readCachedGeneration(promptKey);
     if (cached) {
       recordGenerationMetric("cacheHits", 1);
@@ -204,7 +222,7 @@ export async function POST(req: Request) {
     if (sourceImageDataUrl) {
       recordGenerationMetric("inFlightCount", 1);
       try {
-        const imageDataUrl = await editImage(promptCheck.prompt, sourceImageDataUrl);
+        const imageDataUrl = await editImage(promptCheck.prompt, sourceImageDataUrl, generationSize);
         recordGenerationMetric("totalSuccess", 1);
         recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
         return NextResponse.json({
@@ -219,7 +237,7 @@ export async function POST(req: Request) {
 
     recordGenerationMetric("inFlightCount", 1);
     const generationPromise = (async () => {
-      const imageDataUrl = await generateImage(promptCheck.prompt);
+      const imageDataUrl = await generateImage(promptCheck.prompt, generationSize);
       generationCache.set(promptKey, {
         imageDataUrl,
         expiresAt: Date.now() + CACHE_TTL_MS,

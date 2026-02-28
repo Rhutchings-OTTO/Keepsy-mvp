@@ -3,6 +3,8 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { MockupRenderer } from "@/components/MockupRenderer";
+import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import {
   Sparkles,
   ShoppingCart,
@@ -170,6 +172,19 @@ function fromPersistedCart(raw: string): CartItem[] {
     .filter((item): item is CartItem => item !== null);
 }
 
+function getMockupProductType(type: MerchType): MockupProductType {
+  if (type === "tshirt") return "tshirt";
+  if (type === "hoodie") return "hoodie";
+  if (type === "mug") return "mug";
+  return "card";
+}
+
+function getMockupColor(hex: string): MockupColor {
+  if (hex === "#111827") return "black";
+  if (hex === "#2563EB") return "blue";
+  return "white";
+}
+
 function getVisitorId(): string {
   if (typeof window === "undefined") return "server";
   const storageKey = "keepsy_visitor_id";
@@ -255,154 +270,6 @@ async function checkoutViaKeepsyAPI(args: {
   if (!res.ok) throw new Error(data?.error || "Failed to create checkout session");
   return data.url as string;
 }
-
-/** Realistic mockup using YOUR photos in /public/product-tiles */
-const RealProductPreview = React.memo(function RealProductPreview({
-  type,
-  imageDataUrl,
-  selectedColor,
-}: {
-  type: MerchType;
-  imageDataUrl: string | null;
-  selectedColor: string;
-}) {
-  type ImageFormat = "portrait" | "landscape" | "square";
-
-  const [imageFormat, setImageFormat] = useState<ImageFormat>("square");
-
-  // Fit presets by product + generated image format on realistic plain mockups.
-  const overlayByFormat: Record<MerchType, Record<ImageFormat, React.CSSProperties>> = {
-    card: {
-      landscape: { top: "36%", left: "19%", width: "56%", height: "26%" },
-      portrait: { top: "27%", left: "27%", width: "40%", height: "48%" },
-      square: { top: "31%", left: "23%", width: "48%", height: "36%" },
-    },
-    tshirt: {
-      landscape: { top: "40%", left: "26%", width: "48%", height: "20%" },
-      portrait: { top: "30%", left: "33%", width: "34%", height: "44%" },
-      square: { top: "34%", left: "29%", width: "42%", height: "34%" },
-    },
-    mug: {
-      landscape: { top: "41%", left: "30%", width: "41%", height: "17%" },
-      portrait: { top: "31%", left: "37%", width: "26%", height: "38%" },
-      square: { top: "36%", left: "33%", width: "34%", height: "28%" },
-    },
-    hoodie: {
-      landscape: { top: "42%", left: "27%", width: "46%", height: "19%" },
-      portrait: { top: "31%", left: "34%", width: "32%", height: "43%" },
-      square: { top: "36%", left: "30%", width: "40%", height: "33%" },
-    },
-  };
-  const colorKeyByHex: Record<string, "white" | "black" | "blue"> = {
-    "#FFFFFF": "white",
-    "#111827": "black",
-    "#2563EB": "blue",
-  };
-  const selectedColorKey = colorKeyByHex[selectedColor] ?? "white";
-  const productImageByType: Record<MerchType, string> = {
-    tshirt: `/product-tiles/tee-${selectedColorKey}.png`,
-    mug: "/product-tiles/plain-mug.png",
-    card: "/product-tiles/plain-card.png",
-    hoodie: `/product-tiles/hoodie-${selectedColorKey}.png`,
-  };
-  const overlayFxByType: Record<MerchType, React.CSSProperties> = {
-    tshirt: {
-      mixBlendMode: "multiply",
-      opacity: selectedColorKey === "white" ? 0.9 : 0.96,
-      filter: "saturate(1.08) contrast(1.03)",
-      transform: "perspective(1000px) rotateX(1deg)",
-      borderRadius: "0.8rem",
-    },
-    hoodie: {
-      mixBlendMode: "multiply",
-      opacity: selectedColorKey === "white" ? 0.9 : 0.96,
-      filter: "saturate(1.08) contrast(1.03)",
-      transform: "perspective(1000px) rotateX(1deg)",
-      borderRadius: "0.8rem",
-    },
-    mug: {
-      mixBlendMode: "multiply",
-      opacity: 0.94,
-      filter: "saturate(1.04) contrast(1.02)",
-      transform: "perspective(900px) rotateY(-8deg)",
-      borderRadius: "999px",
-    },
-    card: {
-      mixBlendMode: "multiply",
-      opacity: 0.95,
-      filter: "contrast(1.02)",
-      transform: "rotate(-6deg)",
-      borderRadius: "0.45rem",
-    },
-  };
-  const textureFxByType: Partial<Record<MerchType, React.CSSProperties>> = {
-    tshirt: {
-      background:
-        "repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 1px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 4px)",
-      mixBlendMode: "soft-light",
-      opacity: selectedColorKey === "white" ? 0.2 : 0.28,
-      borderRadius: "0.8rem",
-      transform: "perspective(1000px) rotateX(1deg)",
-    },
-    hoodie: {
-      background:
-        "repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 1px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 4px)",
-      mixBlendMode: "soft-light",
-      opacity: selectedColorKey === "white" ? 0.2 : 0.28,
-      borderRadius: "0.8rem",
-      transform: "perspective(1000px) rotateX(1deg)",
-    },
-  };
-
-  const currentFormat: ImageFormat = imageDataUrl ? imageFormat : "square";
-
-  return (
-    <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-2xl border border-black/10 bg-[#F5F5F6]">
-      <div className="absolute inset-0 bg-gradient-to-b from-white/60 to-black/[0.03]" />
-      <Image
-        src={productImageByType[type]}
-        alt={`${type} mockup`}
-        fill
-        className="object-cover"
-        sizes="(max-width: 1024px) 100vw, 700px"
-      />
-      {imageDataUrl && (
-        <>
-          <motion.img
-            key={imageDataUrl}
-            initial={{ opacity: 0, scale: 0.985 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-            src={imageDataUrl}
-            onLoad={(event) => {
-              const ratio = event.currentTarget.naturalWidth / event.currentTarget.naturalHeight;
-              if (ratio > 1.2) setImageFormat("landscape");
-              else if (ratio < 0.8) setImageFormat("portrait");
-              else setImageFormat("square");
-            }}
-            alt="Applied design"
-            className="absolute"
-            style={{
-              ...overlayByFormat[type][currentFormat],
-              ...overlayFxByType[type],
-              objectFit: "cover",
-            }}
-          />
-          {textureFxByType[type] && (
-            <div
-              className="absolute pointer-events-none"
-              style={{
-                ...overlayByFormat[type][currentFormat],
-                ...textureFxByType[type],
-              }}
-            />
-          )}
-        </>
-      )}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/0 via-black/0 to-black/[0.08]" />
-    </div>
-  );
-});
 
 export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?: InitialCreateQuery }) {
   const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
@@ -718,7 +585,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       </div>
 
       {/* NAV */}
-      <nav className="fixed top-16 w-full z-40 bg-white/75 backdrop-blur-md border-b border-black/5 px-6 py-4 flex items-center justify-between">
+      <nav className="fixed top-16 z-40 flex w-full items-center justify-between border-b border-black/5 bg-[#F7F1EB] px-6 py-4">
         <motion.div
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
@@ -729,22 +596,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           }}
         >
           <Image
-            src="/keepsy-logo.svg"
+            src="/keepsy-logo.png"
             alt="Keepsy"
             width={420}
             height={120}
-            className="hidden h-16 w-auto object-contain sm:block"
+            className="h-12 w-auto object-contain sm:h-16"
           />
-          <span
-            className="text-3xl font-black tracking-tight text-transparent sm:hidden"
-            style={{
-              backgroundImage: "linear-gradient(90deg,#5FA8E8,#88C6D8,#F2B287,#9F82C7)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-            }}
-          >
-            keepsy
-          </span>
         </motion.div>
 
         <div className="flex items-center gap-4">
@@ -1025,10 +882,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
                 >
                   <div className="lg:col-span-7 sticky top-24">
-                    <RealProductPreview
-                      type={selectedProduct.type}
-                      imageDataUrl={generatedImage}
-                      selectedColor={selectedColor}
+                    <MockupRenderer
+                      productType={getMockupProductType(selectedProduct.type)}
+                      color={getMockupColor(selectedColor)}
+                      generatedImage={generatedImage}
                     />
                     <div className="mt-6 flex gap-3 items-center">
                       <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">
@@ -1315,7 +1172,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           {item.imageDataUrl ? (
                             <Image src={item.imageDataUrl} alt={item.product.name} fill className="object-cover" />
                           ) : (
-                            <Image src="/keepsy-logo.svg" alt={item.product.name} fill className="object-contain p-2" />
+                            <Image src="/keepsy-logo.png" alt={item.product.name} fill className="object-contain p-2" />
                           )}
                         </div>
                         <div className="flex-1">

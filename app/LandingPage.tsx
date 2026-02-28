@@ -7,24 +7,24 @@ import { useRouter } from "next/navigation";
 
 const FLOATING_EXAMPLES = [
   {
-    id: "plain-tee",
-    label: "Plain Tee Mockup",
+    id: "tee-white",
+    label: "Premium Tee Mockup",
     product: "T-Shirt",
-    image: "/product-tiles/plain-tee.png",
+    image: "/product-tiles/tee-white.png",
     className: "hidden xl:block top-[10%] left-[2%] w-36 2xl:w-40",
   },
   {
     id: "plain-mug",
     label: "Plain Mug Mockup",
     product: "Mug",
-    image: "/product-tiles/plain-mug.png",
+    image: "/product-tiles/plain-mug-front.png",
     className: "hidden xl:block top-[12%] right-[2%] w-40 2xl:w-44",
   },
   {
     id: "plain-hoodie",
     label: "Plain Hoodie Mockup",
     product: "Hoodie",
-    image: "/product-tiles/plain-hoodie.png",
+    image: "/product-tiles/hoodie-white.png",
     className: "hidden xl:block bottom-[14%] left-[3%] w-44 2xl:w-48",
   },
   {
@@ -110,7 +110,7 @@ export default function LandingPage() {
       </div>
 
       <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-center px-6 py-8">
-        <Image src="/keepsy-logo.svg" alt="Keepsy" width={480} height={128} className="h-24 w-auto object-contain" />
+        <Image src="/keepsy-logo.png" alt="Keepsy" width={480} height={128} className="h-24 w-auto object-contain" />
       </header>
 
       <main className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">

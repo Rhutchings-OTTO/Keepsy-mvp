@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 export function SiteHeader() {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-50 border-b border-black/10 bg-[#F7F1EB]/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-black/10 bg-[#F7F1EB]">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <nav className="flex items-center gap-1 sm:gap-3" aria-label="Primary">
           {NAV_ITEMS.map((item) => {
@@ -34,22 +34,12 @@ export function SiteHeader() {
         </nav>
         <Link href="/" aria-label="Go to homepage">
           <Image
-            src="/keepsy-logo.svg"
+            src="/keepsy-logo.png"
             alt="Keepsy"
             width={280}
             height={80}
-            className="hidden h-11 w-auto object-contain sm:block sm:h-12"
+            className="h-9 w-auto object-contain sm:h-12"
           />
-          <span
-            className="text-2xl font-black tracking-tight text-transparent sm:hidden"
-            style={{
-              backgroundImage: "linear-gradient(90deg,#5FA8E8,#88C6D8,#F2B287,#9F82C7)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-            }}
-          >
-            keepsy
-          </span>
         </Link>
       </div>
     </header>

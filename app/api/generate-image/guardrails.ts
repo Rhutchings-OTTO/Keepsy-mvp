@@ -18,20 +18,6 @@ const DAILY_CAP: Record<UserTier, number> = {
 
 const MIN_INTERVAL_MS = 10_000; // 1 generation per 10 seconds
 
-const BLOCKED_KEYWORDS = [
-  "nude",
-  "nudity",
-  "explicit",
-  "sexual",
-  "porn",
-  "gore",
-  "bloodbath",
-  "beheading",
-  "violence",
-  "kill",
-  "hate symbol",
-];
-
 export function getClientKey(req: Request): string {
   const visitorId = req.headers.get("x-visitor-id")?.trim();
   const forwardedFor = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
@@ -113,16 +99,10 @@ export function sanitizePrompt(input: string): { ok: true; prompt: string } | { 
   const trimmed = input.trim().slice(0, 600);
   if (!trimmed) return { ok: false, error: "Prompt cannot be empty." };
 
-  const lower = trimmed.toLowerCase();
-  const blocked = BLOCKED_KEYWORDS.find((word) => lower.includes(word));
-  if (blocked) {
-    return { ok: false, error: "Prompt contains blocked content. Please keep it family-friendly." };
-  }
-
   const safePrompt =
-    "Create a family-friendly, gift-ready artwork for merchandise printing. " +
+    "Create a high-quality, gift-ready artwork for merchandise printing. " +
     `${trimmed}. ` +
-    "Avoid nudity, violence, hate symbols, deformed anatomy, text artifacts, blur, and watermarks.";
+    "Keep the result print-ready, visually clear, and compliant with OpenAI safety policies. Avoid unreadable text artifacts and watermarks unless explicitly requested.";
 
   return { ok: true, prompt: safePrompt };
 }

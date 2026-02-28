@@ -48,11 +48,24 @@ export function getPlacement(productType: MockupProductType, color: MockupColor 
   if (!byProduct) {
     throw new Error(`Unknown product type: ${productType}`);
   }
-  const entry = byProduct[color] || byProduct.white;
-  if (!entry) {
+  const colorEntry = byProduct[color] || byProduct.white;
+  if (!colorEntry) {
     throw new Error(`Missing placement for ${productType}/${color}`);
   }
-  return entry;
+
+  // Keep apparel print placement uniform across all colors.
+  // We still use each color's own base mockup image.
+  if (productType === "tshirt" || productType === "hoodie") {
+    const uniformEntry = byProduct.white || colorEntry;
+    return {
+      ...colorEntry,
+      placement: uniformEntry.placement,
+      opacity: uniformEntry.opacity,
+      dropShadow: uniformEntry.dropShadow,
+    };
+  }
+
+  return colorEntry;
 }
 
 export function getPlacementPath() {

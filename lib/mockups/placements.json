@@ -7,9 +7,9 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 37,
-          "wPct": 30,
-          "hPct": 30,
+          "yPct": 40,
+          "wPct": 15,
+          "hPct": 25,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         },
@@ -23,9 +23,9 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 37,
-          "wPct": 30,
-          "hPct": 30,
+          "yPct": 40,
+          "wPct": 15,
+          "hPct": 25,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         },
@@ -39,9 +39,9 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 37,
-          "wPct": 30,
-          "hPct": 30,
+          "yPct": 40,
+          "wPct": 15,
+          "hPct": 25,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         },
@@ -57,9 +57,9 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 40,
-          "wPct": 31,
-          "hPct": 31,
+          "yPct": 45,
+          "wPct": 17,
+          "hPct": 30,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         },
@@ -73,9 +73,9 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 40,
-          "wPct": 31,
-          "hPct": 31,
+          "yPct": 45,
+          "wPct": 17,
+          "hPct": 30,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         },
@@ -89,9 +89,9 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 40,
-          "wPct": 31,
-          "hPct": 31,
+          "yPct": 45,
+          "wPct": 17,
+          "hPct": 30,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         },
@@ -106,10 +106,10 @@
       "placement": {
         "kind": "rect",
         "rect": {
-          "xPct": 50,
-          "yPct": 56,
-          "wPct": 26,
-          "hPct": 26,
+          "xPct": 48,
+          "yPct": 54,
+          "wPct": 22,
+          "hPct": 50,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         },
@@ -124,10 +124,10 @@
       "placement": {
         "kind": "quad",
         "quad": {
-          "tl": { "xPct": 19, "yPct": 43 },
-          "tr": { "xPct": 40, "yPct": 35 },
-          "br": { "xPct": 41, "yPct": 63 },
-          "bl": { "xPct": 20, "yPct": 72 }
+          "tl": { "xPct": 11.02941176470588, "yPct": 23.767653581294 },
+          "tr": { "xPct": 55.7401085434173, "yPct": 15.9708983387153 },
+          "br": { "xPct": 60.1628151260504, "yPct": 74.5438275687662 },
+          "bl": { "xPct": 15.6862745098039, "yPct": 86.5735517254795 }
         },
         "opacity": 0.95,
         "dropShadow": "drop-shadow(0 6px 10px rgba(0,0,0,.18))"

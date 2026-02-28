@@ -24,11 +24,11 @@ export function Hero() {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        {/* TODO: Replace placeholder collage with professional lifestyle photoshoot */}
-        <Image src="/product-tiles/card.jpg" alt="Family card gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
-        <Image src="/product-tiles/mug.jpg" alt="Pet mug gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
-        <Image src="/product-tiles/tee.jpg" alt="Cartoon tee gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
-        <Image src="/product-tiles/hoodie.jpg" alt="Anniversary hoodie gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
+        {/* Plain realistic product mockups */}
+        <Image src="/product-tiles/plain-card.png" alt="Family card gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
+        <Image src="/product-tiles/plain-mug.png" alt="Pet mug gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
+        <Image src="/product-tiles/plain-tee.png" alt="Plain tee gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
+        <Image src="/product-tiles/plain-hoodie.png" alt="Anniversary hoodie gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
       </div>
     </section>
   );

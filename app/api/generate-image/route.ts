@@ -5,10 +5,15 @@ import {
   fetchWithBackoff,
   sanitizePrompt,
 } from "./guardrails";
-import { getGenerationMetrics, recordGenerationMetric } from "./metrics";
+import {
+  getGenerationMetrics,
+  persistMetricsIfDue,
+  recordGenerationMetric,
+} from "./metrics";
 
 const CACHE_TTL_MS = 3 * 60 * 1000;
 const MAX_IN_FLIGHT_GENERATIONS = 8;
+const MAX_SOURCE_IMAGE_DATA_URL_CHARS = 8 * 1024 * 1024;
 
 type CachedGeneration = {
   imageDataUrl: string;
@@ -125,7 +130,12 @@ async function editImage(prompt: string, sourceImageDataUrl: string): Promise<st
 export async function POST(req: Request) {
   try {
     recordGenerationMetric("totalRequests", 1);
-    const body = (await req.json()) as GenerationRequestBody;
+    let body: GenerationRequestBody;
+    try {
+      body = (await req.json()) as GenerationRequestBody;
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+    }
     const prompt = body?.prompt;
     const sourceImageDataUrl =
       typeof body?.sourceImageDataUrl === "string" ? body.sourceImageDataUrl : null;
@@ -135,6 +145,12 @@ export async function POST(req: Request) {
     }
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json({ error: "Invalid prompt" }, { status: 400 });
+    }
+    if (sourceImageDataUrl && sourceImageDataUrl.length > MAX_SOURCE_IMAGE_DATA_URL_CHARS) {
+      return NextResponse.json(
+        { error: "Uploaded image is too large. Please upload a smaller file." },
+        { status: 400 }
+      );
     }
 
     const usageCheck = await enforceUsageGuards(req);
@@ -231,5 +247,7 @@ export async function POST(req: Request) {
     recordGenerationMetric("totalErrors", 1);
     const normalized = normalizeGenerationError(message);
     return NextResponse.json({ error: normalized.error }, { status: normalized.status });
+  } finally {
+    persistMetricsIfDue();
   }
 }

@@ -11,8 +11,9 @@ type SiteChromeProps = {
 export function SiteChrome({ children }: SiteChromeProps) {
   const pathname = usePathname();
   const isEntryLanding = pathname === "/";
+  const isCreateRoute = pathname.startsWith("/create");
 
-  if (isEntryLanding) {
+  if (isEntryLanding || isCreateRoute) {
     return <>{children}</>;
   }
 

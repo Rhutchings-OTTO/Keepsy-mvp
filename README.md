@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Keepsy MVP
 
-## Getting Started
+Keepsy is an AI-powered personalized gift storefront built with Next.js. Users can:
 
-First, run the development server:
+- Describe an image or upload a photo to transform with OpenAI image generation.
+- Preview the generated design on product mockups (tee, mug, card, hoodie).
+- Add items to cart and checkout through Stripe.
+
+## Local Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create `.env.local` with required variables:
+
+```bash
+OPENAI_API_KEY=...
+STRIPE_SECRET_KEY=...
+STRIPE_WEBHOOK_SECRET=...
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+SITE_URL=http://localhost:3000
+```
+
+3. Optional variables:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+PERF_DASHBOARD_KEY=...
+NEXT_PUBLIC_DEV_DATE=2026-12-10
+```
+
+4. Run app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Webhook Setup (Stripe)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Local webhook endpoint: `http://localhost:3000/api/stripe/webhook`
+- Configure Stripe to send `checkout.session.completed`.
+- Ensure `STRIPE_WEBHOOK_SECRET` matches the endpoint secret from Stripe.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Database Migrations (Supabase)
 
-## Learn More
+Apply both SQL files in `supabase/migrations`:
 
-To learn more about Next.js, take a look at the following resources:
+- `20260226_gatekeeper.sql`
+- `20260228_orders_and_perf.sql`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+These create guardrail, order, webhook idempotency, and metrics tables.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Production Readiness Status
 
-## Deploy on Vercel
+Completed:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- OpenAI generation + image edit flow
+- Stripe Checkout session creation with server-trusted product pricing
+- Stripe webhook ingestion and order persistence scaffolding
+- Cart + create-flow deep-linking from occasion/product pages
+- Success page backed by persisted order status
+- Payment failure/expiry order status transitions in webhook handlers
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Remaining intentional final step:
+
+- Printify API order execution after webhook-confirmed payment.
+
+## Production Checklist
+
+- Set `NEXT_PUBLIC_SITE_URL` and `SITE_URL` to your production origin.
+- Set `STRIPE_WEBHOOK_SECRET` from the live Stripe endpoint.
+- Apply Supabase migrations before first production checkout.
+- Set `PERF_DASHBOARD_KEY` to protect `/perf` and `/api/health/perf` in production.
+- Keep Printify integration disabled until you connect and test fulfillment webhooks.

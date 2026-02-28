@@ -9,10 +9,10 @@ export type ProductCard = {
 };
 
 export const PRODUCT_CARDS: ProductCard[] = [
-  { type: "card", name: "Greeting Card", price: 8, image: "/product-tiles/card.jpg" },
-  { type: "hoodie", name: "Premium Hoodie", price: 40, image: "/product-tiles/hoodie.jpg" },
-  { type: "mug", name: "Ceramic Mug", price: 14, image: "/product-tiles/mug.jpg" },
-  { type: "tee", name: "Premium Tee", price: 29, image: "/product-tiles/tee.jpg" },
+  { type: "card", name: "Greeting Card", price: 8, image: "/product-tiles/plain-card.png" },
+  { type: "hoodie", name: "Premium Hoodie", price: 40, image: "/product-tiles/plain-hoodie.png" },
+  { type: "mug", name: "Ceramic Mug", price: 14, image: "/product-tiles/plain-mug.png" },
+  { type: "tee", name: "Premium Tee", price: 29, image: "/product-tiles/plain-tee.png" },
 ];
 
 type ProductGridProps = {

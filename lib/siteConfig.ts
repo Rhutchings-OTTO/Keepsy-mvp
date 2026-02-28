@@ -51,7 +51,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Heartfelt portrait gifts moms keep forever.",
     defaultStyle: "Watercolor portrait",
     defaultProduct: "card",
-    image: "/product-tiles/card.jpg",
+    image: "/occasion-tiles/mothers-day-floral.png",
   },
   {
     id: "christmas",
@@ -59,7 +59,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Warm festive cards and family keepsakes.",
     defaultStyle: "Classic Christmas card",
     defaultProduct: "card",
-    image: "/product-tiles/card.jpg",
+    image: "/occasion-tiles/christmas-scene.png",
   },
   {
     id: "thanksgiving",
@@ -67,7 +67,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Family gratitude moments turned into gifts.",
     defaultStyle: "Vintage oil painting",
     defaultProduct: "mug",
-    image: "/product-tiles/mug.jpg",
+    image: "/occasion-tiles/thanksgiving-cartoon.png",
   },
   {
     id: "fourth-of-july",
@@ -75,7 +75,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Celebrate with bold patriotic artwork.",
     defaultStyle: "Kids as superheroes",
     defaultProduct: "tee",
-    image: "/product-tiles/tee.jpg",
+    image: "/occasion-tiles/fourth-july-photo.png",
   },
   {
     id: "birthdays",
@@ -83,7 +83,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Personalized gifts ready in minutes.",
     defaultStyle: "Minimal line art",
     defaultProduct: "hoodie",
-    image: "/product-tiles/hoodie.jpg",
+    image: "/occasion-tiles/birthday-confetti.png",
   },
   {
     id: "anniversaries",
@@ -91,7 +91,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Romantic custom art for meaningful milestones.",
     defaultStyle: "Watercolor portrait",
     defaultProduct: "card",
-    image: "/product-tiles/card.jpg",
+    image: "/occasion-tiles/anniversary-watercolor.png",
   },
   {
     id: "pet-gifts",
@@ -99,7 +99,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Turn pet photos into adorable keepsakes.",
     defaultStyle: "Pet portrait",
     defaultProduct: "mug",
-    image: "/product-tiles/mug.jpg",
+    image: "/occasion-tiles/pet-gifts-portrait.png",
   },
 ];
 

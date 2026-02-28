@@ -7,83 +7,73 @@ import { useRouter } from "next/navigation";
 
 const FLOATING_EXAMPLES = [
   {
-    id: "family-tee",
-    label: "Family Portrait Tee",
+    id: "plain-tee",
+    label: "Plain Tee Mockup",
     product: "T-Shirt",
-    image:
-      "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&q=80",
+    image: "/product-tiles/plain-tee.png",
     className: "hidden xl:block top-[10%] left-[2%] w-36 2xl:w-40",
   },
   {
-    id: "pet-mug",
-    label: "Pet Memory Mug",
+    id: "plain-mug",
+    label: "Plain Mug Mockup",
     product: "Mug",
-    image:
-      "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&q=80",
+    image: "/product-tiles/plain-mug.png",
     className: "hidden xl:block top-[12%] right-[2%] w-40 2xl:w-44",
   },
   {
-    id: "cartoon-hoodie",
-    label: "Cartoon Hoodie",
+    id: "plain-hoodie",
+    label: "Plain Hoodie Mockup",
     product: "Hoodie",
-    image:
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80",
+    image: "/product-tiles/plain-hoodie.png",
     className: "hidden xl:block bottom-[14%] left-[3%] w-44 2xl:w-48",
   },
   {
-    id: "kids-card",
-    label: "Kids Art Card",
+    id: "plain-card",
+    label: "Plain Card Mockup",
     product: "Card",
-    image:
-      "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=600&q=80",
+    image: "/product-tiles/plain-card.png",
     className: "hidden xl:block bottom-[14%] right-[3%] w-36 2xl:w-40",
   },
   {
-    id: "anniversary-card",
-    label: "Anniversary Card",
-    product: "Card",
-    image:
-      "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&q=80",
+    id: "christmas-scene",
+    label: "Christmas Scene",
+    product: "Design",
+    image: "/occasion-tiles/christmas-scene.png",
     className: "hidden 2xl:block top-[6%] right-[20%] w-36",
   },
   {
-    id: "baby-tee",
-    label: "Baby Memory Tee",
-    product: "T-Shirt",
-    image:
-      "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=600&q=80",
+    id: "thanksgiving-scene",
+    label: "Thanksgiving Cartoon",
+    product: "Design",
+    image: "/occasion-tiles/thanksgiving-cartoon.png",
     className: "hidden 2xl:block top-[38%] left-[0.5%] w-32",
   },
   {
-    id: "dog-hoodie",
-    label: "Pet Hoodie",
-    product: "Hoodie",
-    image:
-      "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=600&q=80",
+    id: "fourth-july-scene",
+    label: "Fourth of July Photo",
+    product: "Design",
+    image: "/occasion-tiles/fourth-july-photo.png",
     className: "hidden 2xl:block bottom-[4%] left-[20%] w-44",
   },
   {
-    id: "holiday-mug",
-    label: "Holiday Mug",
-    product: "Mug",
-    image:
-      "https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=600&q=80",
+    id: "anniversary-scene",
+    label: "Anniversary Watercolor",
+    product: "Design",
+    image: "/occasion-tiles/anniversary-watercolor.png",
     className: "hidden 2xl:block top-[44%] right-[15%] w-36",
   },
   {
-    id: "kids-art-card",
-    label: "Kids Art Card",
-    product: "Card",
-    image:
-      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=600&q=80",
+    id: "birthday-scene",
+    label: "Birthday Scene",
+    product: "Design",
+    image: "/occasion-tiles/birthday-confetti.png",
     className: "hidden 2xl:block bottom-[32%] right-[0.5%] w-28",
   },
   {
-    id: "family-hoodie",
-    label: "Family Hoodie",
-    product: "Hoodie",
-    image:
-      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
+    id: "pet-scene",
+    label: "Pet Portrait Scene",
+    product: "Design",
+    image: "/occasion-tiles/pet-gifts-portrait.png",
     className: "hidden 2xl:block top-[26%] left-[16%] w-52",
   },
 ];
@@ -97,16 +87,6 @@ export default function LandingPage() {
   return (
     <div
       className="relative min-h-screen overflow-hidden bg-[#FDFCFB] text-[#23211F]"
-      role="button"
-      tabIndex={0}
-      aria-label="Enter Keepsy creation studio"
-      onClick={() => router.push("/create")}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          router.push("/create");
-        }
-      }}
       onMouseMove={(event) => {
         const { innerWidth, innerHeight } = window;
         const x = ((event.clientX / innerWidth) * 100 - 50) * pointerScale;
@@ -157,18 +137,20 @@ export default function LandingPage() {
           <p className="mx-auto mt-6 max-w-3xl text-xl font-medium text-black/60">
             Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
           </p>
-          <motion.p
-            className="mx-auto mt-9 inline-block bg-clip-text text-lg font-extrabold text-transparent md:text-2xl"
-            style={{
-              backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)",
-              backgroundSize: "220% auto",
-              backgroundPosition: `${cursorOffset.x * 1.25}px ${cursorOffset.y * 1.25}px`,
-            }}
-            animate={{ backgroundSize: ["220% auto", "245% auto", "220% auto"] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            Tap anywhere to start creating
-          </motion.p>
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <button
+              onClick={() => router.push("/create")}
+              className="rounded-2xl bg-black px-6 py-3 text-base font-black text-white shadow-lg transition hover:bg-black/90"
+            >
+              Start creating
+            </button>
+            <button
+              onClick={() => router.push("/gift-ideas")}
+              className="rounded-2xl border border-black/15 bg-white/80 px-6 py-3 text-base font-bold text-black transition hover:bg-white"
+            >
+              Browse gift ideas
+            </button>
+          </div>
         </div>
 
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">

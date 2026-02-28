@@ -39,11 +39,6 @@ export function getClientKey(req: Request): string {
   return visitorId || forwardedFor || fallback;
 }
 
-function getUserTierFromHeader(req: Request): UserTier {
-  const header = req.headers.get("x-user-tier");
-  return header === "paid" ? "paid" : "free";
-}
-
 async function getUserTierFromDb(clientKey: string, fallbackTier: UserTier): Promise<UserTier> {
   const supabase = getSupabaseAdmin();
   if (!supabase) return fallbackTier;
@@ -111,8 +106,7 @@ async function enforceUsageGuardsSupabase(clientKey: string, fallbackTier: UserT
 
 export async function enforceUsageGuards(req: Request): Promise<GuardResult> {
   const clientKey = getClientKey(req);
-  const headerTier = getUserTierFromHeader(req);
-  return enforceUsageGuardsSupabase(clientKey, headerTier);
+  return enforceUsageGuardsSupabase(clientKey, "free");
 }
 
 export function sanitizePrompt(input: string): { ok: true; prompt: string } | { ok: false; error: string } {

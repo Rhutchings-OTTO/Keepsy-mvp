@@ -40,6 +40,22 @@ interface CartItem {
   quantity: number;
 }
 
+type PersistedCartItem = {
+  id: string;
+  productId: string;
+  imageDataUrl: string | null;
+  prompt: string;
+  quantity: number;
+};
+
+type InitialCreateQuery = {
+  product?: string;
+  style?: string;
+  occasion?: string;
+  success?: boolean;
+  canceled?: boolean;
+};
+
 /** Match your real products */
 const PRODUCTS: Product[] = [
   {
@@ -48,7 +64,7 @@ const PRODUCTS: Product[] = [
     name: "Premium tee",
     price: 29,
     description: "Soft, heavyweight premium tee.",
-    colors: ["#FFFFFF"],
+    colors: ["#FFFFFF", "#111827", "#2563EB"],
   },
   {
     id: "mug",
@@ -72,7 +88,7 @@ const PRODUCTS: Product[] = [
     name: "Hoodie",
     price: 40,
     description: "Soft fleece hoodie, gift-ready print.",
-    colors: ["#FFFFFF"],
+    colors: ["#FFFFFF", "#111827", "#2563EB"],
   },
 ];
 
@@ -119,9 +135,39 @@ const GBP_FORMATTER = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
 });
+const CART_STORAGE_KEY = "keepsy_cart_v1";
 
 function gbp(n: number) {
   return GBP_FORMATTER.format(n);
+}
+
+function toPersistedCart(cartItems: CartItem[]): PersistedCartItem[] {
+  return cartItems.map((item) => ({
+    id: item.id,
+    productId: item.product.id,
+    imageDataUrl: item.imageDataUrl,
+    prompt: item.prompt,
+    quantity: item.quantity,
+  }));
+}
+
+function fromPersistedCart(raw: string): CartItem[] {
+  const parsed = JSON.parse(raw) as PersistedCartItem[];
+  if (!Array.isArray(parsed)) return [];
+  return parsed
+    .map((item) => {
+      const product = PRODUCTS.find((candidate) => candidate.id === item.productId);
+      if (!product) return null;
+      if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 20) return null;
+      return {
+        id: item.id,
+        product,
+        imageDataUrl: typeof item.imageDataUrl === "string" ? item.imageDataUrl : null,
+        prompt: typeof item.prompt === "string" ? item.prompt : "",
+        quantity: item.quantity,
+      };
+    })
+    .filter((item): item is CartItem => item !== null);
 }
 
 function getVisitorId(): string {
@@ -183,12 +229,12 @@ async function checkoutViaKeepsyAPI(args: {
   selectedProduct: Product;
   prompt: string;
   imageDataUrl: string;
-  cart?: Array<{ id: string; name: string; priceGBP: number; quantity: number }>;
+  cart?: Array<{ id: string; name: string; quantity: number }>;
 }) {
   const normalizedCart =
     args.cart && args.cart.length > 0
       ? args.cart
-      : [{ id: args.selectedProduct.id, name: args.selectedProduct.name, priceGBP: args.selectedProduct.price, quantity: 1 }];
+      : [{ id: args.selectedProduct.id, name: args.selectedProduct.name, quantity: 1 }];
 
   const res = await fetch("/api/create-checkout-session", {
     method: "POST",
@@ -197,7 +243,6 @@ async function checkoutViaKeepsyAPI(args: {
       product: {
         id: args.selectedProduct.id,
         name: args.selectedProduct.name,
-        priceGBP: args.selectedProduct.price,
       },
       currency: "gbp",
       prompt: args.prompt,
@@ -215,9 +260,11 @@ async function checkoutViaKeepsyAPI(args: {
 const RealProductPreview = React.memo(function RealProductPreview({
   type,
   imageDataUrl,
+  selectedColor,
 }: {
   type: MerchType;
   imageDataUrl: string | null;
+  selectedColor: string;
 }) {
   type ImageFormat = "portrait" | "landscape" | "square";
 
@@ -226,9 +273,9 @@ const RealProductPreview = React.memo(function RealProductPreview({
   // Fit presets by product + generated image format on realistic plain mockups.
   const overlayByFormat: Record<MerchType, Record<ImageFormat, React.CSSProperties>> = {
     card: {
-      landscape: { top: "35%", left: "22%", width: "56%", height: "26%" },
-      portrait: { top: "26%", left: "30%", width: "40%", height: "48%" },
-      square: { top: "31%", left: "26%", width: "48%", height: "36%" },
+      landscape: { top: "36%", left: "19%", width: "56%", height: "26%" },
+      portrait: { top: "27%", left: "27%", width: "40%", height: "48%" },
+      square: { top: "31%", left: "23%", width: "48%", height: "36%" },
     },
     tshirt: {
       landscape: { top: "40%", left: "26%", width: "48%", height: "20%" },
@@ -236,9 +283,9 @@ const RealProductPreview = React.memo(function RealProductPreview({
       square: { top: "34%", left: "29%", width: "42%", height: "34%" },
     },
     mug: {
-      landscape: { top: "40%", left: "27%", width: "46%", height: "18%" },
-      portrait: { top: "31%", left: "35%", width: "30%", height: "40%" },
-      square: { top: "35%", left: "31%", width: "38%", height: "30%" },
+      landscape: { top: "41%", left: "30%", width: "41%", height: "17%" },
+      portrait: { top: "31%", left: "37%", width: "26%", height: "38%" },
+      square: { top: "36%", left: "33%", width: "34%", height: "28%" },
     },
     hoodie: {
       landscape: { top: "42%", left: "27%", width: "46%", height: "19%" },
@@ -246,11 +293,65 @@ const RealProductPreview = React.memo(function RealProductPreview({
       square: { top: "36%", left: "30%", width: "40%", height: "33%" },
     },
   };
+  const colorKeyByHex: Record<string, "white" | "black" | "blue"> = {
+    "#FFFFFF": "white",
+    "#111827": "black",
+    "#2563EB": "blue",
+  };
+  const selectedColorKey = colorKeyByHex[selectedColor] ?? "white";
   const productImageByType: Record<MerchType, string> = {
-    tshirt: "/product-tiles/plain-tee.png",
+    tshirt: `/product-tiles/tee-${selectedColorKey}.png`,
     mug: "/product-tiles/plain-mug.png",
     card: "/product-tiles/plain-card.png",
-    hoodie: "/product-tiles/plain-hoodie.png",
+    hoodie: `/product-tiles/hoodie-${selectedColorKey}.png`,
+  };
+  const overlayFxByType: Record<MerchType, React.CSSProperties> = {
+    tshirt: {
+      mixBlendMode: "multiply",
+      opacity: selectedColorKey === "white" ? 0.9 : 0.96,
+      filter: "saturate(1.08) contrast(1.03)",
+      transform: "perspective(1000px) rotateX(1deg)",
+      borderRadius: "0.8rem",
+    },
+    hoodie: {
+      mixBlendMode: "multiply",
+      opacity: selectedColorKey === "white" ? 0.9 : 0.96,
+      filter: "saturate(1.08) contrast(1.03)",
+      transform: "perspective(1000px) rotateX(1deg)",
+      borderRadius: "0.8rem",
+    },
+    mug: {
+      mixBlendMode: "multiply",
+      opacity: 0.94,
+      filter: "saturate(1.04) contrast(1.02)",
+      transform: "perspective(900px) rotateY(-8deg)",
+      borderRadius: "999px",
+    },
+    card: {
+      mixBlendMode: "multiply",
+      opacity: 0.95,
+      filter: "contrast(1.02)",
+      transform: "rotate(-6deg)",
+      borderRadius: "0.45rem",
+    },
+  };
+  const textureFxByType: Partial<Record<MerchType, React.CSSProperties>> = {
+    tshirt: {
+      background:
+        "repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 1px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 4px)",
+      mixBlendMode: "soft-light",
+      opacity: selectedColorKey === "white" ? 0.2 : 0.28,
+      borderRadius: "0.8rem",
+      transform: "perspective(1000px) rotateX(1deg)",
+    },
+    hoodie: {
+      background:
+        "repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 1px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 4px)",
+      mixBlendMode: "soft-light",
+      opacity: selectedColorKey === "white" ? 0.2 : 0.28,
+      borderRadius: "0.8rem",
+      transform: "perspective(1000px) rotateX(1deg)",
+    },
   };
 
   const currentFormat: ImageFormat = imageDataUrl ? imageFormat : "square";
@@ -266,29 +367,44 @@ const RealProductPreview = React.memo(function RealProductPreview({
         sizes="(max-width: 1024px) 100vw, 700px"
       />
       {imageDataUrl && (
-        <motion.img
-          key={imageDataUrl}
-          initial={{ opacity: 0, scale: 0.985 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
-          src={imageDataUrl}
-          onLoad={(event) => {
-            const ratio = event.currentTarget.naturalWidth / event.currentTarget.naturalHeight;
-            if (ratio > 1.2) setImageFormat("landscape");
-            else if (ratio < 0.8) setImageFormat("portrait");
-            else setImageFormat("square");
-          }}
-          alt="Applied design"
-          className="absolute rounded-xl shadow-xl border border-black/10 bg-white"
-          style={{ ...overlayByFormat[type][currentFormat], objectFit: "cover" }}
-        />
+        <>
+          <motion.img
+            key={imageDataUrl}
+            initial={{ opacity: 0, scale: 0.985 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            src={imageDataUrl}
+            onLoad={(event) => {
+              const ratio = event.currentTarget.naturalWidth / event.currentTarget.naturalHeight;
+              if (ratio > 1.2) setImageFormat("landscape");
+              else if (ratio < 0.8) setImageFormat("portrait");
+              else setImageFormat("square");
+            }}
+            alt="Applied design"
+            className="absolute"
+            style={{
+              ...overlayByFormat[type][currentFormat],
+              ...overlayFxByType[type],
+              objectFit: "cover",
+            }}
+          />
+          {textureFxByType[type] && (
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                ...overlayByFormat[type][currentFormat],
+                ...textureFxByType[type],
+              }}
+            />
+          )}
+        </>
       )}
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/0 via-black/0 to-black/[0.08]" />
     </div>
   );
 });
 
-export default function MerchGeneratorPlatform() {
+export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?: InitialCreateQuery }) {
   const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
@@ -307,6 +423,8 @@ export default function MerchGeneratorPlatform() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutSuccess] = useState(false);
+  const [checkoutStatus, setCheckoutStatus] = useState<"success" | "canceled" | null>(null);
+  const didApplyInitialQuery = useRef(false);
   const cartCount = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
     [cartItems]
@@ -315,6 +433,15 @@ export default function MerchGeneratorPlatform() {
     () => cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
     [cartItems]
   );
+  const hasCartItems = cartItems.length > 0;
+  const checkoutTotal = hasCartItems ? cartSubtotal : selectedProduct.price;
+  const checkoutItemDescription = hasCartItems
+    ? `${cartCount} item${cartCount === 1 ? "" : "s"}`
+    : selectedProduct.name;
+  const checkoutPreviewImage = hasCartItems ? cartItems[0]?.imageDataUrl ?? null : generatedImage;
+  const canProceedToCheckout = hasCartItems
+    ? cartItems.length > 0 && cartItems.every((item) => Boolean(item.imageDataUrl))
+    : Boolean(generatedImage);
 
   useEffect(() => {
     return () => {
@@ -322,6 +449,69 @@ export default function MerchGeneratorPlatform() {
       generateAbortRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+      if (!raw) return;
+      const restored = fromPersistedCart(raw);
+      if (restored.length > 0) {
+        setCartItems(restored);
+      }
+    } catch {
+      // ignore malformed local cart snapshots
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toPersistedCart(cartItems)));
+    } catch {
+      // ignore storage write failures in restricted environments
+    }
+  }, [cartItems]);
+
+  useEffect(() => {
+    if (!initialQuery || didApplyInitialQuery.current) return;
+    didApplyInitialQuery.current = true;
+
+    const normalizedProduct = initialQuery.product?.toLowerCase();
+    const productAliasToId: Record<string, Product["id"]> = {
+      tee: "tee",
+      tshirt: "tee",
+      "t-shirt": "tee",
+      mug: "mug",
+      card: "card",
+      hoodie: "hoodie",
+    };
+    const mappedProductId = normalizedProduct ? productAliasToId[normalizedProduct] : null;
+    const mappedProduct = mappedProductId
+      ? PRODUCTS.find((product) => product.id === mappedProductId)
+      : null;
+
+    if (mappedProduct) {
+      setSelectedProduct(mappedProduct);
+      setSelectedColor(mappedProduct.colors[0]);
+      setStep(2);
+    }
+
+    const style = initialQuery.style?.trim();
+    const occasion = initialQuery.occasion?.replace(/-/g, " ").trim();
+    if (style && occasion) {
+      setPrompt(`${style} style artwork for ${occasion}.`);
+    } else if (style) {
+      setPrompt(`${style} style artwork, gift-ready and print-ready.`);
+    }
+
+    if (initialQuery.success) {
+      setCheckoutStatus("success");
+      setView("home");
+      setStep(1);
+      setIsCartOpen(false);
+    } else if (initialQuery.canceled) {
+      setCheckoutStatus("canceled");
+    }
+  }, [initialQuery]);
 
   const handleGenerate = async () => {
     if (!prompt && !uploadedImage) return;
@@ -373,6 +563,11 @@ export default function MerchGeneratorPlatform() {
   };
 
   const handleAddToCart = () => {
+    if (!generatedImage) {
+      setGenerationError("Generate a design before adding an item to cart.");
+      setStep(1);
+      return;
+    }
     const nextItemId = `${selectedProduct.id}-${generatedImage ?? "no-image"}`;
     setCartItems((prev) => {
       const existing = prev.find((item) => item.id === nextItemId);
@@ -430,21 +625,22 @@ export default function MerchGeneratorPlatform() {
 
   const handleCartCheckout = async () => {
     if (cartItems.length === 0) return;
-    const firstItem = cartItems[0];
-    if (!firstItem.imageDataUrl) {
-      alert("Please generate a design before checking out.");
+    if (cartItems.some((item) => !item.imageDataUrl)) {
+      alert("Please remove items missing generated designs before checking out.");
       return;
     }
+    const firstItem = cartItems[0];
+    const checkoutImage = firstItem.imageDataUrl;
+    if (!checkoutImage) return;
     setIsBusy(true);
     try {
       const url = await checkoutViaKeepsyAPI({
         selectedProduct: firstItem.product,
         prompt: firstItem.prompt,
-        imageDataUrl: firstItem.imageDataUrl,
+        imageDataUrl: checkoutImage,
         cart: cartItems.map((item) => ({
           id: item.product.id,
           name: item.product.name,
-          priceGBP: item.product.price * item.quantity,
           quantity: item.quantity,
         })),
       });
@@ -585,6 +781,17 @@ export default function MerchGeneratorPlatform() {
         <AnimatePresence mode="wait">
           {view === "home" && (
             <div className="space-y-20">
+              <div className="flex gap-2 md:hidden">
+                <button onClick={() => setView("home")} className="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs font-bold">
+                  How it works
+                </button>
+                <button onClick={() => setView("catalog")} className="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs font-bold">
+                  Catalog
+                </button>
+                <button onClick={() => setView("community")} className="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs font-bold">
+                  Community
+                </button>
+              </div>
               {/* STEP 1 */}
               {step === 1 && (
                 <motion.div
@@ -636,7 +843,7 @@ export default function MerchGeneratorPlatform() {
                               if (generationError) setGenerationError(null);
                             }}
                             placeholder={uploadedImage ? "Add instructions for your photo..." : "Describe your gift image…"}
-                            className="flex-1 py-4 outline-none text-base md:text-lg placeholder:text-black/25 font-semibold bg-transparent"
+                            className="flex-1 bg-transparent py-4 text-base font-semibold outline-none placeholder:text-black/40 md:text-lg"
                           />
 
                           <div className="flex items-center gap-2 border-l border-black/5 pl-4 ml-2">
@@ -644,7 +851,7 @@ export default function MerchGeneratorPlatform() {
                             <button
                               onClick={() => fileInputRef.current?.click()}
                               className={`p-3 rounded-xl transition-all flex items-center gap-2 ${
-                                uploadedImage ? "bg-black/5 text-black" : "text-black/45 hover:bg-black/5 hover:text-black"
+                                uploadedImage ? "bg-black/5 text-black" : "text-black/60 hover:bg-black/5 hover:text-black"
                               }`}
                               title="Upload a photo"
                             >
@@ -683,6 +890,28 @@ export default function MerchGeneratorPlatform() {
                             className="mx-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
                           >
                             {generationError}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                      <AnimatePresence>
+                        {checkoutStatus === "success" && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            className="mx-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"
+                          >
+                            Payment complete. Your order is confirmed and queued for processing.
+                          </motion.p>
+                        )}
+                        {checkoutStatus === "canceled" && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            className="mx-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700"
+                          >
+                            Checkout canceled. Your design is saved here so you can continue anytime.
                           </motion.p>
                         )}
                       </AnimatePresence>
@@ -799,6 +1028,7 @@ export default function MerchGeneratorPlatform() {
                     <RealProductPreview
                       type={selectedProduct.type}
                       imageDataUrl={generatedImage}
+                      selectedColor={selectedColor}
                     />
                     <div className="mt-6 flex gap-3 items-center">
                       <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">
@@ -874,7 +1104,8 @@ export default function MerchGeneratorPlatform() {
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={handleAddToCart}
-                            className="w-full py-4 bg-black text-white rounded-2xl font-black flex items-center justify-center gap-2"
+                            disabled={!generatedImage}
+                            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-black py-4 font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             Add <Plus size={18} />
                           </motion.button>
@@ -904,12 +1135,12 @@ export default function MerchGeneratorPlatform() {
                   <div className="bg-white/80 border border-black/10 rounded-[32px] p-7 shadow-sm">
                     <h2 className="text-3xl font-black mb-4">Checkout</h2>
                     <p className="text-black/55 font-semibold mb-6">
-                      You’re about to buy: <span className="text-black">{selectedProduct.name}</span>
+                      You&apos;re about to buy: <span className="text-black">{checkoutItemDescription}</span>
                     </p>
 
                     <motion.button
-                      onClick={handleCheckout}
-                      disabled={isBusy || !generatedImage}
+                      onClick={hasCartItems ? handleCartCheckout : handleCheckout}
+                      disabled={isBusy || !canProceedToCheckout}
                       className="w-full py-5 rounded-2xl font-black text-lg text-white shadow-xl relative overflow-hidden"
                       style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#B19CD9)" }}
                     >
@@ -920,7 +1151,7 @@ export default function MerchGeneratorPlatform() {
                           </motion.div>
                         ) : (
                           <motion.div key="default" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-2">
-                            {isBusy ? "Redirecting…" : `Pay ${gbp(selectedProduct.price)}`} <ArrowRight />
+                            {isBusy ? "Redirecting…" : `Pay ${gbp(checkoutTotal)}`} <ArrowRight />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -941,21 +1172,23 @@ export default function MerchGeneratorPlatform() {
                   <div className="bg-white/70 border border-black/10 rounded-[32px] p-7 shadow-sm">
                     <h3 className="text-xl font-black mb-4">Order Summary</h3>
                     <div className="flex items-center gap-4">
-                      <div className="w-20 h-20 rounded-2xl overflow-hidden border border-black/10 bg-white">
-                        {generatedImage ? (
-                          <Image src={generatedImage} className="w-full h-full object-cover" alt="thumb" fill />
+                      <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-black/10 bg-white">
+                        {checkoutPreviewImage ? (
+                          <Image src={checkoutPreviewImage} className="w-full h-full object-cover" alt="thumb" fill />
                         ) : null}
                       </div>
                       <div>
-                        <div className="font-extrabold">{selectedProduct.name}</div>
-                        <div className="text-sm text-black/55 font-semibold">Custom AI-generated design</div>
+                        <div className="font-extrabold">{checkoutItemDescription}</div>
+                        <div className="text-sm text-black/55 font-semibold">
+                          {hasCartItems ? "Mixed cart with custom AI-generated designs" : "Custom AI-generated design"}
+                        </div>
                       </div>
-                      <div className="ml-auto font-black">{gbp(selectedProduct.price)}</div>
+                      <div className="ml-auto font-black">{gbp(checkoutTotal)}</div>
                     </div>
 
                     <div className="mt-6 pt-5 border-t border-black/10 space-y-2 text-sm font-semibold text-black/60">
                       <div className="flex justify-between"><span>Shipping</span><span>Free</span></div>
-                      <div className="flex justify-between text-black font-black text-base pt-2"><span>Total</span><span>{gbp(selectedProduct.price)}</span></div>
+                      <div className="flex justify-between text-black font-black text-base pt-2"><span>Total</span><span>{gbp(checkoutTotal)}</span></div>
                     </div>
 
                     <div className="mt-6 flex items-center gap-2 text-xs text-black/45 font-semibold">

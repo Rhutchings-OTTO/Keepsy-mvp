@@ -6,7 +6,7 @@ export function OccasionTiles() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-12">
       <h2 className="text-2xl font-black sm:text-3xl">Gift ideas by occasion</h2>
-      <p className="mt-2 text-black/65">Start with a curated style and product combo.</p>
+      <p className="mt-2 text-black/65">Start with curated design directions for each occasion.</p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {OCCASIONS.map((occasion) => (
           (() => {

@@ -1,0 +1,137 @@
+{
+  "tshirt": {
+    "white": {
+      "baseMockupSrc": "/product-tiles/tee-white.png",
+      "aspectRatio": 1.7778,
+      "placement": {
+        "kind": "rect",
+        "rect": {
+          "xPct": 50,
+          "yPct": 37,
+          "wPct": 30,
+          "hPct": 30,
+          "rotateDeg": 0,
+          "borderRadiusPct": 2
+        },
+        "opacity": 0.96
+      }
+    },
+    "blue": {
+      "baseMockupSrc": "/product-tiles/tee-blue.png",
+      "aspectRatio": 1.7778,
+      "placement": {
+        "kind": "rect",
+        "rect": {
+          "xPct": 50,
+          "yPct": 37,
+          "wPct": 30,
+          "hPct": 30,
+          "rotateDeg": 0,
+          "borderRadiusPct": 2
+        },
+        "opacity": 0.96
+      }
+    },
+    "black": {
+      "baseMockupSrc": "/mockups/tee-black.png",
+      "aspectRatio": 1.7778,
+      "placement": {
+        "kind": "rect",
+        "rect": {
+          "xPct": 50,
+          "yPct": 37,
+          "wPct": 30,
+          "hPct": 30,
+          "rotateDeg": 0,
+          "borderRadiusPct": 2
+        },
+        "opacity": 0.96
+      }
+    }
+  },
+  "hoodie": {
+    "white": {
+      "baseMockupSrc": "/product-tiles/hoodie-white.png",
+      "aspectRatio": 1.7778,
+      "placement": {
+        "kind": "rect",
+        "rect": {
+          "xPct": 50,
+          "yPct": 40,
+          "wPct": 31,
+          "hPct": 31,
+          "rotateDeg": 0,
+          "borderRadiusPct": 2
+        },
+        "opacity": 0.96
+      }
+    },
+    "blue": {
+      "baseMockupSrc": "/product-tiles/hoodie-blue.png",
+      "aspectRatio": 1.7778,
+      "placement": {
+        "kind": "rect",
+        "rect": {
+          "xPct": 50,
+          "yPct": 40,
+          "wPct": 31,
+          "hPct": 31,
+          "rotateDeg": 0,
+          "borderRadiusPct": 2
+        },
+        "opacity": 0.96
+      }
+    },
+    "black": {
+      "baseMockupSrc": "/mockups/hoodie-black.png",
+      "aspectRatio": 1.7778,
+      "placement": {
+        "kind": "rect",
+        "rect": {
+          "xPct": 50,
+          "yPct": 40,
+          "wPct": 31,
+          "hPct": 31,
+          "rotateDeg": 0,
+          "borderRadiusPct": 2
+        },
+        "opacity": 0.96
+      }
+    }
+  },
+  "mug": {
+    "white": {
+      "baseMockupSrc": "/product-tiles/plain-mug-front.png",
+      "aspectRatio": 1.7778,
+      "placement": {
+        "kind": "rect",
+        "rect": {
+          "xPct": 50,
+          "yPct": 56,
+          "wPct": 26,
+          "hPct": 26,
+          "rotateDeg": 0,
+          "borderRadiusPct": 2
+        },
+        "opacity": 0.98
+      }
+    }
+  },
+  "card": {
+    "white": {
+      "baseMockupSrc": "/product-tiles/plain-card.png",
+      "aspectRatio": 1.7778,
+      "placement": {
+        "kind": "quad",
+        "quad": {
+          "tl": { "xPct": 19, "yPct": 43 },
+          "tr": { "xPct": 40, "yPct": 35 },
+          "br": { "xPct": 41, "yPct": 63 },
+          "bl": { "xPct": 20, "yPct": 72 }
+        },
+        "opacity": 0.95,
+        "dropShadow": "drop-shadow(0 6px 10px rgba(0,0,0,.18))"
+      }
+    }
+  }
+}

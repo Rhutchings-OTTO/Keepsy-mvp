@@ -63,6 +63,7 @@ type PersistedCartItem = {
 
 type InitialCreateQuery = {
   product?: string;
+  prompt?: string;
   style?: string;
   occasion?: string;
   success?: boolean;
@@ -386,7 +387,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
     const style = initialQuery.style?.trim();
     const occasion = initialQuery.occasion?.replace(/-/g, " ").trim();
-    if (style && occasion) {
+    const queryPrompt = initialQuery.prompt?.trim();
+    if (queryPrompt) {
+      setPrompt(queryPrompt);
+    } else if (style && occasion) {
       setPrompt(`${style} style artwork for ${occasion}.`);
     } else if (style) {
       setPrompt(`${style} style artwork, gift-ready and print-ready.`);

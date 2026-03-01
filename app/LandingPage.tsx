@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import RegionSelector from "@/components/RegionSelector";
@@ -89,8 +89,17 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   const router = useRouter();
   const [cursorOffset, setCursorOffset] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const [region, setActiveRegion] = useState<Region | null>(initialRegion);
-  const [selectorOpen, setSelectorOpen] = useState(false);
+  const [region, setActiveRegion] = useState<Region | null>(() => {
+    if (initialRegion) return initialRegion;
+    if (typeof window === "undefined") return null;
+    return getRegion() ?? regionFromPathOrHost();
+  });
+  const [selectorOpen, setSelectorOpen] = useState<boolean>(() => {
+    if (initialRegion) return false;
+    if (typeof window === "undefined") return false;
+    const seededRegion = getRegion() ?? regionFromPathOrHost();
+    return !seededRegion;
+  });
   const [ripple, setRipple] = useState<{ active: boolean; x: number; y: number; to: string }>({
     active: false,
     x: 0,
@@ -99,16 +108,6 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   });
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
   const content = getLandingContent(region ?? "UK");
-
-  useEffect(() => {
-    const stored = getRegion() ?? regionFromPathOrHost();
-    if (stored) {
-      setActiveRegion(stored);
-      setRegion(stored);
-      return;
-    }
-    setSelectorOpen(true);
-  }, []);
 
   const navigateWithRipple = (event: React.MouseEvent<HTMLButtonElement>, to: string) => {
     const x = event.clientX;
@@ -264,7 +263,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               </article>
             ))}
           </div>
-        </div>
+        </section>
 
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           {FLOATING_EXAMPLES.map((example, i) => (

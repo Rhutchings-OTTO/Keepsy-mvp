@@ -3,18 +3,17 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import PerspT from "perspective-transform";
 import PrintAreaOverlay from "@/components/PrintAreaOverlay";
 import {
   getPlacement,
   placements as staticPlacements,
   type MockupColor,
   type MockupProductType,
-  type PlacementQuad,
-  type PlacementQuadPoint,
   type PlacementRect,
+  type PlacementEntry,
   type PlacementMap,
 } from "@/lib/mockups/placements";
+import { fitArtworkToBoundary, type PixelRect } from "@/lib/placement/fitArtworkToBoundary";
 
 type MockupRendererProps = {
   productType: MockupProductType;
@@ -24,30 +23,37 @@ type MockupRendererProps = {
   className?: string;
 };
 
-function rectToQuad(rect: PlacementRect): PlacementQuad {
-  const boundary = rect.boundary;
-  const derivedHalfW = boundary
-    ? Math.max(0, Math.min(rect.xPct - boundary.leftPct, boundary.rightPct - rect.xPct))
-    : rect.wPct / 2;
-  const derivedHalfH = boundary
-    ? Math.max(0, Math.min(rect.yPct - boundary.topPct, boundary.bottomPct - rect.yPct))
-    : rect.hPct / 2;
+const DEBUG_PLACEMENT = process.env.NODE_ENV === "development";
 
-  const hw = derivedHalfW;
-  const hh = derivedHalfH;
-  const angle = (rect.rotateDeg * Math.PI) / 180;
-  const sin = Math.sin(angle);
-  const cos = Math.cos(angle);
-  const center = { x: rect.xPct, y: rect.yPct };
-  const rotate = (x: number, y: number): PlacementQuadPoint => ({
-    xPct: center.x + x * cos - y * sin,
-    yPct: center.y + x * sin + y * cos,
-  });
+function resolvePlacementEntry(
+  activeMap: PlacementMap,
+  productType: MockupProductType,
+  color: MockupColor,
+): PlacementEntry {
+  const byProduct = activeMap[productType];
+  if (!byProduct) return getPlacement(productType, color);
+
+  const colorEntry = byProduct[color] || byProduct.white;
+  if (!colorEntry) return getPlacement(productType, color);
+
+  // Keep apparel print geometry uniform across colors while allowing color-specific mockup assets.
+  if (productType === "tshirt" || productType === "hoodie") {
+    const uniformEntry = byProduct.white || colorEntry;
+    return {
+      ...colorEntry,
+      placement: uniformEntry.placement,
+    };
+  }
+
+  return colorEntry;
+}
+
+function rectPercentToPixels(rect: PlacementRect, width: number, height: number): PixelRect {
   return {
-    tl: rotate(-hw, -hh),
-    tr: rotate(hw, -hh),
-    br: rotate(hw, hh),
-    bl: rotate(-hw, hh),
+    x: ((rect.xPct - rect.wPct / 2) / 100) * width,
+    y: ((rect.yPct - rect.hPct / 2) / 100) * height,
+    w: (rect.wPct / 100) * width,
+    h: (rect.hPct / 100) * height,
   };
 }
 
@@ -61,6 +67,9 @@ export function MockupRenderer({
   const [runtimePlacements, setRuntimePlacements] = useState<PlacementMap | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [sourceSize, setSourceSize] = useState({ width: 1024, height: 1024 });
+  const previousColorRef = useRef<MockupColor | null>(null);
+  const previousArtworkSrcRef = useRef<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -95,36 +104,87 @@ export function MockupRenderer({
     return () => obs.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!generatedImage) return;
+    let active = true;
+    const probe = new window.Image();
+    probe.onload = () => {
+      if (!active) return;
+      setSourceSize({
+        width: Math.max(1, probe.naturalWidth || 1024),
+        height: Math.max(1, probe.naturalHeight || 1024),
+      });
+    };
+    probe.src = generatedImage;
+    return () => {
+      active = false;
+    };
+  }, [generatedImage]);
+
+  useEffect(() => {
+    if (!DEBUG_PLACEMENT) {
+      previousColorRef.current = color;
+      previousArtworkSrcRef.current = generatedImage;
+      return;
+    }
+    const previousColor = previousColorRef.current;
+    const previousArtwork = previousArtworkSrcRef.current;
+    if (
+      previousColor &&
+      previousColor !== color &&
+      previousArtwork &&
+      generatedImage &&
+      previousArtwork !== generatedImage
+    ) {
+      console.error("[MockupRenderer] Artwork source changed when switching color.", {
+        productType,
+        fromColor: previousColor,
+        toColor: color,
+      });
+    }
+    previousColorRef.current = color;
+    previousArtworkSrcRef.current = generatedImage;
+  }, [color, generatedImage, productType]);
+
   const activeMap = runtimePlacements ?? staticPlacements;
-  const byProduct = activeMap[productType];
-  const entry = (byProduct?.[color] || byProduct?.white || getPlacement(productType, color));
+  const entry = resolvePlacementEntry(activeMap, productType, color);
   const artworkPresent = hasArtwork ?? Boolean(generatedImage);
-  const activeQuad =
-    entry.placement.kind === "quad" ? entry.placement.quad : rectToQuad(entry.placement.rect);
+  const rectPlacement = entry.placement.kind === "rect" ? entry.placement.rect : null;
 
-  const quadMatrix = useMemo(() => {
+  const boundaryRectPx = useMemo(() => {
+    if (!rectPlacement) return null;
     if (containerSize.width <= 0 || containerSize.height <= 0) return null;
-    const quad = activeQuad;
-    const srcW = 1000;
-    const srcH = 1000;
-    const srcPts = [0, 0, srcW, 0, srcW, srcH, 0, srcH];
-    const dstPts = [
-      (quad.tl.xPct / 100) * containerSize.width,
-      (quad.tl.yPct / 100) * containerSize.height,
-      (quad.tr.xPct / 100) * containerSize.width,
-      (quad.tr.yPct / 100) * containerSize.height,
-      (quad.br.xPct / 100) * containerSize.width,
-      (quad.br.yPct / 100) * containerSize.height,
-      (quad.bl.xPct / 100) * containerSize.width,
-      (quad.bl.yPct / 100) * containerSize.height,
-    ];
-    const transform = PerspT(srcPts, dstPts);
-    const c = transform.coeffs;
-    if (!Array.isArray(c) || c.length < 9) return null;
+    return rectPercentToPixels(rectPlacement, containerSize.width, containerSize.height);
+  }, [containerSize.height, containerSize.width, rectPlacement]);
 
-    // map projective coefficients to CSS matrix3d
-    return `matrix3d(${c[0]},${c[3]},0,${c[6]},${c[1]},${c[4]},0,${c[7]},0,0,1,0,${c[2]},${c[5]},0,1)`;
-  }, [activeQuad, containerSize.width, containerSize.height]);
+  const artworkRectPx = useMemo(() => {
+    if (!boundaryRectPx) return null;
+    return fitArtworkToBoundary({
+      boundary: boundaryRectPx,
+      imageWidth: sourceSize.width,
+      imageHeight: sourceSize.height,
+      mode: "contain",
+    });
+  }, [boundaryRectPx, sourceSize.height, sourceSize.width]);
+
+  useEffect(() => {
+    if (!DEBUG_PLACEMENT || !boundaryRectPx || !artworkRectPx) return;
+    const boundaryCx = boundaryRectPx.x + boundaryRectPx.w / 2;
+    const boundaryCy = boundaryRectPx.y + boundaryRectPx.h / 2;
+    const artworkCx = artworkRectPx.x + artworkRectPx.w / 2;
+    const artworkCy = artworkRectPx.y + artworkRectPx.h / 2;
+    const deltaX = Math.abs(boundaryCx - artworkCx);
+    const deltaY = Math.abs(boundaryCy - artworkCy);
+    const withinTolerance = deltaX <= 1 && deltaY <= 1;
+    if (!withinTolerance) {
+      console.error("[MockupRenderer] Artwork is not centered inside boundary.", {
+        productType,
+        color,
+        deltaX,
+        deltaY,
+      });
+    }
+  }, [artworkRectPx, boundaryRectPx, color, productType]);
 
   return (
     <div
@@ -145,33 +205,81 @@ export function MockupRenderer({
         isActive={true}
         hasArtwork={artworkPresent}
       />
-      {generatedImage && (
+      {generatedImage && rectPlacement && boundaryRectPx && artworkRectPx ? (
         <>
-          {quadMatrix && (
+          <div
+            className="pointer-events-none absolute"
+            style={{
+              left: boundaryRectPx.x,
+              top: boundaryRectPx.y,
+              width: boundaryRectPx.w,
+              height: boundaryRectPx.h,
+              transform: `rotate(${rectPlacement.rotateDeg}deg)`,
+              transformOrigin: "center center",
+              overflow: "hidden",
+              borderRadius: `${rectPlacement.borderRadiusPct ?? 0}%`,
+            }}
+          >
             <motion.img
-              key={`${productType}-${color}-${generatedImage}-quad`}
+              key={`${productType}-${color}-${generatedImage}-rect`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
               src={generatedImage}
               alt="Applied design"
-              className="absolute left-0 top-0"
-              width={1000}
-              height={1000}
+              className="absolute"
               style={{
-                width: 1000,
-                height: 1000,
+                left: artworkRectPx.x - boundaryRectPx.x,
+                top: artworkRectPx.y - boundaryRectPx.y,
+                width: artworkRectPx.w,
+                height: artworkRectPx.h,
                 objectFit: "contain",
-                transformOrigin: "0 0",
-                transform: quadMatrix,
-                opacity: entry.opacity ?? 0.96,
-                filter: entry.dropShadow ?? "none",
-                mixBlendMode: productType === "mug" ? "normal" : "multiply",
+                objectPosition: "center center",
+                transformOrigin: "center center",
+                opacity: 1,
+                filter: "none",
+                mixBlendMode: "normal",
               }}
             />
+          </div>
+          {DEBUG_PLACEMENT && (
+            <div className="pointer-events-none absolute inset-0 z-30" aria-hidden="true">
+              <div
+                className="absolute border border-emerald-500"
+                style={{
+                  left: boundaryRectPx.x,
+                  top: boundaryRectPx.y,
+                  width: boundaryRectPx.w,
+                  height: boundaryRectPx.h,
+                }}
+              />
+              <div
+                className="absolute border border-fuchsia-500"
+                style={{
+                  left: artworkRectPx.x,
+                  top: artworkRectPx.y,
+                  width: artworkRectPx.w,
+                  height: artworkRectPx.h,
+                }}
+              />
+              <div
+                className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500"
+                style={{
+                  left: boundaryRectPx.x + boundaryRectPx.w / 2,
+                  top: boundaryRectPx.y + boundaryRectPx.h / 2,
+                }}
+              />
+              <div
+                className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-fuchsia-500"
+                style={{
+                  left: artworkRectPx.x + artworkRectPx.w / 2,
+                  top: artworkRectPx.y + artworkRectPx.h / 2,
+                }}
+              />
+            </div>
           )}
         </>
-      )}
+      ) : null}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/[0.08]" />
     </div>
   );

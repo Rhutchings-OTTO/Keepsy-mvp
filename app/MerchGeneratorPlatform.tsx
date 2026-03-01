@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { MockupRenderer } from "@/components/MockupRenderer";
+import { GenerationLoadingOverlay } from "@/components/GenerationLoadingOverlay";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import type { Placement } from "@/lib/mockups/placements";
 import {
@@ -287,6 +288,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [prompt, setPrompt] = useState("");
   const [designShape, setDesignShape] = useState<DesignShape>("square");
   const [isBusy, setIsBusy] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -404,6 +406,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
   const handleGenerate = async () => {
     if (!prompt && !uploadedImage) return;
+    setIsGenerating(true);
     generateAbortRef.current?.abort();
     const controller = new AbortController();
     generateAbortRef.current = controller;
@@ -454,6 +457,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       if (generateAbortRef.current === controller) {
         generateAbortRef.current = null;
       }
+      setIsGenerating(false);
       setIsBusy(false);
     }
   };
@@ -613,7 +617,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F1EB] text-[#23211F] selection:bg-indigo-100 overflow-x-hidden">
+    <div
+      className="min-h-screen flex flex-col bg-[#F7F1EB] text-[#23211F] selection:bg-indigo-100 overflow-x-hidden"
+      aria-busy={isGenerating}
+    >
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
         <motion.div
@@ -1336,6 +1343,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           </div>
         </div>
       </footer>
+      <GenerationLoadingOverlay
+        isOpen={isGenerating}
+        productType={selectedProduct.type}
+      />
     </div>
   );
 }

@@ -9,7 +9,6 @@ import {
   placements as staticPlacements,
   type MockupColor,
   type MockupProductType,
-  type Placement,
   type PlacementQuad,
   type PlacementQuadPoint,
   type PlacementRect,
@@ -21,20 +20,19 @@ type MockupRendererProps = {
   color: MockupColor;
   generatedImage: string | null;
   className?: string;
-  placementOverride?: Placement | null;
-  editable?: boolean;
-  onPlacementChange?: (placement: Placement) => void;
 };
 
-type DragPoint = keyof PlacementQuad;
-
-function clampPct(value: number) {
-  return Math.max(0, Math.min(100, value));
-}
-
 function rectToQuad(rect: PlacementRect): PlacementQuad {
-  const hw = rect.wPct / 2;
-  const hh = rect.hPct / 2;
+  const boundary = rect.boundary;
+  const derivedHalfW = boundary
+    ? Math.max(0, Math.min(rect.xPct - boundary.leftPct, boundary.rightPct - rect.xPct))
+    : rect.wPct / 2;
+  const derivedHalfH = boundary
+    ? Math.max(0, Math.min(rect.yPct - boundary.topPct, boundary.bottomPct - rect.yPct))
+    : rect.hPct / 2;
+
+  const hw = derivedHalfW;
+  const hh = derivedHalfH;
   const angle = (rect.rotateDeg * Math.PI) / 180;
   const sin = Math.sin(angle);
   const cos = Math.cos(angle);
@@ -51,24 +49,15 @@ function rectToQuad(rect: PlacementRect): PlacementQuad {
   };
 }
 
-function normalizeToQuad(placement: Placement): PlacementQuad {
-  if (placement.kind === "quad") return placement.quad;
-  return rectToQuad(placement.rect);
-}
-
 export function MockupRenderer({
   productType,
   color,
   generatedImage,
   className,
-  placementOverride,
-  editable = false,
-  onPlacementChange,
 }: MockupRendererProps) {
   const [runtimePlacements, setRuntimePlacements] = useState<PlacementMap | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  const [dragPoint, setDragPoint] = useState<DragPoint | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -106,8 +95,8 @@ export function MockupRenderer({
   const activeMap = runtimePlacements ?? staticPlacements;
   const byProduct = activeMap[productType];
   const entry = (byProduct?.[color] || byProduct?.white || getPlacement(productType, color));
-  const activePlacement = placementOverride ?? entry.placement;
-  const activeQuad = normalizeToQuad(activePlacement);
+  const activeQuad =
+    entry.placement.kind === "quad" ? entry.placement.quad : rectToQuad(entry.placement.rect);
 
   const quadMatrix = useMemo(() => {
     if (containerSize.width <= 0 || containerSize.height <= 0) return null;
@@ -133,29 +122,11 @@ export function MockupRenderer({
     return `matrix3d(${c[0]},${c[3]},0,${c[6]},${c[1]},${c[4]},0,${c[7]},0,0,1,0,${c[2]},${c[5]},0,1)`;
   }, [activeQuad, containerSize.width, containerSize.height]);
 
-  const handleMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragPoint || !editable || !onPlacementChange) return;
-    const box = containerRef.current?.getBoundingClientRect();
-    if (!box) return;
-    const xPct = clampPct(((event.clientX - box.left) / box.width) * 100);
-    const yPct = clampPct(((event.clientY - box.top) / box.height) * 100);
-    onPlacementChange({
-      kind: "quad",
-      quad: {
-        ...activeQuad,
-        [dragPoint]: { xPct, yPct },
-      },
-    });
-  };
-
   return (
     <div
       ref={containerRef}
       className={`relative w-full overflow-hidden rounded-3xl border border-black/10 bg-[#F5F5F6] shadow-2xl ${className ?? ""}`}
       style={{ aspectRatio: `${entry.aspectRatio}` }}
-      onPointerMove={handleMove}
-      onPointerUp={() => setDragPoint(null)}
-      onPointerLeave={() => setDragPoint(null)}
     >
       <Image
         src={entry.baseMockupSrc}
@@ -192,24 +163,6 @@ export function MockupRenderer({
           )}
         </>
       )}
-      {editable &&
-        generatedImage &&
-        (["tl", "tr", "br", "bl"] as DragPoint[]).map((point) => (
-          <button
-            key={point}
-            type="button"
-            className="absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-black/90"
-            style={{
-              left: `${activeQuad[point].xPct}%`,
-              top: `${activeQuad[point].yPct}%`,
-            }}
-            onPointerDown={(event) => {
-              event.preventDefault();
-              setDragPoint(point);
-            }}
-            aria-label={`Move ${point} corner`}
-          />
-        ))}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/[0.08]" />
     </div>
   );

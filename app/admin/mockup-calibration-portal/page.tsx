@@ -33,6 +33,18 @@ function toPercent(clientX: number, clientY: number, rect: DOMRect) {
   return { xPct, yPct };
 }
 
+function withBoundary(rect: PlacementRect): PlacementRect {
+  return {
+    ...rect,
+    boundary: {
+      leftPct: rect.xPct - rect.wPct / 2,
+      rightPct: rect.xPct + rect.wPct / 2,
+      topPct: rect.yPct - rect.hPct / 2,
+      bottomPct: rect.yPct + rect.hPct / 2,
+    },
+  };
+}
+
 function spreadPlacementAcrossColors(
   map: PlacementMap,
   productType: "tshirt" | "hoodie",
@@ -103,7 +115,7 @@ export default function MockupCalibrationPortalPage() {
       const copy = deepClone(prev);
       const target = copy[productType]?.[color] || copy[productType]?.white;
       if (!target || target.placement.kind !== "rect") return prev;
-      target.placement.rect = next;
+      target.placement.rect = withBoundary(next);
       return copy;
     });
   };
@@ -303,6 +315,9 @@ export default function MockupCalibrationPortalPage() {
                   />
                 </label>
               ))}
+              <p className="rounded-lg bg-black/5 px-2 py-2 text-[11px] font-semibold text-black/60">
+                Boundary safe area is auto-synced from x/y/w/h. Images are centered and cannot exceed this box.
+              </p>
             </>
           )}
 

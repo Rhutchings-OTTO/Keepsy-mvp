@@ -10,6 +10,12 @@ export type PlacementRect = {
   hPct: number;
   rotateDeg: number;
   borderRadiusPct?: number;
+  boundary?: {
+    leftPct: number;
+    rightPct: number;
+    topPct: number;
+    bottomPct: number;
+  };
 };
 
 export type PlacementQuadPoint = {

@@ -7,7 +7,7 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 40,
+          "yPct": 37.5,
           "wPct": 15,
           "hPct": 25,
           "rotateDeg": 0,
@@ -23,7 +23,7 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 40,
+          "yPct": 37.5,
           "wPct": 15,
           "hPct": 25,
           "rotateDeg": 0,
@@ -39,7 +39,7 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 40,
+          "yPct": 37.5,
           "wPct": 15,
           "hPct": 25,
           "rotateDeg": 0,
@@ -57,7 +57,7 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 45,
+          "yPct": 43,
           "wPct": 17,
           "hPct": 30,
           "rotateDeg": 0,
@@ -73,7 +73,7 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 45,
+          "yPct": 43,
           "wPct": 17,
           "hPct": 30,
           "rotateDeg": 0,
@@ -89,7 +89,7 @@
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 45,
+          "yPct": 43,
           "wPct": 17,
           "hPct": 30,
           "rotateDeg": 0,
@@ -107,7 +107,7 @@
         "kind": "rect",
         "rect": {
           "xPct": 48,
-          "yPct": 54,
+          "yPct": 53,
           "wPct": 22,
           "hPct": 50,
           "rotateDeg": 0,
@@ -122,15 +122,16 @@
       "baseMockupSrc": "/product-tiles/plain-card.png",
       "aspectRatio": 1.7778,
       "placement": {
-        "kind": "quad",
-        "quad": {
-          "tl": { "xPct": 11.02941176470588, "yPct": 23.767653581294 },
-          "tr": { "xPct": 55.7401085434173, "yPct": 15.9708983387153 },
-          "br": { "xPct": 60.1628151260504, "yPct": 74.5438275687662 },
-          "bl": { "xPct": 15.6862745098039, "yPct": 86.5735517254795 }
+        "kind": "rect",
+        "rect": {
+          "xPct": 51.83604691876751,
+          "yPct": 52.2526553320624,
+          "wPct": 52.82738095238094,
+          "hPct": 75.2402443294557,
+          "rotateDeg": 0,
+          "borderRadiusPct": 1.8
         },
-        "opacity": 0.95,
-        "dropShadow": "drop-shadow(0 6px 10px rgba(0,0,0,.18))"
+        "opacity": 0.95
       }
     }
   }

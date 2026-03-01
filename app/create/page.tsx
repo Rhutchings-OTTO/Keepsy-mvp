@@ -1,4 +1,5 @@
 import MerchGeneratorPlatform from "../MerchGeneratorPlatform";
+import { ConversionFlowProvider } from "@/context/ConversionFlowContext";
 
 export const dynamic = "force-dynamic";
 
@@ -15,14 +16,16 @@ function readParam(params: Record<string, string | string[] | undefined>, key: s
 export default async function CreatePage({ searchParams }: CreatePageProps) {
   const resolvedParams = (await searchParams) ?? {};
   return (
-    <MerchGeneratorPlatform
-      initialQuery={{
-        product: readParam(resolvedParams, "product"),
-        style: readParam(resolvedParams, "style"),
-        occasion: readParam(resolvedParams, "occasion"),
-        success: readParam(resolvedParams, "success") === "1",
-        canceled: readParam(resolvedParams, "canceled") === "1",
-      }}
-    />
+    <ConversionFlowProvider>
+      <MerchGeneratorPlatform
+        initialQuery={{
+          product: readParam(resolvedParams, "product"),
+          style: readParam(resolvedParams, "style"),
+          occasion: readParam(resolvedParams, "occasion"),
+          success: readParam(resolvedParams, "success") === "1",
+          canceled: readParam(resolvedParams, "canceled") === "1",
+        }}
+      />
+    </ConversionFlowProvider>
   );
 }

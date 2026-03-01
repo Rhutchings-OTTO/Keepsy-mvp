@@ -5,6 +5,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { MockupRenderer } from "@/components/MockupRenderer";
 import { GenerationLoadingOverlay } from "@/components/GenerationLoadingOverlay";
+import GuidedPromptPanel from "@/components/GuidedPromptPanel";
+import TrustBar from "@/components/TrustBar";
+import ReviewsMini from "@/components/ReviewsMini";
+import GiftingStep from "@/components/GiftingStep";
+import CheckoutSummaryEnhancer from "@/components/CheckoutSummaryEnhancer";
+import OccasionBanner from "@/components/OccasionBanner";
+import UpsellDrawer from "@/components/UpsellDrawer";
+import GiftAssistantWidget from "@/components/GiftAssistantWidget";
+import { useConversionFlow } from "@/context/ConversionFlowContext";
+import { FF } from "@/lib/featureFlags";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import {
   Sparkles,
@@ -277,6 +287,7 @@ async function checkoutViaKeepsyAPI(args: {
 }
 
 export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?: InitialCreateQuery }) {
+  const { state: conversionFlow, updateState: updateConversionFlow } = useConversionFlow();
   const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
@@ -295,6 +306,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [selectedColor, setSelectedColor] = useState(PRODUCTS[2].colors[0]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isGiftingSkipped, setIsGiftingSkipped] = useState(false);
+  const [isUpsellOpen, setIsUpsellOpen] = useState(false);
+  const [pendingCheckoutMode, setPendingCheckoutMode] = useState<"single" | "cart" | null>(null);
   const [checkoutSuccess] = useState(false);
   const [checkoutStatus, setCheckoutStatus] = useState<"success" | "canceled" | null>(null);
   const didApplyInitialQuery = useRef(false);
@@ -531,6 +545,23 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
   };
 
+  const runCheckout = async (mode: "single" | "cart") => {
+    if (mode === "cart") {
+      await handleCartCheckout();
+      return;
+    }
+    await handleCheckout();
+  };
+
+  const requestCheckout = (mode: "single" | "cart") => {
+    if (!FF.upsells) {
+      void runCheckout(mode);
+      return;
+    }
+    setPendingCheckoutMode(mode);
+    setIsUpsellOpen(true);
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -700,6 +731,17 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
                   </motion.p>
 
+                  {FF.occasionUX ? (
+                    <motion.div variants={fadeInUp} className="mb-5 w-full">
+                      <OccasionBanner
+                        onUseTemplate={(template) => {
+                          setPrompt(template);
+                          updateConversionFlow({ occasion: template.toLowerCase().includes("mother") ? "Mother's Day" : conversionFlow.occasion });
+                        }}
+                      />
+                    </motion.div>
+                  ) : null}
+
                   <motion.div variants={fadeInUp} className="w-full relative group">
                     <div className="absolute -inset-1 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-700"
                       style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)" }}
@@ -816,6 +858,24 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     </div>
                   </motion.div>
 
+                  {FF.guidedPrompts ? (
+                    <motion.div variants={fadeInUp} className="mt-5 w-full">
+                      <GuidedPromptPanel
+                        currentPrompt={prompt}
+                        onApplyPrompt={(nextPrompt) => {
+                          setPrompt(nextPrompt);
+                          setGenerationError(null);
+                        }}
+                      />
+                    </motion.div>
+                  ) : null}
+
+                  {FF.trustLayer ? (
+                    <motion.div variants={fadeInUp} className="mt-5 w-full">
+                      <TrustBar />
+                    </motion.div>
+                  ) : null}
+
                   <motion.div variants={fadeInUp} className="mt-8 flex flex-wrap justify-center gap-3">
                     <span className="text-sm text-black/35 font-semibold mr-2 self-center">Try:</span>
                     {PRESET_PROMPTS.map((p) => (
@@ -884,6 +944,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       ))}
                     </div>
                   </motion.section>
+
+                  {FF.trustLayer ? (
+                    <motion.div variants={fadeInUp} className="mt-8 w-full">
+                      <ReviewsMini />
+                    </motion.div>
+                  ) : null}
                 </motion.div>
               )}
 
@@ -971,6 +1037,17 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           <span className="text-black/55 font-semibold">Subtotal</span>
                           <span className="text-2xl font-black">{gbp(selectedProduct.price)}</span>
                         </div>
+                        {FF.giftingFlow && generatedImage ? (
+                          <div className="mb-4">
+                            <GiftingStep
+                              value={conversionFlow}
+                              hidden={isGiftingSkipped}
+                              onChange={(patch) => updateConversionFlow(patch)}
+                              onSkip={() => setIsGiftingSkipped(true)}
+                              onReopen={() => setIsGiftingSkipped(false)}
+                            />
+                          </div>
+                        ) : null}
                         <div className="grid grid-cols-2 gap-3">
                           <motion.button
                             whileHover={{ scale: 1.01 }}
@@ -1011,7 +1088,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     </p>
 
                     <motion.button
-                      onClick={hasCartItems ? handleCartCheckout : handleCheckout}
+                      onClick={() => requestCheckout(hasCartItems ? "cart" : "single")}
                       disabled={isBusy || !canProceedToCheckout}
                       className="w-full py-5 rounded-2xl font-black text-lg text-white shadow-xl relative overflow-hidden"
                       style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#B19CD9)" }}
@@ -1032,6 +1109,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <button onClick={() => setStep(2)} className="mt-4 text-sm font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2">
                       <ChevronLeft size={16} /> Back
                     </button>
+                    {FF.trustLayer ? (
+                      <div className="mt-4">
+                        <TrustBar />
+                      </div>
+                    ) : null}
                     <p className="mt-4 text-xs text-black/45">
                       By placing your order, you agree to our{" "}
                       <button className="underline hover:text-black" onClick={() => setView("legal")}>
@@ -1066,6 +1148,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <div className="mt-6 flex items-center gap-2 text-xs text-black/45 font-semibold">
                       <Star size={14} className="text-yellow-500" /> Gift-ready print & packaging
                     </div>
+                    {FF.checkoutUX ? (
+                      <div className="mt-4">
+                        <CheckoutSummaryEnhancer
+                          productName={checkoutItemDescription}
+                          priceText={gbp(checkoutTotal)}
+                          thumbnailSrc={checkoutPreviewImage}
+                        />
+                      </div>
+                    ) : null}
                   </div>
                 </motion.div>
               )}
@@ -1220,7 +1311,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   <span className="text-xl font-black">{gbp(cartSubtotal)}</span>
                 </div>
                 <button
-                  onClick={handleCartCheckout}
+                  onClick={() => requestCheckout("cart")}
                   disabled={isBusy || cartItems.length === 0}
                   className="w-full py-3 rounded-xl bg-black text-white font-extrabold disabled:opacity-40"
                 >
@@ -1231,6 +1322,26 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           </>
         )}
       </AnimatePresence>
+      {FF.upsells ? (
+        <UpsellDrawer
+          open={isUpsellOpen}
+          selectedUpsells={conversionFlow.selectedUpsells}
+          bundleChoice={conversionFlow.bundleChoice}
+          onChange={(patch) => updateConversionFlow(patch)}
+          onNoThanks={() => {
+            setIsUpsellOpen(false);
+            const mode = pendingCheckoutMode;
+            setPendingCheckoutMode(null);
+            if (mode) void runCheckout(mode);
+          }}
+          onContinue={() => {
+            setIsUpsellOpen(false);
+            const mode = pendingCheckoutMode;
+            setPendingCheckoutMode(null);
+            if (mode) void runCheckout(mode);
+          }}
+        />
+      ) : null}
 
       <footer className="py-10 px-6 border-t border-black/10 bg-white/60">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm">
@@ -1252,6 +1363,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         isOpen={isGenerating}
         productType={selectedProduct.type}
       />
+      {FF.giftAssistant && view === "home" ? (
+        <GiftAssistantWidget
+          onApplyPrompt={(nextPrompt) => {
+            setPrompt(nextPrompt);
+            setStep(1);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

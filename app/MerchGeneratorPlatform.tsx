@@ -967,6 +967,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       productType={selectedMockupProductType}
                       color={selectedMockupColor}
                       generatedImage={generatedImage}
+                      hasArtwork={Boolean(generatedImage || uploadedImage)}
                     />
                     <div className="mt-6 flex gap-3 items-center">
                       <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">

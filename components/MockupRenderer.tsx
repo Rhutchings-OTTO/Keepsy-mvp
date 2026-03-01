@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import PerspT from "perspective-transform";
+import PrintAreaOverlay from "@/components/PrintAreaOverlay";
 import {
   getPlacement,
   placements as staticPlacements,
@@ -19,6 +20,7 @@ type MockupRendererProps = {
   productType: MockupProductType;
   color: MockupColor;
   generatedImage: string | null;
+  hasArtwork?: boolean;
   className?: string;
 };
 
@@ -53,6 +55,7 @@ export function MockupRenderer({
   productType,
   color,
   generatedImage,
+  hasArtwork,
   className,
 }: MockupRendererProps) {
   const [runtimePlacements, setRuntimePlacements] = useState<PlacementMap | null>(null);
@@ -95,6 +98,7 @@ export function MockupRenderer({
   const activeMap = runtimePlacements ?? staticPlacements;
   const byProduct = activeMap[productType];
   const entry = (byProduct?.[color] || byProduct?.white || getPlacement(productType, color));
+  const artworkPresent = hasArtwork ?? Boolean(generatedImage);
   const activeQuad =
     entry.placement.kind === "quad" ? entry.placement.quad : rectToQuad(entry.placement.rect);
 
@@ -135,6 +139,11 @@ export function MockupRenderer({
         className="object-cover"
         quality={100}
         sizes="(max-width: 1024px) 100vw, 700px"
+      />
+      <PrintAreaOverlay
+        productType={productType}
+        isActive={true}
+        hasArtwork={artworkPresent}
       />
       {generatedImage && (
         <>

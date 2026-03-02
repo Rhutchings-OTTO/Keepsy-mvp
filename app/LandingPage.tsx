@@ -73,7 +73,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
       <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-4 py-8 sm:px-6">
         <div className="w-24 sm:w-40" />
         <motion.div
-          className="logo-glass-tablet relative z-30 flex min-w-0 max-w-[min(90vw,520px)] shrink-0 items-center justify-center rounded-[26px] px-6 py-4 sm:px-10 sm:py-6"
+          className="logo-glass-tablet relative z-30 flex min-w-0 max-w-fit shrink-0 items-center justify-center rounded-[24px] px-5 py-3 sm:px-6 sm:py-4"
           style={FF.cinematicUX && !reduceMotion ? { y: logoTabletY } : undefined}
           whileHover={!reduceMotion ? { scale: 1.02 } : undefined}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}

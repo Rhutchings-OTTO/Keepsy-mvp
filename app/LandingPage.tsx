@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import Iridescence from "@/components/Iridescence";
+import IridescenceBackground from "@/components/IridescenceBackground";
 import RegionSelector from "@/components/RegionSelector";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
@@ -103,8 +103,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   });
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
   const { scrollY } = useScroll();
+  const reduceMotion = useReducedMotion();
   const heroY = useTransform(scrollY, [0, 400], [0, -28]);
   const cardsY = useTransform(scrollY, [0, 400], [0, -42]);
+  const logoTabletY = useTransform(scrollY, [0, 200], [0, -6]);
   const activeRegion = region ?? "UK";
   // Do not add region-specific sections here; region content is only rendered on the generation page.
 
@@ -125,7 +127,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
   return (
     <div
-      className="relative min-h-screen overflow-hidden bg-[#FDFCFB] text-[#23211F]"
+      className="relative min-h-screen overflow-hidden text-[#23211F]"
       onMouseMove={(event) => {
         const { innerWidth, innerHeight } = window;
         const x = ((event.clientX / innerWidth) * 100 - 50) * pointerScale;
@@ -135,23 +137,24 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Iridescence
-        className="pointer-events-none -z-10"
-        color={[0.98, 0.97, 0.99]}
-        speed={0.7}
-        amplitude={0.1}
-        mouseReact
-      />
+      <IridescenceBackground />
 
-      <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-8">
+      <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-8 sm:px-6">
         <div className="w-24 sm:w-40" />
-        <Image
-          src="/keepsy-logo-transparent.png"
-          alt="Keepsy"
-          width={760}
-          height={220}
-          className="h-28 w-auto object-contain sm:h-32"
-        />
+        <motion.div
+          className="logo-glass-tablet flex min-w-0 max-w-[min(90vw,420px)] items-center justify-center rounded-2xl px-8 py-5 sm:px-10 sm:py-6"
+          style={FF.cinematicUX && !reduceMotion ? { y: logoTabletY } : undefined}
+          whileHover={!reduceMotion ? { scale: 1.02 } : undefined}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        >
+          <Image
+            src="/keepsy-logo-transparent.png"
+            alt="Keepsy"
+            width={760}
+            height={220}
+            className="h-28 w-auto object-contain sm:h-32"
+          />
+        </motion.div>
         <button
           type="button"
           onClick={() => setIsRegionSelectorOpen(true)}
@@ -174,9 +177,11 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               style={{
                 backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)",
                 backgroundSize: "220% auto",
-                backgroundPosition: `${cursorOffset.x}px ${cursorOffset.y}px`,
               }}
-              animate={{ backgroundSize: ["220% auto", "240% auto", "220% auto"] }}
+              animate={{
+                backgroundSize: ["220% auto", "240% auto", "220% auto"],
+                backgroundPosition: ["0% center", "100% center", "0% center"],
+              }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
               Cherish it.

@@ -5,43 +5,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { MockupRenderer } from "@/components/MockupRenderer";
 import { GenerationLoadingOverlay } from "@/components/GenerationLoadingOverlay";
-import GuidedPromptPanel from "@/components/GuidedPromptPanel";
 import TrustBar from "@/components/TrustBar";
-import ReviewsMini from "@/components/ReviewsMini";
 import GiftingStep from "@/components/GiftingStep";
 import CheckoutSummaryEnhancer from "@/components/CheckoutSummaryEnhancer";
-import OccasionBanner from "@/components/OccasionBanner";
 import UpsellDrawer from "@/components/UpsellDrawer";
 import GiftAssistantWidget from "@/components/GiftAssistantWidget";
-import CreateModePanel from "@/components/CreateModePanel";
-import BeforeAfterCarousel from "@/components/BeforeAfterCarousel";
+import { CreatePageLayoutLean } from "@/components/create/CreatePageLayoutLean";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
-import { Carousel } from "@/components/ui/Carousel";
 import { Reveal } from "@/components/motion/Reveal";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
 import MagicpathBackground from "@/components/skin/magicpath/MagicpathBackground";
 import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { useConversionFlow } from "@/context/ConversionFlowContext";
 import { FF } from "@/lib/featureFlags";
-import { REGION_CONTENT } from "@/content/regionContent";
-import { motionTransition, revealUp, softScaleIn, hoverLift } from "@/lib/motion";
+import { motionTransition, revealUp, softScaleIn } from "@/lib/motion";
 import { getRegion, type Region } from "@/lib/region";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import {
   Sparkles,
   ShoppingCart,
-  Zap,
-  Upload,
   X,
   RefreshCcw,
   ArrowRight,
   ChevronLeft,
   Plus,
   Heart,
-  Shirt,
-  Coffee,
-  CreditCard,
-  Layout,
   Check,
   Star,
 } from "lucide-react";
@@ -119,37 +107,11 @@ const PRODUCTS: Product[] = [
   },
 ];
 
-const PRESET_PROMPTS = [
-  "Photoreal family Christmas scene in a snowy village with warm lights, print-ready",
-  "Thanksgiving cartoon family dinner scene with pumpkins and autumn leaves",
-  "Fourth of July backyard scene with fireworks, flags, and a barbecue at dusk",
-  "Romantic anniversary watercolor scene with champagne, roses, and candlelight",
-  "Lifelike pet portrait with soft natural window light and clean background",
-];
-
 const COMMUNITY_DESIGNS = [
   "/occasion-tiles/christmas-scene.png",
   "/occasion-tiles/thanksgiving-cartoon.png",
   "/occasion-tiles/fourth-july-photo.png",
   "/occasion-tiles/anniversary-watercolor.png",
-];
-
-const CREATOR_TESTIMONIALS = [
-  {
-    name: "Sarah J.",
-    quote: "The AI generated exactly what I was looking for! The t-shirt quality is superb.",
-    initials: "SJ",
-  },
-  {
-    name: "Marcus L.",
-    quote: "Uploaded a photo of my dog and the AI turned it into a masterpiece on a mug.",
-    initials: "ML",
-  },
-  {
-    name: "Elena R.",
-    quote: "Fast shipping and beautiful packaging. Will definitely order again.",
-    initials: "ER",
-  },
 ];
 
 const fadeInUp = FF.motionSystem
@@ -305,7 +267,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [region] = useState<Region>(() => getRegion() ?? "UK");
-  const [isInspirationOpenMobile, setIsInspirationOpenMobile] = useState(false);
 
   const [prompt, setPrompt] = useState("");
   const [isBusy, setIsBusy] = useState(false);
@@ -316,7 +277,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
-  const [hasUserTypedPrompt, setHasUserTypedPrompt] = useState(false);
+  const [, setHasUserTypedPrompt] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const generateAbortRef = useRef<AbortController | null>(null);
 
@@ -349,7 +310,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     : Boolean(generatedImage);
   const selectedMockupProductType = getMockupProductType(selectedProduct.type);
   const selectedMockupColor = getMockupColor(selectedColor);
-  const inspiration = REGION_CONTENT[region];
   const isMagicpathSkin = FF.magicpathSkin;
 
   useEffect(() => {
@@ -607,11 +567,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     reader.readAsDataURL(file);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    handleUploadFile(file);
-  };
 
   const handleDeleteMyData = async () => {
     const email = window.prompt("Optional: enter your email for the deletion confirmation");
@@ -640,10 +595,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const applyInspirationPrompt = (value: string) => {
-    setPrompt(value);
-    if (generationError) setGenerationError(null);
-  };
 
   return (
     <div
@@ -739,342 +690,34 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   Community
                 </button>
               </div>
-              {/* STEP 1 */}
+              {/* STEP 1 - Lean layout */}
               {step === 1 && (
-                <motion.div
-                  key="step1"
-                  initial="initial"
-                  animate="animate"
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  className="flex flex-col items-center text-center mt-10 max-w-3xl mx-auto"
-                >
-                  <motion.div
-                    variants={fadeInUp}
-                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/5 text-black/70 text-xs font-extrabold uppercase tracking-wider mb-6"
-                  >
-                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }}>
-                      <Zap size={14} />
-                    </motion.div>
-                    AI Gift Maker
-                  </motion.div>
-
-                  <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-black mb-6 leading-[1.05]">
-                    Imagine it. Generate it.
-                    <br />
-                    <motion.span
-                      className="bg-clip-text text-transparent"
-                      style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)", backgroundSize: "200% auto" }}
-                      animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                      transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                    >
-                      Cherish it.
-                    </motion.span>
-                  </motion.h1>
-
-                  <motion.p variants={fadeInUp} className="text-lg text-black/55 mb-10 max-w-2xl leading-relaxed">
-                    Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
-                  </motion.p>
-
-                  {FF.occasionUX ? (
-                    <motion.div variants={fadeInUp} className="mb-5 w-full">
-                      <OccasionBanner
-                        onUseTemplate={(template) => {
-                          setPrompt(template);
-                          updateConversionFlow({ occasion: template.toLowerCase().includes("mother") ? "Mother's Day" : conversionFlow.occasion });
-                        }}
-                      />
-                    </motion.div>
-                  ) : null}
-
-                  <motion.div variants={fadeInUp} className="w-full">
-                    <CreateModePanel
-                      region={region}
-                      promptValue={prompt}
-                      setPromptValue={(value) => {
-                        setPrompt(value);
-                        setGenerationError(null);
-                      }}
-                      hasUserTyped={hasUserTypedPrompt}
-                      onUploadFile={handleUploadFile}
-                      uploadedPreviewUrl={uploadedImage}
-                      uploadedFileName={uploadedFileName}
-                    />
-                  </motion.div>
-                  {FF.beforeAfter ? (
-                    <BeforeAfterCarousel region={region} />
-                  ) : null}
-
-                  <motion.div variants={fadeInUp} className="w-full relative group">
-                    {!isMagicpathSkin ? (
-                      <div className="absolute -inset-1 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-700"
-                        style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)" }}
-                      />
-                    ) : null}
-                    <MagicpathFrame enabled={isMagicpathSkin}>
-                      <div className={`relative p-2 flex flex-col gap-2 border ${
-                        isMagicpathSkin
-                          ? "rounded-[2rem] border-white/60 bg-white/35 shadow-[0_16px_48px_rgba(0,0,0,0.08)] backdrop-blur-2xl"
-                          : "rounded-2xl border-black/5 bg-white shadow-xl"
-                      }`}>
-                      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
-                        <div className="flex-1 flex items-center px-4">
-                          <input
-                            type="text"
-                            value={prompt}
-                            onChange={(e) => {
-                              setPrompt(e.target.value);
-                              setHasUserTypedPrompt(true);
-                              if (generationError) setGenerationError(null);
-                            }}
-                            placeholder={uploadedImage ? "Describe how you'd like to transform this photo…" : "Describe your gift image…"}
-                            className="flex-1 bg-transparent py-4 text-base font-semibold outline-none placeholder:text-black/40 md:text-lg"
-                          />
-
-                          <div className="flex items-center gap-2 border-l border-black/5 pl-4 ml-2">
-                            <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
-                            <button
-                              onClick={() => fileInputRef.current?.click()}
-                              className={`p-3 rounded-xl transition-all flex items-center gap-2 ${
-                                uploadedImage ? "bg-black/5 text-black" : "text-black/60 hover:bg-black/5 hover:text-black"
-                              }`}
-                              title="Upload a photo"
-                            >
-                              <Upload size={20} />
-                              {uploadedImage && <span className="text-xs font-extrabold hidden sm:inline">Photo added</span>}
-                            </button>
-                          </div>
-                        </div>
-
-                          <motion.button
-                          onClick={handleGenerate}
-                          disabled={(!prompt && !uploadedImage) || isBusy}
-                          className={`px-8 py-4 rounded-xl font-extrabold text-white flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 ${
-                            isBusy ? "bg-black/35 cursor-not-allowed" : "bg-black hover:bg-black/90"
-                          }`}
-                        >
-                          {isBusy ? (
-                            <>
-                              <RefreshCcw className="animate-spin" size={20} />
-                              Generating…
-                            </>
-                          ) : (
-                            <>
-                              Generate Design <ArrowRight size={20} />
-                            </>
-                          )}
-                        </motion.button>
-                      </div>
-
-                      <AnimatePresence>
-                        {generationError && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -4 }}
-                            className="mx-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
-                          >
-                            {generationError}
-                          </motion.p>
-                        )}
-                      </AnimatePresence>
-                      <AnimatePresence>
-                        {checkoutStatus === "success" && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -4 }}
-                            className="mx-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"
-                          >
-                            Payment complete. Your order is confirmed and queued for processing.
-                          </motion.p>
-                        )}
-                        {checkoutStatus === "canceled" && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -4 }}
-                            className="mx-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700"
-                          >
-                            Checkout canceled. Your design is saved here so you can continue anytime.
-                          </motion.p>
-                        )}
-                      </AnimatePresence>
-
-                      <AnimatePresence>
-                        {uploadedImage && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0, scale: 0.98 }}
-                            animate={{ opacity: 1, height: "auto", scale: 1 }}
-                            exit={{ opacity: 0, height: 0, scale: 0.98 }}
-                            className="px-4 pb-2"
-                          >
-                            <div className="relative inline-block mt-2">
-                              <motion.img src={uploadedImage} alt="Uploaded" className="h-16 w-16 object-cover rounded-lg border border-black/10 shadow-sm" />
-                              <motion.button
-                                whileHover={{ scale: 1.08 }}
-                                whileTap={{ scale: 0.92 }}
-                                onClick={clearUploadedImage}
-                                className="absolute -top-2 -right-2 p-1 bg-white border border-black/10 rounded-full shadow-md text-black/50 hover:text-red-600 transition-colors"
-                              >
-                                <X size={12} />
-                              </motion.button>
-                            </div>
-                            <p className="text-[10px] text-black/45 mt-1 font-semibold italic">
-                              Uploaded photo will be used as the generation source.
-                            </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                    </MagicpathFrame>
-                  </motion.div>
-
-                  {FF.guidedPrompts ? (
-                    <motion.div variants={fadeInUp} className="mt-5 w-full">
-                      <GuidedPromptPanel
-                        currentPrompt={prompt}
-                        onApplyPrompt={(nextPrompt) => {
-                          setPrompt(nextPrompt);
-                          setGenerationError(null);
-                        }}
-                      />
-                    </motion.div>
-                  ) : null}
-
-                  {FF.trustLayer ? (
-                    <motion.div variants={fadeInUp} className="mt-5 w-full">
-                      <TrustBar />
-                    </motion.div>
-                  ) : null}
-
-                  <motion.div variants={fadeInUp} className="mt-8 flex flex-wrap justify-center gap-3">
-                    <span className="text-sm text-black/35 font-semibold mr-2 self-center">Try:</span>
-                    {PRESET_PROMPTS.map((p) => (
-                      <motion.button
-                        key={p}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setPrompt(p)}
-                        className="px-4 py-2 rounded-full border border-black/10 text-sm text-black/70 hover:bg-white transition-colors bg-white/70"
-                      >
-                        {p}
-                      </motion.button>
-                    ))}
-                  </motion.div>
-
-                  <motion.section variants={fadeInUp} className="mt-8 w-full rounded-2xl border border-black/10 bg-white/75 p-4 shadow-sm text-left">
-                    <div className="flex items-center justify-between gap-3">
-                      <h2 className="text-sm font-black uppercase tracking-wider text-black/60">
-                        Local Inspiration · {region}
-                      </h2>
-                      <button
-                        type="button"
-                        onClick={() => setIsInspirationOpenMobile((prev) => !prev)}
-                        className="rounded-full border border-black/10 px-3 py-1 text-xs font-semibold text-black/60 md:hidden"
-                      >
-                        {isInspirationOpenMobile ? "Hide" : "Show"}
-                      </button>
-                    </div>
-
-                    <div className={`${isInspirationOpenMobile ? "mt-3 block" : "mt-3 hidden"} md:block`}>
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-black/45">Holiday inspiration</p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {inspiration.holidayBadges.map((badge) => (
-                          <span
-                            key={badge}
-                            className="rounded-full border border-black/10 bg-white/90 px-3 py-1 text-xs font-semibold text-black/60"
-                          >
-                            {badge}
-                          </span>
-                        ))}
-                      </div>
-
-                      <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-black/45">Suggested prompts</p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {inspiration.promptChips.map((chip) => (
-                          <button
-                            key={chip}
-                            type="button"
-                            onClick={() => applyInspirationPrompt(chip)}
-                            className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-semibold text-black/70 hover:bg-black/5"
-                          >
-                            {chip}
-                          </button>
-                        ))}
-                      </div>
-
-                      <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-black/45">Popular right now</p>
-                      <ul className="mt-2 space-y-1">
-                        {inspiration.popularRightNow.map((item) => (
-                          <li key={item} className="text-sm font-semibold text-black/60">
-                            • {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </motion.section>
-
-                  <motion.div variants={fadeInUp} className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 w-full opacity-60">
-                        {[
-                      { Icon: Shirt, label: "T-Shirts" },
-                      { Icon: Coffee, label: "Mugs" },
-                      { Icon: CreditCard, label: "Cards" },
-                      { Icon: Layout, label: "Hoodies" },
-                    ].map(({ Icon, label }) => (
-                      <motion.button
-                        key={label}
-                            whileHover={hoverLift.whileHover}
-                            whileTap={hoverLift.whileTap}
-                        className="flex flex-col items-center gap-2"
-                        onClick={() => {
-                          const typeMap: Record<string, MerchType> = {
-                            "T-Shirts": "tshirt",
-                            Mugs: "mug",
-                            Cards: "card",
-                            Hoodies: "hoodie",
-                          };
-                          const product = PRODUCTS.find((p) => p.type === typeMap[label]);
-                          if (!product) return;
-                          setSelectedProduct(product);
-                          setSelectedColor(product.colors[0]);
-                          setStep(2);
-                        }}
-                      >
-                        <Icon size={28} />
-                        <span className="font-extrabold text-xs uppercase tracking-widest">{label}</span>
-                      </motion.button>
-                    ))}
-                  </motion.div>
-
-                  <motion.section variants={fadeInUp} className="mt-16 w-full">
-                    <h2 className="text-4xl md:text-5xl font-black text-center mb-8">What our creators say</h2>
-                    <Carousel showArrows showDots>
-                      {CREATOR_TESTIMONIALS.map((testimonial) => (
-                        <article
-                          key={testimonial.name}
-                          className="rounded-3xl border border-black/10 bg-white/80 p-6 text-center shadow-sm"
-                        >
-                          <div className="mx-auto h-14 w-14 rounded-full bg-gradient-to-br from-[#7DB9E8]/80 to-[#F8C8DC]/80 text-white font-black flex items-center justify-center border border-white">
-                            {testimonial.initials}
-                          </div>
-                          <div className="mt-4 flex items-center justify-center gap-1">
-                            {Array.from({ length: 5 }).map((_, index) => (
-                              <Star key={`${testimonial.name}-${index}`} size={15} className="text-yellow-500 fill-yellow-500" />
-                            ))}
-                          </div>
-                          <p className="mt-4 text-lg italic text-black/70">&quot;{testimonial.quote}&quot;</p>
-                          <p className="mt-4 text-2xl font-black">{testimonial.name}</p>
-                        </article>
-                      ))}
-                    </Carousel>
-                  </motion.section>
-
-                  {FF.trustLayer ? (
-                    <motion.div variants={fadeInUp} className="mt-8 w-full">
-                      <ReviewsMini />
-                    </motion.div>
-                  ) : null}
-                </motion.div>
+                <CreatePageLayoutLean
+                  region={region}
+                  isMagicpathSkin={isMagicpathSkin}
+                  prompt={prompt}
+                  setPrompt={(v) => {
+                    setPrompt(v);
+                    setGenerationError(null);
+                  }}
+                  setHasUserTypedPrompt={setHasUserTypedPrompt}
+                  uploadedImage={uploadedImage}
+                  uploadedFileName={uploadedFileName}
+                  generationError={generationError}
+                  checkoutStatus={checkoutStatus}
+                  isBusy={isBusy}
+                  onGenerate={handleGenerate}
+                  onUploadFile={handleUploadFile}
+                  onClearUploadedImage={clearUploadedImage}
+                  onProductSelect={(type) => {
+                    const product = PRODUCTS.find((p) => p.type === type);
+                    if (!product) return;
+                    setSelectedProduct(product);
+                    setSelectedColor(product.colors[0]);
+                    setStep(2);
+                  }}
+                  fileInputRef={fileInputRef}
+                />
               )}
 
               {/* STEP 2 */}

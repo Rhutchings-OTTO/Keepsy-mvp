@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Iridescence from "@/components/Iridescence";
 import RegionSelector from "@/components/RegionSelector";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
@@ -124,7 +125,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
   return (
     <div
-      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#FDFCFB] via-[#F8F2FB] to-[#EEF7FF] text-[#23211F]"
+      className="relative min-h-screen overflow-hidden bg-[#FDFCFB] text-[#23211F]"
       onMouseMove={(event) => {
         const { innerWidth, innerHeight } = window;
         const x = ((event.clientX / innerWidth) * 100 - 50) * pointerScale;
@@ -134,23 +135,13 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="absolute inset-0 pointer-events-none">
-        <motion.div
-          className="absolute -top-28 -left-24 h-[28rem] w-[28rem] rounded-full bg-sky-300/35 blur-3xl"
-          animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-10 right-[-2%] h-[32rem] w-[32rem] rounded-full bg-pink-300/32 blur-3xl"
-          animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-[-10%] left-[20%] h-[26rem] w-[26rem] rounded-full bg-amber-200/24 blur-3xl"
-          animate={{ x: [0, 24, 0], y: [0, -24, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
+      <Iridescence
+        className="pointer-events-none -z-10"
+        color={[0.98, 0.97, 0.99]}
+        speed={0.7}
+        amplitude={0.1}
+        mouseReact
+      />
 
       <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-8">
         <div className="w-24 sm:w-40" />

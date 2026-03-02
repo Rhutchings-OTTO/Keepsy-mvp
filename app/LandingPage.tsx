@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import RegionSelector from "@/components/RegionSelector";
-import { getLandingContent } from "@/content/landingContent";
-import { getRegion, regionFromPathOrHost, setRegion, type Region } from "@/lib/region";
+import { LANDING_CONTENT } from "@/content/landingContent";
+import { getRegion, setRegion, type Region } from "@/lib/region";
 
 const FLOATING_EXAMPLES = [
   {
@@ -89,17 +89,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   const router = useRouter();
   const [cursorOffset, setCursorOffset] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const [region, setActiveRegion] = useState<Region | null>(() => {
-    if (initialRegion) return initialRegion;
-    if (typeof window === "undefined") return null;
-    return getRegion() ?? regionFromPathOrHost();
-  });
-  const [selectorOpen, setSelectorOpen] = useState<boolean>(() => {
-    if (initialRegion) return false;
-    if (typeof window === "undefined") return false;
-    const seededRegion = getRegion() ?? regionFromPathOrHost();
-    return !seededRegion;
-  });
+  const [region, setCurrentRegion] = useState<Region | null>(initialRegion);
+  const [isRegionSelectorOpen, setIsRegionSelectorOpen] = useState(!initialRegion);
   const [ripple, setRipple] = useState<{ active: boolean; x: number; y: number; to: string }>({
     active: false,
     x: 0,
@@ -107,7 +98,24 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     to: "/create",
   });
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
-  const content = getLandingContent(region ?? "UK");
+  const activeRegion = region ?? "UK";
+  const content = LANDING_CONTENT[activeRegion];
+
+  useEffect(() => {
+    const savedRegion = getRegion();
+    if (savedRegion) {
+      setCurrentRegion(savedRegion);
+      setIsRegionSelectorOpen(false);
+      return;
+    }
+    if (initialRegion) {
+      setRegion(initialRegion);
+      setCurrentRegion(initialRegion);
+      setIsRegionSelectorOpen(false);
+      return;
+    }
+    setIsRegionSelectorOpen(true);
+  }, [initialRegion]);
 
   const navigateWithRipple = (event: React.MouseEvent<HTMLButtonElement>, to: string) => {
     const x = event.clientX;
@@ -118,14 +126,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     }, 420);
   };
 
-  const applyRegion = (nextRegion: Region) => {
+  const handleSelectRegion = (nextRegion: Region) => {
     setRegion(nextRegion);
-    setActiveRegion(nextRegion);
-    setSelectorOpen(false);
-  };
-
-  const openCreateWithPrompt = (prompt: string) => {
-    router.push(`/create?prompt=${encodeURIComponent(prompt)}`);
+    setCurrentRegion(nextRegion);
+    setIsRegionSelectorOpen(false);
   };
 
   return (
@@ -158,37 +162,44 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
         />
       </div>
 
-      <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between gap-3 px-6 py-8">
-        <button
-          type="button"
-          onClick={() => setSelectorOpen(true)}
-          className="rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-black/60 transition hover:bg-white"
-        >
-          {region ?? "Choose"} region
-        </button>
+      <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-8">
+        <div className="w-24 sm:w-40" />
         <Image
           src="/keepsy-logo-transparent.png"
           alt="Keepsy"
           width={760}
           height={220}
-          className="h-24 w-auto object-contain sm:h-28"
+          className="h-28 w-auto object-contain sm:h-32"
         />
         <button
           type="button"
-          onClick={() => setSelectorOpen(true)}
-          className="rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-black/60 transition hover:bg-white"
+          onClick={() => setIsRegionSelectorOpen(true)}
+          className="rounded-full border border-black/15 bg-white/75 px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-white"
         >
-          Change region
+          {activeRegion} · Change region
         </button>
       </header>
 
-      <main className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl flex-col items-center justify-center gap-8 px-6 pb-14">
-        <div className="relative z-20 max-w-4xl text-center">
+      <main className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
+        <div className="relative z-20 max-w-5xl text-center">
           <p className="mb-4 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
-            AI-powered creativity • {content.region}
+            AI-powered gifting · {activeRegion}
           </p>
           <h1 className="text-5xl font-black leading-[1.05] md:text-7xl">
             {content.heroTitle}
+            <br />
+            <motion.span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)",
+                backgroundSize: "220% auto",
+                backgroundPosition: `${cursorOffset.x}px ${cursorOffset.y}px`,
+              }}
+              animate={{ backgroundSize: ["220% auto", "240% auto", "220% auto"] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              Thoughtful by design.
+            </motion.span>
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-xl font-medium text-black/60">
             {content.heroSubtitle}
@@ -208,15 +219,31 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             </button>
           </div>
 
-          <section className="mx-auto mt-10 max-w-4xl rounded-3xl border border-black/10 bg-white/70 p-5 text-left shadow-sm">
-            <h2 className="text-lg font-black text-black/85">Suggested prompts</h2>
+          <section className="mt-10 rounded-2xl border border-black/10 bg-white/70 p-5 text-left shadow-sm">
+            <h2 className="text-sm font-black uppercase tracking-wider text-black/65">Holiday inspiration</h2>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {content.holidayBadges.map((badge) => (
+                <button
+                  key={badge.label}
+                  type="button"
+                  onClick={(event) => navigateWithRipple(event, `/create?prompt=${encodeURIComponent(badge.prompts[0])}`)}
+                  className="rounded-full border border-black/10 bg-white/90 px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-white"
+                >
+                  {badge.label}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-6 rounded-2xl border border-black/10 bg-white/70 p-5 text-left shadow-sm">
+            <h2 className="text-sm font-black uppercase tracking-wider text-black/65">Suggested prompts</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {content.promptChips.map((chip) => (
                 <button
                   key={chip}
                   type="button"
-                  onClick={() => openCreateWithPrompt(chip)}
-                  className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:border-black/25 hover:bg-white/90"
+                  onClick={(event) => navigateWithRipple(event, `/create?prompt=${encodeURIComponent(chip)}`)}
+                  className="rounded-full border border-black/10 bg-white/90 px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-white"
                 >
                   {chip}
                 </button>
@@ -224,46 +251,28 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             </div>
           </section>
 
-          <section className="mx-auto mt-6 max-w-4xl rounded-3xl border border-black/10 bg-white/70 p-5 text-left shadow-sm">
-            <h2 className="text-lg font-black text-black/85">Occasions coming up</h2>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {content.holidayBadges.map((badge) => (
-                <button
-                  key={badge.label}
-                  type="button"
-                  onClick={() => openCreateWithPrompt(badge.prompts[0] ?? "")}
-                  className="rounded-full border border-[#D9C7B5] bg-[#FBF7F3] px-3 py-1.5 text-xs font-semibold text-[#6C5948] transition hover:border-[#BEA48D]"
-                >
-                  {badge.label}
-                </button>
-              ))}
-            </div>
-          </section>
-        </div>
-
-        <section className="relative z-20 w-full max-w-6xl rounded-3xl border border-black/10 bg-white/70 p-5 shadow-sm">
-          <h2 className="text-2xl font-black text-black/85">Popular this season</h2>
-          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <section className="mt-6 grid gap-4 text-left md:grid-cols-2">
             {content.seasonalBlocks.map((block) => (
-              <article key={block.title} className="rounded-2xl border border-black/10 bg-white/90 p-4">
-                <h3 className="text-base font-black text-black/80">{block.title}</h3>
-                <p className="mt-1 text-sm font-medium text-black/60">{block.description}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
+              <article key={block.title} className="rounded-2xl border border-black/10 bg-white/75 p-5 shadow-sm">
+                <h3 className="text-lg font-black text-black/80">{block.title}</h3>
+                <p className="mt-1 text-sm text-black/60">{block.description}</p>
+                <ul className="mt-3 space-y-2">
                   {block.prompts.map((prompt) => (
-                    <button
-                      key={prompt}
-                      type="button"
-                      onClick={() => openCreateWithPrompt(prompt)}
-                      className="rounded-full border border-black/10 bg-[#F8F4EF] px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:border-black/25"
-                    >
-                      {prompt}
-                    </button>
+                    <li key={prompt}>
+                      <button
+                        type="button"
+                        onClick={(event) => navigateWithRipple(event, `/create?prompt=${encodeURIComponent(prompt)}`)}
+                        className="text-left text-sm font-semibold text-black/70 underline-offset-4 transition hover:text-black hover:underline"
+                      >
+                        {prompt}
+                      </button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </article>
             ))}
-          </div>
-        </section>
+          </section>
+        </div>
 
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           {FLOATING_EXAMPLES.map((example, i) => (
@@ -291,16 +300,6 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
         </div>
       </main>
 
-      <footer className="relative z-20 mx-auto mb-8 flex w-full max-w-7xl items-center justify-center">
-        <button
-          type="button"
-          onClick={() => setSelectorOpen(true)}
-          className="rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs font-semibold text-black/60 hover:bg-white"
-        >
-          Change region ({region ?? "Unselected"})
-        </button>
-      </footer>
-
       {ripple.active && (
         <motion.div
           className="pointer-events-none fixed inset-0 z-[90] bg-[#F7F1EB]"
@@ -309,10 +308,11 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
           transition={{ duration: 0.5, ease: [0.2, 0.9, 0.2, 1] }}
         />
       )}
+
       <RegionSelector
-        open={selectorOpen}
-        onSelect={applyRegion}
-        onClose={region ? () => setSelectorOpen(false) : undefined}
+        open={isRegionSelectorOpen}
+        onSelect={handleSelectRegion}
+        onClose={region ? () => setIsRegionSelectorOpen(false) : undefined}
       />
     </div>
   );

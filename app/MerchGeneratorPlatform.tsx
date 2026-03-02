@@ -385,11 +385,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setStep(2);
     }
 
+    const promptPrefill = initialQuery.prompt?.trim();
     const style = initialQuery.style?.trim();
     const occasion = initialQuery.occasion?.replace(/-/g, " ").trim();
-    const queryPrompt = initialQuery.prompt?.trim();
-    if (queryPrompt) {
-      setPrompt(queryPrompt);
+    if (promptPrefill) {
+      setPrompt(promptPrefill);
     } else if (style && occasion) {
       setPrompt(`${style} style artwork for ${occasion}.`);
     } else if (style) {

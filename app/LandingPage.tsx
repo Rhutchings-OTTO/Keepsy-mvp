@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import RegionSelector from "@/components/RegionSelector";
@@ -89,8 +89,11 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   const router = useRouter();
   const [cursorOffset, setCursorOffset] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const [region, setCurrentRegion] = useState<Region | null>(initialRegion);
-  const [isRegionSelectorOpen, setIsRegionSelectorOpen] = useState(!initialRegion);
+  const [region, setCurrentRegion] = useState<Region | null>(() => initialRegion ?? getRegion());
+  const [isRegionSelectorOpen, setIsRegionSelectorOpen] = useState<boolean>(() => {
+    const resolvedRegion = initialRegion ?? getRegion();
+    return !resolvedRegion;
+  });
   const [ripple, setRipple] = useState<{ active: boolean; x: number; y: number; to: string }>({
     active: false,
     x: 0,
@@ -100,22 +103,6 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
   const activeRegion = region ?? "UK";
   const content = LANDING_CONTENT[activeRegion];
-
-  useEffect(() => {
-    const savedRegion = getRegion();
-    if (savedRegion) {
-      setCurrentRegion(savedRegion);
-      setIsRegionSelectorOpen(false);
-      return;
-    }
-    if (initialRegion) {
-      setRegion(initialRegion);
-      setCurrentRegion(initialRegion);
-      setIsRegionSelectorOpen(false);
-      return;
-    }
-    setIsRegionSelectorOpen(true);
-  }, [initialRegion]);
 
   const navigateWithRipple = (event: React.MouseEvent<HTMLButtonElement>, to: string) => {
     const x = event.clientX;

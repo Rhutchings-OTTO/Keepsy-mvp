@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import RegionSelector from "@/components/RegionSelector";
-import { LANDING_CONTENT } from "@/content/landingContent";
 import { getRegion, setRegion, type Region } from "@/lib/region";
 
 const FLOATING_EXAMPLES = [
@@ -102,7 +101,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   });
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
   const activeRegion = region ?? "UK";
-  const content = LANDING_CONTENT[activeRegion];
+  // Do not add region-specific sections here; region content is only rendered on the generation page.
 
   const navigateWithRipple = (event: React.MouseEvent<HTMLButtonElement>, to: string) => {
     const x = event.clientX;
@@ -170,10 +169,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
       <main className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
         <div className="relative z-20 max-w-5xl text-center">
           <p className="mb-4 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
-            AI-powered gifting · {activeRegion}
+            AI-powered creativity
           </p>
           <h1 className="text-5xl font-black leading-[1.05] md:text-7xl">
-            {content.heroTitle}
+            Imagine it. Generate it.
             <br />
             <motion.span
               className="bg-clip-text text-transparent"
@@ -185,18 +184,18 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               animate={{ backgroundSize: ["220% auto", "240% auto", "220% auto"] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
-              Thoughtful by design.
+              Cherish it.
             </motion.span>
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-xl font-medium text-black/60">
-            {content.heroSubtitle}
+            Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <button
               onClick={(event) => navigateWithRipple(event, "/create")}
               className="rounded-2xl bg-black px-6 py-3 text-base font-black text-white shadow-lg transition hover:bg-black/90"
             >
-              {content.primaryCta}
+              Start creating
             </button>
             <button
               onClick={() => router.push("/gift-ideas")}
@@ -205,60 +204,6 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               Browse gift ideas
             </button>
           </div>
-
-          <section className="mt-10 rounded-2xl border border-black/10 bg-white/70 p-5 text-left shadow-sm">
-            <h2 className="text-sm font-black uppercase tracking-wider text-black/65">Holiday inspiration</h2>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {content.holidayBadges.map((badge) => (
-                <button
-                  key={badge.label}
-                  type="button"
-                  onClick={(event) => navigateWithRipple(event, `/create?prompt=${encodeURIComponent(badge.prompts[0])}`)}
-                  className="rounded-full border border-black/10 bg-white/90 px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-white"
-                >
-                  {badge.label}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="mt-6 rounded-2xl border border-black/10 bg-white/70 p-5 text-left shadow-sm">
-            <h2 className="text-sm font-black uppercase tracking-wider text-black/65">Suggested prompts</h2>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {content.promptChips.map((chip) => (
-                <button
-                  key={chip}
-                  type="button"
-                  onClick={(event) => navigateWithRipple(event, `/create?prompt=${encodeURIComponent(chip)}`)}
-                  className="rounded-full border border-black/10 bg-white/90 px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-white"
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="mt-6 grid gap-4 text-left md:grid-cols-2">
-            {content.seasonalBlocks.map((block) => (
-              <article key={block.title} className="rounded-2xl border border-black/10 bg-white/75 p-5 shadow-sm">
-                <h3 className="text-lg font-black text-black/80">{block.title}</h3>
-                <p className="mt-1 text-sm text-black/60">{block.description}</p>
-                <ul className="mt-3 space-y-2">
-                  {block.prompts.map((prompt) => (
-                    <li key={prompt}>
-                      <button
-                        type="button"
-                        onClick={(event) => navigateWithRipple(event, `/create?prompt=${encodeURIComponent(prompt)}`)}
-                        className="text-left text-sm font-semibold text-black/70 underline-offset-4 transition hover:text-black hover:underline"
-                      >
-                        {prompt}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            ))}
-          </section>
         </div>
 
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">

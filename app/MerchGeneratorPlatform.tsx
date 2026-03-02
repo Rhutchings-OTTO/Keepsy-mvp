@@ -15,6 +15,8 @@ import UpsellDrawer from "@/components/UpsellDrawer";
 import GiftAssistantWidget from "@/components/GiftAssistantWidget";
 import { useConversionFlow } from "@/context/ConversionFlowContext";
 import { FF } from "@/lib/featureFlags";
+import { REGION_CONTENT } from "@/content/regionContent";
+import { getRegion, type Region } from "@/lib/region";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import {
   Sparkles,
@@ -291,6 +293,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const { state: conversionFlow, updateState: updateConversionFlow } = useConversionFlow();
   const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [region] = useState<Region>(() => getRegion() ?? "UK");
+  const [isInspirationOpenMobile, setIsInspirationOpenMobile] = useState(false);
 
   const [prompt, setPrompt] = useState("");
   const [isBusy, setIsBusy] = useState(false);
@@ -332,6 +336,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     : Boolean(generatedImage);
   const selectedMockupProductType = getMockupProductType(selectedProduct.type);
   const selectedMockupColor = getMockupColor(selectedColor);
+  const inspiration = REGION_CONTENT[region];
 
   useEffect(() => {
     return () => {
@@ -615,6 +620,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const applyInspirationPrompt = (value: string) => {
+    setPrompt(value);
+    if (generationError) setGenerationError(null);
+  };
+
   return (
     <div
       className="min-h-screen flex flex-col bg-[#F7F1EB] text-[#23211F] selection:bg-indigo-100 overflow-x-hidden"
@@ -894,6 +904,58 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       </motion.button>
                     ))}
                   </motion.div>
+
+                  <motion.section variants={fadeInUp} className="mt-8 w-full rounded-2xl border border-black/10 bg-white/75 p-4 shadow-sm text-left">
+                    <div className="flex items-center justify-between gap-3">
+                      <h2 className="text-sm font-black uppercase tracking-wider text-black/60">
+                        Local Inspiration · {region}
+                      </h2>
+                      <button
+                        type="button"
+                        onClick={() => setIsInspirationOpenMobile((prev) => !prev)}
+                        className="rounded-full border border-black/10 px-3 py-1 text-xs font-semibold text-black/60 md:hidden"
+                      >
+                        {isInspirationOpenMobile ? "Hide" : "Show"}
+                      </button>
+                    </div>
+
+                    <div className={`${isInspirationOpenMobile ? "mt-3 block" : "mt-3 hidden"} md:block`}>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-black/45">Holiday inspiration</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {inspiration.holidayBadges.map((badge) => (
+                          <span
+                            key={badge}
+                            className="rounded-full border border-black/10 bg-white/90 px-3 py-1 text-xs font-semibold text-black/60"
+                          >
+                            {badge}
+                          </span>
+                        ))}
+                      </div>
+
+                      <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-black/45">Suggested prompts</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {inspiration.promptChips.map((chip) => (
+                          <button
+                            key={chip}
+                            type="button"
+                            onClick={() => applyInspirationPrompt(chip)}
+                            className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-semibold text-black/70 hover:bg-black/5"
+                          >
+                            {chip}
+                          </button>
+                        ))}
+                      </div>
+
+                      <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-black/45">Popular right now</p>
+                      <ul className="mt-2 space-y-1">
+                        {inspiration.popularRightNow.map((item) => (
+                          <li key={item} className="text-sm font-semibold text-black/60">
+                            • {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </motion.section>
 
                   <motion.div variants={fadeInUp} className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 w-full opacity-60">
                     {[

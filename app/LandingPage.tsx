@@ -1,88 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import IridescenceBackground from "@/components/IridescenceBackground";
 import RegionSelector from "@/components/RegionSelector";
+import { HeroFloatingCards } from "@/components/HeroFloatingCards";
 import { Reveal } from "@/components/motion/Reveal";
-import { InteractiveCard } from "@/components/ui/InteractiveCard";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
-
-const FLOATING_EXAMPLES = [
-  {
-    id: "tee-white",
-    label: "Premium Tee Mockup",
-    product: "T-Shirt",
-    image: "/product-tiles/tee-white.png",
-    className: "hidden xl:block top-[10%] left-[2%] w-36 2xl:w-40",
-  },
-  {
-    id: "plain-mug",
-    label: "Plain Mug Mockup",
-    product: "Mug",
-    image: "/product-tiles/plain-mug-front.png",
-    className: "hidden xl:block top-[12%] right-[2%] w-40 2xl:w-44",
-  },
-  {
-    id: "plain-hoodie",
-    label: "Plain Hoodie Mockup",
-    product: "Hoodie",
-    image: "/product-tiles/hoodie-white.png",
-    className: "hidden xl:block bottom-[14%] left-[3%] w-44 2xl:w-48",
-  },
-  {
-    id: "plain-card",
-    label: "Plain Card Mockup",
-    product: "Card",
-    image: "/product-tiles/plain-card.png",
-    className: "hidden xl:block bottom-[14%] right-[3%] w-36 2xl:w-40",
-  },
-  {
-    id: "christmas-scene",
-    label: "Christmas Scene",
-    product: "Design",
-    image: "/occasion-tiles/christmas-scene.png",
-    className: "hidden 2xl:block top-[6%] right-[20%] w-36",
-  },
-  {
-    id: "thanksgiving-scene",
-    label: "Thanksgiving Cartoon",
-    product: "Design",
-    image: "/occasion-tiles/thanksgiving-cartoon.png",
-    className: "hidden 2xl:block top-[38%] left-[0.5%] w-32",
-  },
-  {
-    id: "fourth-july-scene",
-    label: "Fourth of July Photo",
-    product: "Design",
-    image: "/occasion-tiles/fourth-july-photo.png",
-    className: "hidden 2xl:block bottom-[4%] left-[20%] w-44",
-  },
-  {
-    id: "anniversary-scene",
-    label: "Anniversary Watercolor",
-    product: "Design",
-    image: "/occasion-tiles/anniversary-watercolor.png",
-    className: "hidden 2xl:block top-[44%] right-[15%] w-36",
-  },
-  {
-    id: "birthday-scene",
-    label: "Birthday Scene",
-    product: "Design",
-    image: "/occasion-tiles/birthday-confetti.png",
-    className: "hidden 2xl:block bottom-[32%] right-[0.5%] w-28",
-  },
-  {
-    id: "pet-scene",
-    label: "Pet Portrait Scene",
-    product: "Design",
-    image: "/occasion-tiles/pet-gifts-portrait.png",
-    className: "hidden 2xl:block top-[26%] left-[16%] w-52",
-  },
-];
 
 type LandingPageProps = {
   initialRegion?: Region | null;
@@ -103,6 +30,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     y: 0,
     to: "/create",
   });
+  const heroTextRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
   const { scrollY } = useScroll();
   const reduceMotion = useReducedMotion();
@@ -141,10 +70,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     >
       <IridescenceBackground />
 
-      <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-8 sm:px-6">
+      <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-4 py-8 sm:px-6">
         <div className="w-24 sm:w-40" />
         <motion.div
-          className="logo-glass-tablet flex min-w-0 max-w-[min(90vw,420px)] items-center justify-center rounded-2xl px-8 py-5 sm:px-10 sm:py-6"
+          className="logo-glass-tablet relative z-30 flex min-w-0 max-w-[min(90vw,520px)] shrink-0 items-center justify-center rounded-[26px] px-6 py-4 sm:px-10 sm:py-6"
           style={FF.cinematicUX && !reduceMotion ? { y: logoTabletY } : undefined}
           whileHover={!reduceMotion ? { scale: 1.02 } : undefined}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
@@ -154,7 +83,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             alt="Keepsy"
             width={760}
             height={220}
-            className="h-28 w-auto object-contain sm:h-32"
+            className="h-44 w-auto object-contain sm:h-48"
           />
         </motion.div>
         <button
@@ -166,8 +95,13 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
         </button>
       </header>
 
-      <motion.main style={FF.cinematicUX ? { y: heroY } : undefined} className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
+      <motion.main
+        ref={mainRef}
+        style={FF.cinematicUX ? { y: heroY } : undefined}
+        className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14"
+      >
         <Reveal variant="fadeUp" className="relative z-20 max-w-5xl text-center">
+          <div ref={heroTextRef}>
           <p className="mb-4 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
             AI-powered creativity
           </p>
@@ -206,29 +140,16 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               Browse gift ideas
             </button>
           </div>
+          </div>
         </Reveal>
 
-        <motion.div aria-hidden style={FF.cinematicUX ? { y: cardsY } : undefined} className="pointer-events-none absolute inset-0 z-0">
-          {FLOATING_EXAMPLES.map((example, i) => (
-            <motion.div
-              key={example.id}
-              className={`absolute ${example.className}`}
-              style={{
-                x: cursorOffset.x * (0.24 + i * 0.015),
-                y: cursorOffset.y * (0.24 + i * 0.015),
-              }}
-              animate={{ y: [0, i % 2 === 0 ? -12 : 12, 0], rotate: [0, i % 2 === 0 ? 1.4 : -1.4, 0] }}
-              transition={{ duration: 6 + i, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <InteractiveCard
-                image={<Image src={example.image} alt={example.label} width={240} height={160} className="h-28 w-full rounded-xl object-cover" />}
-                title={example.label}
-                subtitle={`${example.product} preview`}
-                className="border-black/10 bg-white/80"
-              />
-            </motion.div>
-          ))}
-        </motion.div>
+        <HeroFloatingCards
+          textRef={heroTextRef}
+          containerRef={mainRef}
+          cursorOffset={cursorOffset}
+          cardsY={cardsY}
+          reduceMotion={reduceMotion ?? false}
+        />
       </motion.main>
 
       {ripple.active && (

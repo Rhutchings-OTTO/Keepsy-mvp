@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
 import RegionSelector from "@/components/RegionSelector";
+import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
 
 const FLOATING_EXAMPLES = [
@@ -100,6 +101,9 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     to: "/create",
   });
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 400], [0, -28]);
+  const cardsY = useTransform(scrollY, [0, 400], [0, -42]);
   const activeRegion = region ?? "UK";
   // Do not add region-specific sections here; region content is only rendered on the generation page.
 
@@ -166,7 +170,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
         </button>
       </header>
 
-      <main className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
+      <motion.main style={FF.cinematicUX ? { y: heroY } : undefined} className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
         <div className="relative z-20 max-w-5xl text-center">
           <p className="mb-4 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
             AI-powered creativity
@@ -206,7 +210,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
           </div>
         </div>
 
-        <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        <motion.div aria-hidden style={FF.cinematicUX ? { y: cardsY } : undefined} className="pointer-events-none absolute inset-0 z-0">
           {FLOATING_EXAMPLES.map((example, i) => (
             <motion.div
               key={example.id}
@@ -229,8 +233,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               <div className="text-[11px] font-semibold text-black/50">{example.product} preview</div>
             </motion.div>
           ))}
-        </div>
-      </main>
+        </motion.div>
+      </motion.main>
 
       {ripple.active && (
         <motion.div

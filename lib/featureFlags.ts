@@ -1,4 +1,11 @@
 export const FF = {
+  cinematicUX: true,
+  createModes: true,
+  uploadTransformation: true,
+  beforeAfter: true,
+  motionSystem: true,
+  dynamicReveal: true,
+  personalisedStory: true,
   guidedPrompts: true,
   trustLayer: true,
   giftingFlow: true,

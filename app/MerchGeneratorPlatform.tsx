@@ -14,9 +14,13 @@ import OccasionBanner from "@/components/OccasionBanner";
 import UpsellDrawer from "@/components/UpsellDrawer";
 import GiftAssistantWidget from "@/components/GiftAssistantWidget";
 import CreateModePanel from "@/components/CreateModePanel";
+import BeforeAfterCarousel from "@/components/BeforeAfterCarousel";
+import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
 import { useConversionFlow } from "@/context/ConversionFlowContext";
 import { FF } from "@/lib/featureFlags";
 import { REGION_CONTENT } from "@/content/regionContent";
+import { motionTransition, revealUp, softScaleIn, hoverLift } from "@/lib/motion";
 import { getRegion, type Region } from "@/lib/region";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import {
@@ -144,11 +148,13 @@ const CREATOR_TESTIMONIALS = [
   },
 ];
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 18 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.45, ease: "easeOut" },
-};
+const fadeInUp = FF.motionSystem
+  ? revealUp
+  : {
+      initial: { opacity: 0, y: 18 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0.45, ease: "easeOut" },
+    };
 
 const GBP_FORMATTER = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -779,6 +785,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       uploadedFileName={uploadedFileName}
                     />
                   </motion.div>
+                  {FF.beforeAfter ? (
+                    <BeforeAfterCarousel region={region} />
+                  ) : null}
 
                   <motion.div variants={fadeInUp} className="w-full relative group">
                     <div className="absolute -inset-1 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-700"
@@ -814,7 +823,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </div>
                         </div>
 
-                        <motion.button
+                          <motion.button
                           onClick={handleGenerate}
                           disabled={(!prompt && !uploadedImage) || isBusy}
                           className={`px-8 py-4 rounded-xl font-extrabold text-white flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 ${
@@ -983,7 +992,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   </motion.section>
 
                   <motion.div variants={fadeInUp} className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 w-full opacity-60">
-                    {[
+                        {[
                       { Icon: Shirt, label: "T-Shirts" },
                       { Icon: Coffee, label: "Mugs" },
                       { Icon: CreditCard, label: "Cards" },
@@ -991,7 +1000,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     ].map(({ Icon, label }) => (
                       <motion.button
                         key={label}
-                        whileHover={{ scale: 1.06, opacity: 1 }}
+                            whileHover={hoverLift.whileHover}
+                            whileTap={hoverLift.whileTap}
                         className="flex flex-col items-center gap-2"
                         onClick={() => {
                           const typeMap: Record<string, MerchType> = {
@@ -1054,12 +1064,20 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
                 >
                   <div className="lg:col-span-7 sticky top-24">
-                    <MockupRenderer
-                      productType={selectedMockupProductType}
-                      color={selectedMockupColor}
-                      generatedImage={generatedImage}
-                      hasArtwork={Boolean(generatedImage || uploadedImage)}
-                    />
+                    <motion.div
+                      key={generatedImage ?? "empty-reveal"}
+                      initial={FF.dynamicReveal ? "initial" : false}
+                      animate={FF.dynamicReveal ? "animate" : false}
+                      variants={FF.dynamicReveal ? softScaleIn : undefined}
+                      transition={motionTransition("slow")}
+                    >
+                      <MockupRenderer
+                        productType={selectedMockupProductType}
+                        color={selectedMockupColor}
+                        generatedImage={generatedImage}
+                        hasArtwork={Boolean(generatedImage || uploadedImage)}
+                      />
+                    </motion.div>
                     <div className="mt-6 flex gap-3 items-center">
                       <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">
                         <Sparkles size={14} /> Applied to real mockups
@@ -1072,6 +1090,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         Back
                       </button>
                     </div>
+                    {FF.beforeAfter ? (
+                      <div className="mt-4">
+                        <BeforeAfterSlider beforeSrc={uploadedImage} afterSrc={generatedImage} />
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="lg:col-span-5 space-y-6">
@@ -1079,6 +1102,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       <h2 className="text-4xl font-black mb-2">{selectedProduct.name}</h2>
                       <p className="text-black/55 font-semibold">{selectedProduct.description}</p>
                     </div>
+                    {FF.personalisedStory ? (
+                      <PersonalisedStoryCopy region={region} productType={selectedProduct.type} />
+                    ) : null}
 
                     <div className="bg-white/80 border border-black/10 rounded-3xl p-5 shadow-sm">
                       <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-4">
@@ -1454,6 +1480,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       <GenerationLoadingOverlay
         isOpen={isGenerating}
         productType={selectedProduct.type}
+        hasSourceImage={Boolean(uploadedImage)}
       />
       {FF.giftAssistant && view === "home" ? (
         <GiftAssistantWidget

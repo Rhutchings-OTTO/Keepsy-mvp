@@ -6,6 +6,7 @@ export const CREATE_EXAMPLES: Record<
     describeChips: string[];
     uploadTransformChips: string[];
     beforeAfterTiles: { beforeLabel: string; afterLabel: string; caption: string }[];
+    localInspiration: string[];
   }
 > = {
   US: {
@@ -30,6 +31,12 @@ export const CREATE_EXAMPLES: Record<
       { beforeLabel: "Pet snapshot", afterLabel: "Cozy portrait art", caption: "Pet photo -> portrait print" },
       { beforeLabel: "Landscape photo", afterLabel: "Vintage poster", caption: "Scenery -> travel-style art" },
     ],
+    localInspiration: [
+      "Thanksgiving host gift",
+      "Fourth of July family memory",
+      "Mother's Day US floral keepsake",
+      "Holiday house portrait",
+    ],
   },
   UK: {
     describeChips: [
@@ -52,6 +59,12 @@ export const CREATE_EXAMPLES: Record<
       { beforeLabel: "Home snapshot", afterLabel: "Watercolor keepsake", caption: "Home photo -> keepsake art" },
       { beforeLabel: "Pet photo", afterLabel: "Painterly portrait", caption: "Pet photo -> portrait gift" },
       { beforeLabel: "Landscape", afterLabel: "Vintage poster style", caption: "Landscape -> vintage art print" },
+    ],
+    localInspiration: [
+      "Mother's Day UK keepsake",
+      "New baby announcement art",
+      "Birthday memory in watercolor",
+      "Cosy Christmas family portrait",
     ],
   },
 };

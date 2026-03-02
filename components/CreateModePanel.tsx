@@ -6,6 +6,7 @@ import { UploadCloud, WandSparkles } from "lucide-react";
 import Image from "next/image";
 import type { Region } from "@/lib/region";
 import { CREATE_EXAMPLES } from "@/content/createExamples";
+import { FF } from "@/lib/featureFlags";
 
 type Mode = "describe" | "upload";
 
@@ -40,6 +41,7 @@ export default function CreateModePanel({
     () => (mode === "describe" ? content.describeChips : content.uploadTransformChips),
     [content.describeChips, content.uploadTransformChips, mode],
   );
+  if (!FF.createModes) return null;
 
   const requestPrompt = (nextPrompt: string) => {
     if (!hasUserTyped || promptValue.trim().length === 0) {
@@ -209,22 +211,13 @@ export default function CreateModePanel({
         </div>
       ) : null}
 
-      <div className="mt-4 overflow-x-auto pb-1">
-        <div className="flex min-w-max gap-3">
-          {content.beforeAfterTiles.map((tile) => (
-            <article key={tile.caption} className="w-64 rounded-2xl border border-black/10 bg-white p-3">
-              <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-xl bg-gradient-to-br from-[#ECE7E1] to-[#DCD3C8] p-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-black/45">Before</p>
-                  <p className="mt-6 text-xs font-semibold text-black/65">{tile.beforeLabel}</p>
-                </div>
-                <div className="rounded-xl bg-gradient-to-br from-[#E9EDF7] to-[#D7DFEE] p-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-black/45">After</p>
-                  <p className="mt-6 text-xs font-semibold text-black/65">{tile.afterLabel}</p>
-                </div>
-              </div>
-              <p className="mt-2 text-xs font-semibold text-black/60">{tile.caption}</p>
-            </article>
+      <div className="mt-4">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-black/45">Local inspiration</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {content.localInspiration.map((item) => (
+            <span key={item} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-semibold text-black/60">
+              {item}
+            </span>
           ))}
         </div>
       </div>

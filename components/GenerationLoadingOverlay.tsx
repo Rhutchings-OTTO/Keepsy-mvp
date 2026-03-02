@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { FF } from "@/lib/featureFlags";
 import { useLockBodyScroll } from "@/lib/useLockBodyScroll";
 
 type ProductType = "tshirt" | "hoodie" | "card" | "mug" | string;
@@ -10,6 +11,7 @@ type ProductType = "tshirt" | "hoodie" | "card" | "mug" | string;
 type GenerationLoadingOverlayProps = {
   isOpen: boolean;
   productType?: ProductType;
+  hasSourceImage?: boolean;
   showSavingHint?: boolean;
 };
 
@@ -20,6 +22,12 @@ const STAGE_MESSAGES = [
   "Perfecting the details...",
   "Making it gift-ready...",
   "Preparing your preview...",
+] as const;
+
+const UPLOAD_TRANSFORMATION_MESSAGES = [
+  "Analysing your photo...",
+  "Designing your gift...",
+  "Preparing preview...",
 ] as const;
 
 const MESSAGE_INTERVAL_MS = 1800;
@@ -37,6 +45,7 @@ function getContextMessage(productType?: ProductType) {
 export function GenerationLoadingOverlay({
   isOpen,
   productType,
+  hasSourceImage = false,
   showSavingHint = false,
 }: GenerationLoadingOverlayProps) {
   const prefersReducedMotion = useReducedMotion();
@@ -68,10 +77,13 @@ export function GenerationLoadingOverlay({
   }, [isOpen]);
 
   const message = useMemo(() => {
+    if (hasSourceImage && FF.uploadTransformation) {
+      return UPLOAD_TRANSFORMATION_MESSAGES[tickCount % UPLOAD_TRANSFORMATION_MESSAGES.length];
+    }
     const contextual = getContextMessage(productType);
     if (contextual && tickCount % 3 === 2) return contextual;
     return STAGE_MESSAGES[stageIndex];
-  }, [productType, stageIndex, tickCount]);
+  }, [hasSourceImage, productType, stageIndex, tickCount]);
 
   return (
     <AnimatePresence>

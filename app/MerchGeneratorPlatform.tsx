@@ -16,6 +16,8 @@ import GiftAssistantWidget from "@/components/GiftAssistantWidget";
 import CreateModePanel from "@/components/CreateModePanel";
 import BeforeAfterCarousel from "@/components/BeforeAfterCarousel";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+import { Carousel } from "@/components/ui/Carousel";
+import { Reveal } from "@/components/motion/Reveal";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
 import MagicpathBackground from "@/components/skin/magicpath/MagicpathBackground";
 import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
@@ -1046,7 +1048,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
                   <motion.section variants={fadeInUp} className="mt-16 w-full">
                     <h2 className="text-4xl md:text-5xl font-black text-center mb-8">What our creators say</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <Carousel showArrows showDots>
                       {CREATOR_TESTIMONIALS.map((testimonial) => (
                         <article
                           key={testimonial.name}
@@ -1064,7 +1066,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           <p className="mt-4 text-2xl font-black">{testimonial.name}</p>
                         </article>
                       ))}
-                    </div>
+                    </Carousel>
                   </motion.section>
 
                   {FF.trustLayer ? (
@@ -1262,7 +1264,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     </p>
                   </div>
 
-                  <div className="bg-white/70 border border-black/10 rounded-[32px] p-7 shadow-sm">
+                  <Reveal variant="fadeUp" className="bg-white/70 border border-black/10 rounded-[32px] p-7 shadow-sm">
                     <h3 className="text-xl font-black mb-4">Order Summary</h3>
                     <div className="flex items-center gap-4">
                       <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-black/10 bg-white">
@@ -1296,7 +1298,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         />
                       </div>
                     ) : null}
-                  </div>
+                  </Reveal>
                 </motion.div>
               )}
             </div>

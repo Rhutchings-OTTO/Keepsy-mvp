@@ -29,21 +29,30 @@ uniform float uSpeed;
 
 varying vec2 vUv;
 
+vec3 hueToRgb(float h) {
+  h = fract(h);
+  float r = abs(h * 6.0 - 3.0) - 1.0;
+  float g = 2.0 - abs(h * 6.0 - 2.0);
+  float b = 2.0 - abs(h * 6.0 - 4.0);
+  return clamp(vec3(r, g, b), 0.0, 1.0);
+}
+
 void main() {
   float mr = min(uResolution.x, uResolution.y);
   vec2 uv = (vUv.xy * 2.0 - 1.0) * uResolution.xy / mr;
-
   uv += (uMouse - vec2(0.5)) * uAmplitude;
 
-  float d = -uTime * 0.5 * uSpeed;
-  float a = 0.0;
-  for (float i = 0.0; i < 8.0; ++i) {
-    a += cos(i - d - a * uv.x);
-    d += sin(uv.y * i + a);
-  }
-  d += uTime * 0.5 * uSpeed;
-  vec3 col = vec3(cos(uv * vec2(d, a)) * 0.6 + 0.4, cos(a + d) * 0.5 + 0.5);
-  col = cos(col * cos(vec3(d, a, 2.5)) * 0.5 + 0.5) * uColor;
+  float t = uTime * uSpeed;
+  float wave1 = sin(uv.x * 2.5 + t * 0.7) * cos(uv.y * 2.5 - t * 0.5);
+  float wave2 = sin((uv.x + uv.y) * 1.8 + t * 0.9) * 0.5 + 0.5;
+  float wave3 = cos(length(uv) * 2.0 - t * 0.6) * 0.5 + 0.5;
+
+  float h = fract(0.55 + wave1 * 0.15 + wave2 * 0.2 + wave3 * 0.1);
+  float s = 0.7 + wave2 * 0.3;
+  float v = 0.85 + wave3 * 0.15;
+
+  vec3 rgb = hueToRgb(h) * v * s + (1.0 - s) * v;
+  vec3 col = mix(rgb * uColor, rgb, 0.3);
   gl_FragColor = vec4(col, 1.0);
 }
 `;

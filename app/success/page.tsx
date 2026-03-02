@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { Reveal } from "@/components/motion/Reveal";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <Reveal variant="fadeUp">
       <div className="rounded-3xl border border-black/10 bg-white p-8 shadow-sm">
         <h1 className="text-4xl font-black">{headline} ✅</h1>
         <p className="mt-3 text-black/70">
@@ -111,6 +113,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
           Final remaining integration: Printify order execution after webhook-confirmed payment.
         </p>
       </div>
+      </Reveal>
     </main>
   );
 }

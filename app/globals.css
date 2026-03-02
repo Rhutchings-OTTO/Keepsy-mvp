@@ -52,3 +52,7 @@ html {
     -webkit-backdrop-filter: blur(20px);
   }
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

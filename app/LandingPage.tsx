@@ -6,6 +6,8 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
 import { useRouter } from "next/navigation";
 import IridescenceBackground from "@/components/IridescenceBackground";
 import RegionSelector from "@/components/RegionSelector";
+import { Reveal } from "@/components/motion/Reveal";
+import { InteractiveCard } from "@/components/ui/InteractiveCard";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
 
@@ -165,7 +167,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
       </header>
 
       <motion.main style={FF.cinematicUX ? { y: heroY } : undefined} className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14">
-        <div className="relative z-20 max-w-5xl text-center">
+        <Reveal variant="fadeUp" className="relative z-20 max-w-5xl text-center">
           <p className="mb-4 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
             AI-powered creativity
           </p>
@@ -204,13 +206,13 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               Browse gift ideas
             </button>
           </div>
-        </div>
+        </Reveal>
 
         <motion.div aria-hidden style={FF.cinematicUX ? { y: cardsY } : undefined} className="pointer-events-none absolute inset-0 z-0">
           {FLOATING_EXAMPLES.map((example, i) => (
             <motion.div
               key={example.id}
-              className={`absolute ${example.className} rounded-2xl border border-black/10 bg-white/80 p-2 shadow-xl backdrop-blur`}
+              className={`absolute ${example.className}`}
               style={{
                 x: cursorOffset.x * (0.24 + i * 0.015),
                 y: cursorOffset.y * (0.24 + i * 0.015),
@@ -218,15 +220,12 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               animate={{ y: [0, i % 2 === 0 ? -12 : 12, 0], rotate: [0, i % 2 === 0 ? 1.4 : -1.4, 0] }}
               transition={{ duration: 6 + i, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Image
-                src={example.image}
-                alt={example.label}
-                width={240}
-                height={160}
-                className="h-28 w-full rounded-xl object-cover"
+              <InteractiveCard
+                image={<Image src={example.image} alt={example.label} width={240} height={160} className="h-28 w-full rounded-xl object-cover" />}
+                title={example.label}
+                subtitle={`${example.product} preview`}
+                className="border-black/10 bg-white/80"
               />
-              <div className="mt-2 text-xs font-bold text-black/75">{example.label}</div>
-              <div className="text-[11px] font-semibold text-black/50">{example.product} preview</div>
             </motion.div>
           ))}
         </motion.div>

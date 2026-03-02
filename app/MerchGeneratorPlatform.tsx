@@ -17,6 +17,8 @@ import CreateModePanel from "@/components/CreateModePanel";
 import BeforeAfterCarousel from "@/components/BeforeAfterCarousel";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
+import MagicpathBackground from "@/components/skin/magicpath/MagicpathBackground";
+import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { useConversionFlow } from "@/context/ConversionFlowContext";
 import { FF } from "@/lib/featureFlags";
 import { REGION_CONTENT } from "@/content/regionContent";
@@ -346,6 +348,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const selectedMockupProductType = getMockupProductType(selectedProduct.type);
   const selectedMockupColor = getMockupColor(selectedColor);
   const inspiration = REGION_CONTENT[region];
+  const isMagicpathSkin = FF.magicpathSkin;
 
   useEffect(() => {
     return () => {
@@ -642,74 +645,84 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-[#F7F1EB] text-[#23211F] selection:bg-indigo-100 overflow-x-hidden"
+      className={`min-h-screen flex flex-col text-[#23211F] selection:bg-indigo-100 overflow-x-hidden ${
+        isMagicpathSkin ? "bg-[#FDFCFB]" : "bg-[#F7F1EB]"
+      }`}
       aria-busy={isGenerating}
     >
-      {/* Background blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <motion.div
-          animate={{ x: [0, 80, 0], y: [0, 40, 0], scale: [1, 1.15, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#7DB9E8]/20 blur-[120px] rounded-full"
-        />
-        <motion.div
-          animate={{ x: [0, -60, 0], y: [0, 80, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-[#F8C8DC]/20 blur-[120px] rounded-full"
-        />
-      </div>
+      <MagicpathBackground enabled={isMagicpathSkin} />
+      {!isMagicpathSkin ? (
+        <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+          <motion.div
+            animate={{ x: [0, 80, 0], y: [0, 40, 0], scale: [1, 1.15, 1] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#7DB9E8]/20 blur-[120px] rounded-full"
+          />
+          <motion.div
+            animate={{ x: [0, -60, 0], y: [0, 80, 0], scale: [1, 1.1, 1] }}
+            transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-[#F8C8DC]/20 blur-[120px] rounded-full"
+          />
+        </div>
+      ) : null}
 
       {/* NAV */}
-      <nav className="fixed top-0 z-40 flex w-full items-center justify-between border-b border-black/10 bg-[#F7F1EB]/78 backdrop-blur-md px-6 py-4">
-        <motion.div
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          className="flex items-center gap-3 cursor-pointer"
-          onClick={() => {
-            setView("home");
-            setStep(1);
-          }}
-        >
-          <Image
-            src="/keepsy-logo-transparent.png"
-            alt="Keepsy"
-            width={640}
-            height={190}
-            className="h-16 w-auto object-contain sm:h-20"
-          />
-        </motion.div>
-
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-black/60">
-            <button onClick={() => setView("home")} className={view === "home" ? "text-black" : ""}>
-              How it works
-            </button>
-            <button onClick={() => setView("catalog")} className={view === "catalog" ? "text-black" : ""}>
-              Catalog
-            </button>
-            <button onClick={() => setView("community")} className={view === "community" ? "text-black" : ""}>
-              Community
-            </button>
-          </div>
-
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="flex items-center gap-2 bg-black/5 hover:bg-black/10 transition-all px-4 py-2 rounded-full"
-          >
-            <ShoppingCart size={18} className="text-black/70" />
-            <motion.span
-              key={cartCount}
-              initial={{ scale: 1.35 }}
-              animate={{ scale: 1 }}
-              className="font-extrabold text-sm"
+      <nav className={`fixed z-40 w-full px-6 ${isMagicpathSkin ? "top-5" : "top-0 py-4"}`}>
+        <MagicpathFrame enabled={isMagicpathSkin} className={isMagicpathSkin ? "mx-auto flex w-full max-w-5xl items-center justify-between px-7 py-5" : ""}>
+          <div className={`flex w-full items-center justify-between ${isMagicpathSkin ? "" : "border-b border-black/10 bg-[#F7F1EB]/78 px-0 backdrop-blur-md"}`}>
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={() => {
+                setView("home");
+                setStep(1);
+              }}
             >
-              {cartCount}
-            </motion.span>
-          </button>
-        </div>
+              <Image
+                src="/keepsy-logo-transparent.png"
+                alt="Keepsy"
+                width={640}
+                height={190}
+                className="h-16 w-auto object-contain sm:h-20"
+              />
+            </motion.div>
+
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-black/60">
+                <button onClick={() => setView("home")} className={view === "home" ? "text-black" : ""}>
+                  How it works
+                </button>
+                <button onClick={() => setView("catalog")} className={view === "catalog" ? "text-black" : ""}>
+                  Catalog
+                </button>
+                <button onClick={() => setView("community")} className={view === "community" ? "text-black" : ""}>
+                  Community
+                </button>
+              </div>
+
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className={`flex items-center gap-2 transition-all px-4 py-2 rounded-full ${
+                  isMagicpathSkin ? "bg-black text-white shadow-xl" : "bg-black/5 hover:bg-black/10"
+                }`}
+              >
+                <ShoppingCart size={18} className={isMagicpathSkin ? "text-white" : "text-black/70"} />
+                <motion.span
+                  key={cartCount}
+                  initial={{ scale: 1.35 }}
+                  animate={{ scale: 1 }}
+                  className="font-extrabold text-sm"
+                >
+                  {cartCount}
+                </motion.span>
+              </button>
+            </div>
+          </div>
+        </MagicpathFrame>
       </nav>
 
-      <main className="flex-1 pt-32 pb-16 px-6 max-w-7xl mx-auto w-full">
+      <main className={`flex-1 pb-16 px-6 max-w-7xl mx-auto w-full ${isMagicpathSkin ? "pt-40" : "pt-32"}`}>
         <AnimatePresence mode="wait">
           {view === "home" && (
             <div className="space-y-20">
@@ -790,10 +803,17 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   ) : null}
 
                   <motion.div variants={fadeInUp} className="w-full relative group">
-                    <div className="absolute -inset-1 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-700"
-                      style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)" }}
-                    />
-                    <div className="relative bg-white p-2 rounded-2xl shadow-xl flex flex-col gap-2 border border-black/5">
+                    {!isMagicpathSkin ? (
+                      <div className="absolute -inset-1 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-700"
+                        style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)" }}
+                      />
+                    ) : null}
+                    <MagicpathFrame enabled={isMagicpathSkin}>
+                      <div className={`relative p-2 flex flex-col gap-2 border ${
+                        isMagicpathSkin
+                          ? "rounded-[2rem] border-white/60 bg-white/35 shadow-[0_16px_48px_rgba(0,0,0,0.08)] backdrop-blur-2xl"
+                          : "rounded-2xl border-black/5 bg-white shadow-xl"
+                      }`}>
                       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
                         <div className="flex-1 flex items-center px-4">
                           <input
@@ -904,6 +924,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         )}
                       </AnimatePresence>
                     </div>
+                    </MagicpathFrame>
                   </motion.div>
 
                   {FF.guidedPrompts ? (
@@ -1461,21 +1482,23 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         />
       ) : null}
 
-      <footer className="py-10 px-6 border-t border-black/10 bg-white/60">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm">
-          <div className="font-semibold text-black/55">
-            © 2026 Keepsy Ltd. All designs generated are owned by the creator. Powered by OpenAI & Stripe
+      <footer className={`px-6 ${isMagicpathSkin ? "pb-20 pt-16" : "py-10 border-t border-black/10 bg-white/60"}`}>
+        <MagicpathFrame enabled={isMagicpathSkin} className={isMagicpathSkin ? "mx-auto max-w-7xl px-8 py-8" : ""}>
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm">
+            <div className="font-semibold text-black/55">
+              © 2026 Keepsy Ltd. All designs generated are owned by the creator. Powered by OpenAI & Stripe
+            </div>
+            <div className="flex items-center gap-5 text-black/60">
+              <button onClick={() => setView("catalog")} className="hover:text-black">Catalog</button>
+              <button onClick={() => setView("community")} className="hover:text-black">Community</button>
+              <button onClick={() => setView("legal")} className="hover:text-black">Terms of Service</button>
+              <button onClick={() => setView("legal")} className="hover:text-black">Privacy Policy</button>
+              <button className="hover:text-black" onClick={handleDeleteMyData}>
+                Delete My Data
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-5 text-black/60">
-            <button onClick={() => setView("catalog")} className="hover:text-black">Catalog</button>
-            <button onClick={() => setView("community")} className="hover:text-black">Community</button>
-            <button onClick={() => setView("legal")} className="hover:text-black">Terms of Service</button>
-            <button onClick={() => setView("legal")} className="hover:text-black">Privacy Policy</button>
-            <button className="hover:text-black" onClick={handleDeleteMyData}>
-              Delete My Data
-            </button>
-          </div>
-        </div>
+        </MagicpathFrame>
       </footer>
       <GenerationLoadingOverlay
         isOpen={isGenerating}

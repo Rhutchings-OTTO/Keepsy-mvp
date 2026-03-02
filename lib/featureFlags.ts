@@ -1,4 +1,5 @@
 export const FF = {
+  magicpathSkin: true,
   cinematicUX: true,
   createModes: true,
   uploadTransformation: true,

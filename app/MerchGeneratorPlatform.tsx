@@ -13,6 +13,7 @@ import CheckoutSummaryEnhancer from "@/components/CheckoutSummaryEnhancer";
 import OccasionBanner from "@/components/OccasionBanner";
 import UpsellDrawer from "@/components/UpsellDrawer";
 import GiftAssistantWidget from "@/components/GiftAssistantWidget";
+import CreateModePanel from "@/components/CreateModePanel";
 import { useConversionFlow } from "@/context/ConversionFlowContext";
 import { FF } from "@/lib/featureFlags";
 import { REGION_CONTENT } from "@/content/regionContent";
@@ -304,6 +305,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [generationError, setGenerationError] = useState<string | null>(null);
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [hasUserTypedPrompt, setHasUserTypedPrompt] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const generateAbortRef = useRef<AbortController | null>(null);
 
@@ -571,9 +574,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     setIsUpsellOpen(true);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleUploadFile = (file: File) => {
     const validTypes = ["image/jpeg", "image/png"];
     const maxFileSizeBytes = 5 * 1024 * 1024;
 
@@ -589,9 +590,16 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     const reader = new FileReader();
     reader.onloadend = () => {
       setUploadedImage(reader.result as string);
+      setUploadedFileName(file.name);
       setGenerationError(null);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    handleUploadFile(file);
   };
 
   const handleDeleteMyData = async () => {
@@ -616,6 +624,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const clearUploadedImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     setUploadedImage(null);
+    setUploadedFileName(null);
     setGenerationError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -756,6 +765,21 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     </motion.div>
                   ) : null}
 
+                  <motion.div variants={fadeInUp} className="w-full">
+                    <CreateModePanel
+                      region={region}
+                      promptValue={prompt}
+                      setPromptValue={(value) => {
+                        setPrompt(value);
+                        setGenerationError(null);
+                      }}
+                      hasUserTyped={hasUserTypedPrompt}
+                      onUploadFile={handleUploadFile}
+                      uploadedPreviewUrl={uploadedImage}
+                      uploadedFileName={uploadedFileName}
+                    />
+                  </motion.div>
+
                   <motion.div variants={fadeInUp} className="w-full relative group">
                     <div className="absolute -inset-1 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-700"
                       style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)" }}
@@ -768,9 +792,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             value={prompt}
                             onChange={(e) => {
                               setPrompt(e.target.value);
+                              setHasUserTypedPrompt(true);
                               if (generationError) setGenerationError(null);
                             }}
-                            placeholder={uploadedImage ? "Add instructions for your photo..." : "Describe your gift image…"}
+                            placeholder={uploadedImage ? "Describe how you'd like to transform this photo…" : "Describe your gift image…"}
                             className="flex-1 bg-transparent py-4 text-base font-semibold outline-none placeholder:text-black/40 md:text-lg"
                           />
 

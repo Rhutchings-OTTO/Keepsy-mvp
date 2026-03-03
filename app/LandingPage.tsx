@@ -73,8 +73,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     >
       <IridescenceBackground />
 
-      <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-4 py-6 sm:px-6 sm:py-8">
-        <div className="w-24 sm:w-40" />
+      <header className="relative z-20 flex w-full items-center justify-between px-4 py-6 sm:px-6 sm:py-8">
+        <div className="w-24 shrink-0 sm:w-40" />
         <motion.div
           className="logo-glass-tablet relative z-20 flex min-w-0 max-w-fit shrink-0 items-center justify-center rounded-[24px] px-5 py-3 sm:px-6 sm:py-4"
           style={FF.cinematicUX && !reduceMotion ? { y: logoTabletY } : undefined}
@@ -92,7 +92,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
         <button
           type="button"
           onClick={() => setIsRegionSelectorOpen(true)}
-          className="rounded-full border border-black/15 bg-white/75 px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-white"
+          className="shrink-0 rounded-full border border-black/15 bg-white/75 px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-white"
         >
           {activeRegion} · Change region
         </button>

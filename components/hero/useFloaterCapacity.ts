@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const PAD = 14;
-const SAFE_MARGIN = 24;
-const FLOATER_GAP = 12;
-const JITTER = 10;
-const SCALE_MIN = 0.5;
+const PAD = 10;
+const SAFE_MARGIN = 16;
+const FLOATER_GAP = 8;
+const JITTER = 8;
+const SCALE_MIN = 0.4;
 const SCALE_MAX = 1.1;
 const CARD_ASPECT = 170 / 144;
 
-/** Base sizes: slightly smaller to fit more; desktop targets 8–14 floaters */
-const BASE_W_DESKTOP = 180;
-const BASE_W_MOBILE = 130;
+/** Base sizes: smaller to fit many more floaters; desktop targets 12–18 */
+const BASE_W_DESKTOP = 130;
+const BASE_W_MOBILE = 100;
 const MOBILE_BREAK = 640;
 
 const FOLD_GUARD_VH = 0.92;
@@ -143,8 +143,6 @@ export function useFloaterCapacity(
         if (isMobile) {
           scale = Math.max(SCALE_MIN, scale * 0.9);
         }
-        scale = clampScale(scale);
-
         const margin = FLOATER_GAP;
         const safeZone = {
           left: safeLeft - SAFE_MARGIN,
@@ -152,6 +150,14 @@ export function useFloaterCapacity(
           w: safeRight - safeLeft + SAFE_MARGIN * 2,
           h: safeBottom - safeTop + SAFE_MARGIN * 2,
         };
+
+        const rawLeftLaneWidth = Math.max(0, safeZone.left - PAD - margin);
+        const rawRightLaneWidth = Math.max(0, heroW - (safeZone.left + safeZone.w) - margin - PAD);
+        const maxLaneWidth = Math.max(rawLeftLaneWidth, rawRightLaneWidth);
+        if (maxLaneWidth > 0 && maxLaneWidth < baseW) {
+          scale = Math.min(scale, Math.max(SCALE_MIN, (maxLaneWidth - margin * 0.5) / baseW));
+        }
+        scale = clampScale(scale);
 
         let floaterW = baseW * scale;
         let floaterH = floaterW / CARD_ASPECT;
@@ -206,11 +212,11 @@ export function useFloaterCapacity(
           );
         }
 
-        const slotH = floaterH + margin * 0.7;
-        const leftCols = leftLaneWidth > floaterW * 1.5 + margin ? 2 : 1;
-        const rightCols = rightLaneWidth > floaterW * 1.5 + margin ? 2 : 1;
+        const slotH = floaterH + margin * 0.5;
+        const leftCols = leftLaneWidth > floaterW * 2.2 + margin * 2 ? 3 : leftLaneWidth > floaterW * 1.3 + margin ? 2 : 1;
+        const rightCols = rightLaneWidth > floaterW * 2.2 + margin * 2 ? 3 : rightLaneWidth > floaterW * 1.3 + margin ? 2 : 1;
 
-        if (leftLaneWidth > floaterW * 0.2) {
+        if (leftLaneWidth > floaterW * 0.15) {
           let seed = 0;
           for (let col = 0; col < leftCols; col++) {
             const leftX = leftCols > 1 ? leftLaneXMin + col * (floaterW + margin) : leftLaneXMin;
@@ -239,7 +245,7 @@ export function useFloaterCapacity(
           }
         }
 
-        if (rightLaneWidth > floaterW * 0.2) {
+        if (rightLaneWidth > floaterW * 0.15) {
           let seed = 100;
           for (let col = 0; col < rightCols; col++) {
             const rightX =
@@ -271,7 +277,7 @@ export function useFloaterCapacity(
 
         const midLeftX = leftLaneXMin;
         const midRightX = rightLaneXMax;
-        if (leftLaneWidth > floaterW * 0.2 && safeZone.top > floaterH * 2) {
+        if (leftLaneWidth > floaterW * 0.15 && safeZone.top > floaterH * 2) {
           candidates.push({
             x: jitter(midLeftX, 200),
             y: jitter(safeZone.top - floaterH - margin, 201),
@@ -279,7 +285,7 @@ export function useFloaterCapacity(
             distFromCenter: Math.hypot(midLeftX + floaterW / 2 - centerX, safeZone.top - centerY),
           });
         }
-        if (rightLaneWidth > floaterW * 0.2 && safeZone.top > floaterH * 2) {
+        if (rightLaneWidth > floaterW * 0.15 && safeZone.top > floaterH * 2) {
           candidates.push({
             x: jitter(midRightX, 202),
             y: jitter(safeZone.top - floaterH - margin, 203),
@@ -287,7 +293,7 @@ export function useFloaterCapacity(
             distFromCenter: Math.hypot(midRightX + floaterW / 2 - centerX, safeZone.top - centerY),
           });
         }
-        if (useBottomLane && leftLaneWidth > floaterW * 0.2) {
+        if (useBottomLane && leftLaneWidth > floaterW * 0.15) {
           candidates.push({
             x: jitter(leftLaneXMin + (leftCols > 1 ? floaterW + margin : 0), 204),
             y: jitter(bottomZoneYStart + floaterH * 0.5, 205),
@@ -295,7 +301,7 @@ export function useFloaterCapacity(
             distFromCenter: Math.hypot(leftLaneXMin - centerX, bottomZoneYStart - centerY),
           });
         }
-        if (useBottomLane && rightLaneWidth > floaterW * 0.2) {
+        if (useBottomLane && rightLaneWidth > floaterW * 0.15) {
           candidates.push({
             x: jitter(rightLaneXMax - (rightCols > 1 ? floaterW + margin : 0), 206),
             y: jitter(bottomZoneYStart + floaterH * 0.5, 207),

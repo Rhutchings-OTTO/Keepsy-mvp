@@ -12,7 +12,7 @@ import UpsellDrawer from "@/components/UpsellDrawer";
 import GiftAssistantWidget from "@/components/GiftAssistantWidget";
 import { CreatePageLayoutLean } from "@/components/create/CreatePageLayoutLean";
 import { DesignConfirmation } from "@/components/generation/DesignConfirmation";
-import { SizeAndMeasurements } from "@/components/products/SizeAndMeasurements";
+import { SizeGuideDrawer } from "@/components/products/SizeGuideDrawer";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { Reveal } from "@/components/motion/Reveal";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
@@ -32,6 +32,15 @@ import {
 import { useCreateSession } from "@/lib/store/useCreateSession";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import {
+  PRODUCT_LIST,
+  PRODUCT_CATALOG_IDS,
+  getProductByCatalogId,
+  getColorName,
+  type Product,
+  type ProductType,
+  type ApparelSize,
+} from "@/lib/products";
+import {
   Sparkles,
   ShoppingCart,
   X,
@@ -45,28 +54,25 @@ import {
 } from "lucide-react";
 
 /** Types */
-type MerchType = "tshirt" | "mug" | "card" | "hoodie";
-interface Product {
-  id: string;
-  type: MerchType;
-  name: string;
-  price: number; // GBP
-  description: string;
-  colors: string[];
-}
 interface CartItem {
   id: string;
-  product: Product;
-  imageDataUrl: string | null;
-  prompt: string;
+  productId: string;
+  name: string;
+  color?: string;
+  size?: ApparelSize;
+  imageUrl: string;
+  unitPrice: number;
   quantity: number;
 }
 
 type PersistedCartItem = {
   id: string;
   productId: string;
-  imageDataUrl: string | null;
-  prompt: string;
+  name: string;
+  color?: string;
+  size?: ApparelSize;
+  imageUrl: string;
+  unitPrice: number;
   quantity: number;
 };
 
@@ -80,42 +86,6 @@ type InitialCreateQuery = {
 };
 
 type DesignShape = "square" | "portrait" | "landscape";
-
-/** Match your real products */
-const PRODUCTS: Product[] = [
-  {
-    id: "tee",
-    type: "tshirt",
-    name: "Premium tee",
-    price: 29,
-    description: "Soft, heavyweight premium tee.",
-    colors: ["#FFFFFF", "#111827", "#2563EB"],
-  },
-  {
-    id: "mug",
-    type: "mug",
-    name: "Mug",
-    price: 14,
-    description: "11oz ceramic mug with glossy finish.",
-    colors: ["#FFFFFF"],
-  },
-  {
-    id: "card",
-    type: "card",
-    name: "Greeting card",
-    price: 8,
-    description: "Premium cardstock + envelope.",
-    colors: ["#FFFFFF"],
-  },
-  {
-    id: "hoodie",
-    type: "hoodie",
-    name: "Hoodie",
-    price: 40,
-    description: "Soft fleece hoodie, gift-ready print.",
-    colors: ["#FFFFFF", "#111827", "#2563EB"],
-  },
-];
 
 const COMMUNITY_DESIGNS = [
   "/occasion-tiles/christmas-scene.png",
@@ -136,18 +106,25 @@ const GBP_FORMATTER = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
 });
-const CART_STORAGE_KEY = "keepsy_cart_v1";
+const CART_STORAGE_KEY = "keepsy_cart_v2";
 
 function gbp(n: number) {
   return GBP_FORMATTER.format(n);
 }
 
+function getCatalogId(product: Product): string {
+  return PRODUCT_CATALOG_IDS[product.id];
+}
+
 function toPersistedCart(cartItems: CartItem[]): PersistedCartItem[] {
   return cartItems.map((item) => ({
     id: item.id,
-    productId: item.product.id,
-    imageDataUrl: item.imageDataUrl,
-    prompt: item.prompt,
+    productId: item.productId,
+    name: item.name,
+    color: item.color,
+    size: item.size,
+    imageUrl: item.imageUrl,
+    unitPrice: item.unitPrice,
     quantity: item.quantity,
   }));
 }
@@ -155,23 +132,28 @@ function toPersistedCart(cartItems: CartItem[]): PersistedCartItem[] {
 function fromPersistedCart(raw: string): CartItem[] {
   const parsed = JSON.parse(raw) as PersistedCartItem[];
   if (!Array.isArray(parsed)) return [];
-  return parsed
-    .map((item) => {
-      const product = PRODUCTS.find((candidate) => candidate.id === item.productId);
-      if (!product) return null;
-      if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 20) return null;
-      return {
+  const items: CartItem[] = [];
+    for (const item of parsed) {
+      const catalogProduct = getProductByCatalogId(item.productId);
+      if (!catalogProduct) continue;
+      if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 20) continue;
+      const imageUrl = typeof item.imageUrl === "string" && item.imageUrl ? item.imageUrl : "";
+      if (!imageUrl) continue;
+      items.push({
         id: item.id,
-        product,
-        imageDataUrl: typeof item.imageDataUrl === "string" ? item.imageDataUrl : null,
-        prompt: typeof item.prompt === "string" ? item.prompt : "",
+        productId: item.productId,
+        name: item.name,
+        ...(item.color && { color: item.color }),
+        ...(item.size && { size: item.size }),
+        imageUrl,
+        unitPrice: item.unitPrice,
         quantity: item.quantity,
-      };
-    })
-    .filter((item): item is CartItem => item !== null);
+      });
+    }
+    return items;
 }
 
-function getMockupProductType(type: MerchType): MockupProductType {
+function getMockupProductType(type: ProductType): MockupProductType {
   if (type === "tshirt") return "tshirt";
   if (type === "hoodie") return "hoodie";
   if (type === "mug") return "mug";
@@ -180,7 +162,7 @@ function getMockupProductType(type: MerchType): MockupProductType {
 
 function getMockupColor(hex: string): MockupColor {
   if (hex === "#111827") return "black";
-  if (hex === "#2563EB") return "blue";
+  if (hex === "#2563EB" || hex === "#1e3a8a") return "blue";
   return "white";
 }
 
@@ -267,28 +249,24 @@ async function generateViaKeepsyAPI(args: {
 
 /** Uses YOUR real Stripe session route */
 async function checkoutViaKeepsyAPI(args: {
-  selectedProduct: Product;
-  prompt: string;
+  cart: CartItem[];
   imageDataUrl: string;
-  cart?: Array<{ id: string; name: string; quantity: number }>;
 }) {
-  const normalizedCart =
-    args.cart && args.cart.length > 0
-      ? args.cart
-      : [{ id: args.selectedProduct.id, name: args.selectedProduct.name, quantity: 1 }];
-
   const res = await fetch("/api/create-checkout-session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      product: {
-        id: args.selectedProduct.id,
-        name: args.selectedProduct.name,
-      },
       currency: "gbp",
-      prompt: args.prompt,
       imageDataUrl: args.imageDataUrl,
-      cart: normalizedCart,
+      cart: args.cart.map((item) => ({
+        productId: item.productId,
+        name: item.name,
+        color: item.color,
+        size: item.size,
+        imageUrl: item.imageUrl,
+        unitPrice: item.unitPrice,
+        quantity: item.quantity,
+      })),
     }),
   });
 
@@ -331,8 +309,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const fileInputRef = useRef<HTMLInputElement>(null);
   const generateAbortRef = useRef<AbortController | null>(null);
 
-  const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[2]); // default: card
-  const [selectedColor, setSelectedColor] = useState(PRODUCTS[2].colors[0]);
+  const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCT_LIST[2]); // default: card
+  const [selectedColor, setSelectedColor] = useState(PRODUCT_LIST[2].colors?.[0]?.hex ?? "#FFFFFF");
+  const [selectedSize, setSelectedSize] = useState<ApparelSize | null>(null);
+  const [addToCartConfirmation, setAddToCartConfirmation] = useState<string | null>(null);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isGiftingSkipped, setIsGiftingSkipped] = useState(false);
@@ -346,19 +327,19 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     [cartItems]
   );
   const cartSubtotal = useMemo(
-    () => cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
+    () => cartItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0),
     [cartItems]
   );
   const hasCartItems = cartItems.length > 0;
-  const checkoutTotal = hasCartItems ? cartSubtotal : selectedProduct.price;
+  const checkoutTotal = hasCartItems ? cartSubtotal : selectedProduct.basePrice;
   const checkoutItemDescription = hasCartItems
     ? `${cartCount} item${cartCount === 1 ? "" : "s"}`
     : selectedProduct.name;
-  const checkoutPreviewImage = hasCartItems ? cartItems[0]?.imageDataUrl ?? null : generatedImage;
+  const checkoutPreviewImage = hasCartItems ? cartItems[0]?.imageUrl ?? null : generatedImage;
   const canProceedToCheckout = hasCartItems
-    ? cartItems.length > 0 && cartItems.every((item) => Boolean(item.imageDataUrl))
-    : Boolean(generatedImage);
-  const selectedMockupProductType = getMockupProductType(selectedProduct.type);
+    ? cartItems.length > 0 && cartItems.every((item) => Boolean(item.imageUrl))
+    : Boolean(generatedImage) && !(selectedProduct.hasSize && !selectedSize);
+  const selectedMockupProductType = getMockupProductType(selectedProduct.id);
   const selectedMockupColor = getMockupColor(selectedColor);
   const isMagicpathSkin = FF.magicpathSkin;
 
@@ -402,26 +383,37 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   }, []);
 
   useEffect(() => {
+    if (!selectedProduct.hasSize) {
+      setSelectedSize(null);
+      setIsSizeGuideOpen(false);
+    }
+  }, [selectedProduct]);
+
+  useEffect(() => {
+    if (!addToCartConfirmation) return;
+    const t = setTimeout(() => setAddToCartConfirmation(null), 3000);
+    return () => clearTimeout(t);
+  }, [addToCartConfirmation]);
+
+  useEffect(() => {
     if (!initialQuery || didApplyInitialQuery.current) return;
     didApplyInitialQuery.current = true;
 
     const normalizedProduct = initialQuery.product?.toLowerCase();
-    const productAliasToId: Record<string, Product["id"]> = {
-      tee: "tee",
-      tshirt: "tee",
-      "t-shirt": "tee",
+    const catalogToProduct: Record<string, ProductType> = {
+      tee: "tshirt",
+      tshirt: "tshirt",
+      "t-shirt": "tshirt",
       mug: "mug",
       card: "card",
       hoodie: "hoodie",
     };
-    const mappedProductId = normalizedProduct ? productAliasToId[normalizedProduct] : null;
-    const mappedProduct = mappedProductId
-      ? PRODUCTS.find((product) => product.id === mappedProductId)
-      : null;
+    const productType = normalizedProduct ? catalogToProduct[normalizedProduct] : null;
+    const mappedProduct = productType ? PRODUCT_LIST.find((p) => p.id === productType) ?? null : null;
 
     if (mappedProduct) {
       setSelectedProduct(mappedProduct);
-      setSelectedColor(mappedProduct.colors[0]);
+      setSelectedColor(mappedProduct.colors?.[0]?.hex ?? "#FFFFFF");
     }
 
     const promptPrefill = initialQuery.prompt?.trim();
@@ -573,25 +565,41 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setStep(1);
       return;
     }
-    const nextItemId = `${selectedProduct.id}-${generatedImage ?? "no-image"}`;
+    const colorName = getColorName(selectedProduct, selectedColor);
+    if (selectedProduct.hasSize && !selectedSize) {
+      setAddToCartConfirmation(null);
+      return;
+    }
+    const catalogId = getCatalogId(selectedProduct);
+    const variantKey = `${catalogId}-${selectedColor}-${selectedSize ?? "na"}-${Date.now()}`;
+    const itemId = `item-${variantKey}`;
+    const newItem: CartItem = {
+      id: itemId,
+      productId: catalogId,
+      name: selectedProduct.name,
+      color: selectedProduct.colors?.length ? colorName : undefined,
+      size: selectedProduct.hasSize ? selectedSize ?? undefined : undefined,
+      imageUrl: generatedImage,
+      unitPrice: selectedProduct.basePrice,
+      quantity: 1,
+    };
     setCartItems((prev) => {
-      const existing = prev.find((item) => item.id === nextItemId);
-      if (existing) {
+      const sameVariant = prev.find(
+        (i) =>
+          i.productId === newItem.productId &&
+          i.color === newItem.color &&
+          i.size === newItem.size &&
+          i.imageUrl === newItem.imageUrl
+      );
+      if (sameVariant) {
         return prev.map((item) =>
-          item.id === nextItemId ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === sameVariant.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [
-        ...prev,
-        {
-          id: nextItemId,
-          product: selectedProduct,
-          imageDataUrl: generatedImage,
-          prompt: lastGenerationPrompt,
-          quantity: 1,
-        },
-      ];
+      return [...prev, { ...newItem, id: `item-${catalogId}-${selectedColor}-${selectedSize ?? "na"}-${Date.now()}` }];
     });
+    const sizeStr = selectedProduct.hasSize && selectedSize ? ` – ${selectedSize}` : "";
+    setAddToCartConfirmation(`Added ${selectedProduct.name}${sizeStr} – ${colorName} to your cart`);
     setIsCartOpen(true);
     setStep(4);
   };
@@ -610,16 +618,31 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     );
   };
 
+  const buildSingleCheckoutCart = (): CartItem[] | null => {
+    if (!generatedImage) return null;
+    if (selectedProduct.hasSize && !selectedSize) return null;
+    const catalogId = getCatalogId(selectedProduct);
+    const colorName = getColorName(selectedProduct, selectedColor);
+    return [
+      {
+        id: `single-${Date.now()}`,
+        productId: catalogId,
+        name: selectedProduct.name,
+        color: selectedProduct.colors?.length ? colorName : undefined,
+        size: selectedProduct.hasSize ? selectedSize ?? undefined : undefined,
+        imageUrl: generatedImage,
+        unitPrice: selectedProduct.basePrice,
+        quantity: 1,
+      },
+    ];
+  };
+
   const handleCheckout = async () => {
-    if (!generatedImage) return;
+    const cart = buildSingleCheckoutCart();
+    if (!cart) return;
     setIsBusy(true);
     try {
-      const url = await checkoutViaKeepsyAPI({
-        selectedProduct,
-        prompt: lastGenerationPrompt,
-        imageDataUrl: generatedImage,
-      });
-      // redirect to Stripe Checkout
+      const url = await checkoutViaKeepsyAPI({ cart, imageDataUrl: generatedImage! });
       window.location.href = url;
     } catch (e) {
       console.error(e);
@@ -630,25 +653,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
   const handleCartCheckout = async () => {
     if (cartItems.length === 0) return;
-    if (cartItems.some((item) => !item.imageDataUrl)) {
+    if (cartItems.some((item) => !item.imageUrl)) {
       alert("Please remove items missing generated designs before checking out.");
       return;
     }
-    const firstItem = cartItems[0];
-    const checkoutImage = firstItem.imageDataUrl;
+    const checkoutImage = cartItems[0]?.imageUrl;
     if (!checkoutImage) return;
     setIsBusy(true);
     try {
-      const url = await checkoutViaKeepsyAPI({
-        selectedProduct: firstItem.product,
-        prompt: firstItem.prompt,
-        imageDataUrl: checkoutImage,
-        cart: cartItems.map((item) => ({
-          id: item.product.id,
-          name: item.product.name,
-          quantity: item.quantity,
-        })),
-      });
+      const url = await checkoutViaKeepsyAPI({ cart: cartItems, imageDataUrl: checkoutImage });
       window.location.href = url;
     } catch (e) {
       console.error(e);
@@ -855,13 +868,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   onUploadFile={handleUploadFile}
                   onClearUploadedImage={clearUploadedImage}
                   onProductSelect={(type) => {
-                    const product = PRODUCTS.find((p) => p.type === type);
+                    const product = PRODUCT_LIST.find((p) => p.id === type);
                     if (!product) return;
                     setSelectedProduct(product);
-                    setSelectedColor(product.colors[0]);
+                    setSelectedColor(product.colors?.[0]?.hex ?? "#FFFFFF");
                   }}
                   fileInputRef={fileInputRef}
-                  selectedProductType={selectedProduct.type}
+                  selectedProductType={selectedProduct.id}
                 />
               )}
 
@@ -920,15 +933,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         hasArtwork={Boolean(generatedImage || uploadedImage)}
                       />
                     </motion.div>
-                    {(selectedProduct.type === "tshirt" || selectedProduct.type === "hoodie") && (
-                      <div className="mt-6">
-                        <SizeAndMeasurements
-                          productType={selectedProduct.type}
-                          region={region}
-                          initialSize="M"
-                        />
-                      </div>
-                    )}
                     <div className="mt-6 flex gap-3 items-center">
                       <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">
                         <Sparkles size={14} /> Applied to real mockups
@@ -954,60 +958,101 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       <p className="text-black/55 font-semibold">{selectedProduct.description}</p>
                     </div>
                     {FF.personalisedStory ? (
-                      <PersonalisedStoryCopy region={region} productType={selectedProduct.type} />
+                      <PersonalisedStoryCopy region={region} productType={selectedProduct.id} />
                     ) : null}
 
-                    <div className="bg-white/80 border border-black/10 rounded-3xl p-5 shadow-sm">
-                      <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-4">
-                        Select Product
-                      </h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {PRODUCTS.map((prod) => (
-                          <motion.button
-                            key={prod.id}
-                            whileHover={{ y: -2 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => {
-                              setSelectedProduct(prod);
-                              setSelectedColor(prod.colors[0]);
-                            }}
-                            className={`p-4 rounded-2xl border transition-all text-left ${
-                              selectedProduct.id === prod.id ? "border-black bg-black text-white" : "border-black/10 bg-white"
-                            }`}
-                          >
-                            <div className="text-sm font-extrabold">{prod.name}</div>
-                            <div className={`text-xs mt-1 ${selectedProduct.id === prod.id ? "text-white/70" : "text-black/55"}`}>
-                              {gbp(prod.price)}
-                            </div>
-                          </motion.button>
-                        ))}
-                      </div>
+                    <div className="bg-white/80 border border-black/10 rounded-3xl p-5 shadow-sm space-y-5">
+                      <section>
+                        <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">
+                          Select Product
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          {PRODUCT_LIST.map((prod) => (
+                            <motion.button
+                              key={prod.id}
+                              whileHover={{ y: -2 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => {
+                                setSelectedProduct(prod);
+                                setSelectedColor(prod.colors?.[0]?.hex ?? "#FFFFFF");
+                              }}
+                              className={`p-4 rounded-2xl border transition-all text-left ${
+                                selectedProduct.id === prod.id ? "border-black bg-black text-white" : "border-black/10 bg-white"
+                              }`}
+                            >
+                              <div className="text-sm font-extrabold">{prod.name}</div>
+                              <div className={`text-xs mt-1 ${selectedProduct.id === prod.id ? "text-white/70" : "text-black/55"}`}>
+                                {gbp(prod.basePrice)}
+                              </div>
+                            </motion.button>
+                          ))}
+                        </div>
+                      </section>
 
-                      {selectedProduct.colors.length > 1 && (
-                        <div className="mt-5">
+                      {selectedProduct.colors && selectedProduct.colors.length > 1 && (
+                        <section>
                           <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">Color</h3>
-                          <div className="flex gap-3">
+                          <div className="flex gap-3 flex-wrap">
                             {selectedProduct.colors.map((c) => (
                               <button
-                                key={c}
-                                onClick={() => setSelectedColor(c)}
-                                className={`w-10 h-10 rounded-full border ${
-                                  selectedColor === c ? "border-black ring-4 ring-black/5" : "border-black/10"
+                                key={c.hex}
+                                type="button"
+                                onClick={() => setSelectedColor(c.hex)}
+                                className={`w-10 h-10 rounded-full border-2 transition ${
+                                  selectedColor === c.hex ? "border-black ring-4 ring-black/5" : "border-black/10 hover:border-black/30"
                                 }`}
-                                style={{ backgroundColor: c }}
+                                style={{ backgroundColor: c.hex }}
+                                aria-pressed={selectedColor === c.hex}
+                                aria-label={`${c.name}`}
                               />
                             ))}
                           </div>
-                        </div>
+                        </section>
                       )}
 
-                      <div className="mt-6 pt-5 border-t border-black/10">
+                      {selectedProduct.hasSize && selectedProduct.sizes && (
+                        <section>
+                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">Size</h3>
+                          <div className="flex flex-wrap gap-2" role="group" aria-label="Select size">
+                            {selectedProduct.sizes.map((size) => (
+                              <button
+                                key={size}
+                                type="button"
+                                onClick={() => setSelectedSize(size)}
+                                className={`min-h-[44px] min-w-[44px] px-3 py-2 rounded-xl text-sm font-bold transition ${
+                                  selectedSize === size
+                                    ? "bg-black text-white"
+                                    : "bg-black/5 text-black/80 hover:bg-black/10"
+                                }`}
+                                aria-pressed={selectedSize === size}
+                              >
+                                {size}
+                              </button>
+                            ))}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setIsSizeGuideOpen(true)}
+                            className="mt-2 text-sm font-semibold text-black/60 hover:text-black underline underline-offset-2"
+                          >
+                            View size guide
+                          </button>
+                          {selectedProduct.hasSize && !selectedSize && (
+                            <p className="mt-1 text-xs text-amber-700 font-medium">Please select a size</p>
+                          )}
+                        </section>
+                      )}
+
+                      <section className="pt-4 border-t border-black/10">
                         <div className="flex justify-between items-center mb-4">
                           <span className="text-black/55 font-semibold">Subtotal</span>
-                          <span className="text-2xl font-black">{gbp(selectedProduct.price)}</span>
+                          <span className="text-2xl font-black">{gbp(selectedProduct.basePrice)}</span>
                         </div>
                         {FF.giftingFlow && generatedImage ? (
                           <div className="mb-4">
+                            <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">
+                              Optional Gifting Details
+                            </h3>
                             <GiftingStep
                               value={conversionFlow}
                               hidden={isGiftingSkipped}
@@ -1017,27 +1062,43 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             />
                           </div>
                         ) : null}
-                        <div className="grid grid-cols-2 gap-3">
-                          <motion.button
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={handleAddToCart}
-                            disabled={!generatedImage}
-                            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-black py-4 font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
-                          >
-                            Add <Plus size={18} />
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full py-4 bg-white border border-black/10 text-black rounded-2xl font-black flex items-center justify-center gap-2"
-                          >
-                            Save <Heart size={18} className="text-pink-400" />
-                          </motion.button>
-                        </div>
-                      </div>
+                        <section>
+                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">
+                            Add to Cart
+                          </h3>
+                          {addToCartConfirmation && (
+                            <p className="mb-3 text-sm font-semibold text-green-700">{addToCartConfirmation}</p>
+                          )}
+                          <div className="grid grid-cols-2 gap-3">
+                            <motion.button
+                              whileHover={{ scale: 1.01 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={handleAddToCart}
+                              disabled={!generatedImage || (selectedProduct.hasSize && !selectedSize)}
+                              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-black py-4 font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              Add <Plus size={18} />
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.01 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="w-full py-4 bg-white border border-black/10 text-black rounded-2xl font-black flex items-center justify-center gap-2"
+                            >
+                              Save <Heart size={18} className="text-pink-400" />
+                            </motion.button>
+                          </div>
+                        </section>
+                      </section>
                     </div>
                   </div>
+                  {(selectedProduct.id === "tshirt" || selectedProduct.id === "hoodie") && (
+                    <SizeGuideDrawer
+                      open={isSizeGuideOpen}
+                      onClose={() => setIsSizeGuideOpen(false)}
+                      productType={selectedProduct.id}
+                      region={region}
+                    />
+                  )}
                 </motion.div>
               )}
 
@@ -1141,7 +1202,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {PRODUCTS.map((p) => (
+                {PRODUCT_LIST.map((p) => (
                   <motion.button
                     key={p.id}
                     whileHover={{ y: -6 }}
@@ -1155,7 +1216,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   >
                     <div className="text-lg font-black">{p.name}</div>
                     <div className="text-sm text-black/55 font-semibold mt-1">{p.description}</div>
-                    <div className="text-sm font-black mt-3">{gbp(p.price)}</div>
+                    <div className="text-sm font-black mt-3">{gbp(p.basePrice)}</div>
                   </motion.button>
                 ))}
               </div>
@@ -1244,17 +1305,22 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <div key={item.id} className="border border-black/10 rounded-2xl p-3">
                       <div className="flex items-center gap-3">
                         <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-black/5 border border-black/10">
-                          {item.imageDataUrl ? (
-                            <Image src={item.imageDataUrl} alt={item.product.name} fill className="object-cover" />
+                          {item.imageUrl ? (
+                            <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
                           ) : (
-                            <Image src="/keepsy-logo-transparent.png" alt={item.product.name} fill className="object-contain p-2" />
+                            <Image src="/keepsy-logo-transparent.png" alt={item.name} fill className="object-contain p-2" />
                           )}
                         </div>
-                        <div className="flex-1">
-                          <div className="font-bold text-sm">{item.product.name}</div>
-                          <div className="text-black/55 text-sm">{gbp(item.product.price)}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-sm">{item.name}</div>
+                          {(item.size || item.color) && (
+                            <div className="text-black/55 text-xs mt-0.5">
+                              {[item.size, item.color].filter(Boolean).join(" · ")}
+                            </div>
+                          )}
+                          <div className="text-black/55 text-sm">{gbp(item.unitPrice)}</div>
                         </div>
-                        <button onClick={() => handleRemoveCartItem(item.id)} className="text-black/40 hover:text-red-600">
+                        <button onClick={() => handleRemoveCartItem(item.id)} className="text-black/40 hover:text-red-600 shrink-0">
                           <X size={16} />
                         </button>
                       </div>
@@ -1268,7 +1334,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             +
                           </button>
                         </div>
-                        <div className="font-bold">{gbp(item.product.price * item.quantity)}</div>
+                        <div className="font-bold">{gbp(item.unitPrice * item.quantity)}</div>
                       </div>
                     </div>
                   ))
@@ -1332,7 +1398,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       </footer>
       <GenerationLoadingOverlay
         isOpen={isGenerating}
-        productType={selectedProduct.type}
+        productType={selectedProduct.id}
         hasSourceImage={Boolean(uploadedImage)}
       />
       {FF.giftAssistant && view === "home" ? (

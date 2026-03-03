@@ -9,7 +9,6 @@ import { PromptHelperCollapsible } from "./PromptHelperCollapsible";
 import { IdeasForYou } from "./IdeasForYou";
 import { Carousel } from "@/components/ui/Carousel";
 import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNotice";
-import { SizeAndMeasurements } from "@/components/products/SizeAndMeasurements";
 import { revealUp } from "@/lib/motion";
 import type { Region } from "@/lib/region";
 
@@ -329,18 +328,7 @@ export function CreatePageLayoutLean({
         </div>
       </motion.div>
 
-      {/* F) SIZE & MEASUREMENTS — when T-shirt or Hoodie selected (before artwork) */}
-      {(selectedProductType === "tshirt" || selectedProductType === "hoodie") && (
-        <motion.div variants={fadeInUp} className="mt-6 w-full max-w-xl">
-          <SizeAndMeasurements
-            productType={selectedProductType}
-            region={region}
-            initialSize="M"
-          />
-        </motion.div>
-      )}
-
-      {/* G) TESTIMONIALS - SINGLE COMPACT */}
+      {/* F) TESTIMONIALS - SINGLE COMPACT */}
       <motion.section variants={fadeInUp} className="mt-14 w-full">
         <h2 className="text-2xl md:text-3xl font-black text-center mb-6">What our creators say</h2>
         <Carousel showArrows showDots>

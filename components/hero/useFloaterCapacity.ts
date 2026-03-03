@@ -2,16 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const PAD = 16;
-const SAFE_MARGIN = 28;
-const FLOATER_GAP = 14;
-const JITTER = 12;
-const SCALE_MIN = 0.55;
+const PAD = 14;
+const SAFE_MARGIN = 24;
+const FLOATER_GAP = 12;
+const JITTER = 10;
+const SCALE_MIN = 0.5;
 const CARD_ASPECT = 170 / 144;
 
-/** Base sizes: desktop 180–220px, mobile 120–160px */
-const BASE_W_DESKTOP = 200;
-const BASE_W_MOBILE = 140;
+/** Base sizes: slightly smaller to fit more; desktop targets 8–14 floaters */
+const BASE_W_DESKTOP = 180;
+const BASE_W_MOBILE = 130;
 const MOBILE_BREAK = 640;
 
 const FOLD_GUARD_VH = 0.92;
@@ -114,13 +114,13 @@ export function useFloaterCapacity(
       const whitespaceRatio = Math.max(0, whitespaceArea / (heroW * heroH));
 
       if (ctaBelowFold) {
-        scale = Math.max(SCALE_MIN, 0.85);
+        scale = Math.max(SCALE_MIN, 0.82);
       }
       if (whitespaceRatio < 0.5 && !ctaBelowFold) {
-        scale = Math.max(SCALE_MIN, 0.9);
+        scale = Math.max(SCALE_MIN, 0.88);
       }
       if (isMobile) {
-        scale = Math.max(SCALE_MIN, scale * 0.92);
+        scale = Math.max(SCALE_MIN, scale * 0.9);
       }
 
       const margin = FLOATER_GAP;
@@ -182,11 +182,11 @@ export function useFloaterCapacity(
         );
       }
 
-      const slotH = floaterH + margin * 0.8;
-      const leftCols = leftLaneWidth > floaterW * 1.8 + margin ? 2 : 1;
-      const rightCols = rightLaneWidth > floaterW * 1.8 + margin ? 2 : 1;
+      const slotH = floaterH + margin * 0.7;
+      const leftCols = leftLaneWidth > floaterW * 1.5 + margin ? 2 : 1;
+      const rightCols = rightLaneWidth > floaterW * 1.5 + margin ? 2 : 1;
 
-      if (leftLaneWidth > floaterW * 0.25) {
+      if (leftLaneWidth > floaterW * 0.2) {
         let seed = 0;
         for (let col = 0; col < leftCols; col++) {
           const leftX = leftCols > 1 ? leftLaneXMin + col * (floaterW + margin) : leftLaneXMin;
@@ -215,7 +215,7 @@ export function useFloaterCapacity(
         }
       }
 
-      if (rightLaneWidth > floaterW * 0.3) {
+      if (rightLaneWidth > floaterW * 0.2) {
         let seed = 100;
         for (let col = 0; col < rightCols; col++) {
           const rightX =
@@ -243,6 +243,41 @@ export function useFloaterCapacity(
             }
           }
         }
+      }
+
+      const midLeftX = leftLaneXMin;
+      const midRightX = rightLaneXMax;
+      if (leftLaneWidth > floaterW * 0.2 && safeZone.top > floaterH * 2) {
+        candidates.push({
+          x: jitter(midLeftX, 200),
+          y: jitter(safeZone.top - floaterH - margin, 201),
+          lane: "mid-left",
+          distFromCenter: Math.hypot(midLeftX + floaterW / 2 - centerX, safeZone.top - centerY),
+        });
+      }
+      if (rightLaneWidth > floaterW * 0.2 && safeZone.top > floaterH * 2) {
+        candidates.push({
+          x: jitter(midRightX, 202),
+          y: jitter(safeZone.top - floaterH - margin, 203),
+          lane: "mid-right",
+          distFromCenter: Math.hypot(midRightX + floaterW / 2 - centerX, safeZone.top - centerY),
+        });
+      }
+      if (useBottomLane && leftLaneWidth > floaterW * 0.2) {
+        candidates.push({
+          x: jitter(leftLaneXMin + (leftCols > 1 ? floaterW + margin : 0), 204),
+          y: jitter(bottomZoneYStart + floaterH * 0.5, 205),
+          lane: "left-mid-bottom",
+          distFromCenter: Math.hypot(leftLaneXMin - centerX, bottomZoneYStart - centerY),
+        });
+      }
+      if (useBottomLane && rightLaneWidth > floaterW * 0.2) {
+        candidates.push({
+          x: jitter(rightLaneXMax - (rightCols > 1 ? floaterW + margin : 0), 206),
+          y: jitter(bottomZoneYStart + floaterH * 0.5, 207),
+          lane: "right-mid-bottom",
+          distFromCenter: Math.hypot(rightLaneXMax - centerX, bottomZoneYStart - centerY),
+        });
       }
 
       candidates.sort((a, b) => b.distFromCenter - a.distFromCenter);

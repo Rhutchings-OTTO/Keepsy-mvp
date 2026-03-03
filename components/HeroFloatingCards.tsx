@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, type MotionValue } from "framer-motion";
 import { InteractiveCard } from "@/components/ui/InteractiveCard";
 import { FF } from "@/lib/featureFlags";
-import { FLOATER_POOL } from "@/components/hero/floaterPool";
+import { FLOATER_POOL_SIZE, selectBalancedFloaters } from "@/components/hero/floaterPool";
 import type { FloaterCapacityResult, FloaterSlot } from "@/components/hero/useFloaterCapacity";
 
 const MOTION_MAX_DESKTOP = 12;
@@ -68,7 +68,7 @@ function DebugOverlay({
         />
       ))}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-lg bg-black/80 px-4 py-2 font-mono text-sm text-white">
-        Placed {layout.placedCount}/{FLOATER_POOL.length}
+        Placed {layout.placedCount}/{FLOATER_POOL_SIZE}
       </div>
     </div>
   );
@@ -77,14 +77,26 @@ function DebugOverlay({
 export function HeroFloatingCards({ layout, cursorOffset, cardsY, reduceMotion, heroRef, safeZoneRef }: HeroFloatingCardsProps) {
   const searchParams = useSearchParams();
   const debugFloaters = searchParams?.get("debugFloaters") === "1";
+  const [viewportWidth, setViewportWidth] = useState(1024);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setViewportWidth(window.innerWidth);
+    const onResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const { visibleFloaters } = layout;
   if (visibleFloaters.length === 0) return null;
 
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+  const isMobile = viewportWidth < 640;
   const motionMax = isMobile ? MOTION_MAX_MOBILE : MOTION_MAX_DESKTOP;
 
-  const cards = FLOATER_POOL.slice(0, visibleFloaters.length);
+  const cards = useMemo(
+    () => selectBalancedFloaters(visibleFloaters.length, viewportWidth),
+    [visibleFloaters.length, viewportWidth]
+  );
 
   return (
     <>
@@ -125,14 +137,14 @@ export function HeroFloatingCards({ layout, cursorOffset, cardsY, reduceMotion, 
                 image={
                   <Image
                     src={def.image}
-                    alt={def.label}
+                    alt={def.title}
                     width={240}
                     height={160}
                     className="h-full w-full rounded-xl object-cover"
                   />
                 }
-                title={def.label}
-                subtitle={`${def.product} preview`}
+                title={def.title}
+                subtitle={def.subtitle}
                 className="border-black/10 bg-white/80"
               />
             </motion.div>

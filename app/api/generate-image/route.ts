@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createHash } from "crypto";
+import { z } from "zod";
 import {
   enforceUsageGuards,
   fetchWithBackoff,
@@ -10,20 +11,24 @@ import {
   persistMetricsIfDue,
   recordGenerationMetric,
 } from "./metrics";
+import { guardOrigin, guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
+import { parseAndValidate, Constraints } from "@/lib/http/validate";
 
 const CACHE_TTL_MS = 3 * 60 * 1000;
 const MAX_IN_FLIGHT_GENERATIONS = 8;
 const MAX_SOURCE_IMAGE_DATA_URL_CHARS = 8 * 1024 * 1024;
 
+const generateBodySchema = z
+  .object({
+    prompt: z.string().max(Constraints.PROMPT_MAX_LEN),
+    sourceImageDataUrl: z.string().max(MAX_SOURCE_IMAGE_DATA_URL_CHARS).optional().nullable(),
+    designShape: z.enum(["square", "portrait", "landscape"]).optional(),
+  })
+  .strict();
+
 type CachedGeneration = {
   imageDataUrl: string;
   expiresAt: number;
-};
-
-type GenerationRequestBody = {
-  prompt?: unknown;
-  sourceImageDataUrl?: unknown;
-  designShape?: unknown;
 };
 
 type DesignShape = "square" | "portrait" | "landscape";
@@ -141,36 +146,30 @@ async function editImage(
 }
 
 export async function POST(req: Request) {
+  const requestId = getRequestId(req);
+  const originDeny = guardOrigin(req, "/api/generate-image", requestId);
+  if (originDeny) return originDeny;
+  const rateLimitResult = guardRateLimit(req, "/api/generate-image", "POST", requestId);
+  if ("response" in rateLimitResult) return rateLimitResult.response;
+
   try {
     recordGenerationMetric("totalRequests", 1);
-    let body: GenerationRequestBody;
-    try {
-      body = (await req.json()) as GenerationRequestBody;
-    } catch {
-      return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+    const parsed = await parseAndValidate(req, generateBodySchema);
+    if ("error" in parsed) {
+      return NextResponse.json(parsed.error, {
+        status: parsed.status,
+        headers: { "Content-Type": "application/json", ...rateLimitResult.headers },
+      });
     }
-    const prompt = body?.prompt;
-    const sourceImageDataUrl =
-      typeof body?.sourceImageDataUrl === "string" ? body.sourceImageDataUrl : null;
-    const designShape: DesignShape =
-      body?.designShape === "portrait" || body?.designShape === "landscape" || body?.designShape === "square"
-        ? body.designShape
-        : "square";
+    const body = parsed.data;
+    const prompt = body.prompt;
+    const sourceImageDataUrl = body.sourceImageDataUrl ?? null;
+    const designShape: DesignShape = body.designShape ?? "square";
     const generationSize = getImageSizeForShape(designShape);
 
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({ error: "Missing OPENAI_API_KEY" }, { status: 500 });
     }
-    if (!prompt || typeof prompt !== "string") {
-      return NextResponse.json({ error: "Invalid prompt" }, { status: 400 });
-    }
-    if (sourceImageDataUrl && sourceImageDataUrl.length > MAX_SOURCE_IMAGE_DATA_URL_CHARS) {
-      return NextResponse.json(
-        { error: "Uploaded image is too large. Please upload a smaller file." },
-        { status: 400 }
-      );
-    }
-
     const usageCheck = await enforceUsageGuards(req);
     if (!usageCheck.ok) {
       return NextResponse.json({ error: usageCheck.error }, { status: usageCheck.status });

@@ -1,52 +1,27 @@
 import Stripe from "stripe";
 import { createHash } from "crypto";
+import { z } from "zod";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { PRODUCT_CATALOG } from "@/lib/commerce/catalog";
+import type { CatalogProduct } from "@/lib/commerce/catalog";
+import { guardOrigin, guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
+import { parseAndValidate, schemas } from "@/lib/http/validate";
 
-type CatalogProduct = {
-  id: string;
-  name: string;
-  priceGBP: number;
-};
-
-const PRODUCT_CATALOG: Record<string, CatalogProduct> = {
-  card: { id: "card", name: "Greeting card", priceGBP: 8 },
-  mug: { id: "mug", name: "Mug", priceGBP: 14 },
-  tee: { id: "tee", name: "Premium tee", priceGBP: 29 },
-  hoodie: { id: "hoodie", name: "Hoodie", priceGBP: 40 },
-};
-
-type CheckoutBody = {
-  cart?: unknown;
-  product?: unknown;
-  prompt?: unknown;
-  imageDataUrl?: unknown;
-};
-
-type CheckoutCartItem = {
-  id: string;
-  quantity: number;
-};
-
-function parseProductId(product: unknown): string | null {
-  if (!product || typeof product !== "object") return null;
-  const value = (product as { id?: unknown }).id;
-  return typeof value === "string" ? value : null;
-}
-
-function parseCart(cart: unknown): CheckoutCartItem[] {
-  if (!Array.isArray(cart)) return [];
-  return cart
-    .map((item) => {
-      if (!item || typeof item !== "object") return null;
-      const id = typeof (item as { id?: unknown }).id === "string" ? (item as { id: string }).id : null;
-      const quantityRaw = (item as { quantity?: unknown }).quantity;
-      const quantity = Number.isFinite(quantityRaw) ? Number(quantityRaw) : 0;
-      if (!id) return null;
-      if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) return null;
-      return { id, quantity };
-    })
-    .filter((item): item is CheckoutCartItem => item !== null);
-}
+const checkoutSchema = z
+  .object({
+    cart: z
+      .array(
+        z.object({
+          id: z.string().max(64).regex(/^[a-zA-Z0-9_-]+$/),
+          quantity: schemas.quantity,
+        })
+      )
+      .optional(),
+    product: z.object({ id: z.string().max(64) }).optional(),
+    prompt: z.string().max(500).optional(),
+    imageDataUrl: z.string().max(500_000).optional(),
+  })
+  .strict();
 
 function getBaseUrl() {
   const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL;
@@ -60,9 +35,14 @@ function getBaseUrl() {
 }
 
 export async function POST(req: Request) {
+  const requestId = getRequestId(req);
+  const originDeny = guardOrigin(req, "/api/create-checkout-session", requestId);
+  if (originDeny) return originDeny;
+  const rateLimitResult = guardRateLimit(req, "/api/create-checkout-session", "POST", requestId);
+  if ("response" in rateLimitResult) return rateLimitResult.response;
+
   try {
     const secretKey = process.env.STRIPE_SECRET_KEY;
-
     if (!secretKey) {
       return new Response(
         JSON.stringify({
@@ -73,23 +53,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create Stripe INSIDE the handler so builds don't crash if env vars aren't set yet
+    const parsed = await parseAndValidate(req, checkoutSchema);
+    if ("error" in parsed) {
+      return new Response(JSON.stringify(parsed.error), {
+        status: parsed.status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    const body = parsed.data;
+
     const stripe = new Stripe(secretKey, {
       apiVersion: "2026-02-25.clover",
     });
 
-    let body: CheckoutBody;
-    try {
-      body = (await req.json()) as CheckoutBody;
-    } catch {
-      return new Response(JSON.stringify({ error: "Invalid JSON body." }), { status: 400 });
-    }
-
-    const parsedCart = parseCart(body.cart);
-    const requestedProductId = parseProductId(body.product);
+    const parsedCart =
+      body.cart?.filter((item) => PRODUCT_CATALOG[item.id]) ?? [];
+    const requestedProductId = body.product?.id;
     const fallbackCart =
       requestedProductId && PRODUCT_CATALOG[requestedProductId]
-        ? [{ id: requestedProductId, quantity: 1 }]
+        ? [{ id: requestedProductId, quantity: 1 as const }]
         : [];
     const cart = parsedCart.length > 0 ? parsedCart : fallbackCart;
 
@@ -120,8 +102,8 @@ export async function POST(req: Request) {
     const baseUrl = getBaseUrl();
     const primaryProductName = safeCartSummary[0]?.name || "Keepsy order";
     const orderRef = `order_${globalThis.crypto.randomUUID()}`;
-    const prompt = typeof body.prompt === "string" ? body.prompt : "";
-    const imageDataUrl = typeof body.imageDataUrl === "string" ? body.imageDataUrl : "";
+    const prompt = body.prompt ?? "";
+    const imageDataUrl = body.imageDataUrl ?? "";
 
     const idempotencySource = JSON.stringify({
       orderRef,
@@ -198,7 +180,14 @@ export async function POST(req: Request) {
       { idempotencyKey }
     );
 
-    return new Response(JSON.stringify({ url: session.url, sessionId: session.id, orderRef }), { status: 200 });
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...rateLimitResult.headers,
+    };
+    return new Response(JSON.stringify({ url: session.url, sessionId: session.id, orderRef }), {
+      status: 200,
+      headers,
+    });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Checkout error";
     return new Response(JSON.stringify({ error: message }), { status: 500 });

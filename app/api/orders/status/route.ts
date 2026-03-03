@@ -1,12 +1,24 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
+import { schemas, validateWithSchema } from "@/lib/http/validate";
 
 export async function GET(req: Request) {
+  const requestId = getRequestId(req);
+  const rl = guardRateLimit(req, "/api/orders/status", "GET", requestId);
+  if ("response" in rl) return rl.response;
+
   const url = new URL(req.url);
-  const sessionId = url.searchParams.get("session_id");
-  if (!sessionId) {
-    return NextResponse.json({ error: "session_id is required." }, { status: 400 });
+  const sessionIdRaw = url.searchParams.get("session_id");
+  const validated = validateWithSchema(
+    { session_id: sessionIdRaw ?? "" },
+    z.object({ session_id: schemas.sessionId }).strict()
+  );
+  if ("error" in validated) {
+    return NextResponse.json(validated.error, { status: validated.status });
   }
+  const sessionId = validated.data.session_id;
 
   const supabase = getSupabaseAdmin();
   if (!supabase) {

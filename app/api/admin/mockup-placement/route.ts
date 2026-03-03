@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { readFile, writeFile } from "fs/promises";
 import path from "path";
 import type { PlacementMap } from "@/lib/mockups/placements";
+import { guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
+import { parseJsonSafe } from "@/lib/http/validate";
 
 export const runtime = "nodejs";
+
+const MAX_PLACEMENT_BODY = 1 * 1024 * 1024; // 1MB
 
 const FILE_PATH = path.join(process.cwd(), "lib", "mockups", "placements.json");
 
@@ -23,6 +27,9 @@ function assertAdminAccess(req: Request) {
 export async function GET(req: Request) {
   const denial = assertAdminAccess(req);
   if (denial) return denial;
+  const requestId = getRequestId(req);
+  const rl = guardRateLimit(req, "/api/admin/mockup-placement", "GET", requestId);
+  if ("response" in rl) return rl.response;
   try {
     const json = await readFile(FILE_PATH, "utf8");
     return NextResponse.json(JSON.parse(json));
@@ -34,8 +41,15 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const denial = assertAdminAccess(req);
   if (denial) return denial;
+  const requestId = getRequestId(req);
+  const rl = guardRateLimit(req, "/api/admin/mockup-placement", "POST", requestId);
+  if ("response" in rl) return rl.response;
   try {
-    const body = (await req.json()) as PlacementMap;
+    const parsed = await parseJsonSafe(req, MAX_PLACEMENT_BODY);
+    if ("error" in parsed) {
+      return NextResponse.json(parsed.error, { status: parsed.status });
+    }
+    const body = parsed.data as PlacementMap;
     await writeFile(FILE_PATH, `${JSON.stringify(body, null, 2)}\n`, "utf8");
     return NextResponse.json({ ok: true });
   } catch {

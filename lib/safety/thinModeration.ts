@@ -1,14 +1,13 @@
 /**
  * Thin moderation layer.
  * 1) OpenAI Moderation API for disallowed content (hard block)
- * 2) Light fragment patch for public figure likeness only
- * 3) Hard block for named copyrighted characters
- * No aggressive rewriting, no similarity scoring, no safe suffix injection.
+ * 2) Hard block for named copyrighted characters
+ * NO prompt rewriting. 1:1 prompt fidelity when block passes.
  */
 
 import { logThinModeration } from "./audit";
 
-const MAX_PROMPT_LEN = 600;
+const MAX_PROMPT_LEN = 1000;
 
 /** Named copyrighted characters – hard block, no rewrite */
 const COPYRIGHTED_CHARACTERS = [
@@ -22,35 +21,13 @@ const COPYRIGHTED_CHARACTERS = [
   "teenage mutant", "peppa pig", "bluey", "paw patrol",
 ];
 
-/** Minimal fragment replacements for public figure likeness only. No long suffix. */
-const PUBLIC_FIGURE_PATCHES: Array<{ pattern: RegExp; replacement: string }> = [
-  { pattern: /\(think\s+leo\s+in\s+the\s+great\s+gatsby\)/gi, replacement: "(a charismatic 1920s art-deco party vibe)" },
-  { pattern: /\blike\s+(?:leo|leonardo\s+dicaprio)\b[^.]*/gi, replacement: "with a charismatic classic 1920s party vibe" },
-  { pattern: /\b(?:like|as)\s+taylor\s+swift\b[^.]*/gi, replacement: "with an elegant pop-star aesthetic" },
-  { pattern: /\b(?:like|as)\s+beyonce\b[^.]*/gi, replacement: "with a glamorous performance aesthetic" },
-  { pattern: /\bgreat\s+gatsby\b/gi, replacement: "1920s art-deco jazz age party" },
-];
-
 export type ThinModerationResult =
-  | { ok: true; prompt: string; fragmentPatchApplied?: boolean }
+  | { ok: true; prompt: string }
   | { ok: false; code: string; userMessage: string; suggestions: string[] };
 
 function containsCopyrightedCharacter(text: string): boolean {
   const lower = text.toLowerCase();
   return COPYRIGHTED_CHARACTERS.some((name) => lower.includes(name));
-}
-
-function applyPublicFigureFragmentPatch(text: string): { patched: string; applied: boolean } {
-  let result = text;
-  let applied = false;
-  for (const { pattern, replacement } of PUBLIC_FIGURE_PATCHES) {
-    const regex = new RegExp(pattern.source, pattern.flags);
-    if (regex.test(result)) {
-      result = result.replace(new RegExp(pattern.source, pattern.flags), replacement);
-      applied = true;
-    }
-  }
-  return { patched: result.trim(), applied };
 }
 
 async function checkOpenAIModeration(input: string): Promise<{ flagged: boolean; categories?: string[] }> {
@@ -133,12 +110,6 @@ export async function moderatePrompt(
       userMessage: "This request cannot be fulfilled. Please try a different prompt.",
       suggestions: [],
     };
-  }
-
-  const { patched, applied } = applyPublicFigureFragmentPatch(normalized);
-  if (applied) {
-    logThinModeration({ event: "fragment_patch", reason: "public_figure_likeness", clientId: clientIdentifier });
-    return { ok: true, prompt: patched, fragmentPatchApplied: true };
   }
 
   return { ok: true, prompt: normalized };

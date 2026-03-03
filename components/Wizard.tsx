@@ -94,6 +94,7 @@ export function Wizard({ initialStyle, initialProduct }: WizardProps) {
       const prompt = `${style}. ${advancedPrompt || "Gift-ready, warm, family-friendly."}`;
       const response = await fetch("/api/generate-image", {
         method: "POST",
+        cache: "no-store",
         headers: {
           "Content-Type": "application/json",
           "x-visitor-id": getVisitorId(),

@@ -201,6 +201,7 @@ async function generateViaKeepsyAPI(args: {
 }) {
   const res = await fetch("/api/generate-image", {
     method: "POST",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       "x-visitor-id": getVisitorId(),
@@ -449,9 +450,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     setGenerationError(null);
     setIsBusy(true);
     try {
-      const basePrompt = effectivePrompt || "Create a polished lifelike keepsake design from this uploaded image.";
-      const shapeGuide = "Use a square composition.";
-      const promptWithQualityGuide = `${basePrompt}. ${shapeGuide} High-quality production-ready design. Use realistic lighting, depth, and texture.`;
+      const basePrompt = effectivePrompt || "Create a design from this image.";
       let result: {
         imageDataUrl: string;
         appliedRewrite?: boolean;
@@ -465,7 +464,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
         try {
           result = await generateViaKeepsyAPI({
-            prompt: promptWithQualityGuide,
+            prompt: basePrompt,
             sourceImageDataUrl: uploadedImage,
             designShape: "square",
             signal: controller.signal,
@@ -481,7 +480,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       }
 
       if (!result) throw new Error("Failed to generate image");
-      setInitialGeneration({ prompt: promptWithQualityGuide, imageUrl: result.imageDataUrl });
+      setInitialGeneration({ prompt: basePrompt, imageUrl: result.imageDataUrl });
       setGenerationError(null);
       setGenerationContentBlock(null);
       setGenerationRewriteApplied(

@@ -3,11 +3,9 @@ import { createHash } from "crypto";
 import { z } from "zod";
 import {
   enforceUsageGuards,
-  fetchWithBackoff,
   getClientKey,
-  sanitizePrompt,
 } from "./guardrails";
-import { moderatePrompt } from "@/lib/safety/thinModeration";
+import { baselineGenerate, minimalSanitize } from "@/lib/gen/baselineGenerate";
 import {
   getGenerationMetrics,
   persistMetricsIfDue,
@@ -15,6 +13,8 @@ import {
 } from "./metrics";
 import { guardOrigin, guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
 import { parseAndValidate, Constraints } from "@/lib/http/validate";
+
+export const dynamic = "force-dynamic";
 
 const CACHE_TTL_MS = 3 * 60 * 1000;
 const MAX_IN_FLIGHT_GENERATIONS = 8;
@@ -42,7 +42,10 @@ function getImageSizeForShape(shape: DesignShape): "1024x1024" | "1024x1536" | "
 }
 
 const generationCache = new Map<string, CachedGeneration>();
-const inflightByPrompt = new Map<string, Promise<string>>();
+type InflightResult =
+  | { ok: true; imageDataUrl: string }
+  | { ok: false; code: string; userMessage: string; suggestions: string[] };
+const inflightByPrompt = new Map<string, Promise<InflightResult>>();
 
 const BLOCK_TITLE = "Let's tweak that slightly";
 
@@ -82,84 +85,6 @@ function readCachedGeneration(promptKey: string): string | null {
   return hit.imageDataUrl;
 }
 
-async function generateImage(prompt: string, size: "1024x1024" | "1024x1536" | "1536x1024"): Promise<string> {
-  const resp = await fetchWithBackoff("https://api.openai.com/v1/images/generations", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-image-1",
-      prompt,
-      size,
-    }),
-  }, { retries: 2, timeoutMs: 90_000 });
-
-  const data = await resp.json();
-
-  if (!resp.ok) {
-    throw new Error(data?.error?.message || "OpenAI error");
-  }
-
-  const b64 = data?.data?.[0]?.b64_json;
-  if (!b64) throw new Error("No image returned");
-  return `data:image/png;base64,${b64}`;
-}
-
-function parseDataUrl(dataUrl: string): { mimeType: string; imageBuffer: ArrayBuffer } | null {
-  const match = dataUrl.match(/^data:(image\/(?:png|jpeg));base64,(.+)$/);
-  if (!match) return null;
-  const [, mimeType, base64Payload] = match;
-  try {
-    const decoded = Buffer.from(base64Payload, "base64");
-    const bytes = Uint8Array.from(decoded);
-    const imageBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-    return { mimeType, imageBuffer };
-  } catch {
-    return null;
-  }
-}
-
-async function editImage(
-  prompt: string,
-  sourceImageDataUrl: string,
-  size: "1024x1024" | "1024x1536" | "1536x1024"
-): Promise<string> {
-  const parsed = parseDataUrl(sourceImageDataUrl);
-  if (!parsed) {
-    throw new Error("Invalid uploaded image format. Please use JPG or PNG.");
-  }
-
-  const extension = parsed.mimeType === "image/png" ? "png" : "jpg";
-  const formData = new FormData();
-  formData.set("model", "gpt-image-1");
-  formData.set("prompt", prompt);
-  formData.set("size", size);
-  formData.set("image", new Blob([parsed.imageBuffer], { type: parsed.mimeType }), `upload.${extension}`);
-
-  const resp = await fetchWithBackoff(
-    "https://api.openai.com/v1/images/edits",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: formData,
-    },
-    { retries: 2, timeoutMs: 90_000 }
-  );
-
-  const data = await resp.json();
-  if (!resp.ok) {
-    throw new Error(data?.error?.message || "OpenAI edit error");
-  }
-
-  const b64 = data?.data?.[0]?.b64_json;
-  if (!b64) throw new Error("No image returned");
-  return `data:image/png;base64,${b64}`;
-}
-
 export async function POST(req: Request) {
   const requestId = getRequestId(req);
   const originDeny = guardOrigin(req, "/api/generate-image", requestId);
@@ -167,13 +92,15 @@ export async function POST(req: Request) {
   const rateLimitResult = guardRateLimit(req, "/api/generate-image", "POST", requestId);
   if ("response" in rateLimitResult) return rateLimitResult.response;
 
+  const noStoreHeaders = { "Cache-Control": "no-store" };
+
   try {
     recordGenerationMetric("totalRequests", 1);
     const parsed = await parseAndValidate(req, generateBodySchema);
     if ("error" in parsed) {
       return NextResponse.json(parsed.error, {
         status: parsed.status,
-        headers: { "Content-Type": "application/json", ...rateLimitResult.headers },
+        headers: { "Content-Type": "application/json", ...noStoreHeaders, ...rateLimitResult.headers },
       });
     }
     const body = parsed.data;
@@ -190,62 +117,61 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: usageCheck.error }, { status: usageCheck.status });
     }
 
-    const clientId = getClientKey(req);
-    const moderation = await moderatePrompt(prompt, clientId);
-
-    if (!moderation.ok) {
+    const sanitized = minimalSanitize(prompt);
+    if (!sanitized.ok) {
       return NextResponse.json(
-        {
-          ok: false,
-          code: moderation.code,
-          userMessage: moderation.userMessage,
-          suggestions: moderation.suggestions,
-          title: BLOCK_TITLE,
-        },
-        { status: 400 }
+        { ok: false, code: "empty", userMessage: sanitized.error, suggestions: [], title: BLOCK_TITLE },
+        { status: 400, headers: noStoreHeaders }
       );
     }
 
-    const promptCheck = sanitizePrompt(moderation.prompt);
-    if (!promptCheck.ok) {
-      return NextResponse.json({ error: promptCheck.error }, { status: 400 });
-    }
-
+    const promptKey = getPromptKey(`${sanitized.prompt}::${generationSize}`);
     const startedAt = Date.now();
-    const promptKey = getPromptKey(`${promptCheck.prompt}::${generationSize}`);
     const cached = readCachedGeneration(promptKey);
-    const fragmentPatchMeta =
-      moderation.ok && moderation.fragmentPatchApplied
-        ? { appliedRewrite: true, appliedPatches: [], patchedPrompt: moderation.prompt }
-        : undefined;
 
     if (cached) {
       recordGenerationMetric("cacheHits", 1);
       recordGenerationMetric("totalSuccess", 1);
       recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
-      return NextResponse.json({
-        ok: true,
-        imageDataUrl: cached,
-        cached: true,
-        latencyMs: Date.now() - startedAt,
-        ...fragmentPatchMeta,
-      });
+      return NextResponse.json(
+        {
+          ok: true,
+          imageDataUrl: cached,
+          cached: true,
+          latencyMs: Date.now() - startedAt,
+        },
+        { headers: noStoreHeaders }
+      );
     }
     recordGenerationMetric("cacheMisses", 1);
 
     const existingInflight = inflightByPrompt.get(promptKey);
     if (existingInflight) {
-      const imageDataUrl = await existingInflight;
+      const dedupResult = await existingInflight;
+      if (!dedupResult.ok) {
+        return NextResponse.json(
+          {
+            ok: false,
+            code: dedupResult.code,
+            userMessage: dedupResult.userMessage,
+            suggestions: dedupResult.suggestions,
+            title: BLOCK_TITLE,
+          },
+          { status: 400, headers: noStoreHeaders }
+        );
+      }
       recordGenerationMetric("dedupedHits", 1);
       recordGenerationMetric("totalSuccess", 1);
       recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
-      return NextResponse.json({
-        ok: true,
-        imageDataUrl,
-        deduped: true,
-        latencyMs: Date.now() - startedAt,
-        ...fragmentPatchMeta,
-      });
+      return NextResponse.json(
+        {
+          ok: true,
+          imageDataUrl: dedupResult.imageDataUrl,
+          deduped: true,
+          latencyMs: Date.now() - startedAt,
+        },
+        { headers: noStoreHeaders }
+      );
     }
 
     const snapshot = getGenerationMetrics();
@@ -254,55 +180,79 @@ export async function POST(req: Request) {
       recordGenerationMetric("totalErrors", 1);
       return NextResponse.json(
         { error: "Generator is busy. Please retry in a few seconds." },
-        { status: 503 }
+        { status: 503, headers: noStoreHeaders }
       );
     }
 
-    if (sourceImageDataUrl) {
+    const clientId = getClientKey(req);
+    const mode = sourceImageDataUrl ? "upload" : "describe";
+
+    const runGeneration = async (): Promise<
+      { ok: true; imageDataUrl: string } | { ok: false; code: string; userMessage: string; suggestions: string[] }
+    > => {
       recordGenerationMetric("inFlightCount", 1);
       try {
-        const imageDataUrl = await editImage(promptCheck.prompt, sourceImageDataUrl, generationSize);
-        recordGenerationMetric("totalSuccess", 1);
-        recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
-        return NextResponse.json({
-          ok: true,
-          imageDataUrl,
-          edited: true,
-          latencyMs: Date.now() - startedAt,
-          ...fragmentPatchMeta,
+        const result = await baselineGenerate({
+          prompt: sanitized.prompt,
+          mode,
+          referenceImageDataUrl: sourceImageDataUrl,
+          size: generationSize,
+          clientId,
+          requestId,
         });
+
+        if (!result.ok) {
+          return {
+            ok: false,
+            code: result.code,
+            userMessage: result.userMessage,
+            suggestions: result.suggestions,
+          };
+        }
+
+        const { imageDataUrl, promptUsed } = result;
+        const cacheKey = getPromptKey(`${promptUsed}::${generationSize}`);
+        generationCache.set(cacheKey, {
+          imageDataUrl,
+          expiresAt: Date.now() + CACHE_TTL_MS,
+        });
+        return { ok: true, imageDataUrl };
       } finally {
         recordGenerationMetric("inFlightCount", -1);
       }
-    }
+    };
 
-    recordGenerationMetric("inFlightCount", 1);
-    const generationPromise = (async () => {
-      const imageDataUrl = await generateImage(promptCheck.prompt, generationSize);
-      generationCache.set(promptKey, {
-        imageDataUrl,
-        expiresAt: Date.now() + CACHE_TTL_MS,
-      });
-      return imageDataUrl;
-    })();
-
+    const generationPromise = runGeneration();
     inflightByPrompt.set(promptKey, generationPromise);
 
-    try {
-      const imageDataUrl = await generationPromise;
-      recordGenerationMetric("totalSuccess", 1);
-      recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
-      return NextResponse.json({
+    const genResult = await generationPromise;
+    inflightByPrompt.delete(promptKey);
+
+    if (!genResult.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          code: genResult.code,
+          userMessage: genResult.userMessage,
+          suggestions: genResult.suggestions,
+          title: BLOCK_TITLE,
+        },
+        { status: 400, headers: noStoreHeaders }
+      );
+    }
+
+    recordGenerationMetric("totalSuccess", 1);
+    recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
+    return NextResponse.json(
+      {
         ok: true,
-        imageDataUrl,
+        imageDataUrl: genResult.imageDataUrl,
+        edited: mode === "upload",
         cached: false,
         latencyMs: Date.now() - startedAt,
-        ...fragmentPatchMeta,
-      });
-    } finally {
-      recordGenerationMetric("inFlightCount", -1);
-      inflightByPrompt.delete(promptKey);
-    }
+      },
+      { headers: noStoreHeaders }
+    );
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     recordGenerationMetric("totalErrors", 1);
@@ -310,7 +260,7 @@ export async function POST(req: Request) {
     const body = normalized.contentBlock
       ? { ok: false, error: normalized.error, ...OPENAI_BLOCK_RESPONSE }
       : { ok: false, error: normalized.error };
-    return NextResponse.json(body, { status: normalized.status });
+    return NextResponse.json(body, { status: normalized.status, headers: noStoreHeaders });
   } finally {
     persistMetricsIfDue();
   }

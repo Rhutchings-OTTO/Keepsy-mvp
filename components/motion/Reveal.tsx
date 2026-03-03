@@ -24,11 +24,15 @@ export function Reveal(props: RevealProps) {
   const v = variantMap[variant];
 
   useEffect(() => {
-    if (typeof window === "undefined" || !ref.current || reduceMotion) {
-      setInView(true);
-      return;
+    if (typeof window === "undefined" || reduceMotion) {
+      const t = setTimeout(() => setInView(true), 0);
+      return () => clearTimeout(t);
     }
     const el = ref.current;
+    if (!el) {
+      const t = setTimeout(() => setInView(true), 0);
+      return () => clearTimeout(t);
+    }
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

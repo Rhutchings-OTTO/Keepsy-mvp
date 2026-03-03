@@ -8,6 +8,7 @@ import { InteractiveCard } from "@/components/ui/InteractiveCard";
 import { FF } from "@/lib/featureFlags";
 import { FLOATER_POOL_SIZE, selectBalancedFloaters } from "@/components/hero/floaterPool";
 import type { FloaterCapacityResult, FloaterSlot } from "@/components/hero/useFloaterCapacity";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 const MOTION_MAX_DESKTOP = 12;
 const MOTION_MAX_MOBILE = 6;
@@ -34,17 +35,21 @@ function DebugOverlay({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const heroEl = heroRef.current;
-    const safeEl = safeZoneRef.current;
+    const heroEl = heroRef?.current;
+    const safeEl = safeZoneRef?.current;
     if (!heroEl || !safeEl) return;
-    const heroRect = heroEl.getBoundingClientRect();
-    const safeRect = safeEl.getBoundingClientRect();
-    setRects({
-      safeLeft: safeRect.left - heroRect.left,
-      safeTop: safeRect.top - heroRect.top,
-      safeW: safeRect.width,
-      safeH: safeRect.height,
-    });
+    const update = () => {
+      const heroRect = heroEl.getBoundingClientRect();
+      const safeRect = safeEl.getBoundingClientRect();
+      setRects({
+        safeLeft: safeRect.left - heroRect.left,
+        safeTop: safeRect.top - heroRect.top,
+        safeW: safeRect.width,
+        safeH: safeRect.height,
+      });
+    };
+    const t = setTimeout(update, 0);
+    return () => clearTimeout(t);
   }, [layout, heroRef, safeZoneRef]);
 
   if (!rects) return null;
@@ -74,29 +79,47 @@ function DebugOverlay({
   );
 }
 
-export function HeroFloatingCards({ layout, cursorOffset, cardsY, reduceMotion, heroRef, safeZoneRef }: HeroFloatingCardsProps) {
+/** Clamp value to safe finite number for CSS. Returns fallback if invalid. */
+function safeNum(val: number, fallback: number): number {
+  if (typeof val !== "number" || !Number.isFinite(val)) return fallback;
+  return val;
+}
+
+function HeroFloatingCardsInner({
+  layout,
+  cursorOffset,
+  cardsY,
+  reduceMotion,
+  heroRef,
+  safeZoneRef,
+}: HeroFloatingCardsProps) {
   const searchParams = useSearchParams();
   const debugFloaters = searchParams?.get("debugFloaters") === "1";
+
   const [viewportWidth, setViewportWidth] = useState(1024);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    setViewportWidth(window.innerWidth);
-    const onResize = () => setViewportWidth(window.innerWidth);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    const setWidth = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", setWidth);
+    const t = setTimeout(setWidth, 0);
+    return () => {
+      window.removeEventListener("resize", setWidth);
+      clearTimeout(t);
+    };
   }, []);
 
   const { visibleFloaters } = layout;
-  if (visibleFloaters.length === 0) return null;
-
-  const isMobile = viewportWidth < 640;
-  const motionMax = isMobile ? MOTION_MAX_MOBILE : MOTION_MAX_DESKTOP;
 
   const cards = useMemo(
     () => selectBalancedFloaters(visibleFloaters.length, viewportWidth),
     [visibleFloaters.length, viewportWidth]
   );
+
+  if (visibleFloaters.length === 0 || cards.length === 0) return null;
+
+  const isMobile = viewportWidth < 640;
+  const motionMax = isMobile ? MOTION_MAX_MOBILE : MOTION_MAX_DESKTOP;
 
   return (
     <>
@@ -108,21 +131,30 @@ export function HeroFloatingCards({ layout, cursorOffset, cardsY, reduceMotion, 
         {cards.map((def, i) => {
           const slot = visibleFloaters[i] as FloaterSlot | undefined;
           if (!slot) return null;
+
+          const x = safeNum(slot.x, 0);
+          const y = safeNum(slot.y, 0);
+          const w = safeNum(slot.w, 120);
+          const h = safeNum(slot.h, 100);
+          const animScale = typeof slot.animationScale === "number" && Number.isFinite(slot.animationScale)
+            ? Math.max(0.4, Math.min(1.1, slot.animationScale))
+            : 1;
+
           const cursorMul = Math.min(0.35, 0.2 + i * 0.012);
           const clampedX = cursorOffset.x * cursorMul;
           const clampedY = cursorOffset.y * cursorMul;
-          const animY = reduceMotion ? 0 : (i % 2 === 0 ? -1 : 1) * slot.animationScale * motionMax;
-          const animRot = reduceMotion ? 0 : (i % 2 === 0 ? 1.2 : -1.2) * slot.animationScale;
+          const animY = reduceMotion ? 0 : (i % 2 === 0 ? -1 : 1) * animScale * motionMax;
+          const animRot = reduceMotion ? 0 : (i % 2 === 0 ? 1.2 : -1.2) * animScale;
 
           return (
             <motion.div
               key={def.id}
               className="absolute"
               style={{
-                left: slot.x,
-                top: slot.y,
-                width: slot.w,
-                height: slot.h,
+                left: x,
+                top: y,
+                width: w,
+                height: h,
                 x: clampedX,
                 y: clampedY,
               }}
@@ -155,5 +187,13 @@ export function HeroFloatingCards({ layout, cursorOffset, cardsY, reduceMotion, 
         <DebugOverlay layout={layout} heroRef={heroRef} safeZoneRef={safeZoneRef} />
       )}
     </>
+  );
+}
+
+export function HeroFloatingCards(props: HeroFloatingCardsProps) {
+  return (
+    <ErrorBoundary>
+      <HeroFloatingCardsInner {...props} />
+    </ErrorBoundary>
   );
 }

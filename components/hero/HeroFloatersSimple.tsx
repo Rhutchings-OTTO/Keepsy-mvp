@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { FloaterCard } from "@/components/hero/FloaterCard";
 import { FLOATER_POOL_SIMPLE } from "@/components/hero/floaterPoolSimple";
+import { getProductPreviewHref } from "@/lib/routes";
 import { useReducedMotionPref } from "@/lib/motion/useReducedMotionPref";
 
 type SizeClass = "large" | "medium" | "small";
@@ -21,7 +22,7 @@ const PARALLAX_STRENGTH: Record<SizeClass, number> = {
   small: 6,
 };
 
-const CARD_ASPECT = 200 / 190;
+const CARD_ASPECT = 200 / 185;
 
 function getTargetCount(width: number): number {
   if (width >= 1200) return 13;
@@ -186,11 +187,11 @@ export function HeroFloatersSimple({ heroRef, safeZoneRef }: HeroFloatersSimpleP
 
     const handlePointerLeave = () => setMouseOffset({ x: 0, y: 0 });
 
-    heroEl.addEventListener("pointermove", handlePointerMove);
-    heroEl.addEventListener("pointerleave", handlePointerLeave);
+    window.addEventListener("pointermove", handlePointerMove);
+    document.documentElement.addEventListener("pointerleave", handlePointerLeave);
     return () => {
-      heroEl.removeEventListener("pointermove", handlePointerMove);
-      heroEl.removeEventListener("pointerleave", handlePointerLeave);
+      window.removeEventListener("pointermove", handlePointerMove);
+      document.documentElement.removeEventListener("pointerleave", handlePointerLeave);
     };
   }, [heroRef, reduceMotion]);
 
@@ -202,7 +203,7 @@ export function HeroFloatersSimple({ heroRef, safeZoneRef }: HeroFloatersSimpleP
         {placed.map((p, i) => (
           <div
             key={p.item.id}
-            className="absolute"
+            className={`absolute ${p.item.productSlug ? "pointer-events-auto" : "pointer-events-none"}`}
             style={{
               left: p.x,
               top: p.y,
@@ -228,6 +229,7 @@ export function HeroFloatersSimple({ heroRef, safeZoneRef }: HeroFloatersSimpleP
                 title={p.item.title}
                 subtitle={p.item.subtitle}
                 className="h-full w-full min-w-0 border-black/10 bg-white/80"
+                href={p.item.productSlug ? getProductPreviewHref(p.item.productSlug) : undefined}
               />
             </motion.div>
           </div>

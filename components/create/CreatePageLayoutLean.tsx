@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Zap, Upload, X, RefreshCcw, ArrowRight, Shirt, Coffee, CreditCard, Layout, Star } from "lucide-react";
@@ -9,6 +10,7 @@ import { PromptHelperCollapsible } from "./PromptHelperCollapsible";
 import { IdeasForYou } from "./IdeasForYou";
 import { Carousel } from "@/components/ui/Carousel";
 import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNotice";
+import { getProductPreviewHref } from "@/lib/routes";
 import { revealUp } from "@/lib/motion";
 import type { Region } from "@/lib/region";
 
@@ -313,17 +315,14 @@ export function CreatePageLayoutLean({
         <p className="text-sm font-black uppercase tracking-wider text-black/55 mb-4">Choose your item</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {PRODUCTS.map(({ type, Icon, label }) => (
-            <motion.button
+            <Link
               key={type}
-              type="button"
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex flex-col items-center gap-2 rounded-2xl border border-black/10 bg-white/80 p-5 shadow-sm min-h-[100px]"
-              onClick={() => onProductSelect(type)}
+              href={getProductPreviewHref(type)}
+              className="flex flex-col items-center gap-2 rounded-2xl border border-black/10 bg-white/80 p-5 shadow-sm min-h-[100px] transition hover:border-black/20"
             >
               <Icon size={28} className="text-black/70" />
               <span className="font-extrabold text-xs uppercase tracking-widest text-black/80">{label}</span>
-            </motion.button>
+            </Link>
           ))}
         </div>
       </motion.div>

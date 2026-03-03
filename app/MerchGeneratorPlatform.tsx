@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { MockupRenderer } from "@/components/MockupRenderer";
@@ -20,6 +21,7 @@ import MagicpathBackground from "@/components/skin/magicpath/MagicpathBackground
 import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { useConversionFlow } from "@/context/ConversionFlowContext";
 import { FF } from "@/lib/featureFlags";
+import { getProductPreviewHref } from "@/lib/routes";
 import { motionTransition, revealUp, softScaleIn } from "@/lib/motion";
 import { getRegion, type Region } from "@/lib/region";
 import {
@@ -1254,21 +1256,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {PRODUCT_LIST.map((p) => (
-                  <motion.button
+                  <Link
                     key={p.id}
-                    whileHover={{ y: -6 }}
-                    whileTap={{ scale: 0.99 }}
-                    className="text-left bg-white/80 border border-black/10 rounded-3xl p-5 shadow-sm"
-                    onClick={() => {
-                      setSelectedProduct(p);
-                      setView("home");
-                      setStep(1);
-                    }}
+                    href={getProductPreviewHref(p.id)}
+                    className="block text-left bg-white/80 border border-black/10 rounded-3xl p-5 shadow-sm transition hover:border-black/20 hover:-translate-y-1"
                   >
                     <div className="text-lg font-black">{p.name}</div>
                     <div className="text-sm text-black/55 font-semibold mt-1">{p.description}</div>
                     <div className="text-sm font-black mt-3">{gbp(p.basePrice)}</div>
-                  </motion.button>
+                  </Link>
                 ))}
               </div>
             </motion.div>

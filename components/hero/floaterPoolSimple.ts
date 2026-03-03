@@ -8,6 +8,8 @@ export type FloaterItem = {
   title: string;
   subtitle: string;
   imageSrc: string;
+  /** Product preview slug for mockups that map to a product */
+  productSlug?: "tee" | "hoodie" | "mug" | "card";
 };
 
 export const FLOATER_POOL_SIMPLE: FloaterItem[] = [
@@ -18,20 +20,20 @@ export const FLOATER_POOL_SIMPLE: FloaterItem[] = [
   { id: "christmas-scene", type: "idea", title: "Christmas Scene", subtitle: "Design preview", imageSrc: "/occasion-tiles/christmas-scene.png" },
   { id: "birthday-scene", type: "idea", title: "Birthday Scene", subtitle: "Design preview", imageSrc: "/occasion-tiles/birthday-confetti.png" },
   { id: "mothers-day-scene", type: "idea", title: "Mother's Day Floral", subtitle: "Design preview", imageSrc: "/occasion-tiles/mothers-day-floral.png" },
-  { id: "plain-card", type: "mockup", title: "Plain Card Mockup", subtitle: "Card preview", imageSrc: "/product-tiles/plain-card.png" },
-  { id: "plain-mug", type: "mockup", title: "Plain Mug Mockup", subtitle: "Mug preview", imageSrc: "/product-tiles/plain-mug-front.png" },
-  { id: "tee-white", type: "mockup", title: "Premium Tee Mockup", subtitle: "T-Shirt preview", imageSrc: "/product-tiles/tee-white.png" },
-  { id: "plain-hoodie", type: "mockup", title: "Plain Hoodie Mockup", subtitle: "Hoodie preview", imageSrc: "/product-tiles/hoodie-white.png" },
-  { id: "tee-black", type: "mockup", title: "Tee Black Mockup", subtitle: "T-Shirt preview", imageSrc: "/product-tiles/tee-black.png" },
-  { id: "tee-blue", type: "mockup", title: "Tee Blue Mockup", subtitle: "T-Shirt preview", imageSrc: "/product-tiles/tee-blue.png" },
-  { id: "hoodie-blue", type: "mockup", title: "Hoodie Blue Mockup", subtitle: "Hoodie preview", imageSrc: "/product-tiles/hoodie-blue.png" },
-  { id: "hoodie-black", type: "mockup", title: "Hoodie Black Mockup", subtitle: "Hoodie preview", imageSrc: "/product-tiles/hoodie-black.png" },
-  { id: "preview-tee-blue", type: "mockup", title: "Tee Blue Preview", subtitle: "T-Shirt preview", imageSrc: "/mockup-previews/preview-tee-blue.png" },
-  { id: "preview-hoodie-black", type: "mockup", title: "Hoodie Black Preview", subtitle: "Hoodie preview", imageSrc: "/mockup-previews/preview-hoodie-black.png" },
-  { id: "preview-plain-card", type: "mockup", title: "Card Preview", subtitle: "Card preview", imageSrc: "/mockup-previews/preview-plain-card.png" },
-  { id: "preview-tee-white", type: "mockup", title: "Tee White Preview", subtitle: "T-Shirt preview", imageSrc: "/mockup-previews/preview-tee-white.png" },
-  { id: "preview-tee-black", type: "mockup", title: "Tee Black Preview", subtitle: "T-Shirt preview", imageSrc: "/mockup-previews/preview-tee-black.png" },
-  { id: "preview-plain-mug", type: "mockup", title: "Mug Preview", subtitle: "Mug preview", imageSrc: "/mockup-previews/preview-plain-mug-front.png" },
-  { id: "preview-hoodie-white", type: "mockup", title: "Hoodie White Preview", subtitle: "Hoodie preview", imageSrc: "/mockup-previews/preview-hoodie-white.png" },
-  { id: "preview-hoodie-blue", type: "mockup", title: "Hoodie Blue Preview", subtitle: "Hoodie preview", imageSrc: "/mockup-previews/preview-hoodie-blue.png" },
+  { id: "plain-card", type: "mockup", title: "Plain Card Mockup", subtitle: "Card preview", imageSrc: "/product-tiles/plain-card.png", productSlug: "card" },
+  { id: "plain-mug", type: "mockup", title: "Plain Mug Mockup", subtitle: "Mug preview", imageSrc: "/product-tiles/plain-mug-front.png", productSlug: "mug" },
+  { id: "tee-white", type: "mockup", title: "Premium Tee Mockup", subtitle: "T-Shirt preview", imageSrc: "/product-tiles/tee-white.png", productSlug: "tee" },
+  { id: "plain-hoodie", type: "mockup", title: "Plain Hoodie Mockup", subtitle: "Hoodie preview", imageSrc: "/product-tiles/hoodie-white.png", productSlug: "hoodie" },
+  { id: "tee-black", type: "mockup", title: "Tee Black Mockup", subtitle: "T-Shirt preview", imageSrc: "/product-tiles/tee-black.png", productSlug: "tee" },
+  { id: "tee-blue", type: "mockup", title: "Tee Blue Mockup", subtitle: "T-Shirt preview", imageSrc: "/product-tiles/tee-blue.png", productSlug: "tee" },
+  { id: "hoodie-blue", type: "mockup", title: "Hoodie Blue Mockup", subtitle: "Hoodie preview", imageSrc: "/product-tiles/hoodie-blue.png", productSlug: "hoodie" },
+  { id: "hoodie-black", type: "mockup", title: "Hoodie Black Mockup", subtitle: "Hoodie preview", imageSrc: "/product-tiles/hoodie-black.png", productSlug: "hoodie" },
+  { id: "preview-tee-blue", type: "mockup", title: "Tee Blue Preview", subtitle: "T-Shirt preview", imageSrc: "/mockup-previews/preview-tee-blue.png", productSlug: "tee" },
+  { id: "preview-hoodie-black", type: "mockup", title: "Hoodie Black Preview", subtitle: "Hoodie preview", imageSrc: "/mockup-previews/preview-hoodie-black.png", productSlug: "hoodie" },
+  { id: "preview-plain-card", type: "mockup", title: "Card Preview", subtitle: "Card preview", imageSrc: "/mockup-previews/preview-plain-card.png", productSlug: "card" },
+  { id: "preview-tee-white", type: "mockup", title: "Tee White Preview", subtitle: "T-Shirt preview", imageSrc: "/mockup-previews/preview-tee-white.png", productSlug: "tee" },
+  { id: "preview-tee-black", type: "mockup", title: "Tee Black Preview", subtitle: "T-Shirt preview", imageSrc: "/mockup-previews/preview-tee-black.png", productSlug: "tee" },
+  { id: "preview-plain-mug", type: "mockup", title: "Mug Preview", subtitle: "Mug preview", imageSrc: "/mockup-previews/preview-plain-mug-front.png", productSlug: "mug" },
+  { id: "preview-hoodie-white", type: "mockup", title: "Hoodie White Preview", subtitle: "Hoodie preview", imageSrc: "/mockup-previews/preview-hoodie-white.png", productSlug: "hoodie" },
+  { id: "preview-hoodie-blue", type: "mockup", title: "Hoodie Blue Preview", subtitle: "Hoodie preview", imageSrc: "/mockup-previews/preview-hoodie-blue.png", productSlug: "hoodie" },
 ];

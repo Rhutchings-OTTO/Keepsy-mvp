@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import IridescenceBackground from "@/components/IridescenceBackground";
 import RegionSelector from "@/components/RegionSelector";
 import { HeroFloatingCards } from "@/components/HeroFloatingCards";
-import { useHeroLayout } from "@/components/hero/useHeroLayout";
+import { useFloaterCapacity } from "@/components/hero/useFloaterCapacity";
+import { FLOATER_POOL_SIZE } from "@/components/hero/floaterPool";
 import { Reveal } from "@/components/motion/Reveal";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
@@ -33,7 +34,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   });
   const heroTextRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
-  const heroLayout = useHeroLayout(mainRef, heroTextRef);
+  const floaterLayout = useFloaterCapacity(mainRef, heroTextRef, FLOATER_POOL_SIZE);
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
   const { scrollY } = useScroll();
   const reduceMotion = useReducedMotion();
@@ -128,7 +129,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
           <p className="mx-auto mt-4 max-w-3xl text-[clamp(0.95rem,2vw,1.25rem)] font-medium leading-relaxed text-black/60 sm:mt-5 md:mt-6">
             Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
           </p>
-          <div className={`mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:mt-8 ${heroLayout.compactMode ? "sm:mt-6" : "md:mt-10"}`}>
+          <div className={`mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:mt-8 ${floaterLayout.compactMode ? "sm:mt-6" : "md:mt-10"}`}>
             <button
               onClick={(event) => navigateWithRipple(event, "/create")}
               className="rounded-2xl bg-black px-6 py-3 text-base font-black text-white shadow-lg transition hover:bg-black/90"
@@ -146,10 +147,12 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
         </Reveal>
 
         <HeroFloatingCards
-          layout={heroLayout}
+          layout={floaterLayout}
           cursorOffset={cursorOffset}
           cardsY={cardsY}
           reduceMotion={reduceMotion ?? false}
+          heroRef={mainRef}
+          safeZoneRef={heroTextRef}
         />
       </motion.main>
 

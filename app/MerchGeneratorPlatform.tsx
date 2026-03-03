@@ -550,9 +550,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   };
 
   const handleRefine = async (refinementText: string) => {
-    const trimmed = refinementText?.trim?.();
-    if (!generatedImage || !trimmed) return;
+    const trimmed = typeof refinementText === "string" ? refinementText.trim() : "";
+    if (!trimmed) return;
+    if (!generatedImage) return;
     if (!canRefine()) return;
+
     setIsGenerating(true);
     setGenerationError(null);
     setGenerationContentBlock(null);
@@ -560,24 +562,19 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     generateAbortRef.current?.abort();
     const controller = new AbortController();
     generateAbortRef.current = controller;
+
+    const nextPrompt = `${lastGenerationPrompt}\n\nRefinement request: ${trimmed}`;
+
     try {
-      const instruction = `${lastGenerationPrompt}\n\nRefinement request: ${trimmed}`;
       const result = await generateViaKeepsyAPI({
-        prompt: instruction,
-        sourceImageDataUrl: generatedImage,
+        prompt: nextPrompt,
+        sourceImageDataUrl: null,
         designShape: "square",
         signal: controller.signal,
       });
-      applyRefinementResult({ imageUrl: result.imageDataUrl, prompt: instruction });
-      setGenerationRewriteApplied(
-        result.appliedRewrite
-          ? {
-              originalPreview: result.originalPreview ?? "",
-              safePreview: result.safePreview ?? result.patchedPrompt ?? "",
-              appliedPatches: result.appliedPatches?.length ? result.appliedPatches : undefined,
-            }
-          : null
-      );
+
+      applyRefinementResult({ imageUrl: result.imageDataUrl, prompt: nextPrompt });
+      setGenerationRewriteApplied(null);
       setRefinementSuccess(true);
       setGenerationError(null);
     } catch (e) {

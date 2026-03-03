@@ -45,7 +45,7 @@ export function InteractiveCard({
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-white/25 bg-white/10 p-2 shadow-lg backdrop-blur-md ${className}`}
+      className={`group relative overflow-hidden rounded-2xl border border-white/25 bg-white/10 p-3 shadow-lg backdrop-blur-md ${className}`}
       style={
         reduceMotion
           ? undefined
@@ -57,13 +57,9 @@ export function InteractiveCard({
       whileTap={reduceMotion ? undefined : { scale: 0.98 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
-      {image && (
-        <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl">
-          {image}
-        </div>
-      )}
-      {title && <div className="mt-1.5 line-clamp-2 shrink-0 text-sm font-bold text-black/85">{title}</div>}
-      {subtitle && <div className="line-clamp-1 shrink-0 text-xs text-black/55">{subtitle}</div>}
+      {image && <div className="overflow-hidden rounded-xl">{image}</div>}
+      {title && <div className="mt-2 font-bold text-black/85">{title}</div>}
+      {subtitle && <div className="text-sm text-black/55">{subtitle}</div>}
       {children}
     </motion.div>
   );

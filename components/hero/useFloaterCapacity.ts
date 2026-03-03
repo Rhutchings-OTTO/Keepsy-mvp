@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const PAD = 10;
-const SAFE_MARGIN = 16;
-const FLOATER_GAP = 8;
+const PAD = 12;
+const SAFE_MARGIN = 20;
+const FLOATER_GAP = 10;
 const JITTER = 8;
-const SCALE_MIN = 0.4;
-const SCALE_MAX = 1.1;
-const CARD_ASPECT = 170 / 144;
+const SCALE_MIN = 0.85;
+const SCALE_MAX = 1.05;
+const CARD_ASPECT = 200 / 190;
 
-/** Base sizes: balance visibility with quantity; desktop targets 10–14 floaters */
-const BASE_W_DESKTOP = 160;
-const BASE_W_MOBILE = 120;
+/** Original card sizing: 200px desktop, reduce count before scaling below 0.85 */
+const BASE_W_DESKTOP = 200;
+const BASE_W_MOBILE = 160;
 const MOBILE_BREAK = 640;
 
 const FOLD_GUARD_VH = 0.92;

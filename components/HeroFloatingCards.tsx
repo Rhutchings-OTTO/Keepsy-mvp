@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, type MotionValue } from "framer-motion";
-import { InteractiveCard } from "@/components/ui/InteractiveCard";
 import { FF } from "@/lib/featureFlags";
+import { FloaterCard } from "@/components/hero/FloaterCard";
 import { FLOATER_POOL_SIZE, selectBalancedFloaters } from "@/components/hero/floaterPool";
 import type { FloaterCapacityResult, FloaterSlot } from "@/components/hero/useFloaterCapacity";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
@@ -79,7 +78,6 @@ function DebugOverlay({
   );
 }
 
-/** Clamp value to safe finite number for CSS. Returns fallback if invalid. */
 function safeNum(val: number, fallback: number): number {
   if (typeof val !== "number" || !Number.isFinite(val)) return fallback;
   return val;
@@ -134,8 +132,8 @@ function HeroFloatingCardsInner({
 
           const x = safeNum(slot.x, 0);
           const y = safeNum(slot.y, 0);
-          const w = safeNum(slot.w, 120);
-          const h = safeNum(slot.h, 100);
+          const w = safeNum(slot.w, 170);
+          const h = safeNum(slot.h, 150);
           const animScale = typeof slot.animationScale === "number" && Number.isFinite(slot.animationScale)
             ? Math.max(0.4, Math.min(1.1, slot.animationScale))
             : 1;
@@ -165,21 +163,12 @@ function HeroFloatingCardsInner({
               }
               transition={{ duration: 6 + (i % 4), repeat: Infinity, ease: "easeInOut" }}
             >
-              <InteractiveCard
-                image={
-                  <div className="relative h-full w-full">
-                    <Image
-                      src={def.image}
-                      alt={def.title}
-                      fill
-                      sizes="(max-width: 640px) 100px, 130px"
-                      className="rounded-xl object-cover"
-                    />
-                  </div>
-                }
+              <FloaterCard
+                image={def.image}
+                alt={def.title}
                 title={def.title}
                 subtitle={def.subtitle}
-                className="border-black/10 bg-white/80"
+                className="h-full w-full min-w-0 border-black/10 bg-white/80"
               />
             </motion.div>
           );

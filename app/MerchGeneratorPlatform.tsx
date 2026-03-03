@@ -12,6 +12,7 @@ import UpsellDrawer from "@/components/UpsellDrawer";
 import GiftAssistantWidget from "@/components/GiftAssistantWidget";
 import { CreatePageLayoutLean } from "@/components/create/CreatePageLayoutLean";
 import { DesignConfirmation } from "@/components/generation/DesignConfirmation";
+import { SizeAndMeasurements } from "@/components/products/SizeAndMeasurements";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { Reveal } from "@/components/motion/Reveal";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
@@ -811,6 +812,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     setSelectedColor(product.colors[0]);
                   }}
                   fileInputRef={fileInputRef}
+                  selectedProductType={selectedProduct.type}
                 />
               )}
 
@@ -861,6 +863,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         hasArtwork={Boolean(generatedImage || uploadedImage)}
                       />
                     </motion.div>
+                    {(selectedProduct.type === "tshirt" || selectedProduct.type === "hoodie") && (
+                      <div className="mt-6">
+                        <SizeAndMeasurements
+                          productType={selectedProduct.type}
+                          region={region}
+                          initialSize="M"
+                        />
+                      </div>
+                    )}
                     <div className="mt-6 flex gap-3 items-center">
                       <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">
                         <Sparkles size={14} /> Applied to real mockups

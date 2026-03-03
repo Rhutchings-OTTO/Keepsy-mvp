@@ -4,12 +4,10 @@ import { z } from "zod";
 import {
   enforceUsageGuards,
   fetchWithBackoff,
+  getClientKey,
   sanitizePrompt,
 } from "./guardrails";
-import {
-  processPrompt,
-  CONTENT_BLOCK_SUGGESTIONS,
-} from "@/lib/moderation/promptModeration";
+import { processPromptPipeline } from "@/lib/safety/promptRewrite";
 import {
   getGenerationMetrics,
   persistMetricsIfDue,
@@ -46,24 +44,28 @@ function getImageSizeForShape(shape: DesignShape): "1024x1024" | "1024x1536" | "
 const generationCache = new Map<string, CachedGeneration>();
 const inflightByPrompt = new Map<string, Promise<string>>();
 
-const CONTENT_BLOCK_RESPONSE = {
+const BLOCK_TITLE = "Let's tweak that slightly";
+
+const OPENAI_BLOCK_RESPONSE = {
   code: "content_block" as const,
-  title: "Let's tweak that slightly",
+  title: BLOCK_TITLE,
   message:
     "We can create original characters and themes, but we can't generate specific copyrighted or trademarked characters. Try describing the style, colours, or mood instead.",
-  suggestions: [...CONTENT_BLOCK_SUGGESTIONS],
+  suggestions: [
+    "Two original comic-style heroes celebrating a birthday",
+    "A watercolor portrait with warm, friendly colours",
+    "A minimalist line-art illustration for a greeting card",
+  ],
 };
 
-function normalizeGenerationError(message: string): { status: number; error: string; contentBlock?: boolean } {
+function normalizeOpenAIError(message: string): { status: number; contentBlock: boolean; error: string } {
   const lower = message.toLowerCase();
-  if (lower.includes("safety system") || lower.includes("content policy")) {
-    return {
-      status: 400,
-      error: CONTENT_BLOCK_RESPONSE.message,
-      contentBlock: true,
-    };
-  }
-  return { status: 500, error: message };
+  const isBlock = lower.includes("safety system") || lower.includes("content policy");
+  return {
+    status: isBlock ? 400 : 500,
+    contentBlock: isBlock,
+    error: isBlock ? OPENAI_BLOCK_RESPONSE.message : message,
+  };
 }
 
 function getPromptKey(prompt: string): string {
@@ -188,19 +190,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: usageCheck.error }, { status: usageCheck.status });
     }
 
-    const moderation = processPrompt(prompt);
-    if (moderation.action === "block") {
+    const clientId = getClientKey(req);
+    const pipeline = processPromptPipeline(prompt, clientId);
+
+    if (!pipeline.ok) {
       return NextResponse.json(
         {
-          error: CONTENT_BLOCK_RESPONSE.message,
-          ...CONTENT_BLOCK_RESPONSE,
+          ok: false,
+          code: pipeline.code,
+          userMessage: pipeline.userMessage,
+          suggestions: pipeline.suggestions,
+          title: BLOCK_TITLE,
         },
         { status: 400 }
       );
     }
-    const promptToUse = moderation.action === "rewrite" ? moderation.prompt : moderation.prompt;
 
-    const promptCheck = sanitizePrompt(promptToUse);
+    const promptCheck = sanitizePrompt(pipeline.prompt);
     if (!promptCheck.ok) {
       return NextResponse.json({ error: promptCheck.error }, { status: 400 });
     }
@@ -208,14 +214,25 @@ export async function POST(req: Request) {
     const startedAt = Date.now();
     const promptKey = getPromptKey(`${promptCheck.prompt}::${generationSize}`);
     const cached = readCachedGeneration(promptKey);
+    const rewriteMeta =
+      pipeline.ok && pipeline.appliedRewrite
+        ? {
+            appliedRewrite: true,
+            originalPreview: pipeline.originalPreview,
+            safePreview: pipeline.safePreview ?? pipeline.prompt.slice(0, 80) + (pipeline.prompt.length > 80 ? "..." : ""),
+          }
+        : undefined;
+
     if (cached) {
       recordGenerationMetric("cacheHits", 1);
       recordGenerationMetric("totalSuccess", 1);
       recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
       return NextResponse.json({
+        ok: true,
         imageDataUrl: cached,
         cached: true,
         latencyMs: Date.now() - startedAt,
+        ...rewriteMeta,
       });
     }
     recordGenerationMetric("cacheMisses", 1);
@@ -227,9 +244,11 @@ export async function POST(req: Request) {
       recordGenerationMetric("totalSuccess", 1);
       recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
       return NextResponse.json({
+        ok: true,
         imageDataUrl,
         deduped: true,
         latencyMs: Date.now() - startedAt,
+        ...rewriteMeta,
       });
     }
 
@@ -250,9 +269,11 @@ export async function POST(req: Request) {
         recordGenerationMetric("totalSuccess", 1);
         recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
         return NextResponse.json({
+          ok: true,
           imageDataUrl,
           edited: true,
           latencyMs: Date.now() - startedAt,
+          ...rewriteMeta,
         });
       } finally {
         recordGenerationMetric("inFlightCount", -1);
@@ -276,9 +297,11 @@ export async function POST(req: Request) {
       recordGenerationMetric("totalSuccess", 1);
       recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
       return NextResponse.json({
+        ok: true,
         imageDataUrl,
         cached: false,
         latencyMs: Date.now() - startedAt,
+        ...rewriteMeta,
       });
     } finally {
       recordGenerationMetric("inFlightCount", -1);
@@ -287,11 +310,10 @@ export async function POST(req: Request) {
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     recordGenerationMetric("totalErrors", 1);
-    const normalized = normalizeGenerationError(message);
-    const body =
-      normalized.contentBlock
-        ? { error: normalized.error, ...CONTENT_BLOCK_RESPONSE }
-        : { error: normalized.error };
+    const normalized = normalizeOpenAIError(message);
+    const body = normalized.contentBlock
+      ? { ok: false, error: normalized.error, ...OPENAI_BLOCK_RESPONSE }
+      : { ok: false, error: normalized.error };
     return NextResponse.json(body, { status: normalized.status });
   } finally {
     persistMetricsIfDue();

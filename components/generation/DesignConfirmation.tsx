@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
-import { GenerationErrorDisplay } from "@/components/GenerationErrorDisplay";
+import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNotice";
 import { motionTransition } from "@/lib/motion";
 
 const REFINEMENT_CHIPS = [
@@ -32,6 +32,7 @@ export type DesignConfirmationProps = {
   isRefining?: boolean;
   refinementError?: string | null;
   refinementContentBlock?: { title: string; message: string; suggestions: string[] } | null;
+  refinementRewriteApplied?: { originalPreview: string; safePreview: string } | null;
   onRefinementSuggestionClick?: (suggestion: string) => void;
   refinementSuccess?: boolean;
 };
@@ -44,6 +45,7 @@ export function DesignConfirmation({
   isRefining = false,
   refinementError = null,
   refinementContentBlock = null,
+  refinementRewriteApplied = null,
   onRefinementSuggestionClick,
   refinementSuccess = false,
 }: DesignConfirmationProps) {
@@ -189,9 +191,10 @@ export function DesignConfirmation({
                   disabled={isRefining}
                 />
 
-                <GenerationErrorDisplay
+                <GenerationSafetyNotice
+                  hardBlock={refinementContentBlock ? { type: "block", ...refinementContentBlock } : null}
+                  rewriteApplied={refinementRewriteApplied ? { type: "rewrite", ...refinementRewriteApplied } : null}
                   error={refinementContentBlock ? null : refinementError ?? null}
-                  contentBlock={refinementContentBlock ?? null}
                   onSuggestionClick={onRefinementSuggestionClick}
                 />
 

@@ -224,21 +224,26 @@ async function generateViaKeepsyAPI(args: {
 
   const data = await res.json();
   if (!res.ok) {
-    const error = new Error(data?.error || "Failed to generate image") as Error & {
+    const error = new Error(data?.error || data?.userMessage || "Failed to generate image") as Error & {
       status?: number;
       contentBlock?: { title: string; message: string; suggestions: string[] };
     };
     error.status = res.status;
-    if (data?.code === "content_block") {
+    if (data?.suggestions || data?.code) {
       error.contentBlock = {
         title: data.title || "Let's tweak that slightly",
-        message: data.message || data.error,
+        message: data.userMessage || data.message || data.error,
         suggestions: Array.isArray(data.suggestions) ? data.suggestions : [],
       };
     }
     throw error;
   }
-  return data.imageDataUrl as string; // IMPORTANT: this is a data URL
+  return {
+    imageDataUrl: data.imageDataUrl as string,
+    appliedRewrite: Boolean(data.appliedRewrite),
+    originalPreview: data.originalPreview as string | undefined,
+    safePreview: data.safePreview as string | undefined,
+  };
 }
 
 /** Uses YOUR real Stripe session route */
@@ -290,6 +295,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     title: string;
     message: string;
     suggestions: string[];
+  } | null>(null);
+  const [generationRewriteApplied, setGenerationRewriteApplied] = useState<{
+    originalPreview: string;
+    safePreview: string;
   } | null>(null);
   const [refinementSuccess, setRefinementSuccess] = useState(false);
 
@@ -406,8 +415,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
   }, [initialQuery]);
 
-  const handleGenerate = async () => {
-    if (!prompt && !uploadedImage) return;
+  const handleGenerate = async (promptOverride?: string) => {
+    const effectivePrompt = promptOverride ?? prompt;
+    if (!effectivePrompt && !uploadedImage) return;
+    if (promptOverride) setPrompt(promptOverride);
     setIsGenerating(true);
     generateAbortRef.current?.abort();
     const controller = new AbortController();
@@ -416,15 +427,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     setGenerationError(null);
     setIsBusy(true);
     try {
-      const basePrompt = prompt || "Create a polished lifelike keepsake design from this uploaded image.";
+      const basePrompt = effectivePrompt || "Create a polished lifelike keepsake design from this uploaded image.";
       const shapeGuide = "Use a square composition.";
       const promptWithQualityGuide = `${basePrompt}. ${shapeGuide} High-quality production-ready design. Use realistic lighting, depth, and texture.`;
-      let imageDataUrl: string | null = null;
+      let result: { imageDataUrl: string; appliedRewrite?: boolean; originalPreview?: string; safePreview?: string } | null = null;
       const maxAttempts = 2;
 
       for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
         try {
-          imageDataUrl = await generateViaKeepsyAPI({
+          result = await generateViaKeepsyAPI({
             prompt: promptWithQualityGuide,
             sourceImageDataUrl: uploadedImage,
             designShape: "square",
@@ -440,11 +451,16 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         }
       }
 
-      if (!imageDataUrl) throw new Error("Failed to generate image");
-      setGeneratedImage(imageDataUrl);
+      if (!result) throw new Error("Failed to generate image");
+      setGeneratedImage(result.imageDataUrl);
       setLastGenerationPrompt(promptWithQualityGuide);
       setGenerationError(null);
       setGenerationContentBlock(null);
+      setGenerationRewriteApplied(
+        result.appliedRewrite && result.originalPreview && result.safePreview
+          ? { originalPreview: result.originalPreview, safePreview: result.safePreview }
+          : null
+      );
       setRefinementSuccess(false);
       setStep(2);
       setView("home");
@@ -477,13 +493,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     generateAbortRef.current = controller;
     try {
       const instruction = `${lastGenerationPrompt}\n\nRefinement request: ${refinementText.trim()}`;
-      const imageDataUrl = await generateViaKeepsyAPI({
+      const result = await generateViaKeepsyAPI({
         prompt: instruction,
         sourceImageDataUrl: generatedImage,
         designShape: "square",
         signal: controller.signal,
       });
-      setGeneratedImage(imageDataUrl);
+      setGeneratedImage(result.imageDataUrl);
+      setGenerationRewriteApplied(
+        result.appliedRewrite && result.originalPreview && result.safePreview
+          ? { originalPreview: result.originalPreview, safePreview: result.safePreview }
+          : null
+      );
       setLastGenerationPrompt(instruction);
       setRefinementSuccess(true);
       setGenerationError(null);
@@ -765,16 +786,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     setPrompt(v);
                     setGenerationError(null);
                     setGenerationContentBlock(null);
+                    setGenerationRewriteApplied(null);
                   }}
                   setHasUserTypedPrompt={setHasUserTypedPrompt}
                   uploadedImage={uploadedImage}
                   uploadedFileName={uploadedFileName}
                   generationError={generationError}
                   generationContentBlock={generationContentBlock}
+                  generationRewriteApplied={generationRewriteApplied}
                   onSuggestionClick={(s) => {
-                    setPrompt(s);
                     setGenerationError(null);
                     setGenerationContentBlock(null);
+                    handleGenerate(s);
                   }}
                   checkoutStatus={checkoutStatus}
                   isBusy={isBusy}
@@ -802,11 +825,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   isRefining={isGenerating}
                   refinementError={generationError}
                   refinementContentBlock={generationContentBlock}
+                  refinementRewriteApplied={generationRewriteApplied}
                   onRefinementSuggestionClick={(s) => {
                     setPrompt(s);
                     setStep(1);
                     setGenerationError(null);
                     setGenerationContentBlock(null);
+                    void handleGenerate(s);
                   }}
                   refinementSuccess={refinementSuccess}
                 />

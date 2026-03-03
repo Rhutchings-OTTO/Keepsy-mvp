@@ -8,7 +8,7 @@ import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { PromptHelperCollapsible } from "./PromptHelperCollapsible";
 import { IdeasForYou } from "./IdeasForYou";
 import { Carousel } from "@/components/ui/Carousel";
-import { GenerationErrorDisplay } from "@/components/GenerationErrorDisplay";
+import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNotice";
 import { revealUp } from "@/lib/motion";
 import type { Region } from "@/lib/region";
 
@@ -37,6 +37,7 @@ export type CreatePageLayoutLeanProps = {
   uploadedFileName: string | null;
   generationError: string | null;
   generationContentBlock: { title: string; message: string; suggestions: string[] } | null;
+  generationRewriteApplied?: { originalPreview: string; safePreview: string } | null;
   onSuggestionClick?: (suggestion: string) => void;
   checkoutStatus: "success" | "canceled" | null;
   isBusy: boolean;
@@ -57,6 +58,7 @@ export function CreatePageLayoutLean({
   uploadedFileName,
   generationError,
   generationContentBlock,
+  generationRewriteApplied,
   onSuggestionClick,
   checkoutStatus,
   isBusy,
@@ -243,9 +245,10 @@ export function CreatePageLayoutLean({
 
             <p className="text-xs font-semibold text-black/50">Takes ~10–20 seconds. You can edit after.</p>
 
-            <GenerationErrorDisplay
+            <GenerationSafetyNotice
+              hardBlock={generationContentBlock ? { type: "block", ...generationContentBlock } : null}
+              rewriteApplied={generationRewriteApplied ? { type: "rewrite", ...generationRewriteApplied } : null}
               error={generationContentBlock ? null : generationError}
-              contentBlock={generationContentBlock}
               onSuggestionClick={onSuggestionClick}
             />
             <AnimatePresence>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import IridescenceBackground from "@/components/IridescenceBackground";
@@ -63,29 +63,16 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     <div className="relative flex min-h-screen flex-col overflow-hidden text-[#23211F]">
       <IridescenceBackground />
 
-      {/* Header: h-16, logo left, region right */}
-      <header className="sticky top-0 z-20 flex h-16 w-full items-center backdrop-blur-sm">
-        <div className={`flex h-full w-full items-center justify-between ${CONTAINER}`}>
-          <Link href="/" className="flex shrink-0 items-center" aria-label="Keepsy homepage">
-            <Image
-              src="/keepsy-logo-transparent.png"
-              alt="Keepsy"
-              width={280}
-              height={80}
-              className="h-8 w-auto object-contain sm:h-9"
-            />
-          </Link>
-          <button
-            type="button"
-            onClick={() => setIsRegionSelectorOpen(true)}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/15 bg-white/75 text-xs font-semibold text-black/70 transition hover:bg-white sm:h-auto sm:w-auto sm:px-3 sm:py-1.5"
-            aria-label="Change region"
-          >
-            <span className="hidden sm:inline">{activeRegion} · Change</span>
-            <span className="sm:hidden">{activeRegion}</span>
-          </button>
-        </div>
-      </header>
+      {/* Region selector: pinned top-right, separate from logo */}
+      <button
+        type="button"
+        onClick={() => setIsRegionSelectorOpen(true)}
+        className="fixed right-4 top-4 z-40 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/80 backdrop-blur-md text-xs font-semibold text-black/80 transition hover:bg-white sm:right-6 sm:top-6 sm:h-auto sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5"
+        aria-label="Change region"
+      >
+        <span className="hidden sm:inline">{activeRegion} · Change</span>
+        <span className="sm:hidden">{activeRegion}</span>
+      </button>
 
       {/* Hero */}
       <motion.main
@@ -95,7 +82,19 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
       >
         <div className={`relative z-30 w-full ${CONTAINER}`}>
           <Reveal variant="fadeUp" className="text-center">
-            <div ref={heroTextRef} id="hero-safezone" className="hero-safe-zone">
+            <div ref={heroTextRef} id="hero-safezone" className="hero-safe-zone flex flex-col items-center gap-6 sm:gap-8">
+              {/* Logo tablet: white logo in glass morphism container */}
+              <div className="rounded-3xl border border-white/20 bg-white/15 px-8 py-6 shadow-lg shadow-black/10 backdrop-blur-md sm:px-12 sm:py-8">
+                <Link href="/" className="block" aria-label="Keepsy homepage">
+                  <Image
+                    src="/keepsy-logo-transparent.png"
+                    alt="Keepsy"
+                    width={240}
+                    height={80}
+                    className="h-auto w-[170px] brightness-0 invert sm:w-[220px]"
+                  />
+                </Link>
+              </div>
               <p className="mb-3 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
                 AI-powered creativity
               </p>

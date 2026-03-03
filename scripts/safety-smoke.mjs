@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Safety pipeline smoke tests.
- * Verifies patch-based rewrite, intent preservation, and hard-block behavior.
+ * Safety pipeline smoke tests (thin moderation layer).
+ * Verifies: safe prompts pass through, copyrighted characters blocked, moderation blocks disallowed content.
  * Usage: BASE_URL=http://localhost:3000 node scripts/safety-smoke.mjs
  */
 const BASE = process.env.BASE_URL || "http://localhost:3000";
@@ -23,9 +23,28 @@ function hasAll(str, words) {
 }
 
 async function main() {
-  console.log("Safety smoke tests against", BASE);
+  console.log("Safety smoke tests (thin moderation) against", BASE);
 
-  await test("puppy top hat gatsby: returns ok or soft_warning with intent preserved", async () => {
+  await test("cartoon puppy top hat: passes through unchanged or with minimal fragment patch", async () => {
+    const r = await fetch(`${BASE}/api/generate-image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://keepsy.store",
+        "x-visitor-id": "smoke-test",
+      },
+      body: JSON.stringify({
+        prompt: "cartoon puppy wearing a top hat saying congratulations",
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok && data.code) {
+      throw new Error(`Expected pass, got ${data.code}`);
+    }
+    if (!data.ok) throw new Error("Expected ok: true");
+  });
+
+  await test("puppy with gatsby vibe: fragment patch only, intent preserved", async () => {
     const r = await fetch(`${BASE}/api/generate-image`, {
       method: "POST",
       headers: {
@@ -38,30 +57,54 @@ async function main() {
       }),
     });
     const data = await r.json();
-    if (r.ok && data.ok) {
-      const prompt = data.patchedPrompt || data.promptUsed || "";
-      if (!hasAll(prompt, ["puppy", "top hat", "congratulations", "cartoon"])) {
-        throw new Error(`Patched prompt missing intent: ${prompt.slice(0, 150)}...`);
-      }
-      if (!hasAll(prompt, ["1920s"]) && !hasAll(prompt, ["art-deco"]) && !hasAll(prompt, ["vibe"])) {
-        throw new Error(`Expected 1920s/vibe replacement: ${prompt.slice(0, 150)}...`);
-      }
-      if (data.appliedPatches && data.appliedPatches.length > 0) {
-        return;
-      }
+    if (!r.ok && data.code) throw new Error(`Expected pass, got ${data.code}`);
+    if (!data.ok) throw new Error("Expected ok: true");
+    const promptUsed = data.patchedPrompt || data.promptUsed || "";
+    if (!hasAll(promptUsed, ["puppy", "top hat", "congratulations", "cartoon"])) {
+      throw new Error(`Prompt missing intent: ${promptUsed.slice(0, 120)}...`);
     }
-    if (!r.ok && data.code === "soft_warning" && data.suggestedPrompt) {
-      const suggested = data.suggestedPrompt;
-      if (!hasAll(suggested, ["puppy", "top hat", "congratulations", "cartoon"])) {
-        throw new Error(`Suggested prompt missing intent: ${suggested.slice(0, 150)}...`);
-      }
-      if (data.appliedPatches && data.appliedPatches.length > 0) {
-        return;
-      }
-    }
-    if (r.ok && data.ok) return;
-    if (!r.ok && data.code === "soft_warning") return;
-    throw new Error(`Unexpected response: ok=${data.ok}, code=${data.code}`);
+  });
+
+  await test("two friendly superheroes: passes through unchanged", async () => {
+    const r = await fetch(`${BASE}/api/generate-image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://keepsy.store",
+        "x-visitor-id": "smoke-test",
+      },
+      body: JSON.stringify({ prompt: "two friendly superheroes celebrating a birthday" }),
+    });
+    const data = await r.json();
+    if (!r.ok && data.code) throw new Error(`Expected pass, got ${data.code}`);
+  });
+
+  await test("romantic 1920s jazz party: passes through unchanged", async () => {
+    const r = await fetch(`${BASE}/api/generate-image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://keepsy.store",
+        "x-visitor-id": "smoke-test",
+      },
+      body: JSON.stringify({ prompt: "romantic 1920s jazz party scene" }),
+    });
+    const data = await r.json();
+    if (!r.ok && data.code) throw new Error(`Expected pass, got ${data.code}`);
+  });
+
+  await test("family Christmas watercolor: passes through unchanged", async () => {
+    const r = await fetch(`${BASE}/api/generate-image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://keepsy.store",
+        "x-visitor-id": "smoke-test",
+      },
+      body: JSON.stringify({ prompt: "family Christmas watercolor illustration" }),
+    });
+    const data = await r.json();
+    if (!r.ok && data.code) throw new Error(`Expected pass, got ${data.code}`);
   });
 
   await test("Spider-Man: hard-block with copyrighted_character", async () => {
@@ -100,24 +143,7 @@ async function main() {
     }
   });
 
-  await test("in the style of Disney: hard-block", async () => {
-    const r = await fetch(`${BASE}/api/generate-image`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Origin: "https://keepsy.store",
-        "x-visitor-id": "smoke-test",
-      },
-      body: JSON.stringify({ prompt: "a cute dog in the style of Disney" }),
-    });
-    const data = await r.json();
-    if (r.ok) throw new Error("Expected 400 for Disney style");
-    if (data.code !== "style_of_brand") {
-      throw new Error(`Expected code style_of_brand, got ${data.code}`);
-    }
-  });
-
-  await test("generic superheroes: allowed or minimal rewrite", async () => {
+  await test("generic superheroes: allowed", async () => {
     const r = await fetch(`${BASE}/api/generate-image`, {
       method: "POST",
       headers: {

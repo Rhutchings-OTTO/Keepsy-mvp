@@ -32,6 +32,29 @@ export function logSafetyEvent(
   }
 }
 
+/** Thin moderation layer logging. Internal only, no full prompts. */
+export type ThinModerationPayload = {
+  event: "hard_block" | "fragment_patch";
+  reason: string;
+  clientId?: string;
+  categories?: string[];
+};
+
+export function logThinModeration(payload: ThinModerationPayload): void {
+  const entry = {
+    ts: new Date().toISOString(),
+    ...payload,
+    clientHash: payload.clientId ? hashClientId(payload.clientId) : undefined,
+  };
+  delete (entry as Record<string, unknown>).clientId;
+  const msg = `[safety:thin] ${JSON.stringify(entry)}`;
+  if (process.env.NODE_ENV === "production") {
+    console.warn(msg);
+  } else {
+    console.info(msg);
+  }
+}
+
 function hashClientId(id: string): string {
   if (typeof id !== "string" || id.length < 4) return "***";
   const lastOctet = id.split(".").pop();

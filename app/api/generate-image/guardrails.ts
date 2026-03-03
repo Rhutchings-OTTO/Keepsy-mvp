@@ -98,13 +98,7 @@ export async function enforceUsageGuards(req: Request): Promise<GuardResult> {
 export function sanitizePrompt(input: string): { ok: true; prompt: string } | { ok: false; error: string } {
   const trimmed = input.trim().slice(0, 600);
   if (!trimmed) return { ok: false, error: "Prompt cannot be empty." };
-
-  const safePrompt =
-    "Create a high-quality, gift-ready artwork for merchandise printing. " +
-    `${trimmed}. ` +
-    "Keep the result print-ready and visually clear.";
-
-  return { ok: true, prompt: safePrompt };
+  return { ok: true, prompt: trimmed };
 }
 
 export async function fetchWithBackoff(

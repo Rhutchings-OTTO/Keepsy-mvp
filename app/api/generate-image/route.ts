@@ -7,7 +7,7 @@ import {
   getClientKey,
   sanitizePrompt,
 } from "./guardrails";
-import { processPromptPipeline } from "@/lib/safety/promptRewrite";
+import { moderatePrompt } from "@/lib/safety/thinModeration";
 import {
   getGenerationMetrics,
   persistMetricsIfDue,
@@ -191,24 +191,22 @@ export async function POST(req: Request) {
     }
 
     const clientId = getClientKey(req);
-    const pipeline = processPromptPipeline(prompt, clientId);
+    const moderation = await moderatePrompt(prompt, clientId);
 
-    if (!pipeline.ok) {
-      const blockPayload: Record<string, unknown> = {
-        ok: false,
-        code: pipeline.code,
-        userMessage: pipeline.userMessage,
-        suggestions: pipeline.suggestions,
-        title: BLOCK_TITLE,
-      };
-      if (pipeline.code === "soft_warning" && "suggestedPrompt" in pipeline) {
-        blockPayload.suggestedPrompt = pipeline.suggestedPrompt;
-        blockPayload.appliedPatches = pipeline.appliedPatches ?? [];
-      }
-      return NextResponse.json(blockPayload, { status: 400 });
+    if (!moderation.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          code: moderation.code,
+          userMessage: moderation.userMessage,
+          suggestions: moderation.suggestions,
+          title: BLOCK_TITLE,
+        },
+        { status: 400 }
+      );
     }
 
-    const promptCheck = sanitizePrompt(pipeline.prompt);
+    const promptCheck = sanitizePrompt(moderation.prompt);
     if (!promptCheck.ok) {
       return NextResponse.json({ error: promptCheck.error }, { status: 400 });
     }
@@ -216,15 +214,9 @@ export async function POST(req: Request) {
     const startedAt = Date.now();
     const promptKey = getPromptKey(`${promptCheck.prompt}::${generationSize}`);
     const cached = readCachedGeneration(promptKey);
-    const rewriteMeta =
-      pipeline.ok && pipeline.appliedRewrite
-        ? {
-            appliedRewrite: true,
-            appliedPatches: pipeline.appliedPatches ?? [],
-            patchedPrompt: pipeline.patchedPrompt ?? pipeline.prompt,
-            originalPreview: pipeline.originalPreview,
-            safePreview: pipeline.safePreview ?? pipeline.prompt.slice(0, 80) + (pipeline.prompt.length > 80 ? "..." : ""),
-          }
+    const fragmentPatchMeta =
+      moderation.ok && moderation.fragmentPatchApplied
+        ? { appliedRewrite: true, appliedPatches: [], patchedPrompt: moderation.prompt }
         : undefined;
 
     if (cached) {
@@ -236,7 +228,7 @@ export async function POST(req: Request) {
         imageDataUrl: cached,
         cached: true,
         latencyMs: Date.now() - startedAt,
-        ...rewriteMeta,
+        ...fragmentPatchMeta,
       });
     }
     recordGenerationMetric("cacheMisses", 1);
@@ -252,7 +244,7 @@ export async function POST(req: Request) {
         imageDataUrl,
         deduped: true,
         latencyMs: Date.now() - startedAt,
-        ...rewriteMeta,
+        ...fragmentPatchMeta,
       });
     }
 
@@ -277,7 +269,7 @@ export async function POST(req: Request) {
           imageDataUrl,
           edited: true,
           latencyMs: Date.now() - startedAt,
-          ...rewriteMeta,
+          ...fragmentPatchMeta,
         });
       } finally {
         recordGenerationMetric("inFlightCount", -1);
@@ -305,7 +297,7 @@ export async function POST(req: Request) {
         imageDataUrl,
         cached: false,
         latencyMs: Date.now() - startedAt,
-        ...rewriteMeta,
+        ...fragmentPatchMeta,
       });
     } finally {
       recordGenerationMetric("inFlightCount", -1);

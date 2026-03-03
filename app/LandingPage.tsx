@@ -1,17 +1,24 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import IridescenceBackground from "@/components/IridescenceBackground";
 import RegionSelector from "@/components/RegionSelector";
-import { HeroFloatingCards } from "@/components/HeroFloatingCards";
-import { useFloaterCapacity } from "@/components/hero/useFloaterCapacity";
-import { FLOATER_POOL_SIZE } from "@/components/hero/floaterPool";
+import { HeroFloatersSimple } from "@/components/hero/HeroFloatersSimple";
 import { Reveal } from "@/components/motion/Reveal";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
+
+const CONTAINER = "w-full max-w-[420px] sm:max-w-[720px] lg:max-w-[960px] mx-auto px-5";
+
+const CREATOR_TESTIMONIALS = [
+  { name: "Sarah J.", quote: "The AI generated exactly what I was looking for! The t-shirt quality is superb.", initials: "SJ" },
+  { name: "Marcus L.", quote: "Uploaded a photo of my dog and the AI turned it into a masterpiece on a mug.", initials: "ML" },
+  { name: "Elena R.", quote: "Fast shipping and beautiful packaging. Will definitely order again.", initials: "ER" },
+];
 
 type LandingPageProps = {
   initialRegion?: Region | null;
@@ -19,8 +26,6 @@ type LandingPageProps = {
 
 export default function LandingPage({ initialRegion = null }: LandingPageProps) {
   const router = useRouter();
-  const [cursorOffset, setCursorOffset] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
   const [region, setCurrentRegion] = useState<Region | null>(() => initialRegion ?? getRegion());
   const [isRegionSelectorOpen, setIsRegionSelectorOpen] = useState<boolean>(() => {
     const resolvedRegion = initialRegion ?? getRegion();
@@ -34,15 +39,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   });
   const heroTextRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
-  const floaterLayout = useFloaterCapacity(mainRef, heroTextRef, FLOATER_POOL_SIZE);
-  const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
   const { scrollY } = useScroll();
   const reduceMotion = useReducedMotion();
   const heroY = useTransform(scrollY, [0, 400], [0, -28]);
-  const cardsY = useTransform(scrollY, [0, 400], [0, -42]);
-  const logoTabletY = useTransform(scrollY, [0, 200], [0, -6]);
   const activeRegion = region ?? "UK";
-  // Do not add region-specific sections here; region content is only rendered on the generation page.
 
   const navigateWithRipple = (event: React.MouseEvent<HTMLButtonElement>, to: string) => {
     const x = event.clientX;
@@ -60,101 +60,160 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   };
 
   return (
-    <div
-      className="relative flex min-h-screen flex-col overflow-hidden text-[#23211F]"
-      onMouseMove={(event) => {
-        const { innerWidth, innerHeight } = window;
-        const x = ((event.clientX / innerWidth) * 100 - 50) * pointerScale;
-        const y = ((event.clientY / innerHeight) * 100 - 50) * pointerScale;
-        setCursorOffset({ x, y });
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative flex min-h-screen flex-col overflow-hidden text-[#23211F]">
       <IridescenceBackground />
 
-      <header className="relative z-20 flex w-full items-center justify-between px-4 py-6 sm:px-6 sm:py-8">
-        <div className="w-24 shrink-0 sm:w-40" />
-        <motion.div
-          className="logo-glass-tablet relative z-20 flex min-w-0 max-w-fit shrink-0 items-center justify-center rounded-[24px] px-5 py-3 sm:px-6 sm:py-4"
-          style={FF.cinematicUX && !reduceMotion ? { y: logoTabletY } : undefined}
-          whileHover={!reduceMotion ? { scale: 1.02 } : undefined}
-          transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        >
-          <Image
-            src="/keepsy-logo-transparent.png"
-            alt="Keepsy"
-            width={760}
-            height={220}
-            className="h-44 w-auto object-contain sm:h-48"
-          />
-        </motion.div>
-        <button
-          type="button"
-          onClick={() => setIsRegionSelectorOpen(true)}
-          className="shrink-0 rounded-full border border-black/15 bg-white/75 px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-white"
-        >
-          {activeRegion} · Change region
-        </button>
+      {/* Header: h-16, logo left, region right */}
+      <header className="sticky top-0 z-20 flex h-16 w-full items-center backdrop-blur-sm">
+        <div className={`flex h-full w-full items-center justify-between ${CONTAINER}`}>
+          <Link href="/" className="flex shrink-0 items-center" aria-label="Keepsy homepage">
+            <Image
+              src="/keepsy-logo-transparent.png"
+              alt="Keepsy"
+              width={280}
+              height={80}
+              className="h-8 w-auto object-contain sm:h-9"
+            />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setIsRegionSelectorOpen(true)}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/15 bg-white/75 text-xs font-semibold text-black/70 transition hover:bg-white sm:h-auto sm:w-auto sm:px-3 sm:py-1.5"
+            aria-label="Change region"
+          >
+            <span className="hidden sm:inline">{activeRegion} · Change</span>
+            <span className="sm:hidden">{activeRegion}</span>
+          </button>
+        </div>
       </header>
 
+      {/* Hero */}
       <motion.main
         ref={mainRef}
         style={FF.cinematicUX ? { y: heroY } : undefined}
-        className="relative z-10 mx-auto flex min-h-0 flex-1 w-full max-w-7xl flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8"
+        className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center py-12 sm:py-16"
       >
-        <Reveal variant="fadeUp" className="relative z-30 max-w-5xl text-center">
-          <div ref={heroTextRef} className="hero-safe-zone">
-          <p className="mb-3 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600 sm:mb-4">
-            AI-powered creativity
-          </p>
-          <h1 className="text-[clamp(2rem,6vw,4.5rem)] font-black leading-[1.05] sm:text-[clamp(2.5rem,7vw,5rem)] md:text-[clamp(3rem,8vw,5.5rem)]">
-            Imagine it. Generate it.
-            <br />
-            <motion.span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)",
-                backgroundSize: "220% auto",
-              }}
-              animate={{
-                backgroundSize: ["220% auto", "240% auto", "220% auto"],
-                backgroundPosition: ["0% center", "100% center", "0% center"],
-              }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            >
-              Cherish it.
-            </motion.span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-3xl text-[clamp(0.95rem,2vw,1.25rem)] font-medium leading-relaxed text-black/60 sm:mt-5 md:mt-6">
-            Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
-          </p>
-          <div className={`mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:mt-8 ${floaterLayout.compactMode ? "sm:mt-6" : "md:mt-10"}`}>
-            <button
-              onClick={(event) => navigateWithRipple(event, "/create")}
-              className="rounded-2xl bg-black px-6 py-3 text-base font-black text-white shadow-lg transition hover:bg-black/90"
-            >
-              Start creating
-            </button>
-            <button
-              onClick={() => router.push("/gift-ideas")}
-              className="rounded-2xl border border-black/15 bg-white/80 px-6 py-3 text-base font-bold text-black transition hover:bg-white"
-            >
-              Browse gift ideas
-            </button>
-          </div>
-          </div>
-        </Reveal>
+        <div className={`relative z-30 w-full ${CONTAINER}`}>
+          <Reveal variant="fadeUp" className="text-center">
+            <div ref={heroTextRef} id="hero-safezone" className="hero-safe-zone">
+              <p className="mb-3 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
+                AI-powered creativity
+              </p>
+              <h1 className="text-[clamp(1.75rem,5vw,3.5rem)] font-black leading-[1.08] sm:text-[clamp(2.25rem,6vw,4.5rem)]">
+                Imagine it. Generate it.
+                <br />
+                <motion.span
+                  className="bg-clip-text text-transparent"
+                  style={{
+                    backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)",
+                    backgroundSize: "220% auto",
+                  }}
+                  animate={
+                    !reduceMotion
+                      ? {
+                          backgroundSize: ["220% auto", "240% auto", "220% auto"],
+                          backgroundPosition: ["0% center", "100% center", "0% center"],
+                        }
+                      : undefined
+                  }
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  Cherish it.
+                </motion.span>
+              </h1>
+              <p className="mx-auto mt-4 max-w-md text-[15px] font-medium leading-relaxed text-black/60 sm:mt-5 sm:text-base">
+                Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
+              </p>
+              <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:justify-center">
+                <button
+                  onClick={(event) => navigateWithRipple(event, "/create")}
+                  className="h-12 w-full rounded-full bg-black px-6 text-base font-black text-white shadow-lg transition hover:bg-black/90 sm:w-auto"
+                >
+                  Start creating
+                </button>
+                <button
+                  onClick={() => router.push("/gift-ideas")}
+                  className="h-12 w-full rounded-full border border-black/15 bg-white/80 px-6 text-base font-bold text-black transition hover:bg-white sm:w-auto"
+                >
+                  Browse gift ideas
+                </button>
+              </div>
+            </div>
+          </Reveal>
+        </div>
 
-        <HeroFloatingCards
-          layout={floaterLayout}
-          cursorOffset={cursorOffset}
-          cardsY={cardsY}
-          reduceMotion={reduceMotion ?? false}
-          heroRef={mainRef}
-          safeZoneRef={heroTextRef}
-        />
+        <HeroFloatersSimple heroRef={mainRef} safeZoneRef={heroTextRef} />
       </motion.main>
+
+      {/* Testimonials: scroll-snap, no arrows on mobile */}
+      <section id="reviews" className="border-t border-black/5 bg-white/30 py-12 sm:py-16">
+        <div className={CONTAINER}>
+          <h2 className="text-center text-xl font-black sm:text-2xl">What our creators say</h2>
+          <div
+            className="mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            role="region"
+            aria-label="Customer testimonials"
+          >
+            {CREATOR_TESTIMONIALS.map((t) => (
+              <article
+                key={t.name}
+                className="min-w-[85%] flex-shrink-0 snap-center rounded-2xl border border-black/10 bg-white/90 p-5 shadow-sm sm:min-w-[45%] lg:min-w-[30%]"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DB9E8]/80 to-[#F8C8DC]/80 text-sm font-black text-white">
+                    {t.initials}
+                  </div>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-500">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="font-bold text-black">{t.name}</p>
+                </div>
+                <p className="mt-3 text-[15px] leading-relaxed text-black/70">&quot;{t.quote}&quot;</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer: 2-col grid */}
+      <footer className="border-t border-black/10 bg-white/60 py-12 sm:py-16">
+        <div className={CONTAINER}>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:gap-x-8">
+            <div className="col-span-2 sm:col-span-1">
+              <p className="font-bold text-black">Keepsy</p>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-500">Turn your favorite memories into meaningful gifts in minutes.</p>
+            </div>
+            <div className="space-y-3">
+              <p className="font-semibold text-black">Company</p>
+              <div className="flex flex-col gap-3">
+                <Link href="/terms" className="text-sm text-neutral-500 hover:text-black">Terms</Link>
+                <Link href="/privacy" className="text-sm text-neutral-500 hover:text-black">Privacy</Link>
+                <Link href="/refunds" className="text-sm text-neutral-500 hover:text-black">Refunds</Link>
+                <Link href="/shipping" className="text-sm text-neutral-500 hover:text-black">Shipping</Link>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <p className="font-semibold text-black">Explore</p>
+              <div className="flex flex-col gap-3">
+                <Link href="/gift-ideas" className="text-sm text-neutral-500 hover:text-black">Gift ideas</Link>
+                <Link href="/create" className="text-sm text-neutral-500 hover:text-black">Create a gift</Link>
+                <Link href="/account" className="text-sm text-neutral-500 hover:text-black">Account</Link>
+              </div>
+            </div>
+          </div>
+          <div className="mt-10 space-y-3 border-t border-black/5 pt-8">
+            <p className="font-semibold text-black">Support</p>
+            <a href="mailto:support@keepsy.store" className="block text-sm text-neutral-500 hover:text-black">support@keepsy.store</a>
+            <p className="text-xs text-neutral-500">UK/US support available Monday–Sunday.</p>
+          </div>
+          <p className="mt-8 text-xs text-neutral-400">Powered by OpenAI & Stripe</p>
+        </div>
+      </footer>
 
       {ripple.active && (
         <motion.div

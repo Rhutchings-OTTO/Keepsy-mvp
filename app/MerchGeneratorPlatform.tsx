@@ -403,7 +403,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     try {
       const basePrompt = prompt || "Create a polished lifelike keepsake design from this uploaded image.";
       const shapeGuide = "Use a square composition.";
-      const promptWithQualityGuide = `${basePrompt}. ${shapeGuide} High-quality production-ready design image. Avoid words, letters, logos, and typographic word-art unless explicitly requested. Use realistic lighting, depth, and texture.`;
+      const promptWithQualityGuide = `${basePrompt}. ${shapeGuide} High-quality production-ready design. Use realistic lighting, depth, and texture.`;
       let imageDataUrl: string | null = null;
       const maxAttempts = 2;
 

@@ -102,7 +102,7 @@ export function sanitizePrompt(input: string): { ok: true; prompt: string } | { 
   const safePrompt =
     "Create a high-quality, gift-ready artwork for merchandise printing. " +
     `${trimmed}. ` +
-    "Keep the result print-ready, visually clear, and compliant with OpenAI safety policies. Avoid unreadable text artifacts and watermarks unless explicitly requested.";
+    "Keep the result print-ready and visually clear.";
 
   return { ok: true, prompt: safePrompt };
 }

@@ -47,7 +47,8 @@ function normalizeGenerationError(message: string): { status: number; error: str
   if (lower.includes("safety system") || lower.includes("content policy")) {
     return {
       status: 400,
-      error: "This image request was blocked by safety checks. Try a different prompt or source image.",
+      error:
+        "This image was blocked by content checks. Try rephrasing (e.g. describe the scene or mood rather than specific characters) or use a different prompt.",
     };
   }
   return { status: 500, error: message };

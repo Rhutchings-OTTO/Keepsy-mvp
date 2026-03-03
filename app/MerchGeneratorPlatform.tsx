@@ -271,32 +271,52 @@ async function generateViaKeepsyAPI(args: {
   };
 }
 
-/** Uses YOUR real Stripe session route */
+/** Uses YOUR real Stripe session route. Payload kept minimal (no full base64) to avoid body size limits. */
 async function checkoutViaKeepsyAPI(args: {
   cart: CartItem[];
   imageDataUrl: string;
-}) {
+}): Promise<string> {
+  const payload = {
+    currency: "gbp" as const,
+    imageDataUrl: args.imageDataUrl ? "1" : undefined,
+    cart: args.cart.map((item) => ({
+      productId: item.productId,
+      name: item.name,
+      color: item.color,
+      size: item.size,
+      imageUrl: item.imageUrl ? "1" : undefined,
+      unitPrice: item.unitPrice,
+      quantity: item.quantity,
+    })),
+  };
+
   const res = await fetch("/api/create-checkout-session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      currency: "gbp",
-      imageDataUrl: args.imageDataUrl,
-      cart: args.cart.map((item) => ({
-        productId: item.productId,
-        name: item.name,
-        color: item.color,
-        size: item.size,
-        imageUrl: item.imageUrl,
-        unitPrice: item.unitPrice,
-        quantity: item.quantity,
-      })),
-    }),
+    body: JSON.stringify(payload),
   });
 
-  const data = await res.json();
-  if (!res.ok) throw new Error(data?.error || "Failed to create checkout session");
-  return data.url as string;
+  const text = await res.text();
+  let data: { url?: string; error?: string; message?: string };
+  try {
+    data = JSON.parse(text);
+  } catch {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[checkout] Non-JSON response:", text.slice(0, 200));
+    }
+    throw new Error("Checkout couldn't start. Please try again.");
+  }
+
+  if (!res.ok) {
+    const msg = data?.message || data?.error || "Failed to create checkout session";
+    throw new Error(typeof msg === "string" ? msg : "Checkout couldn't start. Please try again.");
+  }
+
+  const url = data?.url;
+  if (!url || typeof url !== "string") {
+    throw new Error("Checkout couldn't start. Please try again.");
+  }
+  return url;
 }
 
 export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?: InitialCreateQuery }) {

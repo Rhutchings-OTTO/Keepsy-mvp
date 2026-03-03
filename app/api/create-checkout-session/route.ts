@@ -1,3 +1,12 @@
+/**
+ * Stripe checkout session creation.
+ * ALWAYS returns JSON (success or error).
+ *
+ * Required Vercel env vars:
+ * - STRIPE_SECRET_KEY
+ * - NEXT_PUBLIC_SITE_URL or SITE_URL (for redirects)
+ * Optional: Supabase for order persistence
+ */
 import Stripe from "stripe";
 import { createHash } from "crypto";
 import { z } from "zod";
@@ -7,12 +16,16 @@ import type { CatalogProduct } from "@/lib/commerce/catalog";
 import { guardOrigin, guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
 import { parseAndValidate, schemas } from "@/lib/http/validate";
 
+export const dynamic = "force-dynamic";
+
+const JSON_HEADERS = { "Content-Type": "application/json" };
+
 const lineItemSchema = z.object({
   productId: z.string().max(64).regex(/^[a-zA-Z0-9_-]+$/),
   name: z.string().max(200),
   color: z.string().max(64).optional(),
   size: z.string().max(16).optional(),
-  imageUrl: z.string().max(500_000).optional(),
+  imageUrl: z.string().max(256).optional(),
   unitPrice: z.number().positive(),
   quantity: schemas.quantity,
 });
@@ -21,7 +34,7 @@ const checkoutSchema = z
   .object({
     cart: z.array(lineItemSchema).min(1),
     currency: z.literal("gbp").optional(),
-    imageDataUrl: z.string().max(500_000).optional(),
+    imageDataUrl: z.string().max(256).optional(),
   })
   .strict();
 
@@ -37,6 +50,12 @@ function getBaseUrl() {
 }
 
 export async function POST(req: Request) {
+  if (req.method !== "POST") {
+    return new Response(
+      JSON.stringify({ error: "Method not allowed. Use POST." }),
+      { status: 405, headers: JSON_HEADERS }
+    );
+  }
   const requestId = getRequestId(req);
   const originDeny = guardOrigin(req, "/api/create-checkout-session", requestId);
   if (originDeny) return originDeny;
@@ -46,20 +65,24 @@ export async function POST(req: Request) {
   try {
     const secretKey = process.env.STRIPE_SECRET_KEY;
     if (!secretKey) {
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[checkout] STRIPE_SECRET_KEY is missing. Set in Vercel env vars.");
+      }
       return new Response(
         JSON.stringify({
-          error:
-            "STRIPE_SECRET_KEY is missing. Add it in Vercel → Project → Settings → Environment Variables, then redeploy.",
+          error: "CHECKOUT_FAILED",
+          message: "Checkout is not configured. Please try again later.",
         }),
-        { status: 500 }
+        { status: 500, headers: JSON_HEADERS }
       );
     }
 
-    const parsed = await parseAndValidate(req, checkoutSchema);
+    const CHECKOUT_MAX_BYTES = 64 * 1024;
+    const parsed = await parseAndValidate(req, checkoutSchema, CHECKOUT_MAX_BYTES);
     if ("error" in parsed) {
       return new Response(JSON.stringify(parsed.error), {
         status: parsed.status,
-        headers: { "Content-Type": "application/json" },
+        headers: JSON_HEADERS,
       });
     }
     const body = parsed.data;
@@ -83,7 +106,10 @@ export async function POST(req: Request) {
     });
 
     if (cartSummary.some((item) => item === null)) {
-      return new Response(JSON.stringify({ error: "Checkout includes unknown or invalid product." }), { status: 400 });
+      return new Response(JSON.stringify({ error: "Checkout includes unknown or invalid product." }), {
+        status: 400,
+        headers: JSON_HEADERS,
+      });
     }
 
     type CartLine = CatalogProduct & { quantity: number; color?: string; size?: string; imageUrl?: string };
@@ -91,10 +117,27 @@ export async function POST(req: Request) {
     const totalGBP = safeCartSummary.reduce((sum, item) => sum + item.priceGBP * item.quantity, 0);
 
     if (totalGBP <= 0) {
-      return new Response(JSON.stringify({ error: "Invalid cart total." }), { status: 400 });
+      return new Response(JSON.stringify({ error: "Invalid cart total." }), {
+        status: 400,
+        headers: JSON_HEADERS,
+      });
     }
 
-    const baseUrl = getBaseUrl();
+    let baseUrl: string;
+    try {
+      baseUrl = getBaseUrl();
+    } catch (e) {
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[checkout] SITE_URL missing:", (e as Error).message);
+      }
+      return new Response(
+        JSON.stringify({
+          error: "CHECKOUT_FAILED",
+          message: "Checkout redirect URL is not configured. Please try again later.",
+        }),
+        { status: 500, headers: JSON_HEADERS }
+      );
+    }
     const primaryProductName = safeCartSummary[0]?.name || "Keepsy order";
     const orderRef = `order_${globalThis.crypto.randomUUID()}`;
     const imageDataUrl = body.imageDataUrl ?? safeCartSummary[0]?.imageUrl ?? "";
@@ -125,6 +168,7 @@ export async function POST(req: Request) {
       if (orderInsertError) {
         return new Response(JSON.stringify({ error: "Failed to create pending order record." }), {
           status: 500,
+          headers: JSON_HEADERS,
         });
       }
 
@@ -141,6 +185,7 @@ export async function POST(req: Request) {
       if (itemInsertError) {
         return new Response(JSON.stringify({ error: "Failed to persist pending order items." }), {
           status: 500,
+          headers: JSON_HEADERS,
         });
       }
     }
@@ -190,7 +235,15 @@ export async function POST(req: Request) {
       headers,
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Checkout error";
-    return new Response(JSON.stringify({ error: message }), { status: 500 });
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[checkout] Error:", err instanceof Error ? err.message : err);
+    }
+    return new Response(
+      JSON.stringify({
+        error: "CHECKOUT_FAILED",
+        message: "Checkout couldn't start. Please try again.",
+      }),
+      { status: 500, headers: JSON_HEADERS }
+    );
   }
 }

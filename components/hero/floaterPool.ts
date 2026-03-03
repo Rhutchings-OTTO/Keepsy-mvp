@@ -26,6 +26,9 @@ export const FLOATER_POOL: FloaterDef[] = [
   { id: "birthday-scene", label: "Birthday Scene", product: "Design", image: "/occasion-tiles/birthday-confetti.png" },
   { id: "pet-scene", label: "Pet Portrait Scene", product: "Design", image: "/occasion-tiles/pet-gifts-portrait.png" },
   { id: "mothers-day-scene", label: "Mother's Day Floral", product: "Design", image: "/occasion-tiles/mothers-day-floral.png" },
+  { id: "preview-tee-blue", label: "Tee Blue Preview", product: "T-Shirt", image: "/mockup-previews/preview-tee-blue.png" },
+  { id: "preview-hoodie-black", label: "Hoodie Black Preview", product: "Hoodie", image: "/mockup-previews/preview-hoodie-black.png" },
+  { id: "preview-plain-card", label: "Card Preview", product: "Card", image: "/mockup-previews/preview-plain-card.png" },
 ];
 
 export const FLOATER_POOL_SIZE = FLOATER_POOL.length;

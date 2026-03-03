@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const PAD = 20;
-const SAFE_MARGIN = 40;
-const FLOATER_GAP = 18;
-const JITTER = 14;
-const SCALE_MIN = 0.75;
+const PAD = 16;
+const SAFE_MARGIN = 28;
+const FLOATER_GAP = 14;
+const JITTER = 12;
+const SCALE_MIN = 0.55;
 const CARD_ASPECT = 170 / 144;
 
 /** Base sizes: desktop 180–220px, mobile 120–160px */
@@ -123,8 +123,6 @@ export function useFloaterCapacity(
         scale = Math.max(SCALE_MIN, scale * 0.92);
       }
 
-      const floaterW = baseW * scale;
-      const floaterH = floaterW / CARD_ASPECT;
       const margin = FLOATER_GAP;
       const safeZone = {
         left: safeLeft - SAFE_MARGIN,
@@ -133,10 +131,37 @@ export function useFloaterCapacity(
         h: safeBottom - safeTop + SAFE_MARGIN * 2,
       };
 
-      const leftLaneXMin = PAD;
-      const leftLaneXMax = safeZone.left - margin - floaterW;
+      let floaterW = baseW * scale;
+      let floaterH = floaterW / CARD_ASPECT;
+
+      let leftLaneXMax = safeZone.left - margin - floaterW;
       const rightLaneXMin = safeZone.left + safeZone.w + margin;
-      const rightLaneXMax = heroW - PAD - floaterW;
+      const leftLaneXMin = PAD;
+      let rightLaneXMax = heroW - PAD - floaterW;
+
+      let leftLaneWidth = Math.max(0, leftLaneXMax - leftLaneXMin);
+      let rightLaneWidth = Math.max(0, rightLaneXMax - rightLaneXMin);
+
+      if (leftLaneWidth > 0 && leftLaneWidth < floaterW) {
+        const neededScale = (leftLaneWidth - margin) / baseW;
+        scale = Math.min(scale, Math.max(SCALE_MIN, neededScale));
+        floaterW = baseW * scale;
+        floaterH = floaterW / CARD_ASPECT;
+        leftLaneXMax = safeZone.left - margin - floaterW;
+        rightLaneXMax = heroW - PAD - floaterW;
+        leftLaneWidth = Math.max(0, leftLaneXMax - leftLaneXMin);
+        rightLaneWidth = Math.max(0, rightLaneXMax - rightLaneXMin);
+      }
+      if (rightLaneWidth > 0 && rightLaneWidth < floaterW) {
+        const neededScale = (rightLaneWidth - margin) / baseW;
+        scale = Math.min(scale, Math.max(SCALE_MIN, neededScale));
+        floaterW = baseW * scale;
+        floaterH = floaterW / CARD_ASPECT;
+        leftLaneXMax = safeZone.left - margin - floaterW;
+        rightLaneXMax = heroW - PAD - floaterW;
+        leftLaneWidth = Math.max(0, leftLaneXMax - leftLaneXMin);
+        rightLaneWidth = Math.max(0, rightLaneXMax - rightLaneXMin);
+      }
 
       const bottomZoneYStart = safeZone.top + safeZone.h + margin;
       const bottomZoneH = Math.max(0, heroH - PAD - bottomZoneYStart);
@@ -147,13 +172,21 @@ export function useFloaterCapacity(
       const centerX = (safeLeft + safeRight) / 2;
       const centerY = (safeTop + safeBottom) / 2;
 
-      const leftLaneWidth = leftLaneXMax - leftLaneXMin;
-      const rightLaneWidth = rightLaneXMax - rightLaneXMin;
-      const slotH = floaterH + margin * 0.85;
-      const leftCols = leftLaneWidth > floaterW * 2 + margin ? 2 : 1;
-      const rightCols = rightLaneWidth > floaterW * 2 + margin ? 2 : 1;
+      const topLeft = { x: PAD, y: PAD, lane: "corner-tl", distFromCenter: Math.hypot(PAD + floaterW / 2 - centerX, PAD + floaterH / 2 - centerY) };
+      const topRight = { x: heroW - PAD - floaterW, y: PAD, lane: "corner-tr", distFromCenter: Math.hypot(heroW - PAD - floaterW / 2 - centerX, PAD + floaterH / 2 - centerY) };
+      candidates.push(topLeft, topRight);
+      if (useBottomLane) {
+        candidates.push(
+          { x: PAD, y: heroH - PAD - floaterH, lane: "corner-bl", distFromCenter: Math.hypot(PAD + floaterW / 2 - centerX, heroH - PAD - floaterH / 2 - centerY) },
+          { x: heroW - PAD - floaterW, y: heroH - PAD - floaterH, lane: "corner-br", distFromCenter: Math.hypot(heroW - PAD - floaterW / 2 - centerX, heroH - PAD - floaterH / 2 - centerY) }
+        );
+      }
 
-      if (leftLaneWidth > floaterW * 0.3) {
+      const slotH = floaterH + margin * 0.8;
+      const leftCols = leftLaneWidth > floaterW * 1.8 + margin ? 2 : 1;
+      const rightCols = rightLaneWidth > floaterW * 1.8 + margin ? 2 : 1;
+
+      if (leftLaneWidth > floaterW * 0.25) {
         let seed = 0;
         for (let col = 0; col < leftCols; col++) {
           const leftX = leftCols > 1 ? leftLaneXMin + col * (floaterW + margin) : leftLaneXMin;

@@ -33,7 +33,7 @@ function DebugOverlay({
   const [rects, setRects] = useState<{ safeLeft: number; safeTop: number; safeW: number; safeH: number } | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || process.env.NODE_ENV === "production") return;
+    if (typeof window === "undefined") return;
     const heroEl = heroRef.current;
     const safeEl = safeZoneRef.current;
     if (!heroEl || !safeEl) return;

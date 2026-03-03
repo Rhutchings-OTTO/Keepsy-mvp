@@ -1,11 +1,16 @@
 /**
- * Rewrite-first, block-last content safety pipeline for image generation.
+ * Rewrite-first, block-last content safety pipeline.
+ * Uses patch-based surgical rewriting; preserves user intent.
  */
 
 import { logSafetyEvent } from "./audit";
-
-const SAFE_SUFFIX =
-  " Create original characters and an original scene. Avoid depicting any copyrighted characters or logos.";
+import {
+  applyPatches,
+  computeSimilarity,
+  maybeAddIPSuffix,
+  SIMILARITY_THRESHOLD,
+  type Patch,
+} from "./patchRewrite";
 
 const MAX_PROMPT_LEN = 600;
 
@@ -23,7 +28,6 @@ const IP_DENYLIST = [
 
 const STYLE_OF_BRANDS = ["disney", "pixar", "marvel", "dreamworks"];
 
-/** Generic styles - allow "in the style of X" when X is in this list */
 const GENERIC_STYLES = [
   "watercolor", "watercolour", "oil painting", "oil paint",
   "comic book", "comic", "cartoon", "minimalist", "line art",
@@ -35,14 +39,35 @@ const PUBLIC_FIGURES = [
   "beyonce", "rihanna", "drake", "kanye", "kim kardashian", "celebrity", "famous person",
 ];
 
+/** Patterns suggesting direct likeness request (hard block) */
+const DIRECT_LIKENESS_PATTERNS = [
+  /\b(?:photo|picture|image|portrait|drawing|draw)\s+of\s+/i,
+  /\b(?:as|depicting|showing)\s+(?:[a-z\s]+)\s+(?:trump|biden|obama|putin|taylor swift|beyonce|rihanna|drake|kanye|kim kardashian|elon musk)\b/i,
+];
+
 const DISALLOWED = [
   "nude", "naked", "nsfw", "explicit", "child", "minor", "underage",
   "violence", "gore", "blood", "weapon", "gun", "self-harm", "suicide",
 ];
 
 export type PipelineResult =
-  | { ok: true; prompt: string; appliedRewrite?: true; originalPreview?: string; safePreview?: string }
-  | { ok: false; code: string; userMessage: string; suggestions: string[] };
+  | {
+      ok: true;
+      prompt: string;
+      appliedRewrite?: true;
+      appliedPatches?: Patch[];
+      patchedPrompt?: string;
+      originalPreview?: string;
+      safePreview?: string;
+    }
+  | {
+      ok: false;
+      code: string;
+      userMessage: string;
+      suggestions: string[];
+      suggestedPrompt?: string;
+      appliedPatches?: Patch[];
+    };
 
 function normalize(text: string): string {
   return text.trim().replace(/[\x00-\x1f\x7f]/g, "").slice(0, MAX_PROMPT_LEN);
@@ -62,14 +87,19 @@ function detectStyleOf(text: string): "brand" | "generic" | "other" | null {
   return "other";
 }
 
-function rewriteSuperheroPrompt(input: string): string {
-  const rewritten = input
-    .replace(/\bsuperhero(es)?\b/gi, "ORIGINAL comic-style hero$1 in colourful costumes")
-    .replace(/\bsuper-hero(es)?\b/gi, "ORIGINAL comic-style hero$1 in colourful costumes");
-  if (!/^(a|an|the)\s/i.test(rewritten.trim())) {
-    return `A fun illustration of ${rewritten.trim()}`;
-  }
-  return rewritten;
+function isDirectLikenessRequest(text: string): boolean {
+  if (!containsAny(text, PUBLIC_FIGURES)) return false;
+  return DIRECT_LIKENESS_PATTERNS.some((p) => p.test(text));
+}
+
+/** Check if prompt has patchable celebrity/vibe references (think X, like X, great gatsby) */
+function hasPatchableVibeRef(text: string): boolean {
+  const lower = text.toLowerCase();
+  if (/\bthink\s+[a-z]+/.test(lower)) return true;
+  if (/\blike\s+(?:leo|leonardo|taylor|beyonce|drake|kanye|rihanna)/.test(lower)) return true;
+  if (/\bgreat\s+gatsby\b/.test(lower)) return true;
+  if (/in\s+the\s+style\s+of\s+[a-z\s]+(?:animation|artist|film)/.test(lower)) return true;
+  return false;
 }
 
 export function processPromptPipeline(
@@ -82,11 +112,15 @@ export function processPromptPipeline(
   }
 
   if (containsAny(normalized, IP_DENYLIST)) {
-    logSafetyEvent("hard_block", "copyrighted_character", { clientId: clientIdentifier, promptLen: normalized.length });
+    logSafetyEvent("hard_block", "copyrighted_character", {
+      clientId: clientIdentifier,
+      promptLen: normalized.length,
+    });
     return {
       ok: false,
       code: "copyrighted_character",
-      userMessage: "We can create original characters and themes, but we can't generate specific copyrighted or trademarked characters. Try describing the style, colours, or mood instead.",
+      userMessage:
+        "We can create original characters and themes, but we can't generate specific copyrighted or trademarked characters. Try describing the style, colours, or mood instead.",
       suggestions: [
         "Two original comic-style heroes celebrating a birthday",
         "A bright cartoon birthday card with two caped heroes (original characters)",
@@ -102,7 +136,10 @@ export function processPromptPipeline(
     return { ok: true, prompt: normalized };
   }
   if (styleOf === "brand") {
-    logSafetyEvent("hard_block", "style_of_brand", { clientId: clientIdentifier, promptLen: normalized.length });
+    logSafetyEvent("hard_block", "style_of_brand", {
+      clientId: clientIdentifier,
+      promptLen: normalized.length,
+    });
     return {
       ok: false,
       code: "style_of_brand",
@@ -116,24 +153,53 @@ export function processPromptPipeline(
   }
 
   if (styleOf === "other") {
-    const rewritten = normalized.replace(/in\s+the\s+style\s+of\s+[^.!,?]+/gi, "inspired by modern animation") + SAFE_SUFFIX;
-    const safePreview = rewritten.slice(0, 120) + (rewritten.length > 120 ? "..." : "");
-    logSafetyEvent("rewrite_applied", "style_of_artist", { clientId: clientIdentifier, promptLen: normalized.length });
+    const { patched, patches } = applyPatches(normalized);
+    const hadIPKeyword = patches.length > 0;
+    const finalPrompt = maybeAddIPSuffix(patched, hadIPKeyword);
+    const similarity = computeSimilarity(normalized, finalPrompt);
+    if (similarity < SIMILARITY_THRESHOLD) {
+      logSafetyEvent("soft_warning", "style_of_artist", {
+        clientId: clientIdentifier,
+        promptLen: normalized.length,
+        similarityScore: Math.round(similarity * 100) / 100,
+        patchCount: patches.length,
+      });
+      return {
+        ok: false,
+        code: "soft_warning",
+        userMessage: "We adjusted a few words to keep this original. Use the suggested prompt below to proceed.",
+        suggestions: ["Use suggested safe prompt"],
+        suggestedPrompt: finalPrompt,
+        appliedPatches: patches,
+      };
+    }
+    logSafetyEvent("rewrite_applied", "style_of_artist", {
+      clientId: clientIdentifier,
+      promptLen: normalized.length,
+      similarityScore: Math.round(similarity * 100) / 100,
+      patchCount: patches.length,
+    });
     return {
       ok: true,
-      prompt: rewritten,
+      prompt: finalPrompt,
       appliedRewrite: true,
-      originalPreview: normalized.slice(0, 60) + (normalized.length > 60 ? "..." : ""),
-      safePreview,
+      appliedPatches: patches,
+      patchedPrompt: finalPrompt,
+      originalPreview: normalized.slice(0, 80) + (normalized.length > 80 ? "..." : ""),
+      safePreview: finalPrompt.slice(0, 120) + (finalPrompt.length > 120 ? "..." : ""),
     };
   }
 
-  if (containsAny(normalized, PUBLIC_FIGURES)) {
-    logSafetyEvent("hard_block", "public_figure", { clientId: clientIdentifier, promptLen: normalized.length });
+  if (isDirectLikenessRequest(normalized)) {
+    logSafetyEvent("hard_block", "public_figure", {
+      clientId: clientIdentifier,
+      promptLen: normalized.length,
+    });
     return {
       ok: false,
       code: "public_figure",
-      userMessage: "We can't generate images of real people or public figures. Try describing a fictional person with similar traits instead.",
+      userMessage:
+        "We can't generate images of real people or public figures. Try describing a fictional person with similar traits instead.",
       suggestions: [
         "A friendly fictional person with warm expression",
         "A generic character in a similar pose or setting",
@@ -142,7 +208,10 @@ export function processPromptPipeline(
   }
 
   if (containsAny(normalized, DISALLOWED)) {
-    logSafetyEvent("hard_block", "disallowed_content", { clientId: clientIdentifier, promptLen: normalized.length });
+    logSafetyEvent("hard_block", "disallowed_content", {
+      clientId: clientIdentifier,
+      promptLen: normalized.length,
+    });
     return {
       ok: false,
       code: "disallowed_content",
@@ -151,16 +220,65 @@ export function processPromptPipeline(
     };
   }
 
-  if (/\bsuperhero(es)?\b|\bsuper-hero(es)?\b/i.test(normalized)) {
-    const rewritten = rewriteSuperheroPrompt(normalized) + SAFE_SUFFIX;
-    const safePreview = rewritten.slice(0, 120) + (rewritten.length > 120 ? "..." : "");
-    logSafetyEvent("rewrite_applied", "generic_superhero", { clientId: clientIdentifier, promptLen: normalized.length });
+  if (hasPatchableVibeRef(normalized)) {
+    const { patched, patches } = applyPatches(normalized);
+    if (patches.length === 0) {
+      return { ok: true, prompt: normalized };
+    }
+    const hadIPKeyword = patches.some((p) =>
+      /gatsby|leo|celebrity|style\s+of/i.test(p.from)
+    );
+    const finalPrompt = maybeAddIPSuffix(patched, hadIPKeyword);
+    const similarity = computeSimilarity(normalized, finalPrompt);
+
+    if (similarity < SIMILARITY_THRESHOLD) {
+      logSafetyEvent("soft_warning", "vibe_reference", {
+        clientId: clientIdentifier,
+        promptLen: normalized.length,
+        similarityScore: Math.round(similarity * 100) / 100,
+        patchCount: patches.length,
+      });
+      return {
+        ok: false,
+        code: "soft_warning",
+        userMessage: "We adjusted a couple of words to keep this original. Click below to try with the suggested wording.",
+        suggestions: ["Use suggested safe prompt"],
+        suggestedPrompt: finalPrompt,
+        appliedPatches: patches,
+      };
+    }
+
+    logSafetyEvent("rewrite_applied", "vibe_reference", {
+      clientId: clientIdentifier,
+      promptLen: normalized.length,
+      similarityScore: Math.round(similarity * 100) / 100,
+      patchCount: patches.length,
+    });
     return {
       ok: true,
-      prompt: rewritten,
+      prompt: finalPrompt,
       appliedRewrite: true,
-      originalPreview: normalized.slice(0, 60) + (normalized.length > 60 ? "..." : ""),
-      safePreview,
+      appliedPatches: patches,
+      patchedPrompt: finalPrompt,
+      originalPreview: normalized.slice(0, 80) + (normalized.length > 80 ? "..." : ""),
+      safePreview: finalPrompt.slice(0, 120) + (finalPrompt.length > 120 ? "..." : ""),
+    };
+  }
+
+  if (containsAny(normalized, PUBLIC_FIGURES) && !hasPatchableVibeRef(normalized)) {
+    logSafetyEvent("hard_block", "public_figure", {
+      clientId: clientIdentifier,
+      promptLen: normalized.length,
+    });
+    return {
+      ok: false,
+      code: "public_figure",
+      userMessage:
+        "We can't generate images of real people or public figures. Try describing a fictional person with similar traits instead.",
+      suggestions: [
+        "A friendly fictional person with warm expression",
+        "A generic character in a similar pose or setting",
+      ],
     };
   }
 

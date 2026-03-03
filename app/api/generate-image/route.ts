@@ -194,16 +194,18 @@ export async function POST(req: Request) {
     const pipeline = processPromptPipeline(prompt, clientId);
 
     if (!pipeline.ok) {
-      return NextResponse.json(
-        {
-          ok: false,
-          code: pipeline.code,
-          userMessage: pipeline.userMessage,
-          suggestions: pipeline.suggestions,
-          title: BLOCK_TITLE,
-        },
-        { status: 400 }
-      );
+      const blockPayload: Record<string, unknown> = {
+        ok: false,
+        code: pipeline.code,
+        userMessage: pipeline.userMessage,
+        suggestions: pipeline.suggestions,
+        title: BLOCK_TITLE,
+      };
+      if (pipeline.code === "soft_warning" && "suggestedPrompt" in pipeline) {
+        blockPayload.suggestedPrompt = pipeline.suggestedPrompt;
+        blockPayload.appliedPatches = pipeline.appliedPatches ?? [];
+      }
+      return NextResponse.json(blockPayload, { status: 400 });
     }
 
     const promptCheck = sanitizePrompt(pipeline.prompt);
@@ -218,6 +220,8 @@ export async function POST(req: Request) {
       pipeline.ok && pipeline.appliedRewrite
         ? {
             appliedRewrite: true,
+            appliedPatches: pipeline.appliedPatches ?? [],
+            patchedPrompt: pipeline.patchedPrompt ?? pipeline.prompt,
             originalPreview: pipeline.originalPreview,
             safePreview: pipeline.safePreview ?? pipeline.prompt.slice(0, 80) + (pipeline.prompt.length > 80 ? "..." : ""),
           }

@@ -235,7 +235,13 @@ async function generateViaKeepsyAPI(args: {
   if (!res.ok) {
     const error = new Error(data?.error || data?.userMessage || "Failed to generate image") as Error & {
       status?: number;
-      contentBlock?: { title: string; message: string; suggestions: string[] };
+      contentBlock?: {
+        title: string;
+        message: string;
+        suggestions: string[];
+        suggestedPrompt?: string;
+        appliedPatches?: Array<{ from: string; to: string }>;
+      };
     };
     error.status = res.status;
     if (data?.suggestions || data?.code) {
@@ -243,6 +249,8 @@ async function generateViaKeepsyAPI(args: {
         title: data.title || "Let's tweak that slightly",
         message: data.userMessage || data.message || data.error,
         suggestions: Array.isArray(data.suggestions) ? data.suggestions : [],
+        suggestedPrompt: data.suggestedPrompt,
+        appliedPatches: Array.isArray(data.appliedPatches) ? data.appliedPatches : [],
       };
     }
     throw error;
@@ -250,6 +258,8 @@ async function generateViaKeepsyAPI(args: {
   return {
     imageDataUrl: data.imageDataUrl as string,
     appliedRewrite: Boolean(data.appliedRewrite),
+    appliedPatches: (data.appliedPatches ?? []) as Array<{ from: string; to: string }>,
+    patchedPrompt: data.patchedPrompt as string | undefined,
     originalPreview: data.originalPreview as string | undefined,
     safePreview: data.safePreview as string | undefined,
   };
@@ -305,10 +315,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     title: string;
     message: string;
     suggestions: string[];
+    suggestedPrompt?: string;
+    appliedPatches?: Array<{ from: string; to: string }>;
   } | null>(null);
   const [generationRewriteApplied, setGenerationRewriteApplied] = useState<{
     originalPreview: string;
     safePreview: string;
+    appliedPatches?: Array<{ from: string; to: string }>;
   } | null>(null);
   const [refinementSuccess, setRefinementSuccess] = useState(false);
 
@@ -447,7 +460,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       const basePrompt = effectivePrompt || "Create a polished lifelike keepsake design from this uploaded image.";
       const shapeGuide = "Use a square composition.";
       const promptWithQualityGuide = `${basePrompt}. ${shapeGuide} High-quality production-ready design. Use realistic lighting, depth, and texture.`;
-      let result: { imageDataUrl: string; appliedRewrite?: boolean; originalPreview?: string; safePreview?: string } | null = null;
+      let result: {
+        imageDataUrl: string;
+        appliedRewrite?: boolean;
+        originalPreview?: string;
+        safePreview?: string;
+        patchedPrompt?: string;
+        appliedPatches?: Array<{ from: string; to: string }>;
+      } | null = null;
       const maxAttempts = 2;
 
       for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
@@ -473,8 +493,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setGenerationError(null);
       setGenerationContentBlock(null);
       setGenerationRewriteApplied(
-        result.appliedRewrite && result.originalPreview && result.safePreview
-          ? { originalPreview: result.originalPreview, safePreview: result.safePreview }
+        result.appliedRewrite
+          ? {
+              originalPreview: result.originalPreview ?? "",
+              safePreview: result.safePreview ?? result.patchedPrompt ?? "",
+              appliedPatches: result.appliedPatches?.length ? result.appliedPatches : undefined,
+            }
           : null
       );
       setRefinementSuccess(false);
@@ -520,8 +544,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       });
       applyRefinementResult({ imageUrl: result.imageDataUrl, prompt: instruction });
       setGenerationRewriteApplied(
-        result.appliedRewrite && result.originalPreview && result.safePreview
-          ? { originalPreview: result.originalPreview, safePreview: result.safePreview }
+        result.appliedRewrite
+          ? {
+              originalPreview: result.originalPreview ?? "",
+              safePreview: result.safePreview ?? result.patchedPrompt ?? "",
+              appliedPatches: result.appliedPatches?.length ? result.appliedPatches : undefined,
+            }
           : null
       );
       setRefinementSuccess(true);
@@ -815,6 +843,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     setGenerationError(null);
                     setGenerationContentBlock(null);
                     handleGenerate(s);
+                  }}
+                  onUseSuggestedPromptClick={(suggestedPrompt) => {
+                    setGenerationError(null);
+                    setGenerationContentBlock(null);
+                    handleGenerate(suggestedPrompt);
                   }}
                   checkoutStatus={checkoutStatus}
                   isBusy={isBusy}

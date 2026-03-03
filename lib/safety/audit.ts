@@ -2,12 +2,14 @@
  * Server-side safety audit logging. No full user prompts stored.
  */
 
-export type SafetyEventType = "rewrite_applied" | "hard_block";
+export type SafetyEventType = "rewrite_applied" | "hard_block" | "soft_warning";
 
 export type AuditPayload = {
   clientId?: string;
   promptLen?: number;
   reasonCode?: string;
+  similarityScore?: number;
+  patchCount?: number;
 };
 
 export function logSafetyEvent(

@@ -33,7 +33,11 @@ export type DesignConfirmationProps = {
   isRefining?: boolean;
   refinementError?: string | null;
   refinementContentBlock?: { title: string; message: string; suggestions: string[] } | null;
-  refinementRewriteApplied?: { originalPreview: string; safePreview: string } | null;
+  refinementRewriteApplied?: {
+    originalPreview: string;
+    safePreview: string;
+    appliedPatches?: Array<{ from: string; to: string }>;
+  } | null;
   onRefinementSuggestionClick?: (suggestion: string) => void;
   refinementSuccess?: boolean;
   refinementsLeft?: number;

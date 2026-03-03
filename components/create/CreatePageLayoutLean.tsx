@@ -37,9 +37,20 @@ export type CreatePageLayoutLeanProps = {
   uploadedImage: string | null;
   uploadedFileName: string | null;
   generationError: string | null;
-  generationContentBlock: { title: string; message: string; suggestions: string[] } | null;
-  generationRewriteApplied?: { originalPreview: string; safePreview: string } | null;
+  generationContentBlock: {
+    title: string;
+    message: string;
+    suggestions: string[];
+    suggestedPrompt?: string;
+    appliedPatches?: Array<{ from: string; to: string }>;
+  } | null;
+  generationRewriteApplied?: {
+    originalPreview: string;
+    safePreview: string;
+    appliedPatches?: Array<{ from: string; to: string }>;
+  } | null;
   onSuggestionClick?: (suggestion: string) => void;
+  onUseSuggestedPromptClick?: (prompt: string) => void;
   checkoutStatus: "success" | "canceled" | null;
   isBusy: boolean;
   onGenerate: () => void;
@@ -62,6 +73,7 @@ export function CreatePageLayoutLean({
   generationContentBlock,
   generationRewriteApplied,
   onSuggestionClick,
+  onUseSuggestedPromptClick,
   checkoutStatus,
   isBusy,
   onGenerate,
@@ -253,6 +265,7 @@ export function CreatePageLayoutLean({
               rewriteApplied={generationRewriteApplied ? { type: "rewrite", ...generationRewriteApplied } : null}
               error={generationContentBlock ? null : generationError}
               onSuggestionClick={onSuggestionClick}
+              onUseSuggestedPromptClick={onUseSuggestedPromptClick}
             />
             <AnimatePresence>
               {checkoutStatus === "success" && (

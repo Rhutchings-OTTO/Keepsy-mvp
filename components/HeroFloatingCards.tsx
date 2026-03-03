@@ -167,13 +167,15 @@ function HeroFloatingCardsInner({
             >
               <InteractiveCard
                 image={
-                  <Image
-                    src={def.image}
-                    alt={def.title}
-                    width={240}
-                    height={160}
-                    className="h-full w-full rounded-xl object-cover"
-                  />
+                  <div className="relative h-full w-full">
+                    <Image
+                      src={def.image}
+                      alt={def.title}
+                      fill
+                      sizes="(max-width: 640px) 100px, 130px"
+                      className="rounded-xl object-cover"
+                    />
+                  </div>
                 }
                 title={def.title}
                 subtitle={def.subtitle}

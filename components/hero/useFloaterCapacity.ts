@@ -10,9 +10,9 @@ const SCALE_MIN = 0.4;
 const SCALE_MAX = 1.1;
 const CARD_ASPECT = 170 / 144;
 
-/** Base sizes: smaller to fit many more floaters; desktop targets 12–18 */
-const BASE_W_DESKTOP = 130;
-const BASE_W_MOBILE = 100;
+/** Base sizes: balance visibility with quantity; desktop targets 10–14 floaters */
+const BASE_W_DESKTOP = 160;
+const BASE_W_MOBILE = 120;
 const MOBILE_BREAK = 640;
 
 const FOLD_GUARD_VH = 0.92;

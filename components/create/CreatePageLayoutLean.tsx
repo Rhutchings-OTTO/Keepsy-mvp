@@ -187,7 +187,7 @@ export function CreatePageLayoutLean({
             <div className="flex flex-col gap-3">
               <input
                 type="text"
-                value={prompt}
+                value={typeof prompt === "string" ? prompt : ""}
                 onChange={(e) => {
                   setPrompt(e.target.value);
                   setHasUserTypedPrompt(true);
@@ -238,8 +238,8 @@ export function CreatePageLayoutLean({
               )}
 
               <motion.button
-                onClick={onGenerate}
-                disabled={(!prompt && !uploadedImage) || isBusy}
+                onClick={() => onGenerate()}
+                disabled={(!(typeof prompt === "string" ? prompt : "").trim() && !uploadedImage) || isBusy}
                 className={`w-full min-h-[52px] rounded-xl px-6 py-4 font-extrabold text-lg text-white flex items-center justify-center gap-2 transition-all shadow-lg active:scale-[0.98] ${
                   isBusy ? "bg-black/35 cursor-not-allowed" : "bg-black hover:bg-black/90"
                 }`}

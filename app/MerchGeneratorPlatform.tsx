@@ -189,16 +189,43 @@ function getFriendlyGenerationError(error: unknown): string {
     return "You reached today's generation limit. Please try again tomorrow.";
   }
 
+  if (
+    lower.includes("circular") ||
+    lower.includes("htmlbuttonelement") ||
+    lower.includes("converting circular structure")
+  ) {
+    return "We couldn't send that prompt. Please try again.";
+  }
+
   return message;
 }
 
-/** Uses YOUR real API route */
+/** Uses YOUR real API route. Ensures only serializable primitives in payload. */
 async function generateViaKeepsyAPI(args: {
   prompt: string;
   sourceImageDataUrl?: string | null;
   designShape: DesignShape;
   signal?: AbortSignal;
 }) {
+  const payloadPrompt = typeof args.prompt === "string" ? args.prompt : "";
+  const payloadImage =
+    typeof args.sourceImageDataUrl === "string" ? args.sourceImageDataUrl : args.sourceImageDataUrl ?? null;
+  const payload: { prompt: string; sourceImageDataUrl: string | null; designShape: DesignShape } = {
+    prompt: payloadPrompt,
+    sourceImageDataUrl: payloadImage,
+    designShape: args.designShape,
+  };
+
+  let body: string;
+  try {
+    body = JSON.stringify(payload);
+  } catch (stringifyErr) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[gen] Payload stringify failed:", stringifyErr);
+    }
+    throw new Error("We couldn't send that prompt. Please try again.");
+  }
+
   const res = await fetch("/api/generate-image", {
     method: "POST",
     cache: "no-store",
@@ -207,11 +234,7 @@ async function generateViaKeepsyAPI(args: {
       "x-visitor-id": getVisitorId(),
     },
     signal: args.signal,
-    body: JSON.stringify({
-      prompt: args.prompt,
-      sourceImageDataUrl: args.sourceImageDataUrl ?? null,
-      designShape: args.designShape,
-    }),
+    body,
   });
 
   const data = await res.json();
@@ -286,7 +309,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [region] = useState<Region>(() => getRegion() ?? "UK");
 
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPromptState] = useState<string>("");
+
+  const setPrompt = (value: unknown) => {
+    const s = typeof value === "string" ? value : "";
+    setPromptState(s);
+  };
   const [isBusy, setIsBusy] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -438,10 +466,17 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
   }, [initialQuery]);
 
-  const handleGenerate = async (promptOverride?: string) => {
-    const effectivePrompt = promptOverride ?? prompt;
+  const handleGenerate = async (promptOverride?: unknown) => {
+    const safePromptFromState = typeof prompt === "string" ? prompt : "";
+    const safeOverride = typeof promptOverride === "string" ? promptOverride : undefined;
+    const effectivePrompt = safeOverride ?? safePromptFromState;
     if (!effectivePrompt && !uploadedImage) return;
-    if (promptOverride) setPrompt(promptOverride);
+    if (typeof effectivePrompt !== "string") {
+      setPrompt("");
+      setGenerationError("Something went wrong—please retype your prompt.");
+      return;
+    }
+    if (safeOverride) setPrompt(safeOverride);
     setIsGenerating(true);
     generateAbortRef.current?.abort();
     const controller = new AbortController();

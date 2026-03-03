@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
@@ -52,12 +52,6 @@ export function ProductPreviewClient({ initialSlug }: ProductPreviewClientProps)
   const [selectedColor, setSelectedColor] = useState(
     initialProduct.colors?.[0]?.hex ?? "#FFFFFF"
   );
-
-  useEffect(() => {
-    const prod = slugToProduct(initialSlug) ?? PRODUCT_LIST[0];
-    setSelectedProduct(prod);
-    setSelectedColor(prod.colors?.[0]?.hex ?? "#FFFFFF");
-  }, [initialSlug]);
 
   const mockupProductType = getMockupProductType(selectedProduct.id);
   const mockupColor = getMockupColor(selectedColor);

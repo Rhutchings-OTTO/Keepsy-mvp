@@ -11,5 +11,5 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = PRODUCT_CARDS.find((item) => item.type === type);
   if (!product) return notFound();
 
-  return <ProductPreviewClient initialSlug={type} />;
+  return <ProductPreviewClient key={type} initialSlug={type} />;
 }

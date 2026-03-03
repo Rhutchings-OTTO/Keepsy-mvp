@@ -43,8 +43,24 @@ export function PrintAreaGlassOverlay({ productType, isActive, hasArtwork, class
         }}
       >
         <div className="flex h-full flex-col items-center justify-center gap-1 px-2 text-center">
-          <span className="text-xs font-semibold tracking-wide text-black/70">{COPY[productType]}</span>
-          <span className="text-[10px] font-medium text-black/45">Generate or upload to preview</span>
+          <span
+            className={
+              productType === "tshirt"
+                ? "text-[10px] font-semibold leading-[1.2] tracking-wide text-black/70"
+                : "text-xs font-semibold leading-[1.2] tracking-wide text-black/70"
+            }
+          >
+            {COPY[productType]}
+          </span>
+          <span
+            className={
+              productType === "tshirt"
+                ? "text-[9px] font-medium leading-[1.2] text-black/45"
+                : "text-[10px] font-medium leading-[1.2] text-black/45"
+            }
+          >
+            Generate or upload to preview
+          </span>
         </div>
       </div>
     </motion.div>

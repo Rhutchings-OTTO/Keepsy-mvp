@@ -43,7 +43,7 @@ export const PRODUCTS: Record<ProductType, Product> = {
     colors: [
       { hex: "#FFFFFF", name: "White" },
       { hex: "#1e3a8a", name: "Navy" },
-      { hex: "#2563EB", name: "Blue" },
+      { hex: "#111827", name: "Black" },
     ],
   },
   mug: {

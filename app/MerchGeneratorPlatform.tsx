@@ -22,6 +22,14 @@ import { useConversionFlow } from "@/context/ConversionFlowContext";
 import { FF } from "@/lib/featureFlags";
 import { motionTransition, revealUp, softScaleIn } from "@/lib/motion";
 import { getRegion, type Region } from "@/lib/region";
+import {
+  setInitialGeneration,
+  applyRefinementResult,
+  canRefine,
+  getRefinementsLeft,
+  hasActiveSession,
+} from "@/lib/store/createSession";
+import { useCreateSession } from "@/lib/store/useCreateSession";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import {
   Sparkles,
@@ -281,6 +289,10 @@ async function checkoutViaKeepsyAPI(args: {
 
 export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?: InitialCreateQuery }) {
   const { state: conversionFlow, updateState: updateConversionFlow } = useConversionFlow();
+  const createSession = useCreateSession();
+  const generatedImage = createSession.currentImageUrl;
+  const lastGenerationPrompt = createSession.currentPrompt;
+
   const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [region] = useState<Region>(() => getRegion() ?? "UK");
@@ -288,9 +300,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [prompt, setPrompt] = useState("");
   const [isBusy, setIsBusy] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [lastGenerationPrompt, setLastGenerationPrompt] = useState<string>("");
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [generationContentBlock, setGenerationContentBlock] = useState<{
     title: string;
@@ -371,6 +380,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   useEffect(() => {
     if (step === 2 && !generatedImage) setStep(1);
   }, [step, generatedImage]);
+
+  const didRestoreSession = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || didRestoreSession.current) return;
+    didRestoreSession.current = true;
+    if (hasActiveSession()) setStep(2);
+  }, []);
 
   useEffect(() => {
     if (!initialQuery || didApplyInitialQuery.current) return;
@@ -453,8 +469,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       }
 
       if (!result) throw new Error("Failed to generate image");
-      setGeneratedImage(result.imageDataUrl);
-      setLastGenerationPrompt(promptWithQualityGuide);
+      setInitialGeneration({ prompt: promptWithQualityGuide, imageUrl: result.imageDataUrl });
       setGenerationError(null);
       setGenerationContentBlock(null);
       setGenerationRewriteApplied(
@@ -470,8 +485,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       const aborted = e instanceof Error && e.name === "AbortError";
       const err = e as Error & { contentBlock?: { title: string; message: string; suggestions: string[] } };
       setGenerationContentBlock(err.contentBlock ?? null);
+      const errMsg = err.contentBlock?.message ?? getFriendlyGenerationError(e);
       setGenerationError(
-        aborted ? "Generation timed out. Please try again." : (err.contentBlock ? err.contentBlock.message : getFriendlyGenerationError(e))
+        aborted ? "Generation timed out. Please try again." : (typeof errMsg === "string" ? errMsg : String(errMsg))
       );
     } finally {
       clearTimeout(timeout);
@@ -484,7 +500,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   };
 
   const handleRefine = async (refinementText: string) => {
-    if (!generatedImage || !refinementText.trim()) return;
+    const trimmed = refinementText?.trim?.();
+    if (!generatedImage || !trimmed) return;
+    if (!canRefine()) return;
     setIsGenerating(true);
     setGenerationError(null);
     setGenerationContentBlock(null);
@@ -493,29 +511,27 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     const controller = new AbortController();
     generateAbortRef.current = controller;
     try {
-      const instruction = `${lastGenerationPrompt}\n\nRefinement request: ${refinementText.trim()}`;
+      const instruction = `${lastGenerationPrompt}\n\nRefinement request: ${trimmed}`;
       const result = await generateViaKeepsyAPI({
         prompt: instruction,
         sourceImageDataUrl: generatedImage,
         designShape: "square",
         signal: controller.signal,
       });
-      setGeneratedImage(result.imageDataUrl);
+      applyRefinementResult({ imageUrl: result.imageDataUrl, prompt: instruction });
       setGenerationRewriteApplied(
         result.appliedRewrite && result.originalPreview && result.safePreview
           ? { originalPreview: result.originalPreview, safePreview: result.safePreview }
           : null
       );
-      setLastGenerationPrompt(instruction);
       setRefinementSuccess(true);
       setGenerationError(null);
     } catch (e) {
       const aborted = e instanceof Error && e.name === "AbortError";
       const err = e as Error & { contentBlock?: { title: string; message: string; suggestions: string[] } };
       setGenerationContentBlock(err.contentBlock ?? null);
-      setGenerationError(
-        aborted ? "Update was cancelled." : (err.contentBlock ? err.contentBlock.message : getFriendlyGenerationError(e))
-      );
+      const msg = err.contentBlock?.message ?? getFriendlyGenerationError(e);
+      setGenerationError(aborted ? "Update was cancelled." : (typeof msg === "string" ? msg : String(msg)));
     } finally {
       generateAbortRef.current = null;
       setIsGenerating(false);
@@ -543,7 +559,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           id: nextItemId,
           product: selectedProduct,
           imageDataUrl: generatedImage,
-          prompt,
+          prompt: lastGenerationPrompt,
           quantity: 1,
         },
       ];
@@ -572,7 +588,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     try {
       const url = await checkoutViaKeepsyAPI({
         selectedProduct,
-        prompt,
+        prompt: lastGenerationPrompt,
         imageDataUrl: generatedImage,
       });
       // redirect to Stripe Checkout
@@ -824,8 +840,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   onContinue={() => setStep(3)}
                   onRefine={handleRefine}
                   onBackToPrompt={() => setStep(1)}
+                  onStartFresh={() => {
+                    setPrompt(lastGenerationPrompt);
+                    setStep(1);
+                    setGenerationError(null);
+                    setGenerationContentBlock(null);
+                  }}
                   isRefining={isGenerating}
-                  refinementError={generationError}
+                  refinementError={typeof generationError === "string" ? generationError : generationError ? String(generationError) : null}
                   refinementContentBlock={generationContentBlock}
                   refinementRewriteApplied={generationRewriteApplied}
                   onRefinementSuggestionClick={(s) => {
@@ -836,6 +858,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     void handleGenerate(s);
                   }}
                   refinementSuccess={refinementSuccess}
+                  refinementsLeft={getRefinementsLeft()}
+                  canRefine={canRefine()}
                 />
               )}
 

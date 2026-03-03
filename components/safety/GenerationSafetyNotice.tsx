@@ -71,7 +71,7 @@ export function GenerationSafetyNotice({
           exit={{ opacity: 0, y: -4 }}
           className="rounded-xl border border-black/10 bg-white/95 px-4 py-3 shadow-sm"
         >
-          <p className="text-sm text-black/70">{error}</p>
+          <p className="text-sm text-black/70">{typeof error === "string" ? error : String(error)}</p>
         </motion.div>
       )}
 

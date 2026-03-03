@@ -224,8 +224,18 @@ async function generateViaKeepsyAPI(args: {
 
   const data = await res.json();
   if (!res.ok) {
-    const error = new Error(data?.error || "Failed to generate image") as Error & { status?: number };
+    const error = new Error(data?.error || "Failed to generate image") as Error & {
+      status?: number;
+      contentBlock?: { title: string; message: string; suggestions: string[] };
+    };
     error.status = res.status;
+    if (data?.code === "content_block") {
+      error.contentBlock = {
+        title: data.title || "Let's tweak that slightly",
+        message: data.message || data.error,
+        suggestions: Array.isArray(data.suggestions) ? data.suggestions : [],
+      };
+    }
     throw error;
   }
   return data.imageDataUrl as string; // IMPORTANT: this is a data URL
@@ -276,6 +286,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [lastGenerationPrompt, setLastGenerationPrompt] = useState<string>("");
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [generationContentBlock, setGenerationContentBlock] = useState<{
+    title: string;
+    message: string;
+    suggestions: string[];
+  } | null>(null);
   const [refinementSuccess, setRefinementSuccess] = useState(false);
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -429,13 +444,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setGeneratedImage(imageDataUrl);
       setLastGenerationPrompt(promptWithQualityGuide);
       setGenerationError(null);
+      setGenerationContentBlock(null);
       setRefinementSuccess(false);
       setStep(2);
       setView("home");
     } catch (e) {
       console.error(e);
       const aborted = e instanceof Error && e.name === "AbortError";
-      setGenerationError(aborted ? "Generation timed out. Please try again." : getFriendlyGenerationError(e));
+      const err = e as Error & { contentBlock?: { title: string; message: string; suggestions: string[] } };
+      setGenerationContentBlock(err.contentBlock ?? null);
+      setGenerationError(
+        aborted ? "Generation timed out. Please try again." : (err.contentBlock ? err.contentBlock.message : getFriendlyGenerationError(e))
+      );
     } finally {
       clearTimeout(timeout);
       if (generateAbortRef.current === controller) {
@@ -450,6 +470,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     if (!generatedImage || !refinementText.trim()) return;
     setIsGenerating(true);
     setGenerationError(null);
+    setGenerationContentBlock(null);
     setRefinementSuccess(false);
     generateAbortRef.current?.abort();
     const controller = new AbortController();
@@ -468,7 +489,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setGenerationError(null);
     } catch (e) {
       const aborted = e instanceof Error && e.name === "AbortError";
-      setGenerationError(aborted ? "Update was cancelled." : getFriendlyGenerationError(e));
+      const err = e as Error & { contentBlock?: { title: string; message: string; suggestions: string[] } };
+      setGenerationContentBlock(err.contentBlock ?? null);
+      setGenerationError(
+        aborted ? "Update was cancelled." : (err.contentBlock ? err.contentBlock.message : getFriendlyGenerationError(e))
+      );
     } finally {
       generateAbortRef.current = null;
       setIsGenerating(false);
@@ -477,6 +502,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
   const handleAddToCart = () => {
     if (!generatedImage) {
+      setGenerationContentBlock(null);
       setGenerationError("Generate a design before adding an item to cart.");
       setStep(1);
       return;
@@ -600,6 +626,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setUploadedImage(reader.result as string);
       setUploadedFileName(file.name);
       setGenerationError(null);
+      setGenerationContentBlock(null);
     };
     reader.readAsDataURL(file);
   };
@@ -629,6 +656,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     setUploadedImage(null);
     setUploadedFileName(null);
     setGenerationError(null);
+    setGenerationContentBlock(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -736,11 +764,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   setPrompt={(v) => {
                     setPrompt(v);
                     setGenerationError(null);
+                    setGenerationContentBlock(null);
                   }}
                   setHasUserTypedPrompt={setHasUserTypedPrompt}
                   uploadedImage={uploadedImage}
                   uploadedFileName={uploadedFileName}
                   generationError={generationError}
+                  generationContentBlock={generationContentBlock}
+                  onSuggestionClick={(s) => {
+                    setPrompt(s);
+                    setGenerationError(null);
+                    setGenerationContentBlock(null);
+                  }}
                   checkoutStatus={checkoutStatus}
                   isBusy={isBusy}
                   onGenerate={handleGenerate}
@@ -766,6 +801,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   onBackToPrompt={() => setStep(1)}
                   isRefining={isGenerating}
                   refinementError={generationError}
+                  refinementContentBlock={generationContentBlock}
+                  onRefinementSuggestionClick={(s) => {
+                    setPrompt(s);
+                    setStep(1);
+                    setGenerationError(null);
+                    setGenerationContentBlock(null);
+                  }}
                   refinementSuccess={refinementSuccess}
                 />
               )}

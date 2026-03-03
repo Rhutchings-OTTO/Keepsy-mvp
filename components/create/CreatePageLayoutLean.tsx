@@ -8,6 +8,7 @@ import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { PromptHelperCollapsible } from "./PromptHelperCollapsible";
 import { IdeasForYou } from "./IdeasForYou";
 import { Carousel } from "@/components/ui/Carousel";
+import { GenerationErrorDisplay } from "@/components/GenerationErrorDisplay";
 import { revealUp } from "@/lib/motion";
 import type { Region } from "@/lib/region";
 
@@ -35,6 +36,8 @@ export type CreatePageLayoutLeanProps = {
   uploadedImage: string | null;
   uploadedFileName: string | null;
   generationError: string | null;
+  generationContentBlock: { title: string; message: string; suggestions: string[] } | null;
+  onSuggestionClick?: (suggestion: string) => void;
   checkoutStatus: "success" | "canceled" | null;
   isBusy: boolean;
   onGenerate: () => void;
@@ -53,6 +56,8 @@ export function CreatePageLayoutLean({
   uploadedImage,
   uploadedFileName,
   generationError,
+  generationContentBlock,
+  onSuggestionClick,
   checkoutStatus,
   isBusy,
   onGenerate,
@@ -238,18 +243,11 @@ export function CreatePageLayoutLean({
 
             <p className="text-xs font-semibold text-black/50">Takes ~10–20 seconds. You can edit after.</p>
 
-            <AnimatePresence>
-              {generationError && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  className="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
-                >
-                  {generationError}
-                </motion.p>
-              )}
-            </AnimatePresence>
+            <GenerationErrorDisplay
+              error={generationContentBlock ? null : generationError}
+              contentBlock={generationContentBlock}
+              onSuggestionClick={onSuggestionClick}
+            />
             <AnimatePresence>
               {checkoutStatus === "success" && (
                 <motion.p

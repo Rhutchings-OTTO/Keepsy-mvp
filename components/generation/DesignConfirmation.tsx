@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
+import { GenerationErrorDisplay } from "@/components/GenerationErrorDisplay";
 import { motionTransition } from "@/lib/motion";
 
 const REFINEMENT_CHIPS = [
@@ -30,6 +31,8 @@ export type DesignConfirmationProps = {
   onBackToPrompt: () => void;
   isRefining?: boolean;
   refinementError?: string | null;
+  refinementContentBlock?: { title: string; message: string; suggestions: string[] } | null;
+  onRefinementSuggestionClick?: (suggestion: string) => void;
   refinementSuccess?: boolean;
 };
 
@@ -40,6 +43,8 @@ export function DesignConfirmation({
   onBackToPrompt,
   isRefining = false,
   refinementError = null,
+  refinementContentBlock = null,
+  onRefinementSuggestionClick,
   refinementSuccess = false,
 }: DesignConfirmationProps) {
   const [refinementExpanded, setRefinementExpanded] = useState(false);
@@ -184,9 +189,11 @@ export function DesignConfirmation({
                   disabled={isRefining}
                 />
 
-                {refinementError && (
-                  <p className="text-sm font-semibold text-red-600">{refinementError}</p>
-                )}
+                <GenerationErrorDisplay
+                  error={refinementContentBlock ? null : refinementError ?? null}
+                  contentBlock={refinementContentBlock ?? null}
+                  onSuggestionClick={onRefinementSuggestionClick}
+                />
 
                 <div className="flex items-center gap-4">
                   <motion.button

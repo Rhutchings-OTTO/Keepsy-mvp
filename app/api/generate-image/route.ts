@@ -7,6 +7,10 @@ import {
   sanitizePrompt,
 } from "./guardrails";
 import {
+  processPrompt,
+  CONTENT_BLOCK_SUGGESTIONS,
+} from "@/lib/moderation/promptModeration";
+import {
   getGenerationMetrics,
   persistMetricsIfDue,
   recordGenerationMetric,
@@ -42,13 +46,21 @@ function getImageSizeForShape(shape: DesignShape): "1024x1024" | "1024x1536" | "
 const generationCache = new Map<string, CachedGeneration>();
 const inflightByPrompt = new Map<string, Promise<string>>();
 
-function normalizeGenerationError(message: string): { status: number; error: string } {
+const CONTENT_BLOCK_RESPONSE = {
+  code: "content_block" as const,
+  title: "Let's tweak that slightly",
+  message:
+    "We can create original characters and themes, but we can't generate specific copyrighted or trademarked characters. Try describing the style, colours, or mood instead.",
+  suggestions: [...CONTENT_BLOCK_SUGGESTIONS],
+};
+
+function normalizeGenerationError(message: string): { status: number; error: string; contentBlock?: boolean } {
   const lower = message.toLowerCase();
   if (lower.includes("safety system") || lower.includes("content policy")) {
     return {
       status: 400,
-      error:
-        "This image was blocked by content checks. Try rephrasing (e.g. describe the scene or mood rather than specific characters) or use a different prompt.",
+      error: CONTENT_BLOCK_RESPONSE.message,
+      contentBlock: true,
     };
   }
   return { status: 500, error: message };
@@ -176,7 +188,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: usageCheck.error }, { status: usageCheck.status });
     }
 
-    const promptCheck = sanitizePrompt(prompt);
+    const moderation = processPrompt(prompt);
+    if (moderation.action === "block") {
+      return NextResponse.json(
+        {
+          error: CONTENT_BLOCK_RESPONSE.message,
+          ...CONTENT_BLOCK_RESPONSE,
+        },
+        { status: 400 }
+      );
+    }
+    const promptToUse = moderation.action === "rewrite" ? moderation.prompt : moderation.prompt;
+
+    const promptCheck = sanitizePrompt(promptToUse);
     if (!promptCheck.ok) {
       return NextResponse.json({ error: promptCheck.error }, { status: 400 });
     }
@@ -264,7 +288,11 @@ export async function POST(req: Request) {
     const message = e instanceof Error ? e.message : "Server error";
     recordGenerationMetric("totalErrors", 1);
     const normalized = normalizeGenerationError(message);
-    return NextResponse.json({ error: normalized.error }, { status: normalized.status });
+    const body =
+      normalized.contentBlock
+        ? { error: normalized.error, ...CONTENT_BLOCK_RESPONSE }
+        : { error: normalized.error };
+    return NextResponse.json(body, { status: normalized.status });
   } finally {
     persistMetricsIfDue();
   }

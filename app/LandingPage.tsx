@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import IridescenceBackground from "@/components/IridescenceBackground";
 import RegionSelector from "@/components/RegionSelector";
 import { HeroFloatingCards } from "@/components/HeroFloatingCards";
+import { useHeroLayout } from "@/components/hero/useHeroLayout";
 import { Reveal } from "@/components/motion/Reveal";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
@@ -32,6 +33,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   });
   const heroTextRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
+  const heroLayout = useHeroLayout(mainRef, heroTextRef);
   const pointerScale = useMemo(() => (isHovered ? 1 : 0.45), [isHovered]);
   const { scrollY } = useScroll();
   const reduceMotion = useReducedMotion();
@@ -58,7 +60,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
   return (
     <div
-      className="relative min-h-screen overflow-hidden text-[#23211F]"
+      className="relative flex min-h-screen flex-col overflow-hidden text-[#23211F]"
       onMouseMove={(event) => {
         const { innerWidth, innerHeight } = window;
         const x = ((event.clientX / innerWidth) * 100 - 50) * pointerScale;
@@ -70,10 +72,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     >
       <IridescenceBackground />
 
-      <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-4 py-8 sm:px-6">
+      <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-4 py-6 sm:px-6 sm:py-8">
         <div className="w-24 sm:w-40" />
         <motion.div
-          className="logo-glass-tablet relative z-30 flex min-w-0 max-w-fit shrink-0 items-center justify-center rounded-[24px] px-5 py-3 sm:px-6 sm:py-4"
+          className="logo-glass-tablet relative z-20 flex min-w-0 max-w-fit shrink-0 items-center justify-center rounded-[24px] px-5 py-3 sm:px-6 sm:py-4"
           style={FF.cinematicUX && !reduceMotion ? { y: logoTabletY } : undefined}
           whileHover={!reduceMotion ? { scale: 1.02 } : undefined}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
@@ -98,14 +100,14 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
       <motion.main
         ref={mainRef}
         style={FF.cinematicUX ? { y: heroY } : undefined}
-        className="relative z-10 mx-auto flex min-h-[82vh] max-w-7xl items-center justify-center px-6 pb-14"
+        className="relative z-10 mx-auto flex min-h-0 flex-1 w-full max-w-7xl flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8"
       >
-        <Reveal variant="fadeUp" className="relative z-20 max-w-5xl text-center">
-          <div ref={heroTextRef}>
-          <p className="mb-4 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600">
+        <Reveal variant="fadeUp" className="relative z-30 max-w-5xl text-center">
+          <div ref={heroTextRef} className="hero-safe-zone">
+          <p className="mb-3 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-indigo-600 sm:mb-4">
             AI-powered creativity
           </p>
-          <h1 className="text-5xl font-black leading-[1.05] md:text-7xl">
+          <h1 className="text-[clamp(2rem,6vw,4.5rem)] font-black leading-[1.05] sm:text-[clamp(2.5rem,7vw,5rem)] md:text-[clamp(3rem,8vw,5.5rem)]">
             Imagine it. Generate it.
             <br />
             <motion.span
@@ -123,10 +125,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               Cherish it.
             </motion.span>
           </h1>
-          <p className="mx-auto mt-6 max-w-3xl text-xl font-medium text-black/60">
+          <p className="mx-auto mt-4 max-w-3xl text-[clamp(0.95rem,2vw,1.25rem)] font-medium leading-relaxed text-black/60 sm:mt-5 md:mt-6">
             Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
           </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className={`mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:mt-8 ${heroLayout.compactMode ? "sm:mt-6" : "md:mt-10"}`}>
             <button
               onClick={(event) => navigateWithRipple(event, "/create")}
               className="rounded-2xl bg-black px-6 py-3 text-base font-black text-white shadow-lg transition hover:bg-black/90"
@@ -144,8 +146,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
         </Reveal>
 
         <HeroFloatingCards
-          textRef={heroTextRef}
-          containerRef={mainRef}
+          layout={heroLayout}
           cursorOffset={cursorOffset}
           cardsY={cardsY}
           reduceMotion={reduceMotion ?? false}

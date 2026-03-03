@@ -11,6 +11,7 @@ import CheckoutSummaryEnhancer from "@/components/CheckoutSummaryEnhancer";
 import UpsellDrawer from "@/components/UpsellDrawer";
 import GiftAssistantWidget from "@/components/GiftAssistantWidget";
 import { CreatePageLayoutLean } from "@/components/create/CreatePageLayoutLean";
+import { DesignConfirmation } from "@/components/generation/DesignConfirmation";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { Reveal } from "@/components/motion/Reveal";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
@@ -265,7 +266,7 @@ async function checkoutViaKeepsyAPI(args: {
 export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?: InitialCreateQuery }) {
   const { state: conversionFlow, updateState: updateConversionFlow } = useConversionFlow();
   const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [region] = useState<Region>(() => getRegion() ?? "UK");
 
   const [prompt, setPrompt] = useState("");
@@ -273,7 +274,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [isGenerating, setIsGenerating] = useState(false);
 
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [lastGenerationPrompt, setLastGenerationPrompt] = useState<string>("");
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [refinementSuccess, setRefinementSuccess] = useState(false);
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
@@ -341,6 +344,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   }, [cartItems]);
 
   useEffect(() => {
+    if (step === 2 && !generatedImage) setStep(1);
+  }, [step, generatedImage]);
+
+  useEffect(() => {
     if (!initialQuery || didApplyInitialQuery.current) return;
     didApplyInitialQuery.current = true;
 
@@ -361,7 +368,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     if (mappedProduct) {
       setSelectedProduct(mappedProduct);
       setSelectedColor(mappedProduct.colors[0]);
-      setStep(2);
     }
 
     const promptPrefill = initialQuery.prompt?.trim();
@@ -421,7 +427,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
       if (!imageDataUrl) throw new Error("Failed to generate image");
       setGeneratedImage(imageDataUrl);
+      setLastGenerationPrompt(promptWithQualityGuide);
       setGenerationError(null);
+      setRefinementSuccess(false);
       setStep(2);
       setView("home");
     } catch (e) {
@@ -435,6 +443,35 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       }
       setIsGenerating(false);
       setIsBusy(false);
+    }
+  };
+
+  const handleRefine = async (refinementText: string) => {
+    if (!generatedImage || !refinementText.trim()) return;
+    setIsGenerating(true);
+    setGenerationError(null);
+    setRefinementSuccess(false);
+    generateAbortRef.current?.abort();
+    const controller = new AbortController();
+    generateAbortRef.current = controller;
+    try {
+      const instruction = `${lastGenerationPrompt}\n\nRefinement request: ${refinementText.trim()}`;
+      const imageDataUrl = await generateViaKeepsyAPI({
+        prompt: instruction,
+        sourceImageDataUrl: generatedImage,
+        designShape: "square",
+        signal: controller.signal,
+      });
+      setGeneratedImage(imageDataUrl);
+      setLastGenerationPrompt(instruction);
+      setRefinementSuccess(true);
+      setGenerationError(null);
+    } catch (e) {
+      const aborted = e instanceof Error && e.name === "AbortError";
+      setGenerationError(aborted ? "Update was cancelled." : getFriendlyGenerationError(e));
+    } finally {
+      generateAbortRef.current = null;
+      setIsGenerating(false);
     }
   };
 
@@ -464,7 +501,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       ];
     });
     setIsCartOpen(true);
-    setStep(3);
+    setStep(4);
   };
 
   const handleRemoveCartItem = (id: string) => {
@@ -714,16 +751,29 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     if (!product) return;
                     setSelectedProduct(product);
                     setSelectedColor(product.colors[0]);
-                    setStep(2);
                   }}
                   fileInputRef={fileInputRef}
                 />
               )}
 
-              {/* STEP 2 */}
-              {step === 2 && (
+              {/* STEP 2 — Design confirmation */}
+              {step === 2 && generatedImage && (
+                <DesignConfirmation
+                  generatedImage={generatedImage}
+                  region={region}
+                  onContinue={() => setStep(3)}
+                  onRefine={handleRefine}
+                  onBackToPrompt={() => setStep(1)}
+                  isRefining={isGenerating}
+                  refinementError={generationError}
+                  refinementSuccess={refinementSuccess}
+                />
+              )}
+
+              {/* STEP 3 — Mockup placement */}
+              {step === 3 && (
                 <motion.div
-                  key="step2"
+                  key="step3"
                   initial={{ opacity: 0, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -40 }}
@@ -748,13 +798,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">
                         <Sparkles size={14} /> Applied to real mockups
                       </div>
-                      <button
-                        onClick={() => setStep(1)}
-                        className="text-xs font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2"
-                      >
-                        <ChevronLeft size={16} />
-                        Back
-                      </button>
+                    <button
+                      onClick={() => setStep(2)}
+                      className="text-xs font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2"
+                    >
+                      <ChevronLeft size={16} />
+                      Back
+                    </button>
                     </div>
                     {FF.beforeAfter ? (
                       <div className="mt-4">
@@ -856,10 +906,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 </motion.div>
               )}
 
-              {/* STEP 3 */}
-              {step === 3 && (
+              {/* STEP 4 — Checkout */}
+              {step === 4 && (
                 <motion.div
-                  key="step3"
+                  key="step4"
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.98 }}
@@ -890,7 +940,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       </AnimatePresence>
                     </motion.button>
 
-                    <button onClick={() => setStep(2)} className="mt-4 text-sm font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2">
+                    <button onClick={() => setStep(3)} className="mt-4 text-sm font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2">
                       <ChevronLeft size={16} /> Back
                     </button>
                     {FF.trustLayer ? (
@@ -965,7 +1015,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     onClick={() => {
                       setSelectedProduct(p);
                       setView("home");
-                      setStep(2);
+                      setStep(1);
                     }}
                   >
                     <div className="text-lg font-black">{p.name}</div>

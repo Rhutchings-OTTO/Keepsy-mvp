@@ -5,7 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useFrame } from "@react-three/fiber";
-import { Clouds, Cloud } from "@react-three/drei";
+import {
+  Clouds,
+  Cloud,
+  PerformanceMonitor,
+  AdaptiveDpr,
+  AdaptiveEvents,
+  usePerformanceMonitor,
+} from "@react-three/drei";
 import * as THREE from "three";
 import type { Region } from "@/lib/region";
 import { setRegion } from "@/lib/region";
@@ -103,10 +110,16 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
               <Canvas
                 camera={{ position: [0, 0, 5], fov: 75 }}
                 gl={{ alpha: false }}
+                dpr={[1, 2]}
+                performance={{ min: 0.5, max: 1 }}
                 className="h-full w-full"
               >
                 <color attach="background" args={[IVORY]} />
-                <CloudScene isAccelerating />
+                <PerformanceMonitor>
+                  <AdaptiveDpr pixelated />
+                  <AdaptiveEvents />
+                  <CloudSceneWithPerf isAccelerating />
+                </PerformanceMonitor>
               </Canvas>
             </Suspense>
             {/* ACT 4: White Flash - arrival at 2.5s */}
@@ -124,8 +137,15 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
   );
 }
 
-function CloudScene({ isAccelerating }: { isAccelerating: boolean }) {
+const CLOUD_SEGMENT_COUNT = 60; // 40 + 20 from the two Cloud components
+
+function CloudSceneWithPerf({ isAccelerating }: { isAccelerating: boolean }) {
   const groupRef = useRef<THREE.Group>(null!);
+  const [perfFactor, setPerfFactor] = useState(1);
+
+  usePerformanceMonitor({
+    onChange: ({ factor }) => setPerfFactor(factor),
+  });
 
   useFrame((_: unknown, delta: number) => {
     if (!groupRef.current) return;
@@ -134,13 +154,19 @@ function CloudScene({ isAccelerating }: { isAccelerating: boolean }) {
     if (groupRef.current.position.z > 20) groupRef.current.position.z = 0;
   });
 
+  const cloudRange = Math.max(10, Math.floor(CLOUD_SEGMENT_COUNT * perfFactor));
+
   return (
     <>
       <ambientLight intensity={1.5} />
       <pointLight position={[10, 10, 10]} />
       <fog attach="fog" args={["#F9F8F6", 0, 15]} />
       <group ref={groupRef}>
-        <Clouds material={THREE.MeshLambertMaterial}>
+        <Clouds
+          material={THREE.MeshLambertMaterial}
+          range={cloudRange}
+          limit={CLOUD_SEGMENT_COUNT}
+        >
           <Cloud segments={40} bounds={[10, 2, 2]} volume={10} color="#F9F8F6" opacity={0.8} />
           <Cloud seed={1} scale={2} volume={5} color="#E2E8FF" fade={100} />
         </Clouds>

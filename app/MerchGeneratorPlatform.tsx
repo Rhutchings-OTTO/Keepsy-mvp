@@ -1,14 +1,19 @@
 "use client";
 
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import { flushSync } from "react-dom";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { MockupRenderer } from "@/components/MockupRenderer";
+import dynamic from "next/dynamic";
 import { GenerationLoadingOverlay } from "@/components/GenerationLoadingOverlay";
 import TrustBar from "@/components/TrustBar";
 import GiftingStep from "@/components/GiftingStep";
-import CheckoutSummaryEnhancer from "@/components/CheckoutSummaryEnhancer";
+const CheckoutSummaryEnhancer = dynamic(
+  () => import("@/components/CheckoutSummaryEnhancer"),
+  { ssr: false }
+);
 import UpsellDrawer from "@/components/UpsellDrawer";
 import GiftAssistantWidget from "@/components/GiftAssistantWidget";
 import { CreatePageLayoutLean } from "@/components/create/CreatePageLayoutLean";
@@ -357,6 +362,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   };
   const [isBusy, setIsBusy] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationStartedAt, setGenerationStartedAt] = useState<number | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [generationContentBlock, setGenerationContentBlock] = useState<{
     title: string;
@@ -517,8 +523,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       return;
     }
     if (safeOverride) setPrompt(safeOverride);
-    setIsGenerating(true);
-    generationCtx?.startGeneration();
+    const startedAt = Date.now();
+    flushSync(() => {
+      setIsGenerating(true);
+      setGenerationStartedAt(startedAt);
+      generationCtx?.startGeneration();
+    });
     generateAbortRef.current?.abort();
     const controller = new AbortController();
     generateAbortRef.current = controller;
@@ -596,6 +606,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         generateAbortRef.current = null;
       }
       setIsGenerating(false);
+      setGenerationStartedAt(null);
       generationCtx?.endGeneration();
       setIsBusy(false);
     }
@@ -607,11 +618,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     if (!generatedImage) return;
     if (!canRefine()) return;
 
-    setIsGenerating(true);
-    setGenerationError(null);
-    setGenerationContentBlock(null);
-    setRefinementSuccess(false);
-    generationCtx?.startGeneration();
+    const startedAt = Date.now();
+    flushSync(() => {
+      setIsGenerating(true);
+      setGenerationStartedAt(startedAt);
+      setGenerationError(null);
+      setGenerationContentBlock(null);
+      setRefinementSuccess(false);
+      generationCtx?.startGeneration();
+    });
     generateAbortRef.current?.abort();
     const controller = new AbortController();
     generateAbortRef.current = controller;
@@ -648,6 +663,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     } finally {
       generateAbortRef.current = null;
       setIsGenerating(false);
+      setGenerationStartedAt(null);
       generationCtx?.endGeneration();
     }
   };
@@ -1514,6 +1530,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       </footer>
       <GenerationLoadingOverlay
         isOpen={isGenerating}
+        startedAt={generationStartedAt}
         productType={selectedProduct.id}
         hasSourceImage={Boolean(uploadedImage)}
         region={region}

@@ -2,17 +2,22 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, useScroll, useTransform, useReducedMotion, useMotionValue, useSpring } from "framer-motion";
 import { useRouter } from "next/navigation";
 import AuroraBackground from "@/components/AuroraBackground";
-import { PremiumGateway } from "@/components/PremiumGateway";
 import RegionSelector from "@/components/RegionSelector";
 import { HeroFloatersSimple } from "@/components/hero/HeroFloatersSimple";
 import { Reveal } from "@/components/motion/Reveal";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
+
+const PremiumGateway = dynamic(
+  () => import("@/components/PremiumGateway").then((mod) => mod.PremiumGateway),
+  { ssr: false }
+);
 
 const CONTAINER = "w-full max-w-[420px] sm:max-w-[720px] lg:max-w-[960px] mx-auto px-5";
 
@@ -300,6 +305,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         width={240}
                         height={80}
                         className="h-auto w-[170px] brightness-0 invert sm:w-[220px]"
+                        priority
                       />
                     </Link>
                   </div>

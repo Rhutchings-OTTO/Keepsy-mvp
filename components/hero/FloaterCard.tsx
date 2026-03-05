@@ -16,9 +16,10 @@ type FloaterCardProps = {
   subtitle: string;
   className?: string;
   href?: string;
+  priority?: boolean;
 };
 
-export function FloaterCard({ image, alt, title, subtitle, className = "", href }: FloaterCardProps) {
+export function FloaterCard({ image, alt, title, subtitle, className = "", href, priority }: FloaterCardProps) {
   const reduceMotion = useReducedMotionPref();
 
   const card = (
@@ -35,6 +36,7 @@ export function FloaterCard({ image, alt, title, subtitle, className = "", href 
           fill
           sizes="(max-width: 640px) 120px, 200px"
           className="object-cover"
+          priority={priority}
         />
       </div>
       {/* Title: 14-16px, 2 lines max - pb-1 prevents descender clipping */}

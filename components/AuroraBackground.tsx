@@ -1,6 +1,8 @@
 "use client";
 
-export default function AuroraBackground() {
+import { memo } from "react";
+
+function AuroraBackgroundInner() {
   return (
     <>
       <div className="aurora-container">
@@ -12,3 +14,5 @@ export default function AuroraBackground() {
     </>
   );
 }
+
+export default memo(AuroraBackgroundInner);

@@ -15,21 +15,31 @@ function getSketchMessages(region?: string | null): string[] {
   return SKETCH_MICRO_COPY_TEMPLATES.map((t) => t.replace("{region}", r));
 }
 
+const PROGRESS_DURATION_MS = 20_000;
+/** Ease-out cubic: fast start, slows toward 95% so we never quite finish until API returns */
+function progressFromElapsed(elapsedMs: number): number {
+  const t = Math.min(1, elapsedMs / PROGRESS_DURATION_MS);
+  return Math.min(0.95, 1 - Math.pow(1 - t, 3));
+}
+
 type GenerativeLoaderProps = {
   message?: string;
   useInternalMessages?: boolean;
   region?: string | null;
+  startedAt?: number | null;
 };
 
 export function GenerativeLoader({
   message,
   useInternalMessages = true,
   region,
+  startedAt = null,
 }: GenerativeLoaderProps) {
   const messages = useMemo(() => getSketchMessages(region), [region]);
   const [index, setIndex] = useState(() =>
     Math.floor(Math.random() * messages.length)
   );
+  const [progress, setProgress] = useState(0);
 
   const displayMessage = useMemo(() => {
     if (!useInternalMessages && message) return message;
@@ -43,6 +53,20 @@ export function GenerativeLoader({
     }, 2200);
     return () => clearInterval(t);
   }, [useInternalMessages, messages.length]);
+
+  useEffect(() => {
+    if (startedAt == null) {
+      setProgress(0);
+      return;
+    }
+    const tick = () => {
+      const elapsed = Date.now() - startedAt;
+      setProgress(progressFromElapsed(elapsed));
+    };
+    tick();
+    const id = setInterval(tick, 120);
+    return () => clearInterval(id);
+  }, [startedAt]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-6">
@@ -104,6 +128,25 @@ export function GenerativeLoader({
           {displayMessage}
         </motion.p>
       </AnimatePresence>
+
+      {startedAt != null && (
+        <div className="w-full max-w-[240px]">
+          <div
+            className="h-1 w-full overflow-hidden rounded-full bg-[#1A1A1A]/10"
+            role="progressbar"
+            aria-valuenow={Math.round(progress * 100)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <motion.div
+              className="h-full rounded-full bg-[#1A1A1A]/35"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress * 100}%` }}
+              transition={{ duration: 0.15 }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

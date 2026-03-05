@@ -8,6 +8,7 @@ type ProductType = "tshirt" | "hoodie" | "card" | "mug" | string;
 
 type GenerationLoadingOverlayProps = {
   isOpen: boolean;
+  startedAt?: number | null;
   productType?: ProductType;
   hasSourceImage?: boolean;
   showSavingHint?: boolean;
@@ -16,6 +17,7 @@ type GenerationLoadingOverlayProps = {
 
 export function GenerationLoadingOverlay({
   isOpen,
+  startedAt = null,
   showSavingHint = false,
   region,
 }: GenerationLoadingOverlayProps) {
@@ -58,7 +60,7 @@ export function GenerationLoadingOverlay({
           )}
 
           <div className="frosted-glass relative w-full max-w-md rounded-3xl p-8 text-center">
-            <GenerativeLoader useInternalMessages={true} region={region} />
+            <GenerativeLoader useInternalMessages={true} region={region} startedAt={startedAt} />
 
             <p className="mt-4 text-sm font-medium text-[#1A1A1A]/60">Calibrating pigments — this usually takes a moment.</p>
             {showSavingHint ? (

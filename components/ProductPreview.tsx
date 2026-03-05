@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useId } from "react";
+import { memo, useId } from "react";
 import {
   getPlacement,
   type MockupProductType,
@@ -36,7 +36,7 @@ function rectToSvgMaskRect(rect: PlacementRect): { x: number; y: number; w: numb
   };
 }
 
-export function ProductPreview({
+export const ProductPreview = memo(function ProductPreview({
   imageUrl,
   productType,
   color = "white",
@@ -176,4 +176,4 @@ export function ProductPreview({
       </div>
     </>
   );
-}
+});

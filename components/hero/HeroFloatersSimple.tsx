@@ -230,6 +230,7 @@ export function HeroFloatersSimple({ heroRef, safeZoneRef }: HeroFloatersSimpleP
                 subtitle={p.item.subtitle}
                 className="h-full w-full min-w-0 border-black/10 bg-white/80"
                 href={p.item.productSlug ? getProductPreviewHref(p.item.productSlug) : undefined}
+                priority={i < 4}
               />
             </motion.div>
           </div>

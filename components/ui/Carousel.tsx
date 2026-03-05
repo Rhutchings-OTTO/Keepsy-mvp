@@ -89,7 +89,7 @@ export function Carousel({ children, className = "", showArrows = true, showDots
             onClick={handlePrev}
             disabled={!canScrollLeft}
             aria-label="Previous slide"
-            className="absolute left-0 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 p-2 shadow-md transition hover:bg-white disabled:opacity-30 disabled:hover:bg-white/90"
+            className="absolute left-0 top-1/2 hidden -translate-y-1/2 rounded-full border border-black/10 bg-white/90 p-2 shadow-md transition hover:bg-white disabled:opacity-30 disabled:hover:bg-white/90 sm:flex"
           >
             <ChevronLeft size={20} />
           </button>
@@ -98,7 +98,7 @@ export function Carousel({ children, className = "", showArrows = true, showDots
             onClick={handleNext}
             disabled={!canScrollRight}
             aria-label="Next slide"
-            className="absolute right-0 top-1/2 -translate-y-1/2 rounded-full border border-black/10 bg-white/90 p-2 shadow-md transition hover:bg-white disabled:opacity-30 disabled:hover:bg-white/90"
+            className="absolute right-0 top-1/2 hidden -translate-y-1/2 rounded-full border border-black/10 bg-white/90 p-2 shadow-md transition hover:bg-white disabled:opacity-30 disabled:hover:bg-white/90 sm:flex"
           >
             <ChevronRight size={20} />
           </button>

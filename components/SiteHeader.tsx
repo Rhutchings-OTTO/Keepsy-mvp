@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
+const CONTAINER = "w-full max-w-[420px] sm:max-w-[720px] lg:max-w-[960px] mx-auto px-5";
+
 const NAV_ITEMS = [
   { href: "/gift-ideas", label: "Gift Ideas" },
   { href: "/create", label: "Create" },
@@ -14,8 +16,8 @@ const NAV_ITEMS = [
 export function SiteHeader() {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-50 border-b border-black/10 bg-[#F7F1EB]">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4">
+    <header className="sticky top-0 z-50 h-16 border-b border-black/10 bg-[#F7F1EB]/95 backdrop-blur-sm">
+      <div className={`flex h-full items-center justify-between ${CONTAINER}`}>
         <nav className="flex items-center gap-1 sm:gap-3" aria-label="Primary">
           {NAV_ITEMS.map((item) => {
             const active = item.href !== "/#reviews" && item.href.startsWith("/") && pathname === item.href;
@@ -32,13 +34,13 @@ export function SiteHeader() {
             );
           })}
         </nav>
-        <Link href="/" aria-label="Go to homepage">
+        <Link href="/" aria-label="Go to homepage" className="flex shrink-0 items-center">
           <Image
             src="/keepsy-logo-transparent.png"
             alt="Keepsy"
-            width={560}
-            height={160}
-            className="h-12 w-auto object-contain sm:h-14"
+            width={280}
+            height={80}
+            className="h-8 w-auto object-contain sm:h-9"
           />
         </Link>
       </div>

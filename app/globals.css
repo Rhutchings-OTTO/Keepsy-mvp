@@ -1,10 +1,16 @@
 @import "tailwindcss";
 
+
+/* ===== Global Theme & Design Tokens ===== */
 :root {
-  --bg: #f7f1eb;
-  --ink: #23211f;
-  --muted: rgba(35, 33, 31, 0.62);
-  --border: rgba(35, 33, 31, 0.12);
+  /* Palette */
+  --bg: #F9F8F6;
+  --ink: #1A1A1A;
+  --ink-muted: rgba(26, 26, 26, 0.65);
+  --border: rgba(26, 26, 26, 0.12);
+  --region-uk: #012169;
+  --region-us-blue: #3C3B6E;
+  --region-us-red: #B22234;
 }
 
 html,
@@ -21,7 +27,8 @@ body {
 }
 
 ::selection {
-  background: rgba(124, 199, 230, 0.35);
+  background: #e2e8ff;
+  color: #1a1a1a;
 }
 
 a {
@@ -29,12 +36,39 @@ a {
   text-decoration: none;
 }
 
-/* Smooth scrolling for “Start” button */
 html {
   scroll-behavior: smooth;
 }
 
-/* Premium neutral glass logo tablet - soft fade edges */
+/* Frosted Glass - reusable premium card */
+.frosted-glass {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+}
+
+/* Mesh gradient keyframes */
+@keyframes mesh-oscillate {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.mesh-gradient-bg {
+  background: radial-gradient(at 40% 20%, rgba(200, 220, 230, 0.35) 0%, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(250, 220, 220, 0.3) 0%, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(220, 230, 250, 0.25) 0%, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(240, 230, 210, 0.2) 0%, transparent 50%);
+  background-size: 200% 200%;
+  animation: mesh-oscillate 20s ease-in-out infinite;
+}
+
+/* Premium glass logo tablet - kept for compatibility */
 .logo-glass-tablet {
   position: relative;
   background: radial-gradient(
@@ -65,19 +99,48 @@ html {
   border-radius: inherit;
 }
 
-.logo-glass-tablet img {
-  position: relative;
-  z-index: 1;
-  filter: brightness(1.35) saturate(0) sepia(0.18);
-}
-
-@media (max-width: 640px) {
-  .logo-glass-tablet {
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-  }
-}
-
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Aurora background blobs */
+@keyframes aurora {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+.aurora-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  overflow: hidden;
+  background-color: #f9f8f6;
+  filter: blur(100px);
+  opacity: 0.6;
+}
+
+.aurora-blob {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  mix-blend-mode: multiply;
+  animation: aurora 20s infinite alternate ease-in-out;
+}
+
+.aurora-blob-1 { background: #e2e8ff; top: -10%; left: -10%; }
+.aurora-blob-2 { background: #ffedfa; top: 10%; right: -5%; animation-delay: -5s; }
+.aurora-blob-3 { background: #f0fff4; bottom: -10%; left: 20%; animation-delay: -10s; }
+
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
 }

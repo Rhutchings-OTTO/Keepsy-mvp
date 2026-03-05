@@ -7,6 +7,7 @@ import Image from "next/image";
 import type { Region } from "@/lib/region";
 import { CREATE_EXAMPLES } from "@/content/createExamples";
 import { FF } from "@/lib/featureFlags";
+import { KineticHeading } from "@/components/motion/KineticHeading";
 
 type Mode = "describe" | "upload";
 
@@ -59,7 +60,7 @@ export default function CreateModePanel({
 
   return (
     <section className="mb-5 w-full rounded-3xl border border-black/10 bg-white/80 p-4 text-left shadow-sm sm:p-5">
-      <h2 className="text-xl font-black text-[#2D241E] sm:text-2xl">Start with a memory or an idea</h2>
+      <KineticHeading as="h2" className="text-xl font-black text-[#2D241E] sm:text-2xl">Start with a memory or an idea</KineticHeading>
       <p className="mt-1 text-sm font-medium text-black/55">
         Describe anything you imagine, or upload a photo and we&apos;ll transform it into a beautiful gift.
       </p>

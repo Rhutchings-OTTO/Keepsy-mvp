@@ -6,6 +6,8 @@ import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNotice";
 import { motionTransition } from "@/lib/motion";
+import { KineticHeading } from "@/components/motion/KineticHeading";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 
 const REFINEMENT_CHIPS = [
   "Softer colours",
@@ -110,7 +112,7 @@ export function DesignConfirmation({
 
       {/* Section 1 — Title + reassurance */}
       <div className="text-center mb-10">
-        <h1 className="text-3xl sm:text-4xl font-black text-black mb-2">How does this look?</h1>
+        <KineticHeading className="text-3xl sm:text-4xl font-black text-black mb-2">How does this look?</KineticHeading>
         <p className="text-black/60 font-semibold text-sm sm:text-base">You can still make changes later.</p>
       </div>
 
@@ -169,7 +171,7 @@ export function DesignConfirmation({
         </motion.button>
 
         {/* Option B — Continue (primary) */}
-        <motion.button
+        <MagneticButton
           type="button"
           onClick={onContinue}
           disabled={isRefining}
@@ -179,7 +181,7 @@ export function DesignConfirmation({
         >
           <div>Show me how this will look on my gift</div>
           <div className="text-white/75 text-sm mt-1">See it on cards, mugs and more.</div>
-        </motion.button>
+        </MagneticButton>
       </div>
 
       {/* Section 4 — Refinement panel (accordion) */}
@@ -201,13 +203,13 @@ export function DesignConfirmation({
                     You&apos;ve reached the maximum of 3 tweaks for this design. If you&apos;d like, start a fresh design from the prompt.
                   </p>
                   {onStartFresh && (
-                    <button
+                    <MagneticButton
                       type="button"
                       onClick={onStartFresh}
                       className="px-4 py-2 rounded-xl bg-black text-white text-sm font-bold hover:bg-black/90"
                     >
                       Start a fresh design
-                    </button>
+                    </MagneticButton>
                   )}
                 </div>
               ) : (
@@ -253,7 +255,7 @@ export function DesignConfirmation({
                   />
 
                   <div className="flex items-center gap-4">
-                    <motion.button
+                    <MagneticButton
                       type="submit"
                       disabled={!trimmedText || isRefining || !canRefine}
                       className="px-6 py-3 rounded-xl bg-black text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed"
@@ -261,7 +263,7 @@ export function DesignConfirmation({
                       whileTap={{ scale: 0.98 }}
                     >
                       {isRefining ? "Updating…" : "Update my design"}
-                    </motion.button>
+                    </MagneticButton>
                     <button
                       type="button"
                       onClick={() => {

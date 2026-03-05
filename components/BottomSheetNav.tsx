@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { DynamicLogo } from "@/components/DynamicLogo";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Gift, PlusCircle, Star, Mail } from "lucide-react";
@@ -49,12 +49,14 @@ export function BottomSheetNav() {
               className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl frosted-glass border-t border-white/30 shadow-2xl md:hidden"
             >
               <div className="flex items-center justify-between p-4">
-                <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2">
-                  <Image
-                    src="/keepsy-logo-transparent.png"
-                    alt="Keepsy"
-                    width={100}
-                    height={32}
+                <Link
+                  href="/"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 text-obsidian"
+                >
+                  <DynamicLogo
+                    href={null}
+                    width={80}
                     className="h-6 w-auto brightness-0 invert"
                   />
                 </Link>

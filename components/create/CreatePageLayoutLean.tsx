@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -9,6 +9,8 @@ import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { PromptHelperCollapsible } from "./PromptHelperCollapsible";
 import { IdeasForYou } from "./IdeasForYou";
 import { Carousel } from "@/components/ui/Carousel";
+import { KineticHeading } from "@/components/motion/KineticHeading";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNotice";
 import { getProductPreviewHref } from "@/lib/routes";
 import { revealUp } from "@/lib/motion";
@@ -86,6 +88,26 @@ export function CreatePageLayoutLean({
 }: CreatePageLayoutLeanProps) {
   const [createMode, setCreateMode] = useState<"describe" | "upload">("describe");
   const [pendingReplace, setPendingReplace] = useState<string | null>(null);
+  const [midnightVibe, setMidnightVibe] = useState<{
+    placeholder: string;
+    glowColor: string;
+    buttonText: string;
+  }>({ placeholder: "Imagine it.", glowColor: "rgba(255, 255, 255, 0.2)", buttonText: "Generate" });
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour === 0) {
+      setMidnightVibe({
+        placeholder: "What do you dream of?",
+        glowColor: "rgba(147, 51, 234, 0.4)",
+        buttonText: "Manifest",
+      });
+    }
+  }, []);
+
+  const promptPlaceholder = uploadedImage
+    ? "Describe how you'd like to transform this photo…"
+    : midnightVibe.placeholder;
 
   const handleChipPrompt = (nextPrompt: string) => {
     if (!prompt.trim()) {
@@ -194,8 +216,13 @@ export function CreatePageLayoutLean({
                   setPrompt(e.target.value);
                   setHasUserTypedPrompt(true);
                 }}
-                placeholder={uploadedImage ? "Describe how you'd like to transform this photo…" : "Describe your gift image…"}
-                className="w-full rounded-xl border border-black/10 bg-white px-4 py-4 text-base font-semibold text-black placeholder:text-black/40"
+                placeholder={promptPlaceholder}
+                className="w-full rounded-xl border border-black/10 bg-white px-4 py-4 text-base font-semibold text-black placeholder:text-black/40 transition-shadow duration-300"
+                style={
+                  !uploadedImage && midnightVibe.glowColor !== "rgba(255, 255, 255, 0.2)"
+                    ? { boxShadow: `0 0 24px ${midnightVibe.glowColor}` }
+                    : undefined
+                }
                 aria-label="Describe your gift idea"
               />
 
@@ -239,7 +266,7 @@ export function CreatePageLayoutLean({
                 </div>
               )}
 
-              <motion.button
+              <MagneticButton
                 onClick={() => onGenerate()}
                 disabled={(!(typeof prompt === "string" ? prompt : "").trim() && !uploadedImage) || isBusy}
                 className={`w-full min-h-[52px] rounded-xl px-6 py-4 font-extrabold text-lg text-white flex items-center justify-center gap-2 transition-all shadow-lg active:scale-[0.98] ${
@@ -253,10 +280,10 @@ export function CreatePageLayoutLean({
                   </>
                 ) : (
                   <>
-                    Generate design <ArrowRight size={22} />
+                    {midnightVibe.buttonText} design <ArrowRight size={22} />
                   </>
                 )}
-              </motion.button>
+              </MagneticButton>
             </div>
 
             <p className="text-xs font-semibold text-black/50">Takes ~10–20 seconds. You can edit after.</p>
@@ -329,7 +356,7 @@ export function CreatePageLayoutLean({
 
       {/* F) TESTIMONIALS - SINGLE COMPACT */}
       <motion.section variants={fadeInUp} className="mt-14 w-full">
-        <h2 className="text-2xl md:text-3xl font-black text-center mb-6">What our creators say</h2>
+        <KineticHeading as="h2" className="text-2xl md:text-3xl font-black text-center mb-6">What our creators say</KineticHeading>
         <Carousel showArrows showDots>
           {CREATOR_TESTIMONIALS.map((t) => (
             <article key={t.name} className="rounded-2xl frosted-glass border border-white/20 p-5 text-center">

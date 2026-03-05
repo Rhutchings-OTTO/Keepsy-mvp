@@ -1,15 +1,18 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, useScroll, useTransform, useReducedMotion, useMotionValue, useSpring } from "framer-motion";
 import { useRouter } from "next/navigation";
 import AuroraBackground from "@/components/AuroraBackground";
+import { DynamicLogo } from "@/components/DynamicLogo";
 import RegionSelector from "@/components/RegionSelector";
 import { HeroFloatersSimple } from "@/components/hero/HeroFloatersSimple";
 import { Reveal } from "@/components/motion/Reveal";
+import { RevealSplitText } from "@/components/motion/RevealSplitText";
+import { ParallaxManifesto } from "@/components/ParallaxManifesto";
+import { MouseGlow } from "@/components/MouseGlow";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
@@ -55,9 +58,11 @@ function CommunityBentoGrid({
       className="border-t border-[#1A1A1A]/5 bg-white/30 py-12 sm:py-16"
     >
       <div className="mx-auto w-full max-w-5xl px-5">
-        <h2 className="font-serif text-center text-xl font-bold tracking-tight sm:text-2xl">
-          What our creators say
-        </h2>
+        <RevealSplitText
+          text="What our creators say"
+          as="h2"
+          className="font-serif text-center text-xl font-bold tracking-tight sm:text-2xl"
+        />
         <div
           className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2"
           role="region"
@@ -294,26 +299,28 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center py-12 sm:py-16"
           >
             <div className="absolute inset-0 z-0 mesh-gradient-bg" aria-hidden />
+            <MouseGlow className="z-[1]" />
+            <ParallaxManifesto
+              text="MANIFESTO"
+              speed={0.35}
+              scrollTargetRef={mainRef}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[5]"
+            />
             <div className={`relative z-30 w-full ${CONTAINER}`}>
               <Reveal variant="fadeUp" className="text-center">
                 <div ref={heroTextRef} id="hero-safezone" className="hero-safe-zone flex flex-col items-center gap-6 sm:gap-8">
                   <div className="rounded-3xl frosted-glass px-8 py-6 sm:px-12 sm:py-8">
-                    <Link href="/" className="block" aria-label="Keepsy homepage">
-                      <Image
-                        src="/keepsy-logo-transparent.png"
-                        alt="Keepsy"
-                        width={240}
-                        height={80}
-                        className="h-auto w-[170px] brightness-0 invert sm:w-[220px]"
-                        priority
-                      />
-                    </Link>
+                    <DynamicLogo
+                      href="/"
+                      width={180}
+                      className="block w-[170px] brightness-0 invert sm:w-[220px]"
+                    />
                   </div>
                   <p className="mb-3 inline-block rounded-full bg-[#1A1A1A]/5 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-[#1A1A1A]/70">
                     AI-powered creativity
                   </p>
                   <h1 className="font-serif text-[clamp(1.75rem,5vw,3.5rem)] font-bold leading-[1.08] tracking-tight sm:text-[clamp(2.25rem,6vw,4.5rem)]">
-                    Imagine it. Generate it.
+                    <RevealSplitText text="Imagine it. Generate it." as="span" className="block" />
                     <br />
                     <motion.span
                       className="bg-clip-text text-transparent"
@@ -421,6 +428,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               setIsRegionSelectorOpen(false);
             }}
             onClose={region ? () => setIsRegionSelectorOpen(false) : undefined}
+            currentRegion={activeRegion}
           />
         </>
       )}

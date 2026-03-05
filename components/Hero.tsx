@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { MagneticLink } from "@/components/ui/MagneticLink";
 
 export function Hero() {
   return (
@@ -15,9 +16,9 @@ export function Hero() {
           Upload a photo, choose a style, and we help you create gift-ready cards, mugs, tees, and hoodies for the people you love.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">
-          <Link href="/create" className="min-h-11 rounded-2xl bg-black px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-black/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
+          <MagneticLink href="/create" className="min-h-11 rounded-2xl bg-black px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-black/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 inline-block">
             Create your gift
-          </Link>
+          </MagneticLink>
           <Link href="/gift-ideas" className="text-sm font-semibold text-black/65 underline-offset-4 hover:text-black hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20">
             See gift ideas
           </Link>

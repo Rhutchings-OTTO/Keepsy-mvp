@@ -72,3 +72,20 @@ export const stagger = (delayChildren = 0.05, staggerChildren = 0.08) =>
       },
     },
   }) as Variants;
+
+/** Luxury watch date-flip: each letter flips up from 90° on X-axis */
+export const flipLetter: Variants = {
+  hidden: {
+    opacity: 0,
+    rotateX: 90,
+    transformPerspective: 800,
+  },
+  visible: {
+    opacity: 1,
+    rotateX: 0,
+    transition: {
+      duration: durations.base,
+      ease: easing.smooth,
+    },
+  },
+};

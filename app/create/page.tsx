@@ -1,6 +1,8 @@
 import MerchGeneratorPlatform from "../MerchGeneratorPlatform";
 import { ConversionFlowProvider } from "@/context/ConversionFlowContext";
 import { GenerationProvider, SonicBoomEffect } from "@/context/GenerationContext";
+import { LenisProvider } from "@/components/LenisProvider";
+import { ExitGuardian } from "@/components/ExitGuardian";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,9 @@ export default async function CreatePage({ searchParams }: CreatePageProps) {
   return (
     <ConversionFlowProvider>
       <GenerationProvider>
-        <SonicBoomEffect />
+        <LenisProvider>
+          <SonicBoomEffect />
+        <ExitGuardian />
         <MerchGeneratorPlatform
         initialQuery={{
           product: readParam(resolvedParams, "product"),
@@ -30,6 +34,7 @@ export default async function CreatePage({ searchParams }: CreatePageProps) {
           canceled: readParam(resolvedParams, "canceled") === "1",
         }}
       />
+        </LenisProvider>
       </GenerationProvider>
     </ConversionFlowProvider>
   );

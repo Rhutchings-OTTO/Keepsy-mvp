@@ -5,6 +5,8 @@ import { flushSync } from "react-dom";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { DynamicLogo } from "@/components/DynamicLogo";
+import { MagneticCard } from "@/components/ui/MagneticCard";
 import { MockupRenderer } from "@/components/MockupRenderer";
 import dynamic from "next/dynamic";
 import { GenerationLoadingOverlay } from "@/components/GenerationLoadingOverlay";
@@ -22,6 +24,8 @@ import { SizeGuideDrawer } from "@/components/products/SizeGuideDrawer";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { Reveal } from "@/components/motion/Reveal";
 import { MagneticButton } from "@/components/ui/MagneticButton";
+import { GrainSpotlight } from "@/components/GrainSpotlight";
+import { KineticHeading } from "@/components/motion/KineticHeading";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
 import MagicpathBackground from "@/components/skin/magicpath/MagicpathBackground";
 import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
@@ -882,6 +886,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
             transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
             className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-[#F8C8DC]/20 blur-[120px] rounded-full"
           />
+          <GrainSpotlight />
         </div>
       ) : null}
 
@@ -889,23 +894,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       <nav className={`fixed z-40 w-full px-6 ${isMagicpathSkin ? "top-5" : "top-0 py-4"}`}>
         <MagicpathFrame enabled={isMagicpathSkin} className={isMagicpathSkin ? "mx-auto flex w-full max-w-5xl items-center justify-between px-7 py-5" : ""}>
           <div className={`flex w-full items-center justify-between ${isMagicpathSkin ? "" : "border-b border-black/10 bg-[#F7F1EB]/78 px-0 backdrop-blur-md"}`}>
-            <motion.div
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              className="flex items-center gap-3 cursor-pointer"
+            <DynamicLogo
               onClick={() => {
                 setView("home");
                 setStep(1);
               }}
-            >
-              <Image
-                src="/keepsy-logo-transparent.png"
-                alt="Keepsy"
-                width={640}
-                height={190}
-                className="h-16 w-auto object-contain sm:h-20"
-              />
-            </motion.div>
+              width={160}
+              className="h-16 w-auto text-obsidian sm:h-20"
+            />
 
             <div className="flex items-center gap-4">
               <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-black/60">
@@ -1089,7 +1085,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
                   <div className="lg:col-span-5 space-y-6">
                     <div>
-                      <h2 className="text-4xl font-black mb-2">{selectedProduct.name}</h2>
+                      <KineticHeading as="h2" className="text-4xl font-black mb-2">{selectedProduct.name}</KineticHeading>
                       <p className="text-black/55 font-semibold">{selectedProduct.description}</p>
                     </div>
                     {FF.personalisedStory ? (
@@ -1247,7 +1243,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8"
                 >
                   <div className="bg-white/80 border border-black/10 rounded-[32px] p-7 shadow-sm">
-                    <h2 className="text-3xl font-black mb-4">Checkout</h2>
+                    <KineticHeading as="h2" className="text-3xl font-black mb-4">Checkout</KineticHeading>
                     <p className="text-black/55 font-semibold mb-6">
                       You&apos;re about to buy: <span className="text-black">{checkoutItemDescription}</span>
                     </p>
@@ -1332,7 +1328,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           {view === "catalog" && (
             <motion.div key="catalog" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
               <div className="text-center max-w-2xl mx-auto">
-                <h1 className="text-5xl font-black mb-3">Catalog</h1>
+                <KineticHeading className="text-5xl font-black mb-3">Catalog</KineticHeading>
                 <p className="text-black/55 font-semibold">Pick your base product, then generate a design.</p>
               </div>
 
@@ -1355,17 +1351,22 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           {view === "community" && (
             <motion.div key="community" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
               <div className="text-center max-w-2xl mx-auto">
-                <h1 className="text-5xl font-black mb-3">Community Showcase</h1>
+                <KineticHeading className="text-5xl font-black mb-3">Community Showcase</KineticHeading>
                 <p className="text-black/55 font-semibold">
                   See what other creators are making and get inspiration for your next keepsake.
                 </p>
               </div>
               <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
                 {COMMUNITY_DESIGNS.map((img, idx) => (
-                  <motion.div key={`${img}-${idx}`} whileHover={{ scale: 1.01 }} className="break-inside-avoid rounded-2xl overflow-hidden bg-white border border-black/10">
+                  <MagneticCard
+                    key={`${img}-${idx}`}
+                    maxTilt={8}
+                    hoverScale={1.02}
+                    className="break-inside-avoid rounded-2xl overflow-hidden bg-white border border-black/10 shadow-sm"
+                  >
                     <Image src={img} alt="Community design" width={400} height={500} className="w-full h-auto" />
                     <div className="p-3 text-sm font-semibold text-black/55">@creator_{idx + 1}</div>
-                  </motion.div>
+                  </MagneticCard>
                 ))}
               </div>
             </motion.div>
@@ -1373,23 +1374,23 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
           {view === "legal" && (
             <motion.div key="legal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto space-y-6">
-              <h1 className="text-4xl font-black">Terms & Conditions</h1>
+              <KineticHeading className="text-4xl font-black">Terms & Conditions</KineticHeading>
               <section className="space-y-2 text-black/70">
-                <h2 className="text-xl font-bold text-black">1. Intellectual Property</h2>
+                <KineticHeading as="h2" className="text-xl font-bold text-black">1. Intellectual Property</KineticHeading>
                 <p>
                   AI-generated designs created on Keepsy remain the property of the creator. By placing an order, you grant Keepsy
                   permission to produce and ship products featuring that design.
                 </p>
               </section>
               <section className="space-y-2 text-black/70">
-                <h2 className="text-xl font-bold text-black">2. Usage Policy</h2>
+                <KineticHeading as="h2" className="text-xl font-bold text-black">2. Usage Policy</KineticHeading>
                 <p>
                   Users are responsible for uploaded and generated content. Content must not violate copyright, trademark, or contain
                   illegal or harmful material.
                 </p>
               </section>
               <section className="space-y-2 text-black/70">
-                <h2 className="text-xl font-bold text-black">3. Payments & Refunds</h2>
+                <KineticHeading as="h2" className="text-xl font-bold text-black">3. Payments & Refunds</KineticHeading>
                 <p>
                   Payments are processed securely by Stripe. Because products are custom-made, refunds are only offered for damaged or
                   defective items.
@@ -1534,6 +1535,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         productType={selectedProduct.id}
         hasSourceImage={Boolean(uploadedImage)}
         region={region}
+        prompt={prompt}
       />
       {FF.giftAssistant && view === "home" ? (
         <GiftAssistantWidget

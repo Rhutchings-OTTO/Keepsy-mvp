@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/SiteChrome";
+import { AtelierModeProvider } from "@/context/AtelierModeContext";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -53,7 +54,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${playfair.variable} ${inter.variable}`}>
       <body className="antialiased font-sans">
-        <SiteChrome>{children}</SiteChrome>
+        <AtelierModeProvider>
+          <SiteChrome>{children}</SiteChrome>
+        </AtelierModeProvider>
       </body>
     </html>
   );

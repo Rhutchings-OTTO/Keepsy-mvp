@@ -24,6 +24,7 @@ body {
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 2s ease-out, color 2s ease-out;
 }
 
 ::selection {
@@ -103,6 +104,14 @@ html {
   display: none;
 }
 
+/* Thermal glow on hover - warm orange drop-shadow */
+.thermal-hover {
+  transition: filter 0.3s ease-out;
+}
+.thermal-hover:hover {
+  filter: drop-shadow(0 0 15px rgba(255, 120, 0, 0.2));
+}
+
 /* Aurora background blobs */
 @keyframes aurora {
   0% { transform: translate(0, 0) scale(1); }
@@ -156,4 +165,91 @@ html {
   opacity: 0.04;
   pointer-events: none;
   background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+}
+
+/* Spotlight grain: mouse position creates a clear "spotlight" circle on ivory */
+.grain-spotlight {
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  opacity: 0.07;
+  mask-image: radial-gradient(
+    circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    transparent 0%,
+    rgba(0, 0, 0, 0.3) calc(var(--spot-radius, 280px) * 0.5),
+    black var(--spot-radius, 280px)
+  );
+  mask-size: 100% 100%;
+  -webkit-mask-image: radial-gradient(
+    circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    transparent 0%,
+    rgba(0, 0, 0, 0.3) calc(var(--spot-radius, 280px) * 0.5),
+    black var(--spot-radius, 280px)
+  );
+  -webkit-mask-size: 100% 100%;
+  transition: opacity 0.12s ease;
+}
+
+/* Mouse-following radial glow - uses --x and --y (pixels) from JS */
+.mouse-glow {
+  background: radial-gradient(
+    circle at var(--x, 50%) var(--y, 50%),
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
+  mix-blend-mode: soft-light;
+}
+
+/* ===== Atelier Mode (Konami: ↑↑↓↓←→←→BA) ===== */
+:root.atelier-mode {
+  --bg: #1A1A1A;
+  --ink: #D4AF37;
+  --ink-muted: rgba(212, 175, 55, 0.75);
+  --border: rgba(212, 175, 55, 0.2);
+}
+
+.atelier-mode [class*="bg-ivory"] {
+  background-color: #1A1A1A !important;
+}
+
+.atelier-mode [class*="text-obsidian"] {
+  color: #D4AF37 !important;
+}
+
+.atelier-mode body {
+  background-color: #1A1A1A;
+  color: #D4AF37;
+}
+
+/* Ink Bleed - 2s overlay during atelier toggle */
+.ink-bleed-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  background: #1A1A1A;
+}
+
+.ink-bleed-in {
+  animation: ink-bleed-in 2s ease-out forwards;
+}
+
+.ink-bleed-out {
+  animation: ink-bleed-out 2s ease-out forwards;
+}
+
+@keyframes ink-bleed-in {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+  }
+  100% {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
+
+@keyframes ink-bleed-out {
+  0% {
+    clip-path: circle(150% at 50% 50%);
+  }
+  100% {
+    clip-path: circle(0% at 50% 50%);
+  }
 }

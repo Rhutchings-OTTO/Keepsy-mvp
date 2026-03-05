@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { DynamicLogo } from "@/components/DynamicLogo";
 
 const CONTAINER = "w-full max-w-[420px] sm:max-w-[720px] lg:max-w-[960px] mx-auto px-5";
 
@@ -35,15 +35,11 @@ export function SiteHeader() {
             );
           })}
         </nav>
-        <Link href="/" aria-label="Go to homepage" className="flex shrink-0 items-center">
-          <Image
-            src="/keepsy-logo-transparent.png"
-            alt="Keepsy"
-            width={280}
-            height={80}
-            className="h-8 w-auto object-contain sm:h-9"
-          />
-        </Link>
+        <DynamicLogo
+          href="/"
+          width={110}
+          className="h-8 w-auto text-obsidian sm:h-9"
+        />
       </div>
     </header>
   );

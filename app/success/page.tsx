@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { MagneticLink } from "@/components/ui/MagneticLink";
 import { Reveal } from "@/components/motion/Reveal";
 import { OrderSuccess } from "@/components/OrderSuccess";
 
@@ -115,12 +115,12 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
         )}
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/create" className="rounded-xl bg-black px-4 py-2 font-bold text-white">
+          <MagneticLink href="/create" className="rounded-xl bg-black px-4 py-2 font-bold text-white inline-block">
             Create another design
-          </Link>
-          <Link href="/gift-ideas" className="rounded-xl border border-black/15 px-4 py-2 font-bold text-black">
+          </MagneticLink>
+          <MagneticLink href="/gift-ideas" className="rounded-xl border border-black/15 px-4 py-2 font-bold text-black inline-block">
             Browse gift ideas
-          </Link>
+          </MagneticLink>
         </div>
 
         <p className="mt-6 text-xs text-black/50">

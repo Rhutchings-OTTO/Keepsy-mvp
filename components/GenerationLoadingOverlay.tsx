@@ -13,6 +13,7 @@ type GenerationLoadingOverlayProps = {
   hasSourceImage?: boolean;
   showSavingHint?: boolean;
   region?: string | null;
+  prompt?: string | null;
 };
 
 export function GenerationLoadingOverlay({
@@ -20,6 +21,7 @@ export function GenerationLoadingOverlay({
   startedAt = null,
   showSavingHint = false,
   region,
+  prompt,
 }: GenerationLoadingOverlayProps) {
   const prefersReducedMotion = useReducedMotion();
 
@@ -60,7 +62,7 @@ export function GenerationLoadingOverlay({
           )}
 
           <div className="frosted-glass relative w-full max-w-md rounded-3xl p-8 text-center">
-            <GenerativeLoader useInternalMessages={true} region={region} startedAt={startedAt} />
+            <GenerativeLoader useInternalMessages={true} region={region} startedAt={startedAt} prompt={prompt} />
 
             <p className="mt-4 text-sm font-medium text-[#1A1A1A]/60">Calibrating pigments — this usually takes a moment.</p>
             {showSavingHint ? (

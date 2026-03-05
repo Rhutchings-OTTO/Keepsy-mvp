@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Region } from "@/lib/region";
+import { playPaperPlaneSfx } from "@/lib/sonicTransition";
+import { NanoPlane } from "@/components/easter-eggs/NanoPlane";
 
 type RegionSelectorProps = {
   open: boolean;
   onSelect: (region: Region) => void;
   onClose?: () => void;
+  /** Current region for Transatlantic Flight easter egg (3 clicks on current region) */
+  currentRegion?: Region;
 };
 
 const OPTIONS: Array<{ region: Region; title: string }> = [
@@ -15,13 +19,64 @@ const OPTIONS: Array<{ region: Region; title: string }> = [
   { region: "UK", title: "United Kingdom" },
 ];
 
-export default function RegionSelector({ open, onSelect, onClose }: RegionSelectorProps) {
+const RESET_CLICKS_MS = 2000;
+
+export default function RegionSelector({ open, onSelect, onClose, currentRegion }: RegionSelectorProps) {
   const firstButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [clickCount, setClickCount] = useState(0);
+  const [lastClickedRegion, setLastClickedRegion] = useState<Region | null>(null);
+  const [triggerPlane, setTriggerPlane] = useState(false);
+  const [pendingRegion, setPendingRegion] = useState<Region | null>(null);
+  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!open) return;
     firstButtonRef.current?.focus();
   }, [open]);
+
+  const handleRegionClick = (region: Region) => {
+    const isCurrentRegion = region === currentRegion;
+    const sameRegion = lastClickedRegion === region;
+    const next = sameRegion && isCurrentRegion ? clickCount + 1 : 1;
+    setClickCount(next);
+    setLastClickedRegion(region);
+
+    if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    resetTimeoutRef.current = setTimeout(() => {
+      setClickCount(0);
+      setLastClickedRegion(null);
+    }, RESET_CLICKS_MS);
+
+    if (next === 3 && isCurrentRegion) {
+      if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+      const otherRegion: Region = region === "UK" ? "US" : "UK";
+      setPendingRegion(otherRegion);
+      setTriggerPlane(true);
+      playPaperPlaneSfx();
+    } else if (!isCurrentRegion) {
+      onSelect(region);
+      onClose?.();
+      setClickCount(0);
+      setLastClickedRegion(null);
+    }
+  };
+
+  const handlePlaneComplete = () => {
+    setTriggerPlane(false);
+    setClickCount(0);
+    setLastClickedRegion(null);
+    if (pendingRegion) {
+      onSelect(pendingRegion);
+      onClose?.();
+      setPendingRegion(null);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    };
+  }, []);
 
   return (
     <AnimatePresence>
@@ -56,7 +111,7 @@ export default function RegionSelector({ open, onSelect, onClose }: RegionSelect
                   key={option.region}
                   type="button"
                   ref={index === 0 ? firstButtonRef : null}
-                  onClick={() => onSelect(option.region)}
+                  onClick={() => handleRegionClick(option.region)}
                   className="rounded-2xl border border-[#DDCFC2] bg-white px-4 py-4 text-left transition hover:border-[#C9B49F] hover:bg-[#FFFCF8] focus:outline-none focus:ring-2 focus:ring-[#C9B49F]"
                 >
                   <p className="text-lg font-bold text-[#3A2E25]">{option.title}</p>
@@ -65,6 +120,7 @@ export default function RegionSelector({ open, onSelect, onClose }: RegionSelect
               ))}
             </div>
           </motion.section>
+          {triggerPlane && <NanoPlane onComplete={handlePlaneComplete} />}
         </>
       ) : null}
     </AnimatePresence>

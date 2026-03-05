@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Region } from "@/lib/region";
+import { KineticHeading } from "@/components/motion/KineticHeading";
 import { REGION_CONTENT } from "@/content/regionContent";
 
 const MAX_CHIPS = 6;
@@ -35,7 +36,7 @@ export function IdeasForYou({
 
   return (
     <section className="mt-6 w-full rounded-2xl border border-black/10 bg-white/75 p-4 shadow-sm">
-      <h2 className="text-sm font-black uppercase tracking-wider text-black/60">Ideas for you</h2>
+      <KineticHeading as="h2" className="text-sm font-black uppercase tracking-wider text-black/60">Ideas for you</KineticHeading>
 
       <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-black/45">Holidays & occasions</p>
       <div className="mt-2 flex flex-wrap gap-2">

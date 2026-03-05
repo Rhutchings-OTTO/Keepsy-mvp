@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { BottomSheetNav } from "@/components/BottomSheetNav";
+import { PremiumEffects } from "@/components/PremiumEffects";
+import { EasterEggProvider } from "@/components/EasterEggProvider";
 
 type SiteChromeProps = {
   children: React.ReactNode;
@@ -16,10 +18,11 @@ export function SiteChrome({ children }: SiteChromeProps) {
 
   if (isEntryLanding || isCreateRoute) {
     return (
-      <>
+      <EasterEggProvider>
         {children}
+        <PremiumEffects />
         <BottomSheetNav />
-      </>
+      </EasterEggProvider>
     );
   }
 

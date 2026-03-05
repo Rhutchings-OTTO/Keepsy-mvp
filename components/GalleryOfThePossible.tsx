@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { MagneticLink } from "@/components/ui/MagneticLink";
 
 /** Pre-generated design previews to inspire when user has no designs yet */
 const GALLERY_ITEMS = [
@@ -52,12 +53,12 @@ export function GalleryOfThePossible({
           </div>
         ))}
       </div>
-      <Link
+      <MagneticLink
         href={ctaHref}
         className="mt-6 inline-block rounded-full bg-obsidian px-6 py-3 font-bold text-white transition hover:bg-obsidian/90"
       >
         {ctaLabel}
-      </Link>
+      </MagneticLink>
     </div>
   );
 }

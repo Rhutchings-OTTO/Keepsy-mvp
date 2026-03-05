@@ -1,6 +1,7 @@
 "use client";
 
 import { memo } from "react";
+import { GrainSpotlight } from "@/components/GrainSpotlight";
 
 function AuroraBackgroundInner() {
   return (
@@ -10,7 +11,7 @@ function AuroraBackgroundInner() {
         <div className="aurora-blob aurora-blob-2" />
         <div className="aurora-blob aurora-blob-3" />
       </div>
-      <div className="grain-overlay" aria-hidden />
+      <GrainSpotlight />
     </>
   );
 }

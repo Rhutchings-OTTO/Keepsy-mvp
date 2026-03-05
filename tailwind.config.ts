@@ -11,6 +11,11 @@ const config: Config = {
         ivory: "#F9F8F6",
         obsidian: "#1A1A1A",
         periwinkle: "#E2E8FF",
+        gold: {
+          500: "#D4AF37",
+          400: "#E5C158",
+          600: "#B8962E",
+        },
       },
       fontFamily: {
         serif: ["var(--font-serif)", "Playfair Display", "Editorial New", "Georgia", "serif"],

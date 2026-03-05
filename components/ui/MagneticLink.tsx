@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
+import Link from "next/link";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useReducedMotionPref } from "@/lib/motion/useReducedMotionPref";
 import { useEasterEggMouse } from "@/context/EasterEggContext";
@@ -9,20 +10,20 @@ const MAGNETIC_RADIUS = 50;
 const MAX_OFFSET = 12;
 const SPRING = { stiffness: 150, damping: 15 };
 
-type MagneticButtonProps = React.ComponentProps<typeof motion.button> & {
+type MagneticLinkProps = React.ComponentProps<typeof Link> & {
   children: React.ReactNode;
   strength?: number;
   radius?: number;
 };
 
-export function MagneticButton({
+export function MagneticLink({
   children,
   strength = MAX_OFFSET,
   radius = MAGNETIC_RADIUS,
   className = "",
   ...props
-}: MagneticButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null);
+}: MagneticLinkProps) {
+  const ref = useRef<HTMLAnchorElement>(null);
   const reduceMotion = useReducedMotionPref();
   const easterEggMouse = useEasterEggMouse();
   const x = useMotionValue(0);
@@ -92,20 +93,17 @@ export function MagneticButton({
 
   if (reduceMotion) {
     return (
-      <motion.button ref={ref} className={className} {...props}>
+      <Link ref={ref} className={className} {...props}>
         {children}
-      </motion.button>
+      </Link>
     );
   }
 
   return (
-    <motion.button
-      ref={ref}
-      style={{ x: springX, y: springY }}
-      className={className}
-      {...props}
-    >
-      {children}
-    </motion.button>
+    <Link ref={ref} className={`inline-block ${className}`} {...props}>
+      <motion.span style={{ display: "inline-block", x: springX, y: springY }}>
+        {children}
+      </motion.span>
+    </Link>
   );
 }

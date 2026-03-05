@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { MockupRenderer } from "@/components/MockupRenderer";
+import { MugInspector } from "@/components/easter-eggs/MugInspector";
 import {
   PRODUCT_LIST,
   getColorName,
@@ -74,12 +75,23 @@ export function ProductPreviewClient({ initialSlug }: ProductPreviewClientProps)
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
           >
-            <MockupRenderer
-              productType={mockupProductType}
-              color={mockupColor}
-              generatedImage={null}
-              hasArtwork={false}
-            />
+            {mockupProductType === "mug" ? (
+              <MugInspector>
+                <MockupRenderer
+                  productType={mockupProductType}
+                  color={mockupColor}
+                  generatedImage={null}
+                  hasArtwork={false}
+                />
+              </MugInspector>
+            ) : (
+              <MockupRenderer
+                productType={mockupProductType}
+                color={mockupColor}
+                generatedImage={null}
+                hasArtwork={false}
+              />
+            )}
           </motion.div>
           <div className="mt-6 flex gap-3 items-center">
             <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">

@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
+import { MagneticLink } from "@/components/ui/MagneticLink";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 
@@ -98,18 +99,18 @@ export function OrderSuccess({ productName, designUrl }: OrderSuccessProps) {
         transition={{ delay: 1.5 }}
         className="mt-8 flex flex-wrap justify-center gap-3"
       >
-        <Link
+        <MagneticLink
           href="/create"
           className="rounded-full bg-obsidian px-6 py-3 font-bold text-white transition hover:bg-obsidian/90 inline-block"
         >
           Create another design
-        </Link>
-        <Link
+        </MagneticLink>
+        <MagneticLink
           href="/gift-ideas"
-          className="rounded-full border border-obsidian/15 px-6 py-3 font-bold text-obsidian transition hover:bg-obsidian/5"
+          className="rounded-full border border-obsidian/15 px-6 py-3 font-bold text-obsidian transition hover:bg-obsidian/5 inline-block"
         >
           Browse gift ideas
-        </Link>
+        </MagneticLink>
       </motion.div>
     </div>
   );

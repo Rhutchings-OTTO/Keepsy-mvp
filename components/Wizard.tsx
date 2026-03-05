@@ -247,7 +247,7 @@ export function Wizard({ initialStyle, initialProduct }: WizardProps) {
                 className="mt-3 min-h-12 w-full rounded-xl bg-black px-4 py-3 font-bold text-white shadow-sm disabled:opacity-50"
                 disabled={isGenerating || !style}
               >
-                {isGenerating ? "Generating preview..." : "Generate preview"}
+                {isGenerating ? "Curating preview…" : "Generate preview"}
               </button>
             </div>
             <div className="space-y-3">
@@ -288,7 +288,7 @@ export function Wizard({ initialStyle, initialProduct }: WizardProps) {
                 disabled={!generatedImage || isCheckingOut}
                 className="min-h-12 w-full rounded-2xl bg-black px-4 py-3 text-lg font-bold text-white shadow-sm disabled:opacity-50"
               >
-                {isCheckingOut ? "Redirecting to secure checkout..." : "Checkout"}
+                {isCheckingOut ? "Crafting checkout…" : "Checkout"}
               </button>
             </div>
           </div>

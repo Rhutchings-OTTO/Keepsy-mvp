@@ -3,39 +3,46 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useMemo, useState, useEffect } from "react";
 
-const SKETCH_MICRO_COPY = [
-  "Refining the brushstrokes...",
-  "Curating your masterpiece...",
-  "Priming the canvas...",
-  "Laying down the first strokes...",
-  "Adding the finishing touches...",
+const SKETCH_MICRO_COPY_TEMPLATES = [
+  "Analyzing the brushstroke density...",
+  "Mixing digital pigments...",
+  "Preparing the canvas for {region} standards...",
+  "Finalizing the 1-of-1 artifact...",
 ];
+
+function getSketchMessages(region?: string | null): string[] {
+  const r = region ?? "UK";
+  return SKETCH_MICRO_COPY_TEMPLATES.map((t) => t.replace("{region}", r));
+}
 
 type GenerativeLoaderProps = {
   message?: string;
   useInternalMessages?: boolean;
+  region?: string | null;
 };
 
 export function GenerativeLoader({
   message,
   useInternalMessages = true,
+  region,
 }: GenerativeLoaderProps) {
+  const messages = useMemo(() => getSketchMessages(region), [region]);
   const [index, setIndex] = useState(() =>
-    Math.floor(Math.random() * SKETCH_MICRO_COPY.length)
+    Math.floor(Math.random() * messages.length)
   );
 
   const displayMessage = useMemo(() => {
     if (!useInternalMessages && message) return message;
-    return SKETCH_MICRO_COPY[index];
-  }, [useInternalMessages, message, index]);
+    return messages[index];
+  }, [useInternalMessages, message, index, messages]);
 
   useEffect(() => {
     if (!useInternalMessages) return;
     const t = setInterval(() => {
-      setIndex((prev) => (prev + 1) % SKETCH_MICRO_COPY.length);
+      setIndex((prev) => (prev + 1) % messages.length);
     }, 2200);
     return () => clearInterval(t);
-  }, [useInternalMessages]);
+  }, [useInternalMessages, messages.length]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-6">

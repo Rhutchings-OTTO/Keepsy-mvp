@@ -96,7 +96,7 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
                   className="flex h-full items-center justify-center"
                   style={{ backgroundColor: IVORY }}
                 >
-                  <span className="font-serif text-obsidian/40">Entering studio…</span>
+                  <span className="font-serif text-obsidian/40">Calibrating studio…</span>
                 </div>
               }
             >

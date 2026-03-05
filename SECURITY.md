@@ -25,8 +25,9 @@
 
 1. **Stripe**: Dashboard → Developers → API keys → Roll key. Update `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` in Vercel env. Redeploy.
 2. **OpenAI**: Platform → API keys → Revoke and create new. Update `OPENAI_API_KEY`.
-3. **Supabase**: Project Settings → API → Regenerate service role. Update `SUPABASE_SERVICE_ROLE_KEY`.
-4. **Admin keys**: Regenerate `MOCKUP_CALIBRATION_KEY`, `PERF_DASHBOARD_KEY`; update Vercel env.
+3. **Cloudinary**: Dashboard → Settings → API Keys → Regenerate. Update `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET`.
+4. **Supabase**: Project Settings → API → Regenerate service role. Update `SUPABASE_SERVICE_ROLE_KEY`.
+5. **Admin keys**: Regenerate `MOCKUP_CALIBRATION_KEY`, `PERF_DASHBOARD_KEY`, `DEBUG_PANEL_KEY`; update Vercel env.
 
 ## Rate Limit Tuning
 

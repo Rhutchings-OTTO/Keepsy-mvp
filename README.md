@@ -24,12 +24,25 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 SITE_URL=http://localhost:3000
 ```
 
-3. Optional variables:
+3. Optional variables (for DALL-E 3 + permanent image hosting):
+
+```bash
+# Use DALL-E 3 instead of gpt-image-1 (set to "1" or "true")
+OPENAI_USE_DALLE3=1
+
+# Cloudinary for permanent design URLs (OpenAI URLs expire after ~1 hour)
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+```
+
+4. Other optional variables:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
 PERF_DASHBOARD_KEY=...
+DEBUG_PANEL_KEY=...          # For hidden /debug panel (OpenAI, Stripe, Image Host status)
 NEXT_PUBLIC_DEV_DATE=2026-12-10
 ```
 
@@ -41,7 +54,7 @@ npm run dev
 
 ## Webhook Setup (Stripe)
 
-- Local webhook endpoint: `http://localhost:3000/api/stripe/webhook`
+- Local webhook endpoint: `http://localhost:3000/api/stripe/webhook` or `http://localhost:3000/api/webhooks/stripe`
 - Configure Stripe to send `checkout.session.completed`.
 - Ensure `STRIPE_WEBHOOK_SECRET` matches the endpoint secret from Stripe.
 

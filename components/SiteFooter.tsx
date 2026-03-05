@@ -14,7 +14,7 @@ export function SiteFooter() {
           <div className="space-y-3">
             <p className="font-semibold text-black">Company</p>
             <div className="flex flex-col gap-3">
-              <Link href="/terms" className="text-sm text-neutral-500 hover:text-black">Terms</Link>
+              <Link href="/terms" className="text-sm text-neutral-500 hover:text-black">Terms of Artistry</Link>
               <Link href="/privacy" className="text-sm text-neutral-500 hover:text-black">Privacy</Link>
               <Link href="/refunds" className="text-sm text-neutral-500 hover:text-black">Refunds</Link>
               <Link href="/shipping" className="text-sm text-neutral-500 hover:text-black">Shipping</Link>

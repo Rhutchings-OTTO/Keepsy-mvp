@@ -11,11 +11,13 @@ type GenerationLoadingOverlayProps = {
   productType?: ProductType;
   hasSourceImage?: boolean;
   showSavingHint?: boolean;
+  region?: string | null;
 };
 
 export function GenerationLoadingOverlay({
   isOpen,
   showSavingHint = false,
+  region,
 }: GenerationLoadingOverlayProps) {
   const prefersReducedMotion = useReducedMotion();
 
@@ -33,7 +35,7 @@ export function GenerationLoadingOverlay({
           className="fixed inset-0 z-[120] flex items-center justify-center bg-[#F9F8F6]/94 px-6 backdrop-blur-sm"
           role="status"
           aria-live="polite"
-          aria-label="Generating your image"
+          aria-label="Synthesizing your design"
         >
           {!prefersReducedMotion && (
             <motion.div
@@ -56,9 +58,9 @@ export function GenerationLoadingOverlay({
           )}
 
           <div className="frosted-glass relative w-full max-w-md rounded-3xl p-8 text-center">
-            <GenerativeLoader useInternalMessages={true} />
+            <GenerativeLoader useInternalMessages={true} region={region} />
 
-            <p className="mt-4 text-sm font-medium text-[#1A1A1A]/60">This usually takes a few seconds.</p>
+            <p className="mt-4 text-sm font-medium text-[#1A1A1A]/60">Calibrating pigments — this usually takes a moment.</p>
             {showSavingHint ? (
               <p className="mt-1 text-xs font-semibold text-[#1A1A1A]/45">Don&apos;t refresh — we&apos;re saving your progress.</p>
             ) : null}

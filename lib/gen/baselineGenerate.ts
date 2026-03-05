@@ -1,13 +1,15 @@
 /**
- * Baseline image generation: 1:1 prompt fidelity.
- * - Minimal sanitization only (trim, control chars, length)
+ * Baseline image generation.
+ * - Minimal sanitization (trim, control chars, length)
  * - Moderation for hard blocks (sexual, gore, minors, self-harm, hate)
- * - NO prompt rewriting, enhancing, patching, or fallback mutation
+ * - Keepsy Artistic Director: print optimization, artisanal aesthetic, background control
  */
 
 import { createHash } from "crypto";
 import { moderatePrompt } from "@/lib/safety/thinModeration";
+import { applyArtisticDirection } from "@/lib/gen/artisticDirector";
 import { fetchWithBackoff } from "@/app/api/generate-image/guardrails";
+import { uploadImageToCloudinary } from "@/lib/uploadImage";
 
 const PROMPT_MAX_LEN = 1000;
 type Size = "1024x1024" | "1024x1536" | "1536x1024";
@@ -32,6 +34,8 @@ export type BaselineBlockedResult = {
 export type BaselineSuccessResult = {
   ok: true;
   imageDataUrl: string;
+  /** Permanent URL (Cloudinary) for checkout/fulfillment. Falls back to imageDataUrl if upload fails. */
+  designUrl: string;
   promptUsed: string;
   requestId?: string;
 };
@@ -60,7 +64,30 @@ function parseDataUrl(dataUrl: string): { mimeType: string; imageBuffer: ArrayBu
   }
 }
 
+/** DALL-E 3 size mapping. API accepts 1024x1024, 1024x1792, 1792x1024. */
+function mapSizeToDalle3(size: Size): "1024x1024" | "1024x1792" | "1792x1024" {
+  if (size === "1024x1536") return "1024x1792";
+  if (size === "1536x1024") return "1792x1024";
+  return "1024x1024";
+}
+
 async function callGenerate(prompt: string, size: Size): Promise<string> {
+  const useDalle3 = Boolean(process.env.OPENAI_USE_DALLE3);
+  const model = useDalle3 ? "dall-e-3" : "gpt-image-1";
+  const requestSize = useDalle3 ? mapSizeToDalle3(size) : size;
+
+  const body: Record<string, unknown> =
+    model === "dall-e-3"
+      ? {
+          model: "dall-e-3",
+          prompt,
+          size: requestSize,
+          quality: "standard",
+          style: "vivid",
+          response_format: "b64_json",
+        }
+      : { model: "gpt-image-1", prompt, size: requestSize };
+
   const resp = await fetchWithBackoff(
     "https://api.openai.com/v1/images/generations",
     {
@@ -69,18 +96,24 @@ async function callGenerate(prompt: string, size: Size): Promise<string> {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
-      body: JSON.stringify({
-        model: "gpt-image-1",
-        prompt,
-        size,
-      }),
+      body: JSON.stringify(body),
     },
-    { retries: 2, timeoutMs: 90_000 }
+    { retries: 2, timeoutMs: 120_000 }
   );
 
   const data = await resp.json();
   if (!resp.ok) {
-    throw new Error(data?.error?.message || "OpenAI error");
+    const errMsg = data?.error?.message || "OpenAI error";
+    if (String(errMsg).toLowerCase().includes("content policy") ||
+        String(errMsg).toLowerCase().includes("safety system")) {
+      throw new Error(
+        "We can create original characters and themes, but we can't generate specific copyrighted or trademarked characters. Try describing the style, colours, or mood instead."
+      );
+    }
+    if (resp.status === 503 || resp.status === 429) {
+      throw new Error("Our atelier is temporarily busy. Please retry in a moment.");
+    }
+    throw new Error(errMsg);
   }
   const b64 = data?.data?.[0]?.b64_json;
   if (!b64) throw new Error("No image returned");
@@ -182,13 +215,12 @@ export async function baselineGenerate(
     };
   }
 
-  const finalPrompt = moderation.prompt;
-  const rewriteOccurred = finalPrompt !== userPrompt;
-  if (rewriteOccurred && process.env.NODE_ENV !== "production") {
-    throw new Error(
-      `[gen:fidelity] PROMPT_REGRESSION: finalPrompt differs from userPrompt. Rewrite must not occur.`
-    );
-  }
+  const moderatedPrompt = moderation.prompt;
+  const finalPrompt = applyArtisticDirection({
+    userPrompt: moderatedPrompt,
+    mode,
+    maxTotalLength: 1500,
+  });
 
   if (process.env.NODE_ENV !== "production") {
     devLogFidelity({
@@ -196,16 +228,26 @@ export async function baselineGenerate(
       promptLength: finalPrompt.length,
       excerpt: finalPrompt.slice(0, 60),
       moderationFlagged: false,
-      rewriteOccurred,
+      rewriteOccurred: finalPrompt !== moderatedPrompt,
       requestId,
     });
   }
 
+  let imageDataUrl: string;
   if (mode === "upload" && referenceImageDataUrl) {
-    const imageDataUrl = await callEdit(finalPrompt, referenceImageDataUrl, size);
-    return { ok: true, imageDataUrl, promptUsed: finalPrompt, requestId };
+    imageDataUrl = await callEdit(finalPrompt, referenceImageDataUrl, size);
+  } else {
+    imageDataUrl = await callGenerate(finalPrompt, size);
   }
 
-  const imageDataUrl = await callGenerate(finalPrompt, size);
-  return { ok: true, imageDataUrl, promptUsed: finalPrompt, requestId };
+  const uploadResult = await uploadImageToCloudinary(imageDataUrl);
+  const designUrl = uploadResult.ok ? uploadResult.url : imageDataUrl;
+
+  return {
+    ok: true,
+    imageDataUrl,
+    designUrl,
+    promptUsed: finalPrompt,
+    requestId,
+  };
 }

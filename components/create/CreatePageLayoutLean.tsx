@@ -249,7 +249,7 @@ export function CreatePageLayoutLean({
                 {isBusy ? (
                   <>
                     <RefreshCcw className="animate-spin" size={22} />
-                    Generating…
+                    Synthesizing…
                   </>
                 ) : (
                   <>
@@ -318,7 +318,7 @@ export function CreatePageLayoutLean({
             <Link
               key={type}
               href={getProductPreviewHref(type)}
-              className="flex flex-col items-center gap-2 rounded-2xl border border-black/10 bg-white/80 p-5 shadow-sm min-h-[100px] transition hover:border-black/20"
+              className="flex flex-col items-center gap-2 rounded-2xl frosted-glass border border-white/20 p-5 min-h-[100px] transition hover:border-white/40"
             >
               <Icon size={28} className="text-black/70" />
               <span className="font-extrabold text-xs uppercase tracking-widest text-black/80">{label}</span>
@@ -332,7 +332,7 @@ export function CreatePageLayoutLean({
         <h2 className="text-2xl md:text-3xl font-black text-center mb-6">What our creators say</h2>
         <Carousel showArrows showDots>
           {CREATOR_TESTIMONIALS.map((t) => (
-            <article key={t.name} className="rounded-2xl border border-black/10 bg-white/80 p-5 text-center shadow-sm">
+            <article key={t.name} className="rounded-2xl frosted-glass border border-white/20 p-5 text-center">
               <div className="mx-auto h-12 w-12 rounded-full bg-gradient-to-br from-[#7DB9E8]/80 to-[#F8C8DC]/80 text-white font-black flex items-center justify-center border border-white text-sm">
                 {t.initials}
               </div>

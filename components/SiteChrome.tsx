@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { BottomSheetNav } from "@/components/BottomSheetNav";
 
 type SiteChromeProps = {
   children: React.ReactNode;
@@ -14,7 +15,12 @@ export function SiteChrome({ children }: SiteChromeProps) {
   const isCreateRoute = pathname.startsWith("/create");
 
   if (isEntryLanding || isCreateRoute) {
-    return <>{children}</>;
+    return (
+      <>
+        {children}
+        <BottomSheetNav />
+      </>
+    );
   }
 
   return (
@@ -22,6 +28,7 @@ export function SiteChrome({ children }: SiteChromeProps) {
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />
+      <BottomSheetNav />
     </div>
   );
 }

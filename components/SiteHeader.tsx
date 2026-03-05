@@ -18,7 +18,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 h-16 border-b border-black/10 bg-[#F7F1EB]/95 backdrop-blur-sm">
       <div className={`flex h-full items-center justify-between ${CONTAINER}`}>
-        <nav className="flex items-center gap-1 sm:gap-3" aria-label="Primary">
+        {/* Desktop nav — hidden on mobile (BottomSheetNav handles mobile) */}
+        <nav className="hidden md:flex items-center gap-1 sm:gap-3" aria-label="Primary">
           {NAV_ITEMS.map((item) => {
             const active = item.href !== "/#reviews" && item.href.startsWith("/") && pathname === item.href;
             return (

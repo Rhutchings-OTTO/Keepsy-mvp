@@ -15,6 +15,7 @@ import {
 import { BaseMockupLayer } from "./BaseMockupLayer";
 import { ArtworkLayer } from "./ArtworkLayer";
 import { PrintAreaGlassOverlay } from "./PrintAreaGlassOverlay";
+import { TopLayer } from "./TopLayer";
 
 const DEBUG_PLACEMENT = process.env.NODE_ENV === "development";
 
@@ -173,21 +174,20 @@ export function MockupStage({
       style={{ aspectRatio: `${entry.aspectRatio}` }}
     >
       <div className="absolute inset-[1px] overflow-hidden rounded-[22px] bg-[#F5F4F2]">
+        {/* LAYER 1 (Bottom): Static product base - fabric/ceramic texture */}
         <BaseMockupLayer
           baseMockupSrc={entry.baseMockupSrc}
           productType={productType}
           aspectRatio={entry.aspectRatio}
         />
-        <PrintAreaGlassOverlay
-          productType={productType}
-          isActive={true}
-          hasArtwork={artworkPresent}
-        />
+
+        {/* LAYER 2 (Middle): AI artwork - ONLY this re-renders when prompt changes */}
         {generatedImage && (
-          <>
+          <div className="absolute inset-0 z-10">
             {entry.placement.kind === "rect" && rectPlacementPx && (
               <ArtworkLayer
                 kind="rect"
+                productType={productType}
                 generatedImage={generatedImage}
                 rectPlacementPx={rectPlacementPx}
                 onLoad={(w, h) => setArtNaturalSize({ width: w, height: h })}
@@ -196,6 +196,7 @@ export function MockupStage({
             {entry.placement.kind === "quad" && quadMatrix && (
               <ArtworkLayer
                 kind="quad"
+                productType={productType}
                 generatedImage={generatedImage}
                 quadMatrix={quadMatrix}
                 onLoad={(w, h) => setArtNaturalSize({ width: w, height: h })}
@@ -223,8 +224,19 @@ export function MockupStage({
                 />
               </div>
             )}
-          </>
+          </div>
         )}
+
+        {/* Glass overlay when no artwork */}
+        <PrintAreaGlassOverlay
+          productType={productType}
+          isActive={true}
+          hasArtwork={artworkPresent}
+        />
+
+        {/* LAYER 3 (Top): Drawstrings, mug reflections, shadows - FIXED, never re-renders on prompt change */}
+        <TopLayer productType={productType} color={color} />
+
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/[0.06]"
           aria-hidden

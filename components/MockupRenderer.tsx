@@ -1,6 +1,6 @@
 "use client";
 
-import { MockupStage } from "@/components/mockups/MockupStage";
+import { MockupWithLoupe } from "@/components/mockups/MockupWithLoupe";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 
 export type { MockupColor, MockupProductType };
@@ -14,5 +14,5 @@ type MockupRendererProps = {
 };
 
 export function MockupRenderer(props: MockupRendererProps) {
-  return <MockupStage {...props} />;
+  return <MockupWithLoupe {...props} />;
 }

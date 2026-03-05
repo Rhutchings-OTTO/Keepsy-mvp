@@ -111,6 +111,19 @@ html {
   100% { transform: translate(0, 0) scale(1); }
 }
 
+/* Mug gloss reflection - sits on top of AI art for ceramic sheen */
+.mug-art-overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.1) 80%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  mix-blend-mode: screen;
+}
+
 .aurora-container {
   position: absolute;
   top: 0;

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { Reveal } from "@/components/motion/Reveal";
+import { OrderSuccess } from "@/components/OrderSuccess";
 
 export const dynamic = "force-dynamic";
 
@@ -26,13 +27,14 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
   let totalGBP: number | null = null;
   let items: Array<{ product_name: string; quantity: number; line_total_gbp: number }> = [];
   let errorMessage: string | null = null;
+  let generatedImageUrl: string | null = null;
 
   if (sessionId) {
     const supabase = getSupabaseAdmin();
     if (supabase) {
       const { data: order, error } = await supabase
         .from("orders")
-        .select("order_ref, status, total_gbp")
+        .select("order_ref, status, total_gbp, generated_image_url")
         .eq("stripe_session_id", sessionId)
         .maybeSingle();
       if (error) {
@@ -41,6 +43,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
         status = order.status;
         orderRef = order.order_ref;
         totalGBP = Number(order.total_gbp);
+        generatedImageUrl = order.generated_image_url ?? null;
         const { data: orderItems } = await supabase
           .from("order_items")
           .select("product_name, quantity, line_total_gbp")
@@ -54,10 +57,21 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
     }
   }
 
+  const primaryProductName = items[0]?.product_name ?? "Keepsy creation";
+
+  if (status === "paid") {
+    return (
+      <main className="min-h-screen bg-ivory">
+        <OrderSuccess
+          productName={primaryProductName}
+          designUrl={generatedImageUrl}
+        />
+      </main>
+    );
+  }
+
   const headline =
-    status === "paid"
-      ? "Order confirmed"
-      : status === "failed"
+    status === "failed"
       ? "Payment issue detected"
       : "Payment received";
 

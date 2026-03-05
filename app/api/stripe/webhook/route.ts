@@ -100,6 +100,7 @@ export async function POST(req: Request) {
 
     const orderRef = session.metadata?.order_ref || session.client_reference_id || `order_${session.id}`;
     const prompt = session.metadata?.prompt || "";
+    const designUrl = session.metadata?.design_url || null;
 
     const { error: orderUpsertError } = await supabase.from("orders").upsert(
       {
@@ -109,7 +110,7 @@ export async function POST(req: Request) {
         currency: session.currency || "gbp",
         total_gbp: amountTotal,
         prompt,
-        generated_image_url: null,
+        generated_image_url: designUrl,
       },
       { onConflict: "order_ref" }
     );

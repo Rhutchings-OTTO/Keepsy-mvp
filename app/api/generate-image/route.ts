@@ -30,6 +30,7 @@ const generateBodySchema = z
 
 type CachedGeneration = {
   imageDataUrl: string;
+  designUrl?: string;
   expiresAt: number;
 };
 
@@ -43,7 +44,7 @@ function getImageSizeForShape(shape: DesignShape): "1024x1024" | "1024x1536" | "
 
 const generationCache = new Map<string, CachedGeneration>();
 type InflightResult =
-  | { ok: true; imageDataUrl: string }
+  | { ok: true; imageDataUrl: string; designUrl: string }
   | { ok: false; code: string; userMessage: string; suggestions: string[] };
 const inflightByPrompt = new Map<string, Promise<InflightResult>>();
 
@@ -75,14 +76,14 @@ function getPromptKey(prompt: string): string {
   return createHash("sha256").update(prompt).digest("hex").slice(0, 32);
 }
 
-function readCachedGeneration(promptKey: string): string | null {
+function readCachedGeneration(promptKey: string): CachedGeneration | null {
   const hit = generationCache.get(promptKey);
   if (!hit) return null;
   if (Date.now() > hit.expiresAt) {
     generationCache.delete(promptKey);
     return null;
   }
-  return hit.imageDataUrl;
+  return hit;
 }
 
 export async function POST(req: Request) {
@@ -136,7 +137,8 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           ok: true,
-          imageDataUrl: cached,
+          imageDataUrl: cached.imageDataUrl,
+          designUrl: cached.designUrl ?? cached.imageDataUrl,
           cached: true,
           latencyMs: Date.now() - startedAt,
         },
@@ -167,6 +169,7 @@ export async function POST(req: Request) {
         {
           ok: true,
           imageDataUrl: dedupResult.imageDataUrl,
+          designUrl: dedupResult.designUrl ?? dedupResult.imageDataUrl,
           deduped: true,
           latencyMs: Date.now() - startedAt,
         },
@@ -187,9 +190,7 @@ export async function POST(req: Request) {
     const clientId = getClientKey(req);
     const mode = sourceImageDataUrl ? "upload" : "describe";
 
-    const runGeneration = async (): Promise<
-      { ok: true; imageDataUrl: string } | { ok: false; code: string; userMessage: string; suggestions: string[] }
-    > => {
+    const runGeneration = async (): Promise<InflightResult> => {
       recordGenerationMetric("inFlightCount", 1);
       try {
         const result = await baselineGenerate({
@@ -210,13 +211,14 @@ export async function POST(req: Request) {
           };
         }
 
-        const { imageDataUrl, promptUsed } = result;
+        const { imageDataUrl, designUrl, promptUsed } = result;
         const cacheKey = getPromptKey(`${promptUsed}::${generationSize}`);
         generationCache.set(cacheKey, {
           imageDataUrl,
+          designUrl,
           expiresAt: Date.now() + CACHE_TTL_MS,
         });
-        return { ok: true, imageDataUrl };
+        return { ok: true, imageDataUrl, designUrl };
       } finally {
         recordGenerationMetric("inFlightCount", -1);
       }
@@ -247,6 +249,7 @@ export async function POST(req: Request) {
       {
         ok: true,
         imageDataUrl: genResult.imageDataUrl,
+        designUrl: genResult.designUrl ?? genResult.imageDataUrl,
         edited: mode === "upload",
         cached: false,
         latencyMs: Date.now() - startedAt,

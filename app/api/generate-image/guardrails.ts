@@ -51,7 +51,7 @@ function enforceUsageGuardsMemory(clientKey: string, tier: UserTier): GuardResul
 
   if (now - usage.lastRequestAtMs < MIN_INTERVAL_MS) {
     const waitSeconds = Math.ceil((MIN_INTERVAL_MS - (now - usage.lastRequestAtMs)) / 1000);
-    return { ok: false, status: 429, error: `Please wait ${waitSeconds}s before generating again.` };
+    return { ok: false, status: 429, error: `Calibrating — please allow ${waitSeconds}s before your next generation.` };
   }
 
   if (usage.usedToday >= DAILY_CAP[tier]) {

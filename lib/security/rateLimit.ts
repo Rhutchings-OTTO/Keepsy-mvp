@@ -41,11 +41,14 @@ export type RateLimitConfig = {
 
 const ENDPOINT_CONFIG: Record<string, RateLimitConfig> = {
   "/api/generate-image": { windowSec: 60, limit: 5 },
+  "/api/generate": { windowSec: 60, limit: 5 },
   "generate-hourly": { windowSec: 3600, limit: 20 },
   "/api/create-checkout-session": { windowSec: 60, limit: 10 },
+  "/api/checkout": { windowSec: 60, limit: 10 },
   "/api/upload": { windowSec: 60, limit: 10 },
   "upload-hourly": { windowSec: 3600, limit: 60 },
   "/api/delete-my-data": { windowSec: 60, limit: 5 },
+  "/api/debug/status": { windowSec: 60, limit: 30 },
   "/api/admin/mockup-placement": { windowSec: 60, limit: 30 },
   "/api/admin/mockup-placements": { windowSec: 60, limit: 30 },
   "post-default": { windowSec: 60, limit: 30 },
@@ -53,17 +56,20 @@ const ENDPOINT_CONFIG: Record<string, RateLimitConfig> = {
 };
 
 export function getConfigForEndpoint(pathname: string, method: string): RateLimitConfig {
-  if (pathname === "/api/generate-image" && method === "POST") {
-    return ENDPOINT_CONFIG["/api/generate-image"];
+  if ((pathname === "/api/generate-image" || pathname === "/api/generate") && method === "POST") {
+    return ENDPOINT_CONFIG[pathname] ?? ENDPOINT_CONFIG["/api/generate-image"];
   }
-  if (pathname === "/api/create-checkout-session" && method === "POST") {
-    return ENDPOINT_CONFIG["/api/create-checkout-session"];
+  if ((pathname === "/api/create-checkout-session" || pathname === "/api/checkout") && method === "POST") {
+    return ENDPOINT_CONFIG[pathname] ?? ENDPOINT_CONFIG["/api/create-checkout-session"];
   }
   if (pathname.includes("/api/upload") && method === "POST") {
     return ENDPOINT_CONFIG["/api/upload"];
   }
   if (pathname === "/api/delete-my-data" && method === "POST") {
     return ENDPOINT_CONFIG["/api/delete-my-data"];
+  }
+  if (pathname === "/api/debug/status" && method === "GET") {
+    return ENDPOINT_CONFIG["/api/debug/status"];
   }
   if (pathname === "/api/admin/mockup-placement") {
     return ENDPOINT_CONFIG["/api/admin/mockup-placement"];

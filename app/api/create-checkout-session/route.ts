@@ -35,6 +35,8 @@ const checkoutSchema = z
     cart: z.array(lineItemSchema).min(1),
     currency: z.literal("gbp").optional(),
     imageDataUrl: z.string().max(256).optional(),
+    designUrl: z.string().max(2048).optional(),
+    productType: z.string().max(64).optional(),
   })
   .strict();
 
@@ -141,6 +143,8 @@ export async function POST(req: Request) {
     const primaryProductName = safeCartSummary[0]?.name || "Keepsy order";
     const orderRef = `order_${globalThis.crypto.randomUUID()}`;
     const imageDataUrl = body.imageDataUrl ?? safeCartSummary[0]?.imageUrl ?? "";
+    const designUrl = body.designUrl ?? "";
+    const productType = body.productType ?? primaryProductName;
 
     const idempotencySource = JSON.stringify({
       orderRef,
@@ -220,6 +224,8 @@ export async function POST(req: Request) {
           order_ref: orderRef,
           primary_product: primaryProductName,
           has_image: imageDataUrl ? "1" : "0",
+          design_url: designUrl || "",
+          product_type: productType,
         },
         client_reference_id: orderRef,
       },

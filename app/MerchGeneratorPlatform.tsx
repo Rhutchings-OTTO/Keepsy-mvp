@@ -16,10 +16,12 @@ import { DesignConfirmation } from "@/components/generation/DesignConfirmation";
 import { SizeGuideDrawer } from "@/components/products/SizeGuideDrawer";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { Reveal } from "@/components/motion/Reveal";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
 import MagicpathBackground from "@/components/skin/magicpath/MagicpathBackground";
 import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { useConversionFlow } from "@/context/ConversionFlowContext";
+import { useGeneration } from "@/context/GenerationContext";
 import { FF } from "@/lib/featureFlags";
 import { getProductPreviewHref } from "@/lib/routes";
 import { motionTransition, revealUp, softScaleIn } from "@/lib/motion";
@@ -27,10 +29,13 @@ import { getRegion, type Region } from "@/lib/region";
 import {
   setInitialGeneration,
   applyRefinementResult,
+  applyVaultDesign,
   canRefine,
   getRefinementsLeft,
   hasActiveSession,
 } from "@/lib/store/createSession";
+import { addToDesignVault } from "@/lib/store/designVault";
+import { DesignVaultSidebar } from "@/components/DesignVaultSidebar";
 import { useCreateSession } from "@/lib/store/useCreateSession";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import {
@@ -63,6 +68,7 @@ interface CartItem {
   color?: string;
   size?: ApparelSize;
   imageUrl: string;
+  designUrl?: string;
   unitPrice: number;
   quantity: number;
 }
@@ -74,6 +80,7 @@ type PersistedCartItem = {
   color?: string;
   size?: ApparelSize;
   imageUrl: string;
+  designUrl?: string;
   unitPrice: number;
   quantity: number;
 };
@@ -126,6 +133,7 @@ function toPersistedCart(cartItems: CartItem[]): PersistedCartItem[] {
     color: item.color,
     size: item.size,
     imageUrl: item.imageUrl,
+    designUrl: item.designUrl,
     unitPrice: item.unitPrice,
     quantity: item.quantity,
   }));
@@ -148,6 +156,7 @@ function fromPersistedCart(raw: string): CartItem[] {
         ...(item.color && { color: item.color }),
         ...(item.size && { size: item.size }),
         imageUrl,
+        ...(typeof item.designUrl === "string" && item.designUrl && { designUrl: item.designUrl }),
         unitPrice: item.unitPrice,
         quantity: item.quantity,
       });
@@ -265,6 +274,7 @@ async function generateViaKeepsyAPI(args: {
   }
   return {
     imageDataUrl: data.imageDataUrl as string,
+    designUrl: typeof data.designUrl === "string" && data.designUrl ? data.designUrl : undefined,
     appliedRewrite: Boolean(data.appliedRewrite),
     appliedPatches: (data.appliedPatches ?? []) as Array<{ from: string; to: string }>,
     patchedPrompt: data.patchedPrompt as string | undefined,
@@ -273,14 +283,21 @@ async function generateViaKeepsyAPI(args: {
   };
 }
 
-/** Uses YOUR real Stripe session route. Payload kept minimal (no full base64) to avoid body size limits. */
+/** Uses YOUR real Stripe session route. Passes designUrl and productType for OrderSuccess handshake. */
 async function checkoutViaKeepsyAPI(args: {
   cart: CartItem[];
   imageDataUrl: string;
+  designUrl?: string | null;
+  productType?: string;
 }): Promise<string> {
+  const primaryDesignUrl = args.designUrl ?? args.cart[0]?.designUrl ?? "";
+  const primaryProduct = args.cart[0]?.name ?? args.productType ?? "";
+
   const payload = {
     currency: "gbp" as const,
     imageDataUrl: args.imageDataUrl ? "1" : undefined,
+    designUrl: primaryDesignUrl || undefined,
+    productType: primaryProduct,
     cart: args.cart.map((item) => ({
       productId: item.productId,
       name: item.name,
@@ -324,6 +341,7 @@ async function checkoutViaKeepsyAPI(args: {
 export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?: InitialCreateQuery }) {
   const { state: conversionFlow, updateState: updateConversionFlow } = useConversionFlow();
   const createSession = useCreateSession();
+  const generationCtx = useGeneration();
   const generatedImage = createSession.currentImageUrl;
   const lastGenerationPrompt = createSession.currentPrompt;
 
@@ -500,6 +518,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
     if (safeOverride) setPrompt(safeOverride);
     setIsGenerating(true);
+    generationCtx?.startGeneration();
     generateAbortRef.current?.abort();
     const controller = new AbortController();
     generateAbortRef.current = controller;
@@ -510,6 +529,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       const basePrompt = effectivePrompt || "Create a design from this image.";
       let result: {
         imageDataUrl: string;
+        designUrl?: string;
         appliedRewrite?: boolean;
         originalPreview?: string;
         safePreview?: string;
@@ -537,7 +557,16 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       }
 
       if (!result) throw new Error("Failed to generate image");
-      setInitialGeneration({ prompt: basePrompt, imageUrl: result.imageDataUrl });
+      setInitialGeneration({
+        prompt: basePrompt,
+        imageUrl: result.imageDataUrl,
+        designUrl: result.designUrl,
+      });
+      addToDesignVault({
+        imageUrl: result.imageDataUrl,
+        designUrl: result.designUrl,
+        prompt: basePrompt,
+      });
       setGenerationError(null);
       setGenerationContentBlock(null);
       setGenerationRewriteApplied(
@@ -567,6 +596,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         generateAbortRef.current = null;
       }
       setIsGenerating(false);
+      generationCtx?.endGeneration();
       setIsBusy(false);
     }
   };
@@ -581,6 +611,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     setGenerationError(null);
     setGenerationContentBlock(null);
     setRefinementSuccess(false);
+    generationCtx?.startGeneration();
     generateAbortRef.current?.abort();
     const controller = new AbortController();
     generateAbortRef.current = controller;
@@ -595,7 +626,16 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         signal: controller.signal,
       });
 
-      applyRefinementResult({ imageUrl: result.imageDataUrl, prompt: nextPrompt });
+      applyRefinementResult({
+        imageUrl: result.imageDataUrl,
+        prompt: nextPrompt,
+        designUrl: result.designUrl,
+      });
+      addToDesignVault({
+        imageUrl: result.imageDataUrl,
+        designUrl: result.designUrl,
+        prompt: nextPrompt,
+      });
       setGenerationRewriteApplied(null);
       setRefinementSuccess(true);
       setGenerationError(null);
@@ -608,6 +648,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     } finally {
       generateAbortRef.current = null;
       setIsGenerating(false);
+      generationCtx?.endGeneration();
     }
   };
 
@@ -633,6 +674,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       color: selectedProduct.colors?.length ? colorName : undefined,
       size: selectedProduct.hasSize ? selectedSize ?? undefined : undefined,
       imageUrl: generatedImage,
+      designUrl: createSession.currentDesignUrl ?? undefined,
       unitPrice: selectedProduct.basePrice,
       quantity: 1,
     };
@@ -684,6 +726,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         color: selectedProduct.colors?.length ? colorName : undefined,
         size: selectedProduct.hasSize ? selectedSize ?? undefined : undefined,
         imageUrl: generatedImage,
+        designUrl: createSession.currentDesignUrl ?? undefined,
         unitPrice: selectedProduct.basePrice,
         quantity: 1,
       },
@@ -695,7 +738,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     if (!cart) return;
     setIsBusy(true);
     try {
-      const url = await checkoutViaKeepsyAPI({ cart, imageDataUrl: generatedImage! });
+      const url = await checkoutViaKeepsyAPI({
+        cart,
+        imageDataUrl: generatedImage!,
+        designUrl: createSession.currentDesignUrl,
+        productType: selectedProduct.name,
+      });
       window.location.href = url;
     } catch (e) {
       console.error(e);
@@ -714,7 +762,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     if (!checkoutImage) return;
     setIsBusy(true);
     try {
-      const url = await checkoutViaKeepsyAPI({ cart: cartItems, imageDataUrl: checkoutImage });
+      const url = await checkoutViaKeepsyAPI({
+        cart: cartItems,
+        imageDataUrl: checkoutImage,
+        designUrl: cartItems[0]?.designUrl,
+        productType: cartItems[0]?.name,
+      });
       window.location.href = url;
     } catch (e) {
       console.error(e);
@@ -971,7 +1024,19 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   exit={{ opacity: 0, x: -40 }}
                   className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
                 >
-                  <div className="lg:col-span-7 sticky top-24">
+                  <div className="lg:col-span-7 sticky top-24 flex gap-0">
+                    <DesignVaultSidebar
+                      currentImageUrl={generatedImage}
+                      onSelectDesign={(entry) => {
+                        const src = entry.designUrl || entry.imageUrl;
+                        applyVaultDesign({
+                          imageUrl: src,
+                          designUrl: entry.designUrl ?? null,
+                        });
+                      }}
+                      className="self-start shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
                     <motion.div
                       key={generatedImage ?? "empty-reveal"}
                       initial={FF.dynamicReveal ? "initial" : false}
@@ -1003,6 +1068,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         <BeforeAfterSlider beforeSrc={uploadedImage} afterSrc={generatedImage} />
                       </div>
                     ) : null}
+                    </div>
                   </div>
 
                   <div className="lg:col-span-5 space-y-6">
@@ -1170,10 +1236,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       You&apos;re about to buy: <span className="text-black">{checkoutItemDescription}</span>
                     </p>
 
-                    <motion.button
+                    <MagneticButton
                       onClick={() => requestCheckout(hasCartItems ? "cart" : "single")}
                       disabled={isBusy || !canProceedToCheckout}
-                      className="w-full py-5 rounded-2xl font-black text-lg text-white shadow-xl relative overflow-hidden"
+                      className="w-full py-5 rounded-2xl font-black text-lg text-white shadow-xl relative overflow-hidden disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#B19CD9)" }}
                     >
                       <AnimatePresence mode="wait">
@@ -1183,11 +1249,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </motion.div>
                         ) : (
                           <motion.div key="default" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-2">
-                            {isBusy ? "Redirecting…" : `Pay ${gbp(checkoutTotal)}`} <ArrowRight />
+                            {isBusy ? "Crafting checkout…" : `Pay ${gbp(checkoutTotal)}`} <ArrowRight />
                           </motion.div>
                         )}
                       </AnimatePresence>
-                    </motion.button>
+                    </MagneticButton>
 
                     <button onClick={() => setStep(3)} className="mt-4 text-sm font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2">
                       <ChevronLeft size={16} /> Back
@@ -1346,10 +1412,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               </div>
               <div className="flex-1 overflow-auto space-y-4 pr-1">
                 {cartItems.length === 0 ? (
-                  <p className="text-black/55">Your cart is empty.</p>
+                  <div className="frosted-glass rounded-2xl border border-white/20 p-6 text-center">
+                    <p className="font-semibold text-obsidian">Your cart is empty</p>
+                    <p className="mt-1 text-sm text-black/60">Curating your first design? Add one to get started.</p>
+                  </div>
                 ) : (
                   cartItems.map((item) => (
-                    <div key={item.id} className="border border-black/10 rounded-2xl p-3">
+                    <div key={item.id} className="frosted-glass rounded-2xl border border-white/20 p-3">
                       <div className="flex items-center gap-3">
                         <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-black/5 border border-black/10">
                           {item.imageUrl ? (
@@ -1392,13 +1461,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   <span className="text-black/55 font-semibold">Subtotal</span>
                   <span className="text-xl font-black">{gbp(cartSubtotal)}</span>
                 </div>
-                <button
+                <MagneticButton
                   onClick={() => requestCheckout("cart")}
                   disabled={isBusy || cartItems.length === 0}
-                  className="w-full py-3 rounded-xl bg-black text-white font-extrabold disabled:opacity-40"
+                  className="w-full py-3 rounded-xl bg-black text-white font-extrabold disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {isBusy ? "Redirecting..." : "Checkout"}
-                </button>
+                  {isBusy ? "Crafting checkout…" : "Checkout"}
+                </MagneticButton>
               </div>
             </motion.aside>
           </>
@@ -1447,6 +1516,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         isOpen={isGenerating}
         productType={selectedProduct.id}
         hasSourceImage={Boolean(uploadedImage)}
+        region={region}
       />
       {FF.giftAssistant && view === "home" ? (
         <GiftAssistantWidget

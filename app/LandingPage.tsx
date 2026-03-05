@@ -10,6 +10,7 @@ import { PremiumGateway } from "@/components/PremiumGateway";
 import RegionSelector from "@/components/RegionSelector";
 import { HeroFloatersSimple } from "@/components/hero/HeroFloatersSimple";
 import { Reveal } from "@/components/motion/Reveal";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 import { FF } from "@/lib/featureFlags";
 import { getRegion, setRegion, type Region } from "@/lib/region";
 
@@ -232,7 +233,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     setRipple({ active: true, x, y, to });
     window.setTimeout(() => {
       router.push(to);
-    }, 420);
+    }, 800);
   };
 
   const handleSelectRegion = (nextRegion: Region) => {
@@ -338,18 +339,18 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   </div>
 
                   <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:justify-center">
-                    <button
-                      onClick={(event) => navigateWithRipple(event, "/create")}
+                    <MagneticButton
+                      onClick={(event) => navigateWithRipple(event as React.MouseEvent<HTMLButtonElement>, "/create")}
                       className="h-12 w-full rounded-full bg-[#1A1A1A] px-6 text-base font-black text-white shadow-lg transition hover:bg-[#1A1A1A]/90 sm:w-auto"
                     >
                       Start creating
-                    </button>
-                    <button
-                      onClick={() => router.push("/gift-ideas")}
+                    </MagneticButton>
+                    <MagneticButton
+                      onClick={(e) => navigateWithRipple(e as React.MouseEvent<HTMLButtonElement>, "/gift-ideas")}
                       className="h-12 w-full rounded-full border border-[#1A1A1A]/15 frosted-glass px-6 text-base font-bold text-[#1A1A1A] transition hover:bg-white/50 sm:w-auto"
                     >
                       Browse gift ideas
-                    </button>
+                    </MagneticButton>
                   </div>
                 </div>
               </Reveal>
@@ -374,7 +375,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                 <div className="space-y-3">
                   <p className="font-semibold text-[#1A1A1A]">Company</p>
                   <div className="flex flex-col gap-3">
-                    <Link href="/terms" className="text-sm text-[#1A1A1A]/55 hover:text-[#1A1A1A]">Terms</Link>
+                    <Link href="/terms" className="text-sm text-[#1A1A1A]/55 hover:text-[#1A1A1A]">Terms of Artistry</Link>
                     <Link href="/privacy" className="text-sm text-[#1A1A1A]/55 hover:text-[#1A1A1A]">Privacy</Link>
                     <Link href="/refunds" className="text-sm text-[#1A1A1A]/55 hover:text-[#1A1A1A]">Refunds</Link>
                     <Link href="/shipping" className="text-sm text-[#1A1A1A]/55 hover:text-[#1A1A1A]">Shipping</Link>
@@ -403,7 +404,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               className="pointer-events-none fixed inset-0 z-[90] bg-[#F9F8F6]"
               initial={{ clipPath: `circle(0px at ${ripple.x}px ${ripple.y}px)` }}
               animate={{ clipPath: `circle(220vmax at ${ripple.x}px ${ripple.y}px)` }}
-              transition={{ duration: 0.5, ease: [0.2, 0.9, 0.2, 1] }}
+              transition={{ duration: 0.8, ease: [0.2, 0.9, 0.2, 1] }}
             />
           )}
 

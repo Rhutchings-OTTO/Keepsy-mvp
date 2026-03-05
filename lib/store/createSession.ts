@@ -11,6 +11,8 @@ export type CreateSessionState = {
   basePrompt: string;
   currentPrompt: string;
   currentImageUrl: string | null;
+  /** Permanent Cloudinary URL for checkout/fulfillment */
+  currentDesignUrl: string | null;
   history: Array<{ prompt: string; imageUrl: string; createdAt: number }>;
   refinementCount: number;
   maxRefinements: number;
@@ -23,6 +25,7 @@ let state: CreateSessionState = {
   basePrompt: "",
   currentPrompt: "",
   currentImageUrl: null,
+  currentDesignUrl: null,
   history: [],
   refinementCount: 0,
   maxRefinements: MAX_REFINEMENTS,
@@ -42,6 +45,7 @@ function persist() {
       basePrompt: state.basePrompt,
       currentPrompt: state.currentPrompt,
       currentImageUrl: state.currentImageUrl,
+      currentDesignUrl: state.currentDesignUrl,
       refinementCount: state.refinementCount,
       historyLength: state.history.length,
     };
@@ -58,6 +62,7 @@ function persist() {
         basePrompt: state.basePrompt,
         currentPrompt: state.currentPrompt,
         currentImageUrl: null,
+        currentDesignUrl: state.currentDesignUrl,
         refinementCount: state.refinementCount,
       };
       window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(fallback));
@@ -79,6 +84,7 @@ function hydrate() {
         basePrompt: parsed.basePrompt ?? parsed.currentPrompt ?? "",
         currentPrompt: parsed.currentPrompt,
         currentImageUrl: typeof parsed.currentImageUrl === "string" ? parsed.currentImageUrl : null,
+        currentDesignUrl: typeof parsed.currentDesignUrl === "string" ? parsed.currentDesignUrl : null,
         history: [],
         refinementCount: typeof parsed.refinementCount === "number" ? parsed.refinementCount : 0,
         maxRefinements: MAX_REFINEMENTS,
@@ -101,7 +107,11 @@ export function subscribeCreateSession(listener: Listener): () => void {
   return () => listeners.delete(listener);
 }
 
-export function setInitialGeneration(args: { prompt: string; imageUrl: string }): void {
+export function setInitialGeneration(args: {
+  prompt: string;
+  imageUrl: string;
+  designUrl?: string | null;
+}): void {
   const id = typeof crypto !== "undefined" && crypto.randomUUID
     ? crypto.randomUUID()
     : `sess-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
@@ -110,6 +120,7 @@ export function setInitialGeneration(args: { prompt: string; imageUrl: string })
     basePrompt: args.prompt,
     currentPrompt: args.prompt,
     currentImageUrl: args.imageUrl,
+    currentDesignUrl: args.designUrl ?? null,
     history: [{ prompt: args.prompt, imageUrl: args.imageUrl, createdAt: Date.now() }],
     refinementCount: 0,
     maxRefinements: MAX_REFINEMENTS,
@@ -118,12 +129,17 @@ export function setInitialGeneration(args: { prompt: string; imageUrl: string })
   emit();
 }
 
-export function applyRefinementResult(args: { imageUrl: string; prompt: string }): void {
+export function applyRefinementResult(args: {
+  imageUrl: string;
+  prompt: string;
+  designUrl?: string | null;
+}): void {
   if (state.refinementCount >= state.maxRefinements) return;
   state = {
     ...state,
     currentPrompt: args.prompt,
     currentImageUrl: args.imageUrl,
+    currentDesignUrl: args.designUrl ?? state.currentDesignUrl,
     history: [
       ...state.history,
       { prompt: args.prompt, imageUrl: args.imageUrl, createdAt: Date.now() },
@@ -148,6 +164,7 @@ export function resetSession(): void {
     basePrompt: "",
     currentPrompt: "",
     currentImageUrl: null,
+    currentDesignUrl: null,
     history: [],
     refinementCount: 0,
     maxRefinements: MAX_REFINEMENTS,
@@ -164,4 +181,16 @@ export function resetSession(): void {
 
 export function hasActiveSession(): boolean {
   return Boolean(state.sessionId && state.currentImageUrl);
+}
+
+/** Apply a design from the vault to the mockup without resetting session state. */
+export function applyVaultDesign(args: { imageUrl: string; designUrl?: string | null }): void {
+  if (!state.sessionId) return;
+  state = {
+    ...state,
+    currentImageUrl: args.imageUrl,
+    currentDesignUrl: args.designUrl ?? state.currentDesignUrl,
+  };
+  persist();
+  emit();
 }

@@ -25,7 +25,7 @@ export function TestimonialGrid() {
           <article key={`${t.name}-${idx}`} className="rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] p-4 shadow-warm-sm backdrop-blur-sm">
             <div className="mb-3 flex items-center gap-3">
               <div
-                aria-hidden
+                aria-hidden="true"
                 className="h-10 w-10 rounded-full border border-white/80 bg-gradient-to-br from-terracotta/30 to-forest/20 shadow-sm"
               />
               <div className="font-semibold">

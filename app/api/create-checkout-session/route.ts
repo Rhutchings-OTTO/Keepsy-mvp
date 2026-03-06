@@ -69,12 +69,12 @@ export async function POST(req: Request) {
     const secretKey = process.env.STRIPE_SECRET_KEY;
     if (!secretKey) {
       if (process.env.NODE_ENV !== "production") {
-        console.error("[checkout] STRIPE_SECRET_KEY is missing. Set in Vercel env vars.");
+        console.error("[checkout] STRIPE_SECRET_KEY is missing. Add it to .env.local (local) or Vercel env vars (production).");
       }
       return new Response(
         JSON.stringify({
           error: "CHECKOUT_FAILED",
-          message: "Checkout is not configured. Please try again later.",
+          message: "Payment is not configured. Add STRIPE_SECRET_KEY to your environment variables.",
         }),
         { status: 500, headers: JSON_HEADERS }
       );
@@ -136,7 +136,7 @@ export async function POST(req: Request) {
       return new Response(
         JSON.stringify({
           error: "CHECKOUT_FAILED",
-          message: "Checkout redirect URL is not configured. Please try again later.",
+          message: "Redirect URL not configured. Set NEXT_PUBLIC_SITE_URL or SITE_URL (e.g. https://keepsy.store).",
         }),
         { status: 500, headers: JSON_HEADERS }
       );
@@ -171,27 +171,23 @@ export async function POST(req: Request) {
       );
 
       if (orderInsertError) {
-        return new Response(JSON.stringify({ error: "Failed to create pending order record." }), {
-          status: 500,
-          headers: JSON_HEADERS,
-        });
-      }
-
-      await supabase.from("order_items").delete().eq("order_ref", orderRef);
-      const { error: itemInsertError } = await supabase.from("order_items").insert(
-        safeCartSummary.map((item) => ({
-          order_ref: orderRef,
-          product_name: [item.name, item.size, item.color].filter(Boolean).join(" · ") || item.name,
-          quantity: item.quantity,
-          unit_price_gbp: item.priceGBP,
-          line_total_gbp: Number((item.priceGBP * item.quantity).toFixed(2)),
-        }))
-      );
-      if (itemInsertError) {
-        return new Response(JSON.stringify({ error: "Failed to persist pending order items." }), {
-          status: 500,
-          headers: JSON_HEADERS,
-        });
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("[checkout] Supabase order pre-insert failed (continuing):", orderInsertError.message);
+        }
+      } else {
+        await supabase.from("order_items").delete().eq("order_ref", orderRef);
+        const { error: itemInsertError } = await supabase.from("order_items").insert(
+          safeCartSummary.map((item) => ({
+            order_ref: orderRef,
+            product_name: [item.name, item.size, item.color].filter(Boolean).join(" · ") || item.name,
+            quantity: item.quantity,
+            unit_price_gbp: item.priceGBP,
+            line_total_gbp: Number((item.priceGBP * item.quantity).toFixed(2)),
+          }))
+        );
+        if (itemInsertError && process.env.NODE_ENV !== "production") {
+          console.warn("[checkout] Supabase order_items insert failed (continuing):", itemInsertError.message);
+        }
       }
     }
 
@@ -242,13 +238,17 @@ export async function POST(req: Request) {
       headers,
     });
   } catch (err: unknown) {
+    const errMsg = err instanceof Error ? err.message : String(err);
     if (process.env.NODE_ENV !== "production") {
-      console.error("[checkout] Error:", err instanceof Error ? err.message : err);
+      console.error("[checkout] Error:", errMsg);
     }
+    const isStripeError = errMsg.toLowerCase().includes("stripe") || errMsg.includes("api_key");
     return new Response(
       JSON.stringify({
         error: "CHECKOUT_FAILED",
-        message: "Checkout couldn't start. Please try again.",
+        message: isStripeError && process.env.NODE_ENV !== "production"
+          ? `Stripe error: ${errMsg}`
+          : "Checkout couldn't start. Please try again.",
       }),
       { status: 500, headers: JSON_HEADERS }
     );

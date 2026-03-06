@@ -18,11 +18,13 @@ npm install
 
 ```bash
 OPENAI_API_KEY=...
-STRIPE_SECRET_KEY=...
-STRIPE_WEBHOOK_SECRET=...
+STRIPE_SECRET_KEY=sk_test_...   # From Stripe Dashboard → Developers → API keys
+STRIPE_WEBHOOK_SECRET=...       # Optional, for order persistence
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 SITE_URL=http://localhost:3000
 ```
+
+**Checkout not working?** See [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md) for step-by-step Stripe configuration.
 
 3. Optional variables (for DALL-E 3 + permanent image hosting):
 

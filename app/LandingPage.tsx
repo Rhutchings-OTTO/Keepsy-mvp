@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Gift, ImageIcon, ShieldCheck, Sparkles } from "lucide-react";
-import { MeshGradientBackground } from "@/components/MeshGradientBackground";
 import { DynamicLogo } from "@/components/DynamicLogo";
 import RegionSelector from "@/components/RegionSelector";
 import { getRegion, setRegion, type Region } from "@/lib/region";
@@ -155,15 +154,11 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   };
 
   return (
-    <div className={`relative min-h-screen overflow-hidden bg-[#f6f1eb] text-[#201d1b] ${showGateway ? "fixed inset-0 h-screen" : ""}`}>
+    <div className={`relative min-h-screen overflow-hidden bg-transparent text-[#201d1b] ${showGateway ? "fixed inset-0 h-screen" : ""}`}>
       {showGateway ? (
         <PremiumGateway onComplete={handleGatewayComplete} />
       ) : (
         <>
-          <div className="fixed inset-0 z-0">
-            <MeshGradientBackground />
-          </div>
-
           <header className="relative z-30">
             <div className={`${CONTAINER} flex items-center justify-between py-5`}>
               <DynamicLogo href="/" width={148} className="text-[#201d1b]" />

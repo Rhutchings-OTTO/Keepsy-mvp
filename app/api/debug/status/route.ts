@@ -31,7 +31,7 @@ function guard(req: Request): Response | null {
 
 export async function GET(req: Request) {
   const requestId = getRequestId(req);
-  const rl = guardRateLimit(req, "/api/debug/status", "GET", requestId);
+  const rl = await guardRateLimit(req, "/api/debug/status", "GET", requestId);
   if ("response" in rl) return rl.response;
 
   const denied = guard(req);

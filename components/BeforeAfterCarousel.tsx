@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Sparkles } from "lucide-react";
 import type { Region } from "@/lib/region";
 import { CREATE_EXAMPLES } from "@/content/createExamples";
 import { FF } from "@/lib/featureFlags";
 import { revealUp } from "@/lib/motion";
+import { MockupStage } from "@/components/mockups/MockupStage";
 
 type BeforeAfterCarouselProps = {
   region: Region;
@@ -38,22 +40,37 @@ export default function BeforeAfterCarousel({ region }: BeforeAfterCarouselProps
       <div className={`mt-3 ${showMobile ? "block" : "hidden"} sm:block`}>
         <div className="flex gap-3 overflow-x-auto pb-1">
           {CREATE_EXAMPLES[region].beforeAfterTiles.map((tile) => (
-            <article key={tile.caption} className="min-w-[15rem] rounded-2xl border border-black/10 bg-white p-3">
+            <article
+              key={tile.caption}
+              className="min-w-[20rem] rounded-[1.5rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(249,246,241,0.96))] p-3 shadow-[0_18px_45px_-32px_rgba(34,24,16,0.4)]"
+            >
               <div className="grid grid-cols-3 gap-2">
-                <div className="rounded-xl bg-[#F4EFE8] p-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-black/45">Photo</p>
-                  <p className="mt-5 text-xs font-semibold text-black/65">{tile.beforeLabel}</p>
+                <div className="relative overflow-hidden rounded-xl border border-black/10 bg-[#F4EFE8]">
+                  <Image src={tile.beforeImage} alt={tile.beforeLabel} width={170} height={150} className="h-24 w-full object-cover" />
+                  <p className="absolute left-1.5 top-1.5 rounded-full bg-black/50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                    Photo
+                  </p>
                 </div>
-                <div className="rounded-xl bg-[#E8EEF8] p-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-black/45">Artwork</p>
-                  <p className="mt-5 text-xs font-semibold text-black/65">{tile.afterLabel}</p>
+                <div className="relative overflow-hidden rounded-xl border border-black/10 bg-[#E8EEF8]">
+                  <Image src={tile.afterImage} alt={tile.afterLabel} width={170} height={150} className="h-24 w-full object-contain p-1" />
+                  <p className="absolute left-1.5 top-1.5 rounded-full bg-black/50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                    Artwork
+                  </p>
                 </div>
-                <div className="rounded-xl bg-[#F1EEE9] p-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-black/45">Gift</p>
-                  <p className="mt-5 text-xs font-semibold text-black/65">Ready to print</p>
+                <div className="relative overflow-hidden rounded-xl border border-black/10 bg-[#F1EEE9]">
+                  <MockupStage
+                    productType={tile.gift.productType}
+                    color={tile.gift.color}
+                    generatedImage={tile.gift.artworkImage}
+                    className="h-24 !rounded-none !border-0 !shadow-none"
+                  />
+                  <p className="absolute left-1.5 top-1.5 rounded-full bg-black/50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                    Gift
+                  </p>
                 </div>
               </div>
-              <p className="mt-2 text-xs font-semibold text-black/60">{tile.caption}</p>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-black/45">{tile.beforeLabel} to {tile.afterLabel}</p>
+              <p className="mt-1 text-sm font-semibold text-black/80">{tile.caption}</p>
             </article>
           ))}
         </div>
@@ -61,4 +78,3 @@ export default function BeforeAfterCarousel({ region }: BeforeAfterCarouselProps
     </motion.section>
   );
 }
-

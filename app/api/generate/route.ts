@@ -14,6 +14,7 @@ import { guardOrigin, guardRateLimit, getRequestId } from "@/lib/security/withSe
 import { parseAndValidate, Constraints } from "@/lib/http/validate";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const PREMIUM_ERRORS = {
   openaiDown:
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
   const requestId = getRequestId(req);
   const originDeny = guardOrigin(req, "/api/generate", requestId);
   if (originDeny) return originDeny;
-  const rateLimitResult = guardRateLimit(req, "/api/generate", "POST", requestId);
+  const rateLimitResult = await guardRateLimit(req, "/api/generate", "POST", requestId);
   if ("response" in rateLimitResult) return rateLimitResult.response;
 
   const headers = { "Cache-Control": "no-store", ...rateLimitResult.headers };

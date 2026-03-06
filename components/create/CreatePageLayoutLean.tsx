@@ -1,35 +1,41 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { Zap, Upload, X, RefreshCcw, ArrowRight, Shirt, Coffee, CreditCard, Layout, Star } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  CreditCard,
+  Heart,
+  Layout,
+  RefreshCcw,
+  Shirt,
+  Upload,
+  X,
+  Coffee,
+} from "lucide-react";
 import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { PromptHelperCollapsible } from "./PromptHelperCollapsible";
 import { IdeasForYou } from "./IdeasForYou";
+import BeforeAfterCarousel from "@/components/BeforeAfterCarousel";
 import { Carousel } from "@/components/ui/Carousel";
-import { KineticHeading } from "@/components/motion/KineticHeading";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNotice";
-import { getProductPreviewHref } from "@/lib/routes";
-import { revealUp } from "@/lib/motion";
 import type { Region } from "@/lib/region";
 
 const PRODUCTS = [
-  { type: "tshirt" as const, Icon: Shirt, label: "T-Shirts" },
-  { type: "mug" as const, Icon: Coffee, label: "Mugs" },
-  { type: "card" as const, Icon: CreditCard, label: "Cards" },
-  { type: "hoodie" as const, Icon: Layout, label: "Hoodies" },
+  { type: "tshirt" as const, Icon: Shirt, label: "T-shirt" },
+  { type: "mug" as const, Icon: Coffee, label: "Mug" },
+  { type: "card" as const, Icon: CreditCard, label: "Card" },
+  { type: "hoodie" as const, Icon: Layout, label: "Hoodie" },
 ];
 
-const CREATOR_TESTIMONIALS = [
-  { name: "Sarah J.", quote: "The AI generated exactly what I was looking for! The t-shirt quality is superb.", initials: "SJ" },
-  { name: "Marcus L.", quote: "Uploaded a photo of my dog and the AI turned it into a masterpiece on a mug.", initials: "ML" },
-  { name: "Elena R.", quote: "Fast shipping and beautiful packaging. Will definitely order again.", initials: "ER" },
+const REVIEWS = [
+  { name: "Helen", quote: "It felt simple and clear from the first screen.", initials: "H" },
+  { name: "Rachel", quote: "The preview made it much easier to trust the final gift.", initials: "R" },
+  { name: "Louise", quote: "I liked that it guided me without overwhelming me.", initials: "L" },
 ];
-
-const fadeInUp = revealUp;
 
 export type CreatePageLayoutLeanProps = {
   region: Region;
@@ -64,6 +70,11 @@ export type CreatePageLayoutLeanProps = {
   selectedProductType?: "tshirt" | "mug" | "card" | "hoodie";
 };
 
+const fadeInUp = {
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 0.61, 0.36, 1] as const } },
+};
+
 export function CreatePageLayoutLean({
   region,
   isMagicpathSkin,
@@ -88,26 +99,6 @@ export function CreatePageLayoutLean({
 }: CreatePageLayoutLeanProps) {
   const [createMode, setCreateMode] = useState<"describe" | "upload">("describe");
   const [pendingReplace, setPendingReplace] = useState<string | null>(null);
-  const [midnightVibe, setMidnightVibe] = useState<{
-    placeholder: string;
-    glowColor: string;
-    buttonText: string;
-  }>({ placeholder: "Imagine it.", glowColor: "rgba(255, 255, 255, 0.2)", buttonText: "Generate" });
-
-  useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour === 0) {
-      setMidnightVibe({
-        placeholder: "What do you dream of?",
-        glowColor: "rgba(147, 51, 234, 0.4)",
-        buttonText: "Manifest",
-      });
-    }
-  }, []);
-
-  const promptPlaceholder = uploadedImage
-    ? "Describe how you'd like to transform this photo…"
-    : midnightVibe.placeholder;
 
   const handleChipPrompt = (nextPrompt: string) => {
     if (!prompt.trim()) {
@@ -119,13 +110,10 @@ export function CreatePageLayoutLean({
   };
 
   const handleReplaceConfirm = () => {
-    if (pendingReplace) {
-      setPrompt(pendingReplace);
-      setPendingReplace(null);
-    }
+    if (!pendingReplace) return;
+    setPrompt(pendingReplace);
+    setPendingReplace(null);
   };
-
-  const handleReplaceCancel = () => setPendingReplace(null);
 
   const handleUsePrompt = (nextPrompt: string) => {
     setPrompt(nextPrompt);
@@ -144,235 +132,246 @@ export function CreatePageLayoutLean({
       animate="animate"
       exit={{ opacity: 0, scale: 0.98 }}
       variants={fadeInUp}
-      className="flex flex-col items-center text-center mt-10 max-w-3xl mx-auto"
+      className="mx-auto mt-6 flex max-w-6xl flex-col gap-8 px-1 sm:mt-8 sm:gap-10"
     >
-      <motion.div
-        variants={fadeInUp}
-        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/5 text-black/70 text-xs font-extrabold uppercase tracking-wider mb-6"
-      >
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }}>
-          <Zap size={14} />
-        </motion.div>
-        AI Gift Maker
-      </motion.div>
-
-      <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-black mb-6 leading-[1.05]">
-        Imagine it. Generate it.
-        <br />
-        <motion.span
-          className="bg-clip-text text-transparent"
-          style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#F8C8DC,#FFD194,#B19CD9)", backgroundSize: "200% auto" }}
-          animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-        >
-          Cherish it.
-        </motion.span>
-      </motion.h1>
-
-      <motion.p variants={fadeInUp} className="text-lg text-black/55 mb-8 max-w-2xl leading-relaxed">
-        Turn your favorite memories and wildest ideas into professional-grade merchandise with Keepsy&apos;s high-fidelity AI.
-      </motion.p>
-
-      {/* B) PRIMARY CREATION PANEL - TOP */}
-      <motion.div variants={fadeInUp} className="w-full">
-        <MagicpathFrame enabled={isMagicpathSkin}>
-          <div
-            className={`relative p-4 flex flex-col gap-4 border ${
-              isMagicpathSkin
-                ? "rounded-[2rem] border-white/60 bg-white/35 shadow-[0_16px_48px_rgba(0,0,0,0.08)] backdrop-blur-2xl"
-                : "rounded-2xl border-black/5 bg-white shadow-xl"
-            }`}
-          >
-            <div className="inline-flex rounded-2xl border border-black/10 bg-[#F9F4EE] p-1" role="tablist">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={createMode === "describe"}
-                onClick={() => setCreateMode("describe")}
-                className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition min-h-[44px] ${
-                  createMode === "describe" ? "bg-white text-black shadow-sm" : "text-black/60"
-                }`}
-              >
-                Describe
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={createMode === "upload"}
-                onClick={() => setCreateMode("upload")}
-                className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition min-h-[44px] ${
-                  createMode === "upload" ? "bg-white text-black shadow-sm" : "text-black/60"
-                }`}
-              >
-                Upload a photo
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                value={typeof prompt === "string" ? prompt : ""}
-                onChange={(e) => {
-                  setPrompt(e.target.value);
-                  setHasUserTypedPrompt(true);
-                }}
-                placeholder={promptPlaceholder}
-                className="w-full rounded-xl border border-black/10 bg-white px-4 py-4 text-base font-semibold text-black placeholder:text-black/40 transition-shadow duration-300"
-                style={
-                  !uploadedImage && midnightVibe.glowColor !== "rgba(255, 255, 255, 0.2)"
-                    ? { boxShadow: `0 0 24px ${midnightVibe.glowColor}` }
-                    : undefined
-                }
-                aria-label="Describe your gift idea"
-              />
-
-              {createMode === "upload" && (
-                <div className="rounded-2xl border-2 border-dashed border-black/15 bg-[#FBF8F4] p-4">
-                  <input
-                    ref={fileInputRef as React.RefObject<HTMLInputElement>}
-                    id="create-upload-input"
-                    type="file"
-                    accept="image/png,image/jpeg"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    aria-label="Upload photo"
-                  />
-                  <label
-                    htmlFor="create-upload-input"
-                    className="flex cursor-pointer flex-col items-center gap-2 py-2"
-                  >
-                    <Upload size={24} className="text-black/50" />
-                    <span className="text-sm font-semibold text-black/70">Choose a photo to transform</span>
-                    <span className="text-xs text-black/50">PNG or JPG, max 5MB</span>
-                  </label>
-                  {uploadedImage && (
-                    <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/10 bg-white p-2">
-                      <div className="relative h-12 w-12 overflow-hidden rounded-lg">
-                        <Image src={uploadedImage} alt="Uploaded" fill className="object-cover" unoptimized sizes="48px" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-semibold text-black/70">{uploadedFileName || "Photo selected"}</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={onClearUploadedImage}
-                        className="rounded-full p-1.5 text-black/50 hover:bg-black/5 hover:text-red-600"
-                        aria-label="Remove photo"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <MagneticButton
-                onClick={() => onGenerate()}
-                disabled={(!(typeof prompt === "string" ? prompt : "").trim() && !uploadedImage) || isBusy}
-                className={`w-full min-h-[52px] rounded-xl px-6 py-4 font-extrabold text-lg text-white flex items-center justify-center gap-2 transition-all shadow-lg active:scale-[0.98] ${
-                  isBusy ? "bg-black/35 cursor-not-allowed" : "bg-black hover:bg-black/90"
-                }`}
-              >
-                {isBusy ? (
-                  <>
-                    <RefreshCcw className="animate-spin" size={22} />
-                    Synthesizing…
-                  </>
-                ) : (
-                  <>
-                    {midnightVibe.buttonText} design <ArrowRight size={22} />
-                  </>
-                )}
-              </MagneticButton>
-            </div>
-
-            <p className="text-xs font-semibold text-black/50">Takes ~10–20 seconds. You can edit after.</p>
-
-            <GenerationSafetyNotice
-              hardBlock={generationContentBlock ? { type: "block", ...generationContentBlock } : null}
-              rewriteApplied={generationRewriteApplied ? { type: "rewrite", ...generationRewriteApplied } : null}
-              error={generationContentBlock ? null : generationError}
-              onSuggestionClick={onSuggestionClick}
-              onUseSuggestedPromptClick={onUseSuggestedPromptClick}
-            />
-            <AnimatePresence>
-              {checkoutStatus === "success" && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"
-                >
-                  Payment complete. Your order is confirmed.
-                </motion.p>
-              )}
-              {checkoutStatus === "canceled" && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700"
-                >
-                  Checkout canceled. Your design is saved here so you can continue anytime.
-                </motion.p>
-              )}
-            </AnimatePresence>
+      <div className="grid gap-6 lg:grid-cols-[1.06fr_0.94fr] lg:gap-8">
+        <motion.section variants={fadeInUp} className="max-w-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#d7cabc] bg-white/80 px-3 py-1.5 text-sm font-medium text-[#665f58]">
+            <Heart size={14} className="text-[#a06b55]" />
+            Make a thoughtful personalised gift
           </div>
-        </MagicpathFrame>
-      </motion.div>
+          <h1 className="mt-5 font-serif text-[clamp(2.2rem,4.6vw,4.4rem)] leading-[1.02] tracking-[-0.04em] text-[#1f1b18]">
+            Create something personal in a way that feels easy.
+          </h1>
+          <p className="mt-5 max-w-xl text-lg leading-8 text-[#5c5650]">
+            Tell us what you want to make, or upload a photo. We’ll turn it into a polished design and show you how it will look before you buy.
+          </p>
 
-      {/* C) PROMPT HELPER - COLLAPSIBLE */}
-      <motion.div variants={fadeInUp} className="w-full">
-        <PromptHelperCollapsible onUsePrompt={handleUsePrompt} />
-      </motion.div>
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            {[
+              "Write one simple sentence",
+              "Preview your design on a product",
+              "Only order if it looks right",
+            ].map((item) => (
+              <div key={item} className="rounded-[22px] border border-black/8 bg-white/76 p-4 text-sm leading-6 text-[#564f49] shadow-[0_18px_40px_-32px_rgba(0,0,0,0.3)]">
+                <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#efe4d7] text-[#8b6f47]">
+                  <Check size={16} />
+                </div>
+                {item}
+              </div>
+            ))}
+          </div>
+        </motion.section>
 
-      {/* D) IDEAS FOR YOU - REGION-AWARE */}
-      <motion.div variants={fadeInUp} className="w-full">
-        <IdeasForYou
-          region={region}
-          onUsePrompt={handleChipPrompt}
-          onReplaceConfirm={handleReplaceConfirm}
-          onReplaceCancel={handleReplaceCancel}
-          pendingReplace={pendingReplace}
-        />
-      </motion.div>
+        <motion.section variants={fadeInUp} className="w-full">
+          <MagicpathFrame enabled={isMagicpathSkin}>
+            <div className="rounded-[28px] border border-white/65 bg-[linear-gradient(165deg,rgba(255,255,255,0.9),rgba(255,255,255,0.72))] p-4 shadow-[0_30px_70px_-44px_rgba(0,0,0,0.42)] backdrop-blur-xl sm:p-5">
+              <div className="inline-flex rounded-full border border-black/10 bg-[#f4ede6] p-1">
+                <button
+                  type="button"
+                  onClick={() => setCreateMode("describe")}
+                  className={`rounded-full px-4 py-2 text-sm font-medium ${createMode === "describe" ? "bg-white text-[#1f1b18] shadow-sm" : "text-[#69615a]"}`}
+                >
+                  Describe a gift
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCreateMode("upload")}
+                  className={`rounded-full px-4 py-2 text-sm font-medium ${createMode === "upload" ? "bg-white text-[#1f1b18] shadow-sm" : "text-[#69615a]"}`}
+                >
+                  Use a photo
+                </button>
+              </div>
 
-      {/* E) PRODUCT PICKER */}
-      <motion.div variants={fadeInUp} className="mt-10 w-full">
-        <p className="text-sm font-black uppercase tracking-wider text-black/55 mb-4">Choose your item</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {PRODUCTS.map(({ type, Icon, label }) => (
-            <Link
-              key={type}
-              href={getProductPreviewHref(type)}
-              className="flex flex-col items-center gap-2 rounded-2xl frosted-glass border border-white/20 p-5 min-h-[100px] transition hover:border-white/40"
-            >
-              <Icon size={28} className="text-black/70" />
-              <span className="font-extrabold text-xs uppercase tracking-widest text-black/80">{label}</span>
-            </Link>
-          ))}
+              <div className="mt-4 space-y-4">
+                <label className="block">
+                  <span className="mb-2 block text-sm font-medium text-[#5e5650]">
+                    {createMode === "upload" ? "Describe how you want the photo changed" : "Describe the gift you want to make"}
+                  </span>
+                  <textarea
+                    value={typeof prompt === "string" ? prompt : ""}
+                    onChange={(e) => {
+                      setPrompt(e.target.value);
+                      setHasUserTypedPrompt(true);
+                    }}
+                    placeholder={
+                      createMode === "upload"
+                        ? "Example: Turn this family photo into a soft watercolor birthday card"
+                        : "Example: A warm floral mug design for Mum’s birthday"
+                    }
+                    rows={5}
+                    className="min-h-[144px] w-full resize-none rounded-[22px] border border-black/10 bg-white px-4 py-4 text-base leading-7 text-[#282320] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] outline-none placeholder:text-[#9b938c] focus:border-[#c8b6a2]"
+                  />
+                </label>
+
+                {createMode === "upload" ? (
+                  <div className="rounded-[22px] border border-dashed border-[#d8c9b8] bg-[#fcf8f4] p-4">
+                    <input
+                      ref={fileInputRef}
+                      id="create-upload-input"
+                      type="file"
+                      accept="image/png,image/jpeg"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                    {!uploadedImage ? (
+                      <label htmlFor="create-upload-input" className="flex cursor-pointer flex-col items-center gap-2 py-5 text-center">
+                        <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-[#8b6f47] shadow-sm">
+                          <Upload size={18} />
+                        </div>
+                        <span className="text-base font-medium text-[#302a26]">Choose a photo</span>
+                        <span className="text-sm text-[#726960]">PNG or JPG, up to 5MB</span>
+                      </label>
+                    ) : (
+                      <div className="flex items-center gap-3 rounded-[18px] bg-white p-3">
+                        <div className="relative h-16 w-16 overflow-hidden rounded-2xl">
+                          <Image src={uploadedImage} alt="Uploaded" fill className="object-cover" unoptimized sizes="64px" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-[#2d2724]">{uploadedFileName || "Photo selected"}</p>
+                          <p className="mt-1 text-xs text-[#716960]">Ready to transform</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={onClearUploadedImage}
+                          className="rounded-full p-2 text-[#6a635c] hover:bg-black/5"
+                          aria-label="Remove photo"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+
+                <MagneticButton
+                  onClick={() => onGenerate()}
+                  disabled={(!(typeof prompt === "string" ? prompt : "").trim() && !uploadedImage) || isBusy}
+                  className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-full bg-[#1f2937] px-6 text-base font-semibold text-white shadow-[0_20px_36px_-22px_rgba(17,24,39,0.6)] disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  {isBusy ? (
+                    <>
+                      <RefreshCcw className="animate-spin" size={18} />
+                      Creating your design...
+                    </>
+                  ) : (
+                    <>
+                      Generate preview
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </MagneticButton>
+
+                <p className="text-sm text-[#736b64]">
+                  Most designs are ready in 10 to 20 seconds. You can refine the result afterwards.
+                </p>
+
+                <GenerationSafetyNotice
+                  hardBlock={generationContentBlock ? { type: "block", ...generationContentBlock } : null}
+                  rewriteApplied={generationRewriteApplied ? { type: "rewrite", ...generationRewriteApplied } : null}
+                  error={generationContentBlock ? null : generationError}
+                  onSuggestionClick={onSuggestionClick}
+                  onUseSuggestedPromptClick={onUseSuggestedPromptClick}
+                />
+
+                <AnimatePresence>
+                  {checkoutStatus === "success" ? (
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700"
+                    >
+                      Payment complete. Your order is confirmed.
+                    </motion.p>
+                  ) : null}
+                  {checkoutStatus === "canceled" ? (
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700"
+                    >
+                      Checkout canceled. Your design is still here whenever you want to continue.
+                    </motion.p>
+                  ) : null}
+                </AnimatePresence>
+              </div>
+            </div>
+          </MagicpathFrame>
+        </motion.section>
+      </div>
+
+      <motion.section variants={fadeInUp} className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+        <div className="rounded-[26px] border border-black/8 bg-white/82 p-4 shadow-[0_20px_44px_-34px_rgba(0,0,0,0.3)] sm:p-5">
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#8b7f74]">Need ideas?</p>
+          <PromptHelperCollapsible onUsePrompt={handleUsePrompt} />
         </div>
-      </motion.div>
+        <div className="rounded-[26px] border border-black/8 bg-white/82 p-4 shadow-[0_20px_44px_-34px_rgba(0,0,0,0.3)] sm:p-5">
+          <IdeasForYou
+            region={region}
+            onUsePrompt={handleChipPrompt}
+            onReplaceConfirm={handleReplaceConfirm}
+            onReplaceCancel={() => setPendingReplace(null)}
+            pendingReplace={pendingReplace}
+          />
+        </div>
+      </motion.section>
 
-      {/* F) TESTIMONIALS - SINGLE COMPACT */}
-      <motion.section variants={fadeInUp} className="mt-14 w-full">
-        <KineticHeading as="h2" className="text-2xl md:text-3xl font-black text-center mb-6">What our creators say</KineticHeading>
-        <Carousel showArrows showDots>
-          {CREATOR_TESTIMONIALS.map((t) => (
-            <article key={t.name} className="rounded-2xl frosted-glass border border-white/20 p-5 text-center">
-              <div className="mx-auto h-12 w-12 rounded-full bg-gradient-to-br from-[#7DB9E8]/80 to-[#F8C8DC]/80 text-white font-black flex items-center justify-center border border-white text-sm">
-                {t.initials}
-              </div>
-              <div className="mt-3 flex justify-center gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} size={14} className="text-yellow-500 fill-yellow-500" />
-                ))}
-              </div>
-              <p className="mt-3 text-sm italic text-black/70">&quot;{t.quote}&quot;</p>
-              <p className="mt-2 text-lg font-black">{t.name}</p>
-            </article>
-          ))}
-        </Carousel>
+      <motion.section variants={fadeInUp}>
+        <BeforeAfterCarousel region={region} />
+      </motion.section>
+
+      <motion.section variants={fadeInUp}>
+        <div className="rounded-[26px] border border-black/8 bg-white/82 p-5 shadow-[0_20px_44px_-34px_rgba(0,0,0,0.3)] sm:p-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#8b7f74]">Choose your product</p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {PRODUCTS.map(({ type, Icon, label }) => (
+              <motion.button
+                key={type}
+                type="button"
+                onClick={() => onProductSelect(type)}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.985 }}
+                className={`rounded-[22px] border p-4 text-left transition sm:p-5 ${
+                  selectedProductType === type
+                    ? "border-[#1f2937] bg-[#1f2937] text-white shadow-[0_16px_34px_-22px_rgba(17,24,39,0.55)]"
+                    : "border-black/10 bg-[#fbf8f4] text-[#2b2521]"
+                }`}
+              >
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/80 text-[#8b6f47]">
+                  <Icon size={20} />
+                </div>
+                <p className={`mt-4 text-lg font-semibold ${selectedProductType === type ? "text-white" : "text-[#241f1c]"}`}>
+                  {label}
+                </p>
+                <p className={`mt-1 text-sm ${selectedProductType === type ? "text-white/75" : "text-[#70675f]"}`}>
+                  Preview before you buy
+                </p>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      <motion.section variants={fadeInUp} className="rounded-[26px] border border-black/8 bg-white/82 p-5 shadow-[0_20px_44px_-34px_rgba(0,0,0,0.3)] sm:p-6">
+        <div className="flex flex-col gap-2 text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#8b7f74]">Customer feedback</p>
+          <h2 className="font-serif text-3xl tracking-[-0.03em] text-[#1f1b18]">Designed to feel reassuring, not confusing.</h2>
+        </div>
+        <div className="mt-6">
+          <Carousel showArrows showDots>
+            {REVIEWS.map((review) => (
+              <article key={review.name} className="rounded-[26px] bg-[#fbf7f2] p-6 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#efe4d7] text-sm font-semibold text-[#7d6148]">
+                  {review.initials}
+                </div>
+                <p className="mt-4 text-base leading-7 text-[#4d4742]">&quot;{review.quote}&quot;</p>
+                <p className="mt-4 text-sm font-semibold text-[#7a7066]">{review.name}</p>
+              </article>
+            ))}
+          </Carousel>
+        </div>
       </motion.section>
     </motion.div>
   );

@@ -49,7 +49,7 @@ export default function UpsellDrawer({
             role="dialog"
             aria-modal="true"
             aria-label="Optional add-ons"
-            className="fixed inset-x-0 bottom-0 z-[71] rounded-t-3xl border border-[#E1D4C6] bg-[#FFFDFB] p-5 shadow-2xl"
+            className="fixed inset-x-0 bottom-0 z-[71] rounded-t-[2rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(247,242,236,0.96))] p-5 shadow-[0_-24px_60px_-34px_rgba(0,0,0,0.42)] backdrop-blur-xl"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -61,7 +61,7 @@ export default function UpsellDrawer({
               {OPTIONS.map((option) => (
                 <label
                   key={option.id}
-                  className="flex cursor-pointer items-center justify-between rounded-xl border border-[#E6DBCE] bg-white px-3 py-2"
+                  className="flex cursor-pointer items-center justify-between rounded-[1.15rem] border border-white/65 bg-white/82 px-3 py-2 shadow-[0_10px_24px_-22px_rgba(0,0,0,0.18)]"
                 >
                   <div>
                     <p className="text-sm text-[#594736]">{option.label}</p>
@@ -77,7 +77,7 @@ export default function UpsellDrawer({
               ))}
             </div>
 
-            <div className="mt-3 rounded-xl border border-[#E8DDCF] bg-[#FBF7F2] p-3">
+            <div className="mt-3 rounded-[1.15rem] border border-white/65 bg-[#FBF7F2] p-3">
               <p className="text-xs font-semibold text-[#5D4938]">Bundle option</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {["none", "gift-bundle", "premium-bundle"].map((choice) => (
@@ -119,4 +119,3 @@ export default function UpsellDrawer({
     </AnimatePresence>
   );
 }
-

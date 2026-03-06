@@ -40,7 +40,9 @@ export async function uploadImageToCloudinary(
     if (!url || typeof url !== "string") {
       return { ok: false, error: "Upload succeeded but no URL returned." };
     }
-    return { ok: true, url };
+    // Add immutable cache flag for CDN (public, max-age=31536000, immutable)
+    const cdnUrl = url.replace("/upload/v", "/upload/fl_immutable_cache/v");
+    return { ok: true, url: cdnUrl };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Upload failed";
     return { ok: false, error: msg };

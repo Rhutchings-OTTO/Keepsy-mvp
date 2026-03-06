@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createHash } from "crypto";
 import { z } from "zod";
+import { sha256Hex } from "@/lib/crypto/sha256";
 import {
   enforceUsageGuards,
   getClientKey,
@@ -15,6 +15,7 @@ import { guardOrigin, guardRateLimit, getRequestId } from "@/lib/security/withSe
 import { parseAndValidate, Constraints } from "@/lib/http/validate";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const CACHE_TTL_MS = 3 * 60 * 1000;
 const MAX_IN_FLIGHT_GENERATIONS = 8;
@@ -72,8 +73,8 @@ function normalizeOpenAIError(message: string): { status: number; contentBlock: 
   };
 }
 
-function getPromptKey(prompt: string): string {
-  return createHash("sha256").update(prompt).digest("hex").slice(0, 32);
+async function getPromptKey(prompt: string): Promise<string> {
+  return (await sha256Hex(prompt)).slice(0, 32);
 }
 
 function readCachedGeneration(promptKey: string): CachedGeneration | null {
@@ -90,7 +91,7 @@ export async function POST(req: Request) {
   const requestId = getRequestId(req);
   const originDeny = guardOrigin(req, "/api/generate-image", requestId);
   if (originDeny) return originDeny;
-  const rateLimitResult = guardRateLimit(req, "/api/generate-image", "POST", requestId);
+  const rateLimitResult = await guardRateLimit(req, "/api/generate-image", "POST", requestId);
   if ("response" in rateLimitResult) return rateLimitResult.response;
 
   const noStoreHeaders = { "Cache-Control": "no-store" };
@@ -126,7 +127,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const promptKey = getPromptKey(`${sanitized.prompt}::${generationSize}`);
+    const promptKey = await getPromptKey(`${sanitized.prompt}::${generationSize}`);
     const startedAt = Date.now();
     const cached = readCachedGeneration(promptKey);
 
@@ -212,7 +213,7 @@ export async function POST(req: Request) {
         }
 
         const { imageDataUrl, designUrl, promptUsed } = result;
-        const cacheKey = getPromptKey(`${promptUsed}::${generationSize}`);
+        const cacheKey = await getPromptKey(`${promptUsed}::${generationSize}`);
         generationCache.set(cacheKey, {
           imageDataUrl,
           designUrl,

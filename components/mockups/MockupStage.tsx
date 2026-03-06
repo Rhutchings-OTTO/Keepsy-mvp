@@ -191,6 +191,8 @@ export function MockupStage({
                 generatedImage={generatedImage}
                 rectPlacementPx={rectPlacementPx}
                 onLoad={(w, h) => setArtNaturalSize({ width: w, height: h })}
+                opacity={entry.opacity}
+                dropShadow={entry.dropShadow}
               />
             )}
             {entry.placement.kind === "quad" && quadMatrix && (
@@ -200,6 +202,8 @@ export function MockupStage({
                 generatedImage={generatedImage}
                 quadMatrix={quadMatrix}
                 onLoad={(w, h) => setArtNaturalSize({ width: w, height: h })}
+                opacity={entry.opacity}
+                dropShadow={entry.dropShadow}
               />
             )}
             {DEBUG_PLACEMENT && rectPlacementPx && (
@@ -235,10 +239,20 @@ export function MockupStage({
         />
 
         {/* LAYER 3 (Top): Drawstrings, mug reflections, shadows - FIXED, never re-renders on prompt change */}
-        <TopLayer productType={productType} color={color} />
+        <TopLayer productType={productType} color={color} baseMockupSrc={entry.baseMockupSrc} />
 
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/[0.06]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              productType === "mug"
+                ? "radial-gradient(80% 100% at 30% 40%, rgba(255,255,255,0.14) 0%, transparent 60%)"
+                : "radial-gradient(70% 85% at 50% 28%, rgba(255,255,255,0.1) 0%, transparent 65%)",
+          }}
           aria-hidden
         />
       </div>

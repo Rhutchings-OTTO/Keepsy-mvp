@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 import { useReducedMotionPref } from "@/lib/motion/useReducedMotionPref";
 
 type MagneticCardProps = React.ComponentProps<typeof motion.div> & {
@@ -19,62 +19,14 @@ export function MagneticCard({
   className = "",
   ...props
 }: MagneticCardProps) {
-  const ref = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotionPref();
-
-  const rotateX = useMotionValue(0);
-  const rotateY = useMotionValue(0);
-  const scale = useMotionValue(1);
-
-  const springRotateX = useSpring(rotateX, { stiffness: 300, damping: 25 });
-  const springRotateY = useSpring(rotateY, { stiffness: 300, damping: 25 });
-  const springScale = useSpring(scale, { stiffness: 400, damping: 28 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (reduceMotion) return;
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / rect.width;
-    const dy = (e.clientY - cy) / rect.height;
-    rotateY.set(dx * maxTilt);
-    rotateX.set(-dy * maxTilt);
-    scale.set(hoverScale);
-  };
-
-  const handleMouseLeave = () => {
-    rotateX.set(0);
-    rotateY.set(0);
-    scale.set(1);
-  };
-
-  if (reduceMotion) {
-    return (
-      <motion.div
-        ref={ref}
-        className={className}
-        whileHover={{ scale: 1.01 }}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    );
-  }
+  void maxTilt;
 
   return (
     <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX: springRotateX,
-        rotateY: springRotateY,
-        scale: springScale,
-        transformPerspective: 800,
-      }}
       className={className}
+      whileHover={reduceMotion ? undefined : { y: -3, scale: hoverScale, boxShadow: "0 20px 40px -24px rgba(0,0,0,0.22)" }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       {...props}
     >
       {children}

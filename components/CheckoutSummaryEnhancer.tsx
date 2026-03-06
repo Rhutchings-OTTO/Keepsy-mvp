@@ -29,11 +29,11 @@ export default function CheckoutSummaryEnhancer({ productName, priceText, thumbn
 
   return (
     <section className="space-y-3">
-      <article className="rounded-2xl border border-[#E7DBCF] bg-white/90 p-4">
+      <article className="rounded-[1.5rem] border border-white/65 bg-white/78 p-4 shadow-[0_14px_30px_-24px_rgba(0,0,0,0.22)]">
         <div className="flex items-center gap-3">
           <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-[#F6EFE7]">
             {thumbnailSrc ? (
-              <Image src={thumbnailSrc} alt="Checkout preview" fill className="object-cover" unoptimized />
+              <Image src={thumbnailSrc} alt="Checkout preview" fill className="object-contain p-1.5" unoptimized />
             ) : null}
           </div>
           <div className="min-w-0">
@@ -45,7 +45,7 @@ export default function CheckoutSummaryEnhancer({ productName, priceText, thumbn
         </div>
       </article>
 
-      <article className="rounded-2xl border border-[#E7DBCF] bg-white/85 p-4">
+      <article className="rounded-[1.5rem] border border-white/65 bg-white/74 p-4 shadow-[0_14px_30px_-24px_rgba(0,0,0,0.18)]">
         <p className="mb-2 text-sm font-semibold text-[#4E3D2E]">Need help?</p>
         <div className="space-y-2">
           {FAQS.map((item, index) => (
@@ -67,4 +67,3 @@ export default function CheckoutSummaryEnhancer({ productName, priceText, thumbn
     </section>
   );
 }
-

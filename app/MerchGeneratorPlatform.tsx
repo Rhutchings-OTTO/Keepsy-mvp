@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import useSWR from "swr";
 import { flushSync } from "react-dom";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,7 +25,6 @@ import { SizeGuideDrawer } from "@/components/products/SizeGuideDrawer";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { Reveal } from "@/components/motion/Reveal";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { GrainSpotlight } from "@/components/GrainSpotlight";
 import { KineticHeading } from "@/components/motion/KineticHeading";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
 import MagicpathBackground from "@/components/skin/magicpath/MagicpathBackground";
@@ -33,7 +33,7 @@ import { useConversionFlow } from "@/context/ConversionFlowContext";
 import { useGeneration } from "@/context/GenerationContext";
 import { FF } from "@/lib/featureFlags";
 import { getProductPreviewHref } from "@/lib/routes";
-import { motionTransition, revealUp, softScaleIn } from "@/lib/motion";
+import { motionTransition, softScaleIn } from "@/lib/motion";
 import { getRegion, type Region } from "@/lib/region";
 import {
   setInitialGeneration,
@@ -60,7 +60,6 @@ import {
   Sparkles,
   ShoppingCart,
   X,
-  RefreshCcw,
   ArrowRight,
   ChevronLeft,
   Plus,
@@ -105,20 +104,14 @@ type InitialCreateQuery = {
 
 type DesignShape = "square" | "portrait" | "landscape";
 
-const COMMUNITY_DESIGNS = [
+const COMMUNITY_DESIGNS_FALLBACK = [
   "/occasion-tiles/christmas-scene.png",
   "/occasion-tiles/thanksgiving-cartoon.png",
   "/occasion-tiles/fourth-july-photo.png",
   "/occasion-tiles/anniversary-watercolor.png",
 ];
 
-const fadeInUp = FF.motionSystem
-  ? revealUp
-  : {
-      initial: { opacity: 0, y: 18 },
-      animate: { opacity: 1, y: 0 },
-      transition: { duration: 0.45, ease: "easeOut" },
-    };
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 const GBP_FORMATTER = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -259,7 +252,11 @@ async function generateViaKeepsyAPI(args: {
 
   const data = await res.json();
   if (!res.ok) {
-    const error = new Error(data?.error || data?.userMessage || "Failed to generate image") as Error & {
+    const errMsg =
+      typeof data?.error === "string"
+        ? data.error
+        : data?.error?.message ?? data?.userMessage ?? "Failed to generate image";
+    const error = new Error(errMsg) as Error & {
       status?: number;
       contentBlock?: {
         title: string;
@@ -398,6 +395,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [isGiftingSkipped, setIsGiftingSkipped] = useState(false);
   const [isUpsellOpen, setIsUpsellOpen] = useState(false);
   const [pendingCheckoutMode, setPendingCheckoutMode] = useState<"single" | "cart" | null>(null);
+  const [isSecuring, setIsSecuring] = useState(false);
   const [checkoutSuccess] = useState(false);
   const [checkoutStatus, setCheckoutStatus] = useState<"success" | "canceled" | null>(null);
   const didApplyInitialQuery = useRef(false);
@@ -421,6 +419,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const selectedMockupProductType = getMockupProductType(selectedProduct.id);
   const selectedMockupColor = getMockupColor(selectedColor);
   const isMagicpathSkin = FF.magicpathSkin;
+
+  const { data: communityData } = useSWR<{ designs: string[] }>(
+    "/api/community-designs",
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 3600_000 }
+  );
+  const communityDesigns = communityData?.designs ?? COMMUNITY_DESIGNS_FALLBACK;
 
   useEffect(() => {
     return () => {
@@ -756,6 +761,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const handleCheckout = async () => {
     const cart = buildSingleCheckoutCart();
     if (!cart) return;
+    setIsSecuring(true);
     setIsBusy(true);
     try {
       const url = await checkoutViaKeepsyAPI({
@@ -768,6 +774,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     } catch (e) {
       console.error(e);
       alert(e instanceof Error ? e.message : "Checkout failed");
+      setIsSecuring(false);
       setIsBusy(false);
     }
   };
@@ -780,6 +787,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
     const checkoutImage = cartItems[0]?.imageUrl;
     if (!checkoutImage) return;
+    setIsSecuring(true);
     setIsBusy(true);
     try {
       const url = await checkoutViaKeepsyAPI({
@@ -792,6 +800,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     } catch (e) {
       console.error(e);
       alert(e instanceof Error ? e.message : "Checkout failed");
+      setIsSecuring(false);
       setIsBusy(false);
     }
   };
@@ -875,83 +884,73 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     >
       <MagicpathBackground enabled={isMagicpathSkin} />
       {!isMagicpathSkin ? (
-        <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-          <motion.div
-            animate={{ x: [0, 80, 0], y: [0, 40, 0], scale: [1, 1.15, 1] }}
-            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-            className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#7DB9E8]/20 blur-[120px] rounded-full"
-          />
-          <motion.div
-            animate={{ x: [0, -60, 0], y: [0, 80, 0], scale: [1, 1.1, 1] }}
-            transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-[#F8C8DC]/20 blur-[120px] rounded-full"
-          />
-          <GrainSpotlight />
+        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_12%,rgba(246,221,210,0.56),transparent_30%),radial-gradient(circle_at_85%_14%,rgba(219,232,241,0.42),transparent_28%),linear-gradient(180deg,#f8f4ee_0%,#f5efe8_100%)]" />
         </div>
       ) : null}
 
       {/* NAV */}
-      <nav className={`fixed z-40 w-full px-6 ${isMagicpathSkin ? "top-5" : "top-0 py-4"}`}>
+      <nav className={`fixed z-40 w-full px-4 sm:px-6 ${isMagicpathSkin ? "top-5" : "top-0 py-4"}`}>
         <MagicpathFrame enabled={isMagicpathSkin} className={isMagicpathSkin ? "mx-auto flex w-full max-w-5xl items-center justify-between px-7 py-5" : ""}>
-          <div className={`flex w-full items-center justify-between ${isMagicpathSkin ? "" : "border-b border-black/10 bg-[#F7F1EB]/78 px-0 backdrop-blur-md"}`}>
+          <div className={`flex w-full items-center justify-between rounded-full px-4 py-3 ${isMagicpathSkin ? "" : "border border-black/8 bg-white/82 shadow-[0_16px_34px_-28px_rgba(0,0,0,0.26)] backdrop-blur-md"}`}>
             <DynamicLogo
-              onClick={() => {
-                setView("home");
-                setStep(1);
-              }}
-              width={160}
-              className="h-16 w-auto text-obsidian sm:h-20"
+          onClick={() => {
+            setView("home");
+            setStep(1);
+          }}
+              width={148}
+              className="h-12 w-auto text-obsidian sm:h-14"
             />
 
-            <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-black/60">
-                <button onClick={() => setView("home")} className={view === "home" ? "text-black" : ""}>
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-black/60">
+            <button onClick={() => setView("home")} className={view === "home" ? "text-black" : ""}>
                   How it works
-                </button>
-                <button onClick={() => setView("catalog")} className={view === "catalog" ? "text-black" : ""}>
-                  Catalog
-                </button>
+            </button>
+            <button onClick={() => setView("catalog")} className={view === "catalog" ? "text-black" : ""}>
+              Catalog
+            </button>
                 <button onClick={() => setView("community")} className={view === "community" ? "text-black" : ""}>
                   Community
                 </button>
-              </div>
+          </div>
 
               <button
                 onClick={() => setIsCartOpen(true)}
-                className={`flex items-center gap-2 transition-all px-4 py-2 rounded-full ${
-                  isMagicpathSkin ? "bg-black text-white shadow-xl" : "bg-black/5 hover:bg-black/10"
+                className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all ${
+                  isMagicpathSkin ? "bg-black text-white shadow-xl" : "bg-[#1f2937] text-white shadow-[0_14px_28px_-20px_rgba(17,24,39,0.55)]"
                 }`}
               >
-                <ShoppingCart size={18} className={isMagicpathSkin ? "text-white" : "text-black/70"} />
-                <motion.span
-                  key={cartCount}
-                  initial={{ scale: 1.35 }}
-                  animate={{ scale: 1 }}
-                  className="font-extrabold text-sm"
-                >
-                  {cartCount}
-                </motion.span>
+                <ShoppingCart size={18} className="text-white" />
+            <motion.span
+              key={cartCount}
+              initial={{ scale: 1.35 }}
+              animate={{ scale: 1 }}
+              className="font-extrabold text-sm"
+            >
+              {cartCount}
+            </motion.span>
               </button>
-            </div>
           </div>
+        </div>
         </MagicpathFrame>
       </nav>
 
-      <main className={`flex-1 pb-16 px-6 max-w-7xl mx-auto w-full ${isMagicpathSkin ? "pt-40" : "pt-32"}`}>
+      <main className={`flex-1 pb-16 px-4 sm:px-6 max-w-7xl mx-auto w-full ${isMagicpathSkin ? "pt-40" : "pt-28 sm:pt-32"}`}>
         <AnimatePresence mode="wait">
           {view === "home" && (
             <div className="space-y-20">
               <div className="flex gap-2 md:hidden">
-                <button onClick={() => setView("home")} className="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs font-bold">
+                <button onClick={() => setView("home")} className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold">
                   How it works
                 </button>
-                <button onClick={() => setView("catalog")} className="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs font-bold">
+                <button onClick={() => setView("catalog")} className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold">
                   Catalog
                 </button>
-                <button onClick={() => setView("community")} className="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs font-bold">
+                <button onClick={() => setView("community")} className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold">
                   Community
-                </button>
-              </div>
+                            </button>
+                          </div>
               {/* STEP 1 - Lean layout */}
               {step === 1 && (
                 <CreatePageLayoutLean
@@ -1034,9 +1033,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   initial={{ opacity: 0, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -40 }}
-                  className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
+                  className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]"
                 >
-                  <div className="lg:col-span-7 sticky top-24 flex gap-0">
+                  <div className="sticky top-24 flex gap-0">
                     <DesignVaultSidebar
                       currentImageUrl={generatedImage}
                       onSelectDesign={(entry) => {
@@ -1049,75 +1048,80 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       className="self-start shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                    <motion.div
-                      key={generatedImage ?? "empty-reveal"}
-                      initial={FF.dynamicReveal ? "initial" : false}
-                      animate={FF.dynamicReveal ? "animate" : false}
-                      variants={FF.dynamicReveal ? softScaleIn : undefined}
-                      transition={motionTransition("slow")}
-                    >
-                      <MockupRenderer
-                        productType={selectedMockupProductType}
-                        color={selectedMockupColor}
-                        generatedImage={generatedImage}
-                        hasArtwork={Boolean(generatedImage || uploadedImage)}
-                      />
-                    </motion.div>
-                    <div className="mt-6 flex gap-3 items-center">
-                      <div className="px-3 py-2 rounded-full bg-white/70 border border-black/10 text-xs font-extrabold flex items-center gap-2">
-                        <Sparkles size={14} /> Applied to real mockups
+                      <div className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,242,236,0.84))] p-4 shadow-[0_34px_84px_-46px_rgba(0,0,0,0.36)] backdrop-blur-xl">
+                        <motion.div
+                          key={generatedImage ?? "empty-reveal"}
+                          initial={FF.dynamicReveal ? "initial" : false}
+                          animate={FF.dynamicReveal ? "animate" : false}
+                          variants={FF.dynamicReveal ? softScaleIn : undefined}
+                          transition={motionTransition("slow")}
+                        >
+                          <MockupRenderer
+                            productType={selectedMockupProductType}
+                            color={selectedMockupColor}
+                            generatedImage={generatedImage}
+                            hasArtwork={Boolean(generatedImage || uploadedImage)}
+                          />
+                        </motion.div>
+                        <div className="mt-5 flex flex-wrap items-center gap-3">
+                          <div className="inline-flex rounded-full border border-black/10 bg-white/76 px-3 py-2 text-xs font-extrabold">
+                            <span className="inline-flex items-center gap-2 text-black/70"><Sparkles size={14} /> Real product preview</span>
+                          </div>
+                          <button
+                            onClick={() => setStep(2)}
+                            className="inline-flex items-center gap-2 text-xs font-extrabold text-black/55 hover:text-black"
+                          >
+                            <ChevronLeft size={16} />
+                            Back
+                          </button>
+                        </div>
                       </div>
-                    <button
-                      onClick={() => setStep(2)}
-                      className="text-xs font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2"
-                    >
-                      <ChevronLeft size={16} />
-                      Back
-                    </button>
-                    </div>
-                    {FF.beforeAfter ? (
-                      <div className="mt-4">
-                        <BeforeAfterSlider beforeSrc={uploadedImage} afterSrc={generatedImage} />
-                      </div>
-                    ) : null}
+                      {FF.beforeAfter ? (
+                        <div className="mt-4">
+                          <BeforeAfterSlider beforeSrc={uploadedImage} afterSrc={generatedImage} />
+                        </div>
+                      ) : null}
                     </div>
                   </div>
 
-                  <div className="lg:col-span-5 space-y-6">
-                    <div>
-                      <KineticHeading as="h2" className="text-4xl font-black mb-2">{selectedProduct.name}</KineticHeading>
-                      <p className="text-black/55 font-semibold">{selectedProduct.description}</p>
+                  <div className="space-y-6">
+                    <div className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(247,242,236,0.88))] p-6 shadow-[0_28px_70px_-46px_rgba(0,0,0,0.3)] backdrop-blur-xl">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-black/40">Configure your gift</p>
+                      <KineticHeading as="h2" className="mb-2 mt-3 text-4xl font-black">{selectedProduct.name}</KineticHeading>
+                      <p className="font-semibold text-black/55">{selectedProduct.description}</p>
                     </div>
                     {FF.personalisedStory ? (
                       <PersonalisedStoryCopy region={region} productType={selectedProduct.id} />
                     ) : null}
 
-                    <div className="bg-white/80 border border-black/10 rounded-3xl p-5 shadow-sm space-y-5">
+                    <div className="space-y-5 rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,242,236,0.92))] p-5 shadow-[0_28px_70px_-46px_rgba(0,0,0,0.28)] backdrop-blur-xl">
                       <section>
                         <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">
-                          Select Product
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3">
+                        Select Product
+                      </h3>
+                      <div className="grid grid-cols-2 gap-3">
                           {PRODUCT_LIST.map((prod) => (
-                            <motion.button
-                              key={prod.id}
-                              whileHover={{ y: -2 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => {
-                                setSelectedProduct(prod);
+                          <motion.button
+                            key={prod.id}
+                            whileHover={{ y: -2 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              setSelectedProduct(prod);
                                 setSelectedColor(prod.colors?.[0]?.hex ?? "#FFFFFF");
-                              }}
-                              className={`p-4 rounded-2xl border transition-all text-left ${
-                                selectedProduct.id === prod.id ? "border-black bg-black text-white" : "border-black/10 bg-white"
-                              }`}
-                            >
-                              <div className="text-sm font-extrabold">{prod.name}</div>
-                              <div className={`text-xs mt-1 ${selectedProduct.id === prod.id ? "text-white/70" : "text-black/55"}`}>
+                            }}
+                            className={`rounded-[1.35rem] border p-4 text-left transition-all ${
+                              selectedProduct.id === prod.id
+                                ? "border-[#1f2937] bg-[#1f2937] text-white shadow-[0_16px_34px_-24px_rgba(17,24,39,0.5)]"
+                                : "border-black/10 bg-white/84"
+                            }`}
+                          >
+                            <div className="text-sm font-extrabold">{prod.name}</div>
+                            <div className={`text-xs mt-1 ${selectedProduct.id === prod.id ? "text-white/70" : "text-black/55"}`}>
                                 {gbp(prod.basePrice)}
-                              </div>
-                            </motion.button>
-                          ))}
-                        </div>
+                            </div>
+                          </motion.button>
+                        ))}
+                      </div>
                       </section>
 
                       {selectedProduct.colors && selectedProduct.colors.length > 1 && (
@@ -1160,7 +1164,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                 {size}
                               </button>
                             ))}
-                          </div>
+                        </div>
                           <button
                             type="button"
                             onClick={() => setIsSizeGuideOpen(true)}
@@ -1174,7 +1178,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         </section>
                       )}
 
-                      <section className="pt-4 border-t border-black/10">
+                      <section className="border-t border-black/10 pt-4">
                         <div className="flex justify-between items-center mb-4">
                           <span className="text-black/55 font-semibold">Subtotal</span>
                           <span className="text-2xl font-black">{gbp(selectedProduct.basePrice)}</span>
@@ -1200,28 +1204,28 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           {addToCartConfirmation && (
                             <p className="mb-3 text-sm font-semibold text-green-700">{addToCartConfirmation}</p>
                           )}
-                          <div className="grid grid-cols-2 gap-3">
-                            <motion.button
-                              whileHover={{ scale: 1.01 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={handleAddToCart}
+                        <div className="grid grid-cols-2 gap-3">
+                          <motion.button
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={handleAddToCart}
                               disabled={!generatedImage || (selectedProduct.hasSize && !selectedSize)}
-                              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-black py-4 font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
-                            >
-                              Add <Plus size={18} />
-                            </motion.button>
-                            <motion.button
-                              whileHover={{ scale: 1.01 }}
-                              whileTap={{ scale: 0.98 }}
-                              className="w-full py-4 bg-white border border-black/10 text-black rounded-2xl font-black flex items-center justify-center gap-2"
-                            >
-                              Save <Heart size={18} className="text-pink-400" />
-                            </motion.button>
-                          </div>
+                              className="flex w-full items-center justify-center gap-2 rounded-[1.35rem] bg-[#1f2937] py-4 font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            Add <Plus size={18} />
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex w-full items-center justify-center gap-2 rounded-[1.35rem] border border-black/10 bg-white py-4 font-black text-black"
+                          >
+                            Save <Heart size={18} className="text-pink-400" />
+                          </motion.button>
+                        </div>
                         </section>
                       </section>
+                      </div>
                     </div>
-                  </div>
                   {(selectedProduct.id === "tshirt" || selectedProduct.id === "hoodie") && (
                     <SizeGuideDrawer
                       open={isSizeGuideOpen}
@@ -1240,9 +1244,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.98 }}
-                  className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8"
+                  className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2"
                 >
-                  <div className="bg-white/80 border border-black/10 rounded-[32px] p-7 shadow-sm">
+                  <div className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,242,236,0.88))] p-7 shadow-[0_30px_72px_-44px_rgba(0,0,0,0.32)] backdrop-blur-xl">
                     <KineticHeading as="h2" className="text-3xl font-black mb-4">Checkout</KineticHeading>
                     <p className="text-black/55 font-semibold mb-6">
                       You&apos;re about to buy: <span className="text-black">{checkoutItemDescription}</span>
@@ -1251,8 +1255,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <MagneticButton
                       onClick={() => requestCheckout(hasCartItems ? "cart" : "single")}
                       disabled={isBusy || !canProceedToCheckout}
-                      className="w-full py-5 rounded-2xl font-black text-lg text-white shadow-xl relative overflow-hidden disabled:opacity-40 disabled:cursor-not-allowed"
-                      style={{ backgroundImage: "linear-gradient(90deg,#7DB9E8,#B19CD9)" }}
+                      className="relative w-full overflow-hidden rounded-[1.5rem] bg-[#1f2937] py-5 text-lg font-black text-white shadow-[0_20px_42px_-24px_rgba(17,24,39,0.55)] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <AnimatePresence mode="wait">
                         {checkoutSuccess ? (
@@ -1261,7 +1264,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </motion.div>
                         ) : (
                           <motion.div key="default" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-2">
-                            {isBusy ? "Crafting checkout…" : `Pay ${gbp(checkoutTotal)}`} <ArrowRight />
+                            {isBusy ? "Securing your Masterpiece…" : `Pay ${gbp(checkoutTotal)}`} <ArrowRight />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -1284,19 +1287,19 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     </p>
                   </div>
 
-                  <Reveal variant="fadeUp" className="bg-white/70 border border-black/10 rounded-[32px] p-7 shadow-sm">
+                  <Reveal variant="fadeUp" className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,242,236,0.88))] p-7 shadow-[0_30px_72px_-44px_rgba(0,0,0,0.32)] backdrop-blur-xl">
                     <h3 className="text-xl font-black mb-4">Order Summary</h3>
                     <div className="flex items-center gap-4">
                       <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-black/10 bg-white">
                         {checkoutPreviewImage ? (
-                          <Image src={checkoutPreviewImage} className="w-full h-full object-cover" alt="thumb" fill />
+                          <Image src={checkoutPreviewImage} className="h-full w-full object-contain p-1.5" alt="thumb" fill />
                         ) : null}
                       </div>
                       <div>
                         <div className="font-extrabold">{checkoutItemDescription}</div>
                         <div className="text-sm text-black/55 font-semibold">
                           {hasCartItems ? "Mixed cart with custom AI-generated designs" : "Custom AI-generated design"}
-                        </div>
+                      </div>
                       </div>
                       <div className="ml-auto font-black">{gbp(checkoutTotal)}</div>
                     </div>
@@ -1316,13 +1319,47 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           priceText={gbp(checkoutTotal)}
                           thumbnailSrc={checkoutPreviewImage}
                         />
-                      </div>
+                  </div>
                     ) : null}
                   </Reveal>
                 </motion.div>
               )}
             </div>
           )}
+
+          {/* Optimistic: Securing overlay — shows immediately on Buy click */}
+          <AnimatePresence>
+            {isSecuring && (
+              <motion.div
+                key="securing"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-[60] flex items-center justify-center bg-[#F9F8F6]/95 backdrop-blur-sm"
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center"
+                >
+                  <p className="text-lg font-black text-[#1A1A1A]">Securing your Masterpiece</p>
+                  <p className="mt-2 text-sm font-semibold text-[#1A1A1A]/60">Redirecting to checkout…</p>
+                  <motion.div
+                    className="mt-4 mx-auto h-1 w-32 rounded-full bg-[#1A1A1A]/10 overflow-hidden"
+                    animate={{ opacity: [0.6, 1, 0.6] }}
+                    transition={{ duration: 1.2, repeat: Infinity }}
+                  >
+                    <motion.div
+                      className="h-full bg-[#1A1A1A]/30 rounded-full"
+                      animate={{ width: ["0%", "100%", "0%"] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Catalog */}
           {view === "catalog" && (
@@ -1357,7 +1394,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 </p>
               </div>
               <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-                {COMMUNITY_DESIGNS.map((img, idx) => (
+                {communityDesigns.map((img, idx) => (
                   <MagneticCard
                     key={`${img}-${idx}`}
                     maxTilt={8}
@@ -1419,7 +1456,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               animate={{ x: 0 }}
               exit={{ x: 420 }}
               transition={{ type: "spring", stiffness: 260, damping: 28 }}
-              className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 border-l border-black/10 shadow-2xl p-6 flex flex-col"
+              className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-l border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,242,236,0.94))] p-6 shadow-[0_0_80px_-26px_rgba(0,0,0,0.4)] backdrop-blur-xl"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-2xl font-black">Your Cart</h3>
@@ -1435,11 +1472,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   </div>
                 ) : (
                   cartItems.map((item) => (
-                    <div key={item.id} className="frosted-glass rounded-2xl border border-white/20 p-3">
+                    <div key={item.id} className="rounded-[1.35rem] border border-white/60 bg-white/74 p-3 shadow-[0_14px_28px_-24px_rgba(0,0,0,0.24)]">
                       <div className="flex items-center gap-3">
                         <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-black/5 border border-black/10">
                           {item.imageUrl ? (
-                            <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
+                            <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1.5" />
                           ) : (
                             <Image src="/keepsy-logo-transparent.png" alt={item.name} fill className="object-contain p-2" />
                           )}
@@ -1483,7 +1520,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   disabled={isBusy || cartItems.length === 0}
                   className="w-full py-3 rounded-xl bg-black text-white font-extrabold disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {isBusy ? "Crafting checkout…" : "Checkout"}
+                  {isBusy ? "Securing…" : "Checkout"}
                 </MagneticButton>
               </div>
             </motion.aside>

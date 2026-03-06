@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, Suspense } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -16,7 +17,6 @@ import {
 import * as THREE from "three";
 import type { Region } from "@/lib/region";
 import { setRegion } from "@/lib/region";
-import { playSonicTransition } from "@/lib/sonicTransition";
 
 const Canvas = dynamic(
   () => import("@react-three/fiber").then((mod) => mod.Canvas),
@@ -38,7 +38,6 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
   const [washOrigin, setWashOrigin] = useState({ x: 0, y: 0 });
 
   const startTransition = (region: Region, event: React.MouseEvent) => {
-    playSonicTransition();
     setSelectedRegion(region);
     setWashOrigin({ x: event.clientX, y: event.clientY });
     setPhase("washing");
@@ -56,17 +55,38 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
     >
       {/* ACT 1: Regional Selection */}
       {phase === "idle" && (
-        <div className="flex h-full w-full">
-          <RegionSide
-            name="UK"
-            image={UK_IMAGE}
-            onSelect={(e) => startTransition("UK", e)}
-          />
-          <RegionSide
-            name="US"
-            image={US_IMAGE}
-            onSelect={(e) => startTransition("US", e)}
-          />
+        <div className="relative flex h-full w-full items-center justify-center overflow-hidden px-4">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(219,232,241,0.48),transparent_28%),radial-gradient(circle_at_82%_16%,rgba(250,223,205,0.46),transparent_30%),linear-gradient(180deg,#faf7f2_0%,#f6f1eb_100%)]" />
+          <div className="absolute left-[8%] top-[18%] h-44 w-44 rounded-full bg-[#dbe8f2]/60 blur-3xl" />
+          <div className="absolute bottom-[14%] right-[10%] h-52 w-52 rounded-full bg-[#f8ddcb]/60 blur-3xl" />
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="relative z-10 w-full max-w-5xl rounded-[2.25rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(248,244,238,0.74))] p-5 shadow-[0_40px_110px_-52px_rgba(0,0,0,0.42)] backdrop-blur-2xl sm:p-8"
+          >
+            <div className="max-w-2xl">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-black/40">Choose experience</p>
+              <h1 className="mt-3 font-serif text-4xl font-semibold tracking-[-0.05em] text-[#201d1b] sm:text-5xl">
+                Enter the Keepsy studio.
+              </h1>
+              <p className="mt-4 text-base leading-8 text-black/58">
+                Select your region for local shipping, occasion timing, and product availability. Then continue into the studio.
+              </p>
+            </div>
+            <div className="mt-8 grid gap-4 md:grid-cols-2">
+              <RegionSide
+                name="UK"
+                image={UK_IMAGE}
+                onSelect={(e) => startTransition("UK", e)}
+              />
+              <RegionSide
+                name="US"
+                image={US_IMAGE}
+                onSelect={(e) => startTransition("US", e)}
+              />
+            </div>
+          </motion.div>
         </div>
       )}
 
@@ -97,17 +117,27 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
             className="fixed inset-0 z-50"
             style={{ backgroundColor: IVORY }}
           >
-            <Suspense
+            <ErrorBoundary
               fallback={
                 <div
                   className="flex h-full items-center justify-center"
                   style={{ backgroundColor: IVORY }}
                 >
-                  <span className="font-serif text-obsidian/40">Calibrating studio…</span>
+                  <span className="font-serif text-obsidian/40">3D unavailable — continuing…</span>
                 </div>
               }
             >
-              <Canvas
+              <Suspense
+                fallback={
+                  <div
+                    className="flex h-full items-center justify-center"
+                    style={{ backgroundColor: IVORY }}
+                  >
+                    <span className="font-serif text-obsidian/40">Calibrating studio…</span>
+                  </div>
+                }
+              >
+                <Canvas
                 camera={{ position: [0, 0, 5], fov: 75 }}
                 gl={{ alpha: false }}
                 dpr={[1, 2]}
@@ -121,7 +151,8 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
                   <CloudSceneWithPerf isAccelerating />
                 </PerformanceMonitor>
               </Canvas>
-            </Suspense>
+              </Suspense>
+            </ErrorBoundary>
             {/* ACT 4: White Flash - arrival at 2.5s */}
             <motion.div
               className="pointer-events-none absolute inset-0 z-[51]"
@@ -185,22 +216,26 @@ function RegionSide({ name, image, onSelect }: RegionSideProps) {
   return (
     <motion.button
       type="button"
-      whileHover={{ width: "60%" }}
-      className="relative h-full w-1/2 flex items-center justify-center cursor-pointer overflow-hidden"
+      whileHover={{ y: -4, scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      className="relative flex min-h-[22rem] w-full cursor-pointer items-end overflow-hidden rounded-[1.8rem] border border-white/70 text-left shadow-[0_28px_64px_-34px_rgba(0,0,0,0.42)]"
       onClick={onSelect}
       aria-label={`Shop ${name}`}
     >
       <div className="absolute inset-0">
         <Image src={image} alt={name} fill className="object-cover" sizes="50vw" priority />
-        <div className="absolute inset-0 bg-obsidian/20" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(16,18,21,0.12),rgba(16,18,21,0.52))]" />
       </div>
-      <div className="relative z-10 text-center">
-        <h2 className="font-serif text-5xl text-white tracking-tighter drop-shadow-lg sm:text-7xl">
+      <div className="relative z-10 w-full p-6 sm:p-7">
+        <div className="max-w-[14rem] rounded-[1.5rem] border border-white/25 bg-[rgba(255,255,255,0.14)] p-4 backdrop-blur-md">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/70">Regional studio</p>
+          <h2 className="mt-2 font-serif text-4xl text-white tracking-[-0.04em] drop-shadow-lg sm:text-5xl">
           {name}
-        </h2>
-        <p className="mt-2 font-sans text-xs tracking-[0.4em] text-white/80 uppercase">
-          Enter Studio
-        </p>
+          </h2>
+          <p className="mt-2 text-sm text-white/78">
+            Enter with local gifting context and shipping.
+          </p>
+        </div>
       </div>
     </motion.button>
   );

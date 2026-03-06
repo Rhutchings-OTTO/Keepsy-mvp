@@ -6,7 +6,7 @@ import { guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
 
 export async function GET(req: Request) {
   const requestId = getRequestId(req);
-  const rl = guardRateLimit(req, "/api/mockup-placements", "GET", requestId);
+  const rl = await guardRateLimit(req, "/api/mockup-placements", "GET", requestId);
   if ("response" in rl) return rl.response;
   try {
     const filePath = path.join(process.cwd(), "lib/mockups/placements.json");

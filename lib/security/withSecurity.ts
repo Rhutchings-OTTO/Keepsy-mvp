@@ -19,21 +19,25 @@ export function guardOrigin(req: Request, pathname: string, requestId?: string):
   return new Response(JSON.stringify(body), { status, headers });
 }
 
-export function guardRateLimit(
+export async function guardRateLimit(
   req: Request,
   pathname: string,
   method: string,
   requestId?: string
-): { response: Response } | { headers: Record<string, string> } {
-  const result = rateLimit(req, pathname, method);
+): Promise<{ response: Response } | { headers: Record<string, string> }> {
+  const result = await rateLimit(req, pathname, method);
   if (result.allowed) return { headers: result.headers };
   logSecurityEvent(
     { type: "rate_limit_hit", endpoint: pathname, key: getClientKey(req).slice(0, 20) + "..." },
     requestId
   );
+  const message =
+    "atelierMessage" in result && result.atelierMessage
+      ? result.atelierMessage
+      : "Too many requests. Please try again later.";
   const { body, status, headers } = toErrorResponse(
     ErrorCodes.RATE_LIMITED,
-    "Too many requests. Please try again later.",
+    message,
     { retryAfter: result.retryAfter }
   );
   return {

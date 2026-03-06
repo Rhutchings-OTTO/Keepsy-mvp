@@ -28,7 +28,7 @@ export async function GET(req: Request) {
   const denial = assertAdminAccess(req);
   if (denial) return denial;
   const requestId = getRequestId(req);
-  const rl = guardRateLimit(req, "/api/admin/mockup-placement", "GET", requestId);
+  const rl = await guardRateLimit(req, "/api/admin/mockup-placement", "GET", requestId);
   if ("response" in rl) return rl.response;
   try {
     const json = await readFile(FILE_PATH, "utf8");
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
   const denial = assertAdminAccess(req);
   if (denial) return denial;
   const requestId = getRequestId(req);
-  const rl = guardRateLimit(req, "/api/admin/mockup-placement", "POST", requestId);
+  const rl = await guardRateLimit(req, "/api/admin/mockup-placement", "POST", requestId);
   if ("response" in rl) return rl.response;
   try {
     const parsed = await parseJsonSafe(req, MAX_PLACEMENT_BODY);

@@ -98,7 +98,7 @@ export function DesignConfirmation({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={motionTransition("slow")}
-      className="max-w-[980px] mx-auto w-full px-4 sm:px-6"
+      className="mx-auto w-full max-w-6xl px-4 sm:px-6"
     >
       {/* Back link */}
       <button
@@ -111,16 +111,18 @@ export function DesignConfirmation({
       </button>
 
       {/* Section 1 — Title + reassurance */}
-      <div className="text-center mb-10">
-        <KineticHeading className="text-3xl sm:text-4xl font-black text-black mb-2">How does this look?</KineticHeading>
-        <p className="text-black/60 font-semibold text-sm sm:text-base">You can still make changes later.</p>
+      <div className="mb-10 text-center">
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-black/40">Review your artwork</p>
+        <KineticHeading className="mb-2 mt-3 text-3xl font-black text-black sm:text-4xl">How does this look?</KineticHeading>
+        <p className="text-sm font-semibold text-black/60 sm:text-base">You can still refine it before moving into product preview.</p>
       </div>
 
       {/* Section 2 — Large image preview */}
-      <div className="flex justify-center mb-10">
-        <div className="relative w-full aspect-[16/10] sm:aspect-[16/10] max-w-2xl mx-auto rounded-2xl overflow-hidden bg-white/80 border border-black/10 shadow-lg">
+      <div className="mb-10 flex justify-center">
+        <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(247,242,236,0.82))] p-3 shadow-[0_30px_72px_-40px_rgba(0,0,0,0.34)] backdrop-blur-xl">
+          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[1.5rem] border border-black/8 bg-white/80">
           {isRefining ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/5 rounded-2xl">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[1.5rem] bg-black/5">
               <div className="w-8 h-8 border-2 border-black/20 border-t-black rounded-full animate-spin" />
               <span className="text-sm font-semibold text-black/60">Updating your design…</span>
             </div>
@@ -136,6 +138,7 @@ export function DesignConfirmation({
               unoptimized={generatedImage.startsWith("data:")}
             />
           )}
+          </div>
         </div>
       </div>
 
@@ -154,13 +157,13 @@ export function DesignConfirmation({
       </AnimatePresence>
 
       {/* Section 3 — Two choice buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Option A — Refine (secondary) */}
         <motion.button
           type="button"
           onClick={() => setRefinementExpanded((x) => !x)}
           disabled={isRefining || !canRefine}
-          className="min-h-[72px] sm:min-h-[80px] px-6 py-4 rounded-2xl border-2 border-black/15 bg-white/90 hover:bg-white hover:border-black/25 focus:outline-none focus:ring-2 focus:ring-black/20 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed text-left transition-all"
+          className="min-h-[72px] rounded-[1.5rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-6 py-4 text-left transition-all hover:border-black/20 hover:bg-white focus:outline-none focus:ring-2 focus:ring-black/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px]"
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
         >
@@ -175,7 +178,7 @@ export function DesignConfirmation({
           type="button"
           onClick={onContinue}
           disabled={isRefining}
-          className="min-h-[72px] sm:min-h-[80px] px-6 py-4 rounded-2xl bg-black text-white font-bold text-base sm:text-lg hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed text-left transition-all shadow-lg"
+          className="min-h-[72px] rounded-[1.5rem] bg-[#1f2937] px-6 py-4 text-left text-base font-bold text-white shadow-[0_18px_34px_-20px_rgba(17,24,39,0.55)] transition-all hover:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px] sm:text-lg"
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
         >
@@ -194,7 +197,7 @@ export function DesignConfirmation({
             transition={motionTransition("base")}
             className="overflow-hidden"
           >
-            <div className="border border-black/10 rounded-2xl bg-white/90 p-6 shadow-sm">
+            <div className="rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,242,236,0.9))] p-6 shadow-[0_24px_54px_-38px_rgba(0,0,0,0.32)] backdrop-blur-xl">
               <h3 className="text-lg font-bold text-black mb-3">Tell us what you&apos;d like to change</h3>
 
               {!canRefine ? (

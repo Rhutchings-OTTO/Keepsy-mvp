@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
+import Image from "next/image";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 type TextureLoupeProps = {
@@ -58,17 +59,20 @@ export function TextureLoupe({
     >
       {/* 1. Standard View (The Sandwich) */}
       <div className="absolute inset-0 z-10">
-        <img src={productBase} alt="" className="h-full w-full object-contain" />
-        <img
-          src={aiImage}
-          alt="Your design"
-          className="absolute inset-0 m-auto w-[35%] opacity-90 mix-blend-multiply"
-        />
-        <img
-          src={productTop}
-          alt=""
-          className="absolute inset-0 z-20 h-full w-full object-contain"
-        />
+        <Image src={productBase} alt="" fill className="object-contain" sizes="(max-width: 1024px) 100vw, 700px" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative w-[35%] aspect-square">
+            <Image
+              src={aiImage}
+              alt="Your design"
+              fill
+              className="object-contain opacity-90 mix-blend-multiply"
+              unoptimized={aiImage.startsWith("data:")}
+              sizes="280px"
+            />
+          </div>
+        </div>
+        <Image src={productTop} alt="" fill className="object-contain z-20" sizes="(max-width: 1024px) 100vw, 700px" />
       </div>
 
       {/* 2. The Loupe (The Zoomed Lens) */}

@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Region } from "@/lib/region";
-import { playPaperPlaneSfx } from "@/lib/sonicTransition";
 import { NanoPlane } from "@/components/easter-eggs/NanoPlane";
 
 type RegionSelectorProps = {
@@ -52,7 +51,6 @@ export default function RegionSelector({ open, onSelect, onClose, currentRegion 
       const otherRegion: Region = region === "UK" ? "US" : "UK";
       setPendingRegion(otherRegion);
       setTriggerPlane(true);
-      playPaperPlaneSfx();
     } else if (!isCurrentRegion) {
       onSelect(region);
       onClose?.();
@@ -126,4 +124,3 @@ export default function RegionSelector({ open, onSelect, onClose, currentRegion 
     </AnimatePresence>
   );
 }
-

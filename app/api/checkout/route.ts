@@ -5,7 +5,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import Stripe from "stripe";
-import { createHash } from "crypto";
+import { sha256Hex } from "@/lib/crypto/sha256";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { PRODUCT_CATALOG } from "@/lib/commerce/catalog";
 import type { CatalogProduct } from "@/lib/commerce/catalog";
@@ -13,6 +13,7 @@ import { guardOrigin, guardRateLimit, getRequestId } from "@/lib/security/withSe
 import { parseAndValidate, schemas } from "@/lib/http/validate";
 
 export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
   const requestId = getRequestId(req);
   const originDeny = guardOrigin(req, "/api/checkout", requestId);
   if (originDeny) return originDeny;
-  const rateLimitResult = guardRateLimit(req, "/api/checkout", "POST", requestId);
+  const rateLimitResult = await guardRateLimit(req, "/api/checkout", "POST", requestId);
   if ("response" in rateLimitResult) return rateLimitResult.response;
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -122,7 +123,7 @@ export async function POST(req: Request) {
       totalGBP,
       date: new Date().toISOString().slice(0, 10),
     });
-    const idempotencyKey = createHash("sha256").update(idempotencySource).digest("hex").slice(0, 32);
+    const idempotencyKey = (await sha256Hex(idempotencySource)).slice(0, 32);
 
     const supabase = getSupabaseAdmin();
     if (supabase) {

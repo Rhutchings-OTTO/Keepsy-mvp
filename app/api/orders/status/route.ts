@@ -6,7 +6,7 @@ import { schemas, validateWithSchema } from "@/lib/http/validate";
 
 export async function GET(req: Request) {
   const requestId = getRequestId(req);
-  const rl = guardRateLimit(req, "/api/orders/status", "GET", requestId);
+  const rl = await guardRateLimit(req, "/api/orders/status", "GET", requestId);
   if ("response" in rl) return rl.response;
 
   const url = new URL(req.url);

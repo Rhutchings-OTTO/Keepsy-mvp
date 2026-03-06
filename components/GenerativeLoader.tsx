@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useMemo, useState, useEffect } from "react";
 
 const Canvas = dynamic(
@@ -99,7 +100,9 @@ export function GenerativeLoader({
 }: GenerativeLoaderProps) {
   const showBanana = hasBananaEasterEgg(prompt);
   const prefersReducedMotion = useReducedMotion();
-  const messages = useMemo(() => getSketchMessages(region, showBanana), [region, showBanana]);
+  const [bananaPhase, setBananaPhase] = useState<"spin" | "burst" | "done">("spin");
+  const bananaActive = showBanana && bananaPhase !== "done";
+  const messages = useMemo(() => getSketchMessages(region, bananaActive), [region, bananaActive]);
   const [index, setIndex] = useState(() =>
     Math.floor(Math.random() * messages.length)
   );
@@ -119,6 +122,40 @@ export function GenerativeLoader({
   }, [useInternalMessages, messages.length]);
 
   useEffect(() => {
+    setIndex((prev) => prev % messages.length);
+  }, [messages.length]);
+
+  useEffect(() => {
+    if (!showBanana) {
+      setBananaPhase("spin");
+      return;
+    }
+
+    setBananaPhase("spin");
+    const burstTimer = window.setTimeout(() => {
+      setBananaPhase("burst");
+      import("canvas-confetti")
+        .then(({ default: confetti }) => {
+          confetti({
+            particleCount: 70,
+            spread: 72,
+            origin: { x: 0.5, y: 0.42 },
+            colors: ["#d4af37", "#f8e08c", "#ffffff", "#f7d77c"],
+          });
+        })
+        .catch(() => undefined);
+    }, 1600);
+    const doneTimer = window.setTimeout(() => {
+      setBananaPhase("done");
+    }, 2300);
+
+    return () => {
+      window.clearTimeout(burstTimer);
+      window.clearTimeout(doneTimer);
+    };
+  }, [showBanana]);
+
+  useEffect(() => {
     if (startedAt == null) {
       setProgress(0);
       return;
@@ -136,31 +173,53 @@ export function GenerativeLoader({
     <div className="flex flex-col items-center justify-center gap-6">
       <div
         className={`relative text-[#1A1A1A]/25 ${
-          showBanana && !prefersReducedMotion ? "h-96 w-96" : "h-24 w-24"
+          bananaActive && !prefersReducedMotion ? "h-36 w-36" : "h-24 w-24"
         }`}
       >
-        {showBanana ? (
+        {bananaActive ? (
           prefersReducedMotion ? (
             <div className="flex h-full w-full items-center justify-center [perspective:120px]">
               <motion.div
                 className="origin-center"
-                animate={{ opacity: [0.9, 1, 0.9] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                animate={{
+                  opacity: bananaPhase === "burst" ? [1, 0.7, 0] : [0.92, 1, 0.92],
+                  rotateY: bananaPhase === "burst" ? 540 : 360,
+                  scale: bananaPhase === "burst" ? [1, 1.06, 0] : [0.96, 1.02, 0.96],
+                }}
+                transition={{
+                  duration: bananaPhase === "burst" ? 0.65 : 2.2,
+                  repeat: bananaPhase === "burst" ? 0 : Infinity,
+                  ease: "easeInOut",
+                }}
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <BananaSvg />
               </motion.div>
             </div>
           ) : (
-            <div className="w-96 h-96 flex-shrink-0">
-              <Canvas
-                camera={{ position: [0, 0, 5], fov: 45 }}
-                gl={{ antialias: true, alpha: true }}
-                style={{ width: "100%", height: "100%" }}
+            <ErrorBoundary fallback={<BananaSvg />}>
+              <motion.div
+                className="h-36 w-36 flex-shrink-0"
+                animate={{
+                  opacity: bananaPhase === "burst" ? [1, 0.65, 0] : 1,
+                  scale: bananaPhase === "burst" ? [1, 1.08, 0.12] : [0.98, 1.02, 0.98],
+                  rotateZ: bananaPhase === "burst" ? [0, 10, 18] : 0,
+                }}
+                transition={{
+                  duration: bananaPhase === "burst" ? 0.6 : 1.8,
+                  repeat: bananaPhase === "burst" ? 0 : Infinity,
+                  ease: "easeInOut",
+                }}
               >
-                <SecretBanana />
-              </Canvas>
-            </div>
+                <Canvas
+                  camera={{ position: [0, 0, 5], fov: 38 }}
+                  gl={{ antialias: true, alpha: true }}
+                  style={{ width: "100%", height: "100%" }}
+                >
+                  <SecretBanana />
+                </Canvas>
+              </motion.div>
+            </ErrorBoundary>
           )
         ) : (
           <svg viewBox="0 0 100 100" className="h-full w-full" fill="none">

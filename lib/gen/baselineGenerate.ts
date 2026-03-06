@@ -5,7 +5,7 @@
  * - Keepsy Artistic Director: print optimization, artisanal aesthetic, background control
  */
 
-import { createHash } from "crypto";
+import { sha256Hex } from "@/lib/crypto/sha256";
 import { moderatePrompt } from "@/lib/safety/thinModeration";
 import { applyArtisticDirection } from "@/lib/gen/artisticDirector";
 import { fetchWithBackoff } from "@/app/api/generate-image/guardrails";
@@ -198,7 +198,7 @@ export async function baselineGenerate(
   if (!moderation.ok) {
     if (process.env.NODE_ENV !== "production") {
       devLogFidelity({
-        promptHash: createHash("sha256").update(userPrompt).digest("hex").slice(0, 12),
+        promptHash: (await sha256Hex(userPrompt)).slice(0, 12),
         promptLength: userPrompt.length,
         excerpt: userPrompt.slice(0, 60),
         moderationFlagged: true,
@@ -224,7 +224,7 @@ export async function baselineGenerate(
 
   if (process.env.NODE_ENV !== "production") {
     devLogFidelity({
-      promptHash: createHash("sha256").update(finalPrompt).digest("hex").slice(0, 12),
+      promptHash: (await sha256Hex(finalPrompt)).slice(0, 12),
       promptLength: finalPrompt.length,
       excerpt: finalPrompt.slice(0, 60),
       moderationFlagged: false,

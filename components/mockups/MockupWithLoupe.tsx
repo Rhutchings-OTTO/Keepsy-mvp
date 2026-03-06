@@ -19,6 +19,7 @@ export function MockupWithLoupe({
   ...mockupProps
 }: MockupWithLoupeProps) {
   const [showLoupe, setShowLoupe] = useState(false);
+  const [canUseLoupe, setCanUseLoupe] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [rect, setRect] = useState({ width: 0, height: 0 });
   const mouseX = useMotionValue(0);
@@ -31,7 +32,16 @@ export function MockupWithLoupe({
   const springPanY = useSpring(panY, { stiffness: 400, damping: 35 });
 
   const artworkPresent = hasArtwork ?? Boolean(generatedImage);
-  const loupeActive = enableLoupe && artworkPresent && generatedImage;
+  const loupeActive = enableLoupe && canUseLoupe && artworkPresent && generatedImage;
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const media = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const sync = () => setCanUseLoupe(media.matches);
+    sync();
+    media.addEventListener?.("change", sync);
+    return () => media.removeEventListener?.("change", sync);
+  }, []);
 
   useEffect(() => {
     const node = containerRef.current;
@@ -66,7 +76,7 @@ export function MockupWithLoupe({
         onMouseEnter={() => loupeActive && setShowLoupe(true)}
         onMouseLeave={() => setShowLoupe(false)}
         onMouseMove={loupeActive ? handleMouseMove : undefined}
-        className={loupeActive ? "cursor-none" : ""}
+        className=""
       >
         <MockupStage
           {...mockupProps}
@@ -126,9 +136,9 @@ export function MockupWithLoupe({
         )}
       </div>
 
-      {artworkPresent && (
+      {loupeActive && (
         <p className="mt-3 text-center text-xs font-medium tracking-wide text-black/45">
-          Hover to inspect the weave
+          Hover to inspect material detail
         </p>
       )}
     </div>

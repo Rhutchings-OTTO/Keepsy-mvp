@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   const requestId = getRequestId(req);
   const originDeny = guardOrigin(req, "/api/delete-my-data", requestId);
   if (originDeny) return originDeny;
-  const rateLimitResult = guardRateLimit(req, "/api/delete-my-data", "POST", requestId);
+  const rateLimitResult = await guardRateLimit(req, "/api/delete-my-data", "POST", requestId);
   if ("response" in rateLimitResult) return rateLimitResult.response;
 
   const supabase = getSupabaseAdmin();

@@ -4,7 +4,7 @@ import { guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
 
 export async function GET(req: Request) {
   const requestId = getRequestId(req);
-  const rl = guardRateLimit(req, "/api/health/perf", "GET", requestId);
+  const rl = await guardRateLimit(req, "/api/health/perf", "GET", requestId);
   if ("response" in rl) return rl.response;
   const perfKey = process.env.PERF_DASHBOARD_KEY;
   const isProd = process.env.NODE_ENV === "production";

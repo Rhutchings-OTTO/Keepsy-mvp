@@ -68,4 +68,3 @@ export function AtelierModeProvider({ children }: AtelierModeProviderProps) {
     </AtelierModeContext.Provider>
   );
 }
-

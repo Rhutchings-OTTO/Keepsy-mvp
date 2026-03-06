@@ -1,108 +1,26 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 import { useReducedMotionPref } from "@/lib/motion/useReducedMotionPref";
-import { useEasterEggMouse } from "@/context/EasterEggContext";
-
-const MAGNETIC_RADIUS = 50;
-const MAX_OFFSET = 12;
-const SPRING = { stiffness: 150, damping: 15 };
 
 type MagneticButtonProps = React.ComponentProps<typeof motion.button> & {
   children: React.ReactNode;
-  strength?: number;
-  radius?: number;
 };
 
 export function MagneticButton({
   children,
-  strength = MAX_OFFSET,
-  radius = MAGNETIC_RADIUS,
   className = "",
   ...props
 }: MagneticButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null);
   const reduceMotion = useReducedMotionPref();
-  const easterEggMouse = useEasterEggMouse();
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, SPRING);
-  const springY = useSpring(y, SPRING);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    const el = ref.current;
-    if (!el) return;
-
-    if (easterEggMouse !== null) {
-      const { x: mx, y: my } = easterEggMouse;
-      const rect = el.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = mx - cx;
-      const dy = my - cy;
-      const d = Math.sqrt(dx * dx + dy * dy);
-
-      if (d > radius) {
-        x.set(0);
-        y.set(0);
-        return;
-      }
-
-      const pull = 1 - d / radius;
-      const clamp = (v: number) => Math.max(-strength, Math.min(strength, v));
-      x.set(clamp(dx * pull * 0.35));
-      y.set(clamp(dy * pull * 0.35));
-      return;
-    }
-
-    const handleMove = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = e.clientX - cx;
-      const dy = e.clientY - cy;
-      const d = Math.sqrt(dx * dx + dy * dy);
-
-      if (d > radius) {
-        x.set(0);
-        y.set(0);
-        return;
-      }
-
-      const pull = 1 - d / radius;
-      const clamp = (v: number) => Math.max(-strength, Math.min(strength, v));
-      x.set(clamp(dx * pull * 0.35));
-      y.set(clamp(dy * pull * 0.35));
-    };
-
-    const handleLeave = () => {
-      x.set(0);
-      y.set(0);
-    };
-
-    document.addEventListener("mousemove", handleMove);
-    document.addEventListener("mouseleave", handleLeave);
-    return () => {
-      document.removeEventListener("mousemove", handleMove);
-      document.removeEventListener("mouseleave", handleLeave);
-    };
-  }, [easterEggMouse?.x, easterEggMouse?.y, reduceMotion, radius, strength, x, y]);
-
-  if (reduceMotion) {
-    return (
-      <motion.button ref={ref} className={className} {...props}>
-        {children}
-      </motion.button>
-    );
-  }
 
   return (
     <motion.button
-      ref={ref}
-      style={{ x: springX, y: springY }}
       className={className}
+      whileHover={reduceMotion ? undefined : { y: -1, scale: 1.01 }}
+      whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
       {...props}
     >
       {children}

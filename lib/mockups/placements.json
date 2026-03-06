@@ -2,136 +2,144 @@
   "tshirt": {
     "white": {
       "baseMockupSrc": "/product-tiles/tee-white.png",
-      "aspectRatio": 1.7778,
+      "aspectRatio": 1.8333,
+      "opacity": 0.9,
+      "dropShadow": "0 3px 10px rgba(0,0,0,0.16)",
       "placement": {
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 37.5,
-          "wPct": 15,
-          "hPct": 25,
+          "yPct": 38.2,
+          "wPct": 14.4,
+          "hPct": 24.6,
           "rotateDeg": 0,
           "borderRadiusPct": 2
-        },
-        "opacity": 0.96
+        }
       }
     },
     "blue": {
       "baseMockupSrc": "/product-tiles/tee-blue.png",
-      "aspectRatio": 1.7778,
+      "aspectRatio": 1.8333,
+      "opacity": 0.9,
+      "dropShadow": "0 3px 10px rgba(0,0,0,0.16)",
       "placement": {
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 37.5,
-          "wPct": 15,
-          "hPct": 25,
+          "yPct": 38.2,
+          "wPct": 14.4,
+          "hPct": 24.6,
           "rotateDeg": 0,
           "borderRadiusPct": 2
-        },
-        "opacity": 0.96
+        }
       }
     },
     "black": {
       "baseMockupSrc": "/mockups/tee-black.png",
-      "aspectRatio": 1.7778,
+      "aspectRatio": 1.5015,
+      "opacity": 0.9,
+      "dropShadow": "0 3px 10px rgba(0,0,0,0.16)",
       "placement": {
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 37.5,
-          "wPct": 15,
-          "hPct": 25,
+          "yPct": 38.2,
+          "wPct": 14.4,
+          "hPct": 24.6,
           "rotateDeg": 0,
           "borderRadiusPct": 2
-        },
-        "opacity": 0.96
+        }
       }
     }
   },
   "hoodie": {
     "white": {
       "baseMockupSrc": "/product-tiles/hoodie-white.png",
-      "aspectRatio": 1.7778,
+      "aspectRatio": 1.4993,
+      "opacity": 0.89,
+      "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
       "placement": {
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 43,
-          "wPct": 17,
-          "hPct": 30,
+          "yPct": 42.1,
+          "wPct": 16.2,
+          "hPct": 27.4,
           "rotateDeg": 0,
           "borderRadiusPct": 2
-        },
-        "opacity": 0.96
+        }
       }
     },
     "blue": {
       "baseMockupSrc": "/product-tiles/hoodie-blue.png",
-      "aspectRatio": 1.7778,
+      "aspectRatio": 1.5059,
+      "opacity": 0.89,
+      "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
       "placement": {
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 43,
-          "wPct": 17,
-          "hPct": 30,
+          "yPct": 42.1,
+          "wPct": 16.2,
+          "hPct": 27.4,
           "rotateDeg": 0,
           "borderRadiusPct": 2
-        },
-        "opacity": 0.96
+        }
       }
     },
     "black": {
       "baseMockupSrc": "/mockups/hoodie-black.png",
-      "aspectRatio": 1.7778,
+      "aspectRatio": 1.5015,
+      "opacity": 0.89,
+      "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
       "placement": {
         "kind": "rect",
         "rect": {
           "xPct": 50,
-          "yPct": 43,
-          "wPct": 17,
-          "hPct": 30,
+          "yPct": 42.1,
+          "wPct": 16.2,
+          "hPct": 27.4,
           "rotateDeg": 0,
           "borderRadiusPct": 2
-        },
-        "opacity": 0.96
+        }
       }
     }
   },
   "mug": {
     "white": {
       "baseMockupSrc": "/product-tiles/plain-mug-front.png",
-      "aspectRatio": 1.7778,
+      "aspectRatio": 1.8333,
+      "opacity": 0.93,
+      "dropShadow": "0 2px 8px rgba(0,0,0,0.12)",
       "placement": {
         "kind": "rect",
         "rect": {
-          "xPct": 48,
+          "xPct": 46.9,
           "yPct": 53,
-          "wPct": 22,
-          "hPct": 50,
+          "wPct": 18.6,
+          "hPct": 48.6,
           "rotateDeg": 0,
           "borderRadiusPct": 2
-        },
-        "opacity": 0.98
+        }
       }
     }
   },
   "card": {
     "white": {
       "baseMockupSrc": "/product-tiles/plain-card.png",
-      "aspectRatio": 1.7778,
+      "aspectRatio": 1.5015,
+      "opacity": 0.98,
+      "dropShadow": "0 1px 4px rgba(0,0,0,0.08)",
       "placement": {
         "kind": "rect",
         "rect": {
-          "xPct": 51.83604691876751,
-          "yPct": 52.2526553320624,
-          "wPct": 52.82738095238094,
-          "hPct": 75.2402443294557,
+          "xPct": 50.15,
+          "yPct": 47.95,
+          "wPct": 57.4,
+          "hPct": 62.1,
           "rotateDeg": 0,
           "borderRadiusPct": 1.8
-        },
-        "opacity": 0.95
+        }
       }
     }
   }

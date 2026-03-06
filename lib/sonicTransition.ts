@@ -57,6 +57,54 @@ export function playSonicTransition(isEasterEgg = false): void {
   oscillator.stop(audioCtx.currentTime + 3);
 }
 
+/**
+ * Heavy mechanical thrum (vault door closing) with metallic reverb.
+ * Call when Konami code completes for Atelier mode transition.
+ */
+export function playVaultThrum(): void {
+  if (typeof window === "undefined") return;
+  const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AC) return;
+
+  const ctx = new AC();
+  const masterGain = ctx.createGain();
+  masterGain.gain.setValueAtTime(0, ctx.currentTime);
+  masterGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.03);
+  masterGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
+  masterGain.connect(ctx.destination);
+
+  // Primary thrum: low descending tone (vault impact)
+  const osc = ctx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(70, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(28, ctx.currentTime + 0.35);
+
+  const oscGain = ctx.createGain();
+  oscGain.gain.setValueAtTime(0.8, ctx.currentTime);
+  oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+
+  // Metallic reverb: delay line with feedback + resonant filter for metal character
+  const delay = ctx.createDelay(0.5);
+  delay.delayTime.setValueAtTime(0.045, ctx.currentTime);
+  const delayFeedback = ctx.createGain();
+  delayFeedback.gain.setValueAtTime(0.42, ctx.currentTime);
+  const metallicFilter = ctx.createBiquadFilter();
+  metallicFilter.type = "bandpass";
+  metallicFilter.frequency.setValueAtTime(2400, ctx.currentTime);
+  metallicFilter.Q.setValueAtTime(2.5, ctx.currentTime);
+
+  osc.connect(oscGain);
+  oscGain.connect(delay);
+  oscGain.connect(masterGain);
+  delay.connect(metallicFilter);
+  metallicFilter.connect(delayFeedback);
+  delayFeedback.connect(delay);
+  metallicFilter.connect(masterGain);
+
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.5);
+}
+
 /** Subtle air-whoosh for Transatlantic Flight easter egg. */
 export function playPaperPlaneSfx(): void {
   if (typeof window === "undefined") return;

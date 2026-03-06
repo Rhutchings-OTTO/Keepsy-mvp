@@ -18,8 +18,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        serif: ["var(--font-serif)", "Playfair Display", "Editorial New", "Georgia", "serif"],
-        sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Fraunces", "Iowan Old Style", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "Manrope", "Aptos", "Helvetica Neue", "sans-serif"],
       },
       backdropBlur: {
         xs: "2px",

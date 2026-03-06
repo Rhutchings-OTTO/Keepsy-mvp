@@ -10,7 +10,7 @@ const MAX_PLACEMENTS_BODY = 1 * 1024 * 1024; // 1MB
 
 export async function POST(req: Request) {
   const requestId = getRequestId(req);
-  const rl = guardRateLimit(req, "/api/admin/mockup-placements", "POST", requestId);
+  const rl = await guardRateLimit(req, "/api/admin/mockup-placements", "POST", requestId);
   if ("response" in rl) return rl.response;
 
   if (process.env.MOCKUP_CALIBRATION_ENABLED !== "true") {

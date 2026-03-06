@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useId } from "react";
 
 type HoodieMockupLayeredProps = {
@@ -47,35 +48,36 @@ export function HoodieMockupLayered({
       </svg>
       <div className={`relative aspect-square w-full max-w-md ${className}`}>
       {/* 1. The Base Product (The Hoodie with shadows and folds) */}
-      <img src={baseSrc} alt="" className="absolute inset-0 z-10 w-full object-contain" />
+      <Image src={baseSrc} alt="" fill className="object-contain z-10" sizes="(max-width: 768px) 100vw, 448px" />
 
       {/* 2. The AI Image (The Artwork) */}
       <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-        <img
-          src={designUrl}
-          alt="Your design"
-          className="h-auto w-[40%] opacity-90 mix-blend-multiply contrast-125 brightness-110"
-          style={{
-            filter: `url(#${filterId})`,
-            transform: "perspective(1000px) rotateY(-10deg) rotateX(5deg)",
-            maskImage: `url(${maskSrc})`,
-            WebkitMaskImage: `url(${maskSrc})`,
-            maskSize: "contain",
-            maskRepeat: "no-repeat",
-            maskPosition: "center",
-            WebkitMaskSize: "contain",
-            WebkitMaskRepeat: "no-repeat",
-            WebkitMaskPosition: "center",
-          }}
-        />
+        <div className="relative w-[40%] aspect-square">
+          <Image
+            src={designUrl}
+            alt="Your design"
+            fill
+            className="object-contain opacity-90 mix-blend-multiply contrast-125 brightness-110"
+            style={{
+              filter: `url(#${filterId})`,
+              transform: "perspective(1000px) rotateY(-10deg) rotateX(5deg)",
+              maskImage: `url(${maskSrc})`,
+              WebkitMaskImage: `url(${maskSrc})`,
+              maskSize: "contain",
+              maskRepeat: "no-repeat",
+              maskPosition: "center",
+              WebkitMaskSize: "contain",
+              WebkitMaskRepeat: "no-repeat",
+              WebkitMaskPosition: "center",
+            }}
+            unoptimized={designUrl.startsWith("data:")}
+            sizes="180px"
+          />
+        </div>
       </div>
 
       {/* 3. The Highlight Layer (Adds reflections on top of the art) */}
-      <img
-        src={highlightsSrc}
-        alt=""
-        className="pointer-events-none absolute inset-0 z-30 opacity-30 mix-blend-screen object-contain"
-      />
+      <Image src={highlightsSrc} alt="" fill className="pointer-events-none object-contain z-30 opacity-30 mix-blend-screen" sizes="(max-width: 768px) 100vw, 448px" />
     </div>
     </>
   );

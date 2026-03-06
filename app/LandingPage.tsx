@@ -84,13 +84,13 @@ function FlowStage({
   blurb: string;
 }) {
   return (
-    <div className="flex h-full flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_16px_36px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
+    <div className="flex h-full min-h-[20rem] flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_16px_36px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
       <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">{label}</p>
       <div
-        className="relative mt-2 overflow-hidden rounded-[1.2rem] border border-black/8"
+        className="relative mt-3 flex min-h-[13.5rem] flex-1 items-center justify-center overflow-hidden rounded-[1.2rem] border border-black/8"
         style={{ background: tone }}
       >
-        <Image src={image} alt={alt} width={320} height={320} className="h-40 w-full object-contain p-2" />
+        <Image src={image} alt={alt} width={320} height={320} className="h-44 w-full object-contain p-3" />
       </div>
       <p className="mt-3 text-sm leading-6 text-[#5d5751]">{blurb}</p>
     </div>
@@ -206,18 +206,18 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         Keepsy creates finished artwork and shows it on the actual product, so the whole process feels simple, warm and easy to trust.
                       </p>
 
-                      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                      <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                         <button
                           type="button"
                           onClick={() => router.push("/create")}
-                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1f2937] px-6 text-base font-semibold text-white shadow-[0_18px_34px_-22px_rgba(17,24,39,0.6)]"
+                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1f2937] px-6 text-base font-semibold text-white shadow-[0_18px_34px_-22px_rgba(17,24,39,0.6)] transition-transform duration-200 ease-out hover:-translate-y-0.5"
                         >
                           Create your gift
                           <ArrowRight size={18} />
                         </button>
                         <Link
                           href="/gift-ideas"
-                          className="inline-flex min-h-12 items-center justify-center rounded-full border border-black/10 bg-white/80 px-6 text-base font-semibold text-[#312d2a] shadow-[0_16px_34px_-24px_rgba(0,0,0,0.35)]"
+                          className="inline-flex min-h-12 items-center justify-center rounded-full border border-black/10 bg-white/80 px-6 text-base font-semibold text-[#312d2a] shadow-[0_16px_34px_-24px_rgba(0,0,0,0.35)] transition-transform duration-200 ease-out hover:-translate-y-0.5"
                         >
                           Browse gift ideas
                         </Link>
@@ -251,7 +251,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       initial={{ opacity: 0, y: 24 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.65, delay: 0.08, ease: "easeOut" }}
-                      className="grid gap-4 lg:grid-cols-3"
+                      className="grid auto-rows-fr gap-4 lg:grid-cols-3"
                     >
                       <FlowStage
                         label="1. Original photo"
@@ -268,7 +268,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         blurb="We turn that exact scene into a calmer, gift-ready illustration."
                       />
 
-                      <div className="flex h-full flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
+                      <div className="flex h-full min-h-[20rem] flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
                         <div className="flex items-start justify-between gap-3">
                           <div>
                             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">3. Final keepsake</p>
@@ -278,12 +278,12 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                             Preview first
                           </div>
                         </div>
-                        <div className="mt-3">
+                        <div className="mt-3 flex min-h-[13.5rem] flex-1 items-center">
                           <MockupStage
                             productType={heroExample.gift.productType}
                             color={heroExample.gift.color}
                             generatedImage={heroExample.gift.artworkImage}
-                            className="!rounded-[1.3rem]"
+                            className="!rounded-[1.25rem]"
                           />
                         </div>
                         <p className="mt-3 text-sm leading-6 text-[#5e5852]">

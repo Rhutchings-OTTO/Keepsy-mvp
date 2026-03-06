@@ -213,8 +213,9 @@ function RegionSide({ name, region, onSelect }: RegionSideProps) {
   return (
     <motion.button
       type="button"
-      whileHover={{ y: -4, scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
+      whileHover={{ y: -3, scale: 1.006 }}
+      whileTap={{ scale: 0.992 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
       className="relative flex min-h-[22rem] w-full cursor-pointer items-end overflow-hidden rounded-[1.8rem] border border-white/70 text-left shadow-[0_28px_64px_-34px_rgba(0,0,0,0.42)]"
       onClick={onSelect}
       aria-label={`Shop ${name}`}

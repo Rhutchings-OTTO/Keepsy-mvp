@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { MockupStage } from "./MockupStage";
 import type { MockupStageProps } from "./MockupStage";
 
@@ -26,6 +26,8 @@ export function MockupWithLoupe({
   const mouseY = useMotionValue(0);
   const springX = useSpring(mouseX, { stiffness: 320, damping: 32 });
   const springY = useSpring(mouseY, { stiffness: 320, damping: 32 });
+  const loupeX = useTransform(springX, (value) => value - LOUPE_SIZE / 2);
+  const loupeY = useTransform(springY, (value) => value - LOUPE_SIZE / 2);
   const panX = useMotionValue(0);
   const panY = useMotionValue(0);
   const springPanX = useSpring(panX, { stiffness: 400, damping: 35 });
@@ -87,10 +89,10 @@ export function MockupWithLoupe({
         {showLoupe && loupeActive && rect.width > 0 && (
           <motion.div
             style={{
-              x: springX,
-              y: springY,
-              translateX: "-50%",
-              translateY: "-50%",
+              left: 0,
+              top: 0,
+              x: loupeX,
+              y: loupeY,
               width: LOUPE_SIZE,
               height: LOUPE_SIZE,
             }}

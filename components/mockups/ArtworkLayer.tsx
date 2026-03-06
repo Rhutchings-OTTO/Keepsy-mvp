@@ -7,6 +7,7 @@ import type { MockupProductType } from "@/lib/mockups/placements";
 
 type RectPlacement = {
   boundary: PixelRect;
+  matteRect?: PixelRect | null;
   artworkRect: PixelRect;
   rotateDeg: number;
 };
@@ -108,6 +109,24 @@ export function ArtworkLayer(props: ArtworkLayerProps) {
     const transform = getArtworkTransform(productType, baseTransform, false);
     return (
       <>
+        {productType === "card" && rectPlacementPx.matteRect && (
+          <div
+            className="pointer-events-none absolute"
+            style={{
+              left: rectPlacementPx.matteRect.x,
+              top: rectPlacementPx.matteRect.y,
+              width: rectPlacementPx.matteRect.w,
+              height: rectPlacementPx.matteRect.h,
+              transformOrigin: "center center",
+              transform,
+              background: "rgba(255,255,255,0.985)",
+              boxShadow:
+                "0 1px 0 rgba(255,255,255,0.92) inset, 0 0 0 1px rgba(0,0,0,0.035), 0 10px 18px rgba(0,0,0,0.045)",
+              borderRadius: "1.2%",
+            }}
+            aria-hidden
+          />
+        )}
         <motion.img
           key={`art-rect-${generatedImage.slice(0, 50)}`}
           initial={{ opacity: 0 }}

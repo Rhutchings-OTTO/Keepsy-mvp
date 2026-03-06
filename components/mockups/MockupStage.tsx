@@ -53,6 +53,15 @@ export type MockupStageProps = {
   className?: string;
 };
 
+function insetRect(rect: PixelRect, insetX: number, insetY: number): PixelRect {
+  return {
+    x: rect.x + insetX,
+    y: rect.y + insetY,
+    w: Math.max(0, rect.w - insetX * 2),
+    h: Math.max(0, rect.h - insetY * 2),
+  };
+}
+
 export function MockupStage({
   productType,
   color,
@@ -147,14 +156,22 @@ export function MockupStage({
       w: (rect.wPct / 100) * containerSize.width,
       h: (rect.hPct / 100) * containerSize.height,
     };
+    const matteRect =
+      productType === "card"
+        ? insetRect(boundary, boundary.w * 0.055, boundary.h * 0.07)
+        : null;
+    const artworkBoundary =
+      productType === "card" && matteRect
+        ? insetRect(matteRect, matteRect.w * 0.055, matteRect.h * 0.07)
+        : boundary;
     const artworkRect = fitArtworkToBoundary({
-      boundary,
+      boundary: artworkBoundary,
       imageWidth: artNaturalSize.width,
       imageHeight: artNaturalSize.height,
       mode: "contain",
     });
-    return { boundary, artworkRect, rotateDeg: rect.rotateDeg };
-  }, [artNaturalSize, containerSize, entry.placement]);
+    return { boundary, matteRect, artworkRect, rotateDeg: rect.rotateDeg };
+  }, [artNaturalSize, containerSize, entry.placement, productType]);
 
   useEffect(() => {
     if (!DEBUG_PLACEMENT || !rectPlacementPx) return;

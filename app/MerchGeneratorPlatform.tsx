@@ -904,13 +904,34 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-black/60">
-            <button onClick={() => setView("home")} className={view === "home" ? "text-black" : ""}>
+            <button
+              onClick={() => setView("home")}
+              className={`rounded-full px-3 py-1.5 transition-colors ${
+                view === "home"
+                  ? "bg-[#1f2937] text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
+                  : "text-black/65 hover:bg-black/[0.04] hover:text-black"
+              }`}
+            >
                   How it works
             </button>
-            <button onClick={() => setView("catalog")} className={view === "catalog" ? "text-black" : ""}>
+            <button
+              onClick={() => setView("catalog")}
+              className={`rounded-full px-3 py-1.5 transition-colors ${
+                view === "catalog"
+                  ? "bg-[#1f2937] text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
+                  : "text-black/65 hover:bg-black/[0.04] hover:text-black"
+              }`}
+            >
               Catalog
             </button>
-                <button onClick={() => setView("community")} className={view === "community" ? "text-black" : ""}>
+                <button
+                  onClick={() => setView("community")}
+                  className={`rounded-full px-3 py-1.5 transition-colors ${
+                    view === "community"
+                      ? "bg-[#1f2937] text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
+                      : "text-black/65 hover:bg-black/[0.04] hover:text-black"
+                  }`}
+                >
                   Community
                 </button>
           </div>
@@ -941,13 +962,22 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           {view === "home" && (
             <div className="space-y-20">
               <div className="flex gap-2 md:hidden">
-                <button onClick={() => setView("home")} className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold">
+                <button
+                  onClick={() => setView("home")}
+                  className="rounded-full border border-[#1f2937] bg-[#1f2937] px-3 py-1.5 text-xs font-semibold text-white"
+                >
                   How it works
                 </button>
-                <button onClick={() => setView("catalog")} className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold">
+                <button
+                  onClick={() => setView("catalog")}
+                  className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#2b2521]"
+                >
                   Catalog
                 </button>
-                <button onClick={() => setView("community")} className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold">
+                <button
+                  onClick={() => setView("community")}
+                  className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#2b2521]"
+                >
                   Community
                             </button>
                           </div>

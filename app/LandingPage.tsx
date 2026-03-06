@@ -71,16 +71,15 @@ type LandingPageProps = {
 
 function StorybookJourney() {
   return (
-    <div className="rounded-[1.7rem] border border-black/8 bg-white/82 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
-      <div className="relative overflow-hidden rounded-[1.35rem] border border-black/8 bg-[linear-gradient(145deg,#f7f2eb_0%,#f1ece5_54%,#e8e0d5_100%)]">
+    <div className="flex h-full rounded-[1.7rem] border border-black/8 bg-white/82 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
+      <div className="relative min-h-[28rem] w-full flex-1 overflow-hidden rounded-[1.35rem] border border-black/8 bg-[linear-gradient(145deg,#f7f2eb_0%,#f1ece5_54%,#e8e0d5_100%)] sm:min-h-[34rem]">
         <Image
           src="/generated-hero/house-journey.png"
           alt="Storybook illustration showing a house photo becoming artwork and then a final keepsake"
-          width={1248}
-          height={832}
-          className="h-auto w-full object-cover"
+          fill
+          className="object-contain"
           priority
-          sizes="(max-width: 1024px) 100vw, 720px"
+          sizes="(max-width: 1024px) 100vw, 640px"
         />
         <motion.div
           initial={{ opacity: 0, y: 6, rotate: -4 }}
@@ -96,7 +95,7 @@ function StorybookJourney() {
           whileInView={{ opacity: 1, y: 0, rotate: 2 }}
           viewport={{ once: true, amount: 0.65 }}
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.24 }}
-          className="absolute left-[46%] top-[10%] rounded-[1rem] border border-[#c8c2b2] bg-[rgba(247,249,252,0.9)] px-3 py-2 shadow-[0_12px_24px_-18px_rgba(70,52,34,0.38)] backdrop-blur-sm"
+          className="absolute right-[7%] top-[31%] rounded-[1rem] border border-[#c8c2b2] bg-[rgba(247,249,252,0.9)] px-3 py-2 shadow-[0_12px_24px_-18px_rgba(70,52,34,0.38)] backdrop-blur-sm"
         >
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6f7382]">Artwork style</p>
         </motion.div>
@@ -105,14 +104,11 @@ function StorybookJourney() {
           whileInView={{ opacity: 1, y: 0, rotate: -1 }}
           viewport={{ once: true, amount: 0.65 }}
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.38 }}
-          className="absolute bottom-[8%] right-[4%] rounded-[1rem] border border-[#cdb79d] bg-[rgba(255,249,241,0.9)] px-3 py-2 shadow-[0_12px_24px_-18px_rgba(70,52,34,0.42)] backdrop-blur-sm"
+          className="absolute bottom-[13%] left-[7%] rounded-[1rem] border border-[#cdb79d] bg-[rgba(255,249,241,0.9)] px-3 py-2 shadow-[0_12px_24px_-18px_rgba(70,52,34,0.42)] backdrop-blur-sm"
         >
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#88694e]">Final keepsake</p>
         </motion.div>
       </div>
-      <p className="mt-3 px-1 text-sm leading-6 text-[#5e5852]">
-        One illustrated journey shows the real home, the gift-ready artwork, and the finished keepsake in a single storybook composition.
-      </p>
     </div>
   );
 }

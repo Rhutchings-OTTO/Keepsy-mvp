@@ -5,7 +5,7 @@ const OUT_DIR = join(process.cwd(), "public", "generated-hero");
 const API_URL = process.env.GATEWAY_API_URL || "https://www.keepsy.store/api/generate-image";
 
 const PROMPT =
-  "A single wide hand drawn storybook illustration on textured ivory paper, whimsical classic English children's book feeling, soft watercolor and gouache, muted cream, warm stone, dusty blue and sage palette. On the left: a realistic traditional brick family house in ordinary weather. A winding painted arrow path leads to the upper middle: the same house from a slightly different angle, now decorated for Christmas with snow, warm windows, wreath and little Christmas trees. Another winding painted arrow path leads down to the lower right: a hand drawn greeting card with envelope featuring that same snowy house artwork on the front as a finished keepsake. One continuous illustration, not separate panels, premium editorial composition, balanced negative space, no text, no people.";
+  "A single tall hand drawn storybook illustration on textured ivory paper, whimsical classic English children's book feeling, soft watercolor and gouache, muted cream, warm stone, dusty blue and sage palette. In the upper left: a realistic traditional brick family house in ordinary weather. A winding painted arrow path leads to the upper middle and center: the same house from a slightly different angle, now decorated for Christmas with snow, warm windows, wreath and little Christmas trees. Another winding painted arrow path leads downward to the lower right: a hand drawn greeting card with envelope featuring that same snowy house artwork on the front as a finished keepsake. One continuous illustration, portrait composition, not separate panels, premium editorial composition, balanced negative space, no text, no people.";
 
 function decodeDataUrl(dataUrl) {
   const match = dataUrl.match(/^data:(image\/png|image\/jpeg);base64,(.+)$/);
@@ -24,7 +24,7 @@ const response = await fetch(API_URL, {
   },
   body: JSON.stringify({
     prompt: PROMPT,
-    designShape: "landscape",
+    designShape: "portrait",
   }),
 });
 

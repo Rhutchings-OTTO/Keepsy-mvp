@@ -57,8 +57,7 @@ export const CREATE_EXAMPLES: Record<
         beforeLabel: "House portrait",
         afterLabel: "Christmas artwork",
         caption: "Front door photo -> festive watercolor -> flat card",
-        beforeImage:
-          "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80",
+        beforeImage: "/generated-examples/house-source-photo.png",
         afterImage: "/generated-examples/house-christmas.png",
         gift: {
           productType: "card",
@@ -192,8 +191,7 @@ export const CREATE_EXAMPLES: Record<
         beforeLabel: "House portrait",
         afterLabel: "Christmas artwork",
         caption: "Front door photo -> festive watercolor -> flat card",
-        beforeImage:
-          "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80",
+        beforeImage: "/generated-examples/house-source-photo.png",
         afterImage: "/generated-examples/house-christmas.png",
         gift: {
           productType: "card",

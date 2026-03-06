@@ -33,12 +33,12 @@ export function GenerationErrorDisplay({
         initial={{ opacity: 0, y: -4 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -4 }}
-        className="rounded-xl border border-black/10 bg-white/90 px-4 py-3 shadow-sm"
+        className="rounded-xl border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-4 py-3 shadow-warm-sm backdrop-blur-sm"
       >
         {isContentBlock ? (
           <>
-            <h4 className="text-sm font-bold text-black mb-1">{contentBlock!.title}</h4>
-            <p className="text-sm text-black/70 mb-3">{contentBlock!.message}</p>
+            <h4 className="text-sm font-bold text-charcoal mb-1">{contentBlock!.title}</h4>
+            <p className="text-sm text-charcoal/70 mb-3">{contentBlock!.message}</p>
             {contentBlock!.suggestions.length > 0 && onSuggestionClick && (
               <div className="flex flex-wrap gap-2">
                 {contentBlock!.suggestions.map((s) => (
@@ -46,7 +46,7 @@ export function GenerationErrorDisplay({
                     key={s}
                     type="button"
                     onClick={() => onSuggestionClick(s)}
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-black/5 hover:bg-black/10 text-black/80 transition-colors"
+                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-charcoal/5 hover:bg-charcoal/10 text-charcoal/80 transition-colors"
                   >
                     {s}
                   </button>
@@ -55,7 +55,7 @@ export function GenerationErrorDisplay({
             )}
           </>
         ) : (
-          <p className="text-sm text-black/70">{error}</p>
+          <p className="text-sm text-charcoal/70">{error}</p>
         )}
       </motion.div>
     </AnimatePresence>

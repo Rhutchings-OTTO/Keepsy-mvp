@@ -17,9 +17,9 @@ export function OccasionTiles() {
         <RevealSplitText
           text="Gift ideas by occasion"
           as="h2"
-          className="text-2xl font-black sm:text-3xl"
+          className="font-serif text-2xl font-bold text-charcoal sm:text-3xl"
         />
-        <p className="mt-2 text-black/65">
+        <p className="mt-2 text-charcoal/65">
           Start with a polished gift direction, then make it your own.
         </p>
       </Reveal>

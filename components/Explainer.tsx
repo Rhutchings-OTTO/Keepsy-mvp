@@ -1,20 +1,27 @@
+import { Reveal } from "@/components/motion/Reveal";
+
 const STEPS = [
-  "Upload photo",
-  "Pick a style",
-  "Choose product",
-  "Delivered",
+  { label: "Upload photo", detail: "Share a photo or describe a moment in words." },
+  { label: "Pick a style", detail: "Choose from watercolour, line art, portrait and more." },
+  { label: "Choose product", detail: "See your art on mugs, tees, hoodies, and cards." },
+  { label: "Delivered", detail: "Gift-wrapped and shipped to your door." },
 ];
 
 export function Explainer() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8">
-      <h2 className="text-2xl font-black sm:text-3xl">How it works</h2>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="mx-auto max-w-7xl px-4 py-12">
+      <Reveal variant="fadeUp">
+        <h2 className="font-serif text-3xl font-bold text-charcoal sm:text-4xl">How it works</h2>
+      </Reveal>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {STEPS.map((step, index) => (
-          <article key={step} className="rounded-2xl border border-black/10 bg-white p-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-black/50">Step {index + 1}</p>
-            <p className="mt-1 text-lg font-bold">{step}</p>
-          </article>
+          <Reveal key={step.label} variant="fadeUp" delay={index * 0.07}>
+            <article className="rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] p-5 shadow-warm-sm backdrop-blur-sm">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Step {index + 1}</p>
+              <p className="mt-2 font-serif text-lg font-bold text-charcoal">{step.label}</p>
+              <p className="mt-1 text-sm leading-6 text-charcoal/60">{step.detail}</p>
+            </article>
+          </Reveal>
         ))}
       </div>
     </section>

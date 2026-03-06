@@ -12,13 +12,17 @@ function TrustBarComponent() {
   return (
     <section
       aria-label="Trust highlights"
-      className="rounded-2xl border border-[#E7DBCF] bg-white/85 p-3 sm:p-4"
+      className="rounded-[1.5rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,244,238,0.88))] p-3 shadow-warm-sm backdrop-blur-sm sm:p-4"
     >
       <div className="grid gap-2 sm:grid-cols-3">
         {ITEMS.map(({ icon: Icon, text }) => (
-          <div key={text} className="flex items-center gap-2 rounded-xl bg-[#FCF8F3] px-3 py-2 text-sm text-[#5A4634]">
-            <Icon className="h-4 w-4 text-[#7C644E]" aria-hidden="true" />
-            <span>{text}</span>
+          <div
+            key={text}
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm"
+            style={{ backgroundColor: "rgba(253,246,238,0.70)", color: "var(--color-charcoal)" }}
+          >
+            <Icon className="h-4 w-4 shrink-0" style={{ color: "var(--color-terracotta)" }} aria-hidden="true" />
+            <span className="font-medium">{text}</span>
           </div>
         ))}
       </div>

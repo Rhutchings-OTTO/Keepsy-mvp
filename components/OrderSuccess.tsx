@@ -40,7 +40,7 @@ export function OrderSuccess({ productName, designUrl }: OrderSuccessProps) {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-ivory p-6 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center p-6 text-center" style={{ backgroundColor: "var(--color-cream)" }}>
       {/* 3D Spotlight Container */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
@@ -55,7 +55,7 @@ export function OrderSuccess({ productName, designUrl }: OrderSuccessProps) {
             className="h-64 w-64 rotate-12 object-contain drop-shadow-2xl"
           />
         ) : (
-          <div className="h-64 w-64 rotate-12 rounded-2xl bg-obsidian/5" />
+          <div className="h-64 w-64 rotate-12 rounded-2xl bg-charcoal/5" />
         )}
       </motion.div>
 
@@ -63,7 +63,7 @@ export function OrderSuccess({ productName, designUrl }: OrderSuccessProps) {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="mb-4 font-serif text-5xl text-obsidian"
+        className="mb-4 font-serif text-5xl text-charcoal"
       >
         Masterpiece Confirmed.
       </motion.h1>
@@ -72,7 +72,7 @@ export function OrderSuccess({ productName, designUrl }: OrderSuccessProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
-        className="mb-12 max-w-sm font-sans text-obsidian/60"
+        className="mb-12 max-w-sm text-charcoal/60"
       >
         Your 1-of-1 {productName} has been sent to our atelier for production.
         Expect a digital update as it takes physical form.
@@ -83,14 +83,14 @@ export function OrderSuccess({ productName, designUrl }: OrderSuccessProps) {
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="flex flex-col items-center rounded-2xl border border-white/20 bg-white/40 p-8 shadow-xl backdrop-blur-xl"
+        className="flex flex-col items-center rounded-2xl border border-white/65 bg-white/70 p-8 shadow-xl backdrop-blur-xl"
       >
-        <span className="mb-4 text-[10px] uppercase tracking-[0.4em] text-obsidian/40">
+        <span className="mb-4 text-[10px] uppercase tracking-[0.4em] text-charcoal/40">
           Official Artifact
         </span>
-        <div className="mb-6 h-px w-12 bg-obsidian/10" />
+        <div className="mb-6 h-px w-12 bg-charcoal/8" />
         <p className="mb-1 font-serif text-xl italic">&quot;Keepsy No. 8421&quot;</p>
-        <p className="font-sans text-xs text-obsidian/40">Secured & Registered</p>
+        <p className="text-xs text-charcoal/40">Secured & Registered</p>
       </motion.div>
 
       <motion.div
@@ -101,13 +101,13 @@ export function OrderSuccess({ productName, designUrl }: OrderSuccessProps) {
       >
         <MagneticLink
           href="/create"
-          className="rounded-full bg-obsidian px-6 py-3 font-bold text-white transition hover:bg-obsidian/90 inline-block"
+          className="rounded-full bg-terracotta px-6 py-3 font-bold text-white shadow-terra-glow transition hover:opacity-90 inline-block"
         >
           Create another design
         </MagneticLink>
         <MagneticLink
           href="/gift-ideas"
-          className="rounded-full border border-obsidian/15 px-6 py-3 font-bold text-obsidian transition hover:bg-obsidian/5 inline-block"
+          className="rounded-full border border-charcoal/15 px-6 py-3 font-bold text-charcoal transition hover:bg-charcoal/5 inline-block"
         >
           Browse gift ideas
         </MagneticLink>

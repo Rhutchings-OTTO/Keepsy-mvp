@@ -58,7 +58,7 @@ export function SizeGuideDrawer({
   const content = (
     <div className="flex flex-col h-full max-h-[85vh]">
       <div className="flex items-center justify-between pb-3 border-b border-black/10">
-        <h3 className="text-lg font-bold text-black">Size guide</h3>
+        <h3 className="font-serif text-lg font-bold text-charcoal">Size guide</h3>
         <button
           type="button"
           onClick={onClose}
@@ -144,7 +144,8 @@ export function SizeGuideDrawer({
           role="dialog"
           aria-modal="true"
           aria-label="Size guide"
-          className="relative w-full md:max-w-md md:rounded-2xl rounded-t-2xl bg-white border border-black/10 shadow-2xl p-5 max-h-[85vh] overflow-hidden flex flex-col"
+          className="relative w-full md:max-w-md md:rounded-2xl rounded-t-2xl border border-black/10 shadow-2xl p-5 max-h-[85vh] overflow-hidden flex flex-col"
+          style={{ backgroundColor: "var(--color-cream)" }}
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}

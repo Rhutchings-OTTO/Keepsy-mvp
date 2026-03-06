@@ -35,8 +35,8 @@ export function GalleryOfThePossible({
     <div className={`rounded-[2rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(247,242,236,0.88))] p-5 shadow-[0_30px_70px_-42px_rgba(0,0,0,0.34)] backdrop-blur-xl sm:p-8 ${className}`}>
       <div className="mx-auto max-w-2xl text-center">
         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-black/40">Inspiration</p>
-        <h2 className="mt-3 font-serif text-2xl font-bold tracking-[-0.03em] text-[#201d1b]">{title}</h2>
-        <p className="mt-3 text-sm leading-7 text-black/58">{subtitle}</p>
+        <h2 className="mt-3 font-serif text-2xl font-bold tracking-[-0.03em] text-charcoal">{title}</h2>
+        <p className="mt-3 text-sm leading-7 text-charcoal/60">{subtitle}</p>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
         {GALLERY_ITEMS.map((src, i) => (
@@ -58,7 +58,7 @@ export function GalleryOfThePossible({
       </div>
       <MagneticLink
         href={ctaHref}
-        className="mt-7 inline-block rounded-full bg-[#1f2937] px-6 py-3 font-semibold !text-white shadow-[0_16px_32px_-20px_rgba(17,24,39,0.5)] transition hover:bg-[#111827]"
+        className="mt-7 inline-block rounded-full bg-terracotta px-6 py-3 font-semibold !text-white shadow-terra-glow transition hover:opacity-90"
       >
         {ctaLabel}
       </MagneticLink>

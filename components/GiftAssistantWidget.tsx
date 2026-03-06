@@ -89,10 +89,13 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
   return (
     <div className="fixed bottom-4 right-4 z-40">
       {open ? (
-        <div className="w-[min(92vw,360px)] rounded-2xl border border-[#E3D7CB] bg-white/95 p-3 shadow-xl">
+        <div
+          className="w-[min(92vw,360px)] rounded-2xl border border-black/10 p-3 shadow-xl"
+          style={{ backgroundColor: "var(--color-cream)" }}
+        >
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-sm font-semibold text-[#4E3C2E]">AI Gift Assistant</p>
-            <button type="button" onClick={() => setOpen(false)} className="text-xs text-[#7B6654]">
+            <p className="text-sm font-semibold text-charcoal">AI Gift Assistant</p>
+            <button type="button" onClick={() => setOpen(false)} className="text-xs text-charcoal/60">
               Close
             </button>
           </div>
@@ -100,8 +103,8 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
             {messages.map((message, idx) => (
               <div
                 key={`${message.role}-${idx}`}
-                className={`rounded-xl px-3 py-2 text-xs whitespace-pre-line ${
-                  message.role === "assistant" ? "bg-[#F8F2EB] text-[#4F3C2C]" : "bg-[#EFE6DC] text-[#3F3125]"
+                className={`rounded-xl px-3 py-2 text-xs whitespace-pre-line text-charcoal ${
+                  message.role === "assistant" ? "bg-black/5" : "bg-black/10"
                 }`}
               >
                 {message.text}
@@ -115,7 +118,7 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
                 key={suggestion}
                 type="button"
                 onClick={() => send(suggestion)}
-                className="rounded-full border border-[#DDCCBC] px-2 py-1 text-[11px] text-[#5B4736]"
+                className="rounded-full border border-black/15 px-2 py-1 text-[11px] text-charcoal/70"
               >
                 {suggestion}
               </button>
@@ -127,14 +130,15 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="e.g. mum + cat + cozy"
-              className="w-full rounded-xl border border-[#E4D6C9] px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-black/15 px-3 py-2 text-sm text-charcoal bg-white/60"
             />
             <div className="flex gap-2">
               <button
                 type="button"
                 disabled={!canSend}
                 onClick={() => send()}
-                className="rounded-full bg-[#4D3827] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                className="rounded-full px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                style={{ backgroundColor: "var(--color-terracotta)" }}
               >
                 Send
               </button>
@@ -144,7 +148,7 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
                   const lastAssistant = [...messages].reverse().find((message) => message.role === "assistant");
                   if (lastAssistant) onApplyPrompt(lastAssistant.text.split("\n")[1] ?? lastAssistant.text);
                 }}
-                className="rounded-full border border-[#DCCBBB] px-3 py-1.5 text-xs font-semibold text-[#5A4635]"
+                className="rounded-full border border-black/15 px-3 py-1.5 text-xs font-semibold text-charcoal/80"
               >
                 Use suggestion
               </button>
@@ -155,7 +159,8 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex items-center gap-2 rounded-full border border-[#E2D5C8] bg-white/95 px-3 py-2 text-sm text-[#523F2F] shadow-lg"
+          className="flex items-center gap-2 rounded-full border border-black/15 px-3 py-2 text-sm text-charcoal shadow-lg"
+          style={{ backgroundColor: "var(--color-cream)" }}
         >
           <MessageCircleHeart className="h-4 w-4" aria-hidden="true" />
           AI gift assistant

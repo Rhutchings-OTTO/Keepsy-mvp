@@ -50,16 +50,16 @@ export function GenerationSafetyNotice({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
-          className="rounded-xl border border-black/10 bg-white/95 px-4 py-3 shadow-sm"
+          className="rounded-xl border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-4 py-3 shadow-warm-sm backdrop-blur-sm"
         >
-          <h4 className="text-sm font-bold text-black mb-1">{hardBlock.title}</h4>
-          <p className="text-sm text-black/70 mb-3">{hardBlock.message}</p>
+          <h4 className="text-sm font-bold text-charcoal mb-1">{hardBlock.title}</h4>
+          <p className="text-sm text-charcoal/70 mb-3">{hardBlock.message}</p>
           {hardBlock.suggestedPrompt && onUseSuggestedPromptClick ? (
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => onUseSuggestedPromptClick(hardBlock.suggestedPrompt!)}
-                className="px-4 py-2 rounded-xl text-sm font-semibold bg-black text-white hover:bg-black/90"
+                className="px-4 py-2 rounded-full text-sm font-semibold bg-terracotta text-white shadow-terra-glow transition hover:opacity-90"
               >
                 Try again with suggested wording
               </button>
@@ -73,7 +73,7 @@ export function GenerationSafetyNotice({
                     key={s}
                     type="button"
                     onClick={() => onSuggestionClick(s)}
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-black/5 hover:bg-black/10 text-black/80 transition-colors"
+                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-charcoal/5 hover:bg-charcoal/10 text-charcoal/80 transition-colors"
                   >
                     {s}
                   </button>
@@ -86,7 +86,7 @@ export function GenerationSafetyNotice({
               <button
                 type="button"
                 onClick={() => setShowViewChange((x) => !x)}
-                className="mt-3 text-xs font-semibold text-black/60 hover:text-black underline"
+                className="mt-3 text-xs font-semibold text-charcoal/60 hover:text-charcoal underline"
               >
                 {showViewChange ? "Hide changes" : "See changes"}
               </button>
@@ -94,9 +94,9 @@ export function GenerationSafetyNotice({
                 <div className="mt-3 pt-3 border-t border-black/5 space-y-2">
                   {patches.map((p, i) => (
                     <div key={i} className="text-xs">
-                      <span className="text-black/55 line-through">{p.from}</span>
-                      <span className="text-black/55 mx-1">→</span>
-                      <span className="text-black/80">{p.to}</span>
+                      <span className="text-charcoal/55 line-through">{p.from}</span>
+                      <span className="text-charcoal/55 mx-1">→</span>
+                      <span className="text-charcoal/80">{p.to}</span>
                     </div>
                   ))}
                 </div>
@@ -112,9 +112,9 @@ export function GenerationSafetyNotice({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
-          className="rounded-xl border border-black/10 bg-white/95 px-4 py-3 shadow-sm"
+          className="rounded-xl border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-4 py-3 shadow-warm-sm backdrop-blur-sm"
         >
-          <p className="text-sm text-black/70">{typeof error === "string" ? error : String(error)}</p>
+          <p className="text-sm text-charcoal/70">{typeof error === "string" ? error : String(error)}</p>
         </motion.div>
       )}
 
@@ -124,15 +124,15 @@ export function GenerationSafetyNotice({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
-          className="rounded-xl border border-black/10 bg-white/90 px-4 py-3 text-left"
+          className="rounded-xl border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-4 py-3 text-left shadow-warm-sm backdrop-blur-sm"
         >
-          <p className="text-sm text-black/70">
+          <p className="text-sm text-charcoal/70">
             We adjusted a couple of words to keep this original.
           </p>
           <button
             type="button"
             onClick={() => setShowViewChange((x) => !x)}
-            className="mt-2 text-xs font-semibold text-black/60 hover:text-black underline"
+            className="mt-2 text-xs font-semibold text-charcoal/60 hover:text-charcoal underline"
           >
             {showViewChange ? "Hide details" : "See changes"}
           </button>
@@ -141,20 +141,20 @@ export function GenerationSafetyNotice({
               {hasPatches ? (
                 patches.map((p, i) => (
                   <div key={i} className="text-xs">
-                    <span className="text-black/55 line-through">{p.from}</span>
-                    <span className="text-black/55 mx-1">→</span>
-                    <span className="text-black/80">{p.to}</span>
+                    <span className="text-charcoal/55 line-through">{p.from}</span>
+                    <span className="text-charcoal/55 mx-1">→</span>
+                    <span className="text-charcoal/80">{p.to}</span>
                   </div>
                 ))
               ) : (
                 <>
                   <div>
-                    <div className="text-xs text-black/55 mb-0.5">Original:</div>
-                    <div className="text-xs text-black/80 break-words">{rewriteApplied.originalPreview}</div>
+                    <div className="text-xs text-charcoal/55 mb-0.5">Original:</div>
+                    <div className="text-xs text-charcoal/80 break-words">{rewriteApplied.originalPreview}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-black/55 mb-0.5">Safe version:</div>
-                    <div className="text-xs text-black/80 break-words">{rewriteApplied.safePreview}</div>
+                    <div className="text-xs text-charcoal/55 mb-0.5">Safe version:</div>
+                    <div className="text-xs text-charcoal/80 break-words">{rewriteApplied.safePreview}</div>
                   </div>
                 </>
               )}

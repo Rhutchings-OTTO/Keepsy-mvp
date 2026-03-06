@@ -59,13 +59,13 @@ export default function CreateModePanel({
   };
 
   return (
-    <section className="mb-5 w-full rounded-3xl border border-black/10 bg-white/80 p-4 text-left shadow-sm sm:p-5">
-      <KineticHeading as="h2" className="text-xl font-black text-[#2D241E] sm:text-2xl">Start with a memory or an idea</KineticHeading>
+    <section className="mb-5 w-full rounded-3xl border border-black/10 p-4 text-left shadow-sm sm:p-5" style={{ backgroundColor: "rgba(253,246,238,0.85)" }}>
+      <KineticHeading as="h2" className="font-serif text-xl font-bold text-charcoal sm:text-2xl">Start with a memory or an idea</KineticHeading>
       <p className="mt-1 text-sm font-medium text-black/55">
         Describe anything you imagine, or upload a photo and we&apos;ll transform it into a beautiful gift.
       </p>
 
-      <div className="mt-4 inline-flex rounded-2xl border border-black/10 bg-[#F9F4EE] p-1" role="tablist" aria-label="Creation mode">
+      <div className="mt-4 inline-flex rounded-2xl border border-black/10 p-1" role="tablist" aria-label="Creation mode" style={{ backgroundColor: "var(--color-cream)" }}>
         <button
           type="button"
           role="tab"
@@ -118,7 +118,7 @@ export default function CreateModePanel({
                     key={chip}
                     type="button"
                     onClick={() => requestPrompt(chip)}
-                    className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-black/5"
+                    className="rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-charcoal/70 transition hover:bg-black/5"
                   >
                     {chip}
                   </button>
@@ -136,7 +136,7 @@ export default function CreateModePanel({
             >
               <div
                 className={`rounded-2xl border-2 border-dashed p-4 transition ${
-                  isDragActive ? "border-black/40 bg-black/[0.03]" : "border-black/15 bg-[#FBF8F4]"
+                  isDragActive ? "border-black/40 bg-black/[0.03]" : "border-black/15"
                 }`}
                 onDragOver={(event) => {
                   event.preventDefault();
@@ -152,7 +152,7 @@ export default function CreateModePanel({
               >
                 <p className="text-sm font-semibold text-black/70">Transform your memories into something beautiful.</p>
                 <p className="mt-1 text-xs text-black/50">Drag and drop a photo here, or choose a file.</p>
-                <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-black/70 hover:bg-black/5">
+                <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-charcoal/70 hover:bg-black/5">
                   <UploadCloud size={14} />
                   Choose photo
                   <input
@@ -167,7 +167,7 @@ export default function CreateModePanel({
                   />
                 </label>
                 {uploadedPreviewUrl ? (
-                  <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/10 bg-white p-2">
+                  <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/10 bg-white/70 p-2">
                     <div className="relative h-12 w-12 overflow-hidden rounded-lg">
                       <Image src={uploadedPreviewUrl} alt="Uploaded preview" fill className="object-cover" unoptimized />
                     </div>
@@ -185,7 +185,7 @@ export default function CreateModePanel({
                     key={chip}
                     type="button"
                     onClick={() => requestPrompt(chip)}
-                    className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-black/70 transition hover:bg-black/5"
+                    className="rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-charcoal/70 transition hover:bg-black/5"
                   >
                     {chip}
                   </button>
@@ -197,15 +197,15 @@ export default function CreateModePanel({
       </div>
 
       {pendingPrompt ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs">
-          <span className="font-semibold text-amber-800">Replace your prompt?</span>
-          <button type="button" onClick={acceptReplace} className="rounded-full bg-amber-700 px-3 py-1 font-bold text-white">
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-black/10 px-3 py-2 text-xs" style={{ backgroundColor: "rgba(196,113,74,0.08)" }}>
+          <span className="font-semibold text-charcoal">Replace your prompt?</span>
+          <button type="button" onClick={acceptReplace} className="rounded-full px-3 py-1 font-bold text-white transition hover:opacity-90" style={{ backgroundColor: "var(--color-terracotta)" }}>
             Replace
           </button>
           <button
             type="button"
             onClick={() => setPendingPrompt(null)}
-            className="rounded-full border border-amber-300 px-3 py-1 font-bold text-amber-800"
+            className="rounded-full border border-black/20 px-3 py-1 font-bold text-charcoal/80"
           >
             Cancel
           </button>
@@ -216,7 +216,7 @@ export default function CreateModePanel({
         <p className="text-[11px] font-semibold uppercase tracking-wide text-black/45">Local inspiration</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {content.localInspiration.map((item) => (
-            <span key={item} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-semibold text-black/60">
+            <span key={item} className="rounded-full border border-black/10 bg-white/60 px-3 py-1 text-xs font-semibold text-charcoal/60">
               {item}
             </span>
           ))}
@@ -225,9 +225,9 @@ export default function CreateModePanel({
 
       <p className="mt-4 text-xs font-semibold text-black/55">Tip: The more detail you give, the more personal it feels.</p>
       <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-semibold text-black/55">
-        <span className="rounded-full border border-black/10 bg-white px-3 py-1">Secure checkout</span>
-        <span className="rounded-full border border-black/10 bg-white px-3 py-1">Printed & shipped fast</span>
-        <span className="rounded-full border border-black/10 bg-white px-3 py-1">Made to make someone smile</span>
+        <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1">Secure checkout</span>
+        <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1">Printed & shipped fast</span>
+        <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1">Made to make someone smile</span>
       </div>
     </section>
   );

@@ -8,10 +8,10 @@ type Props = {
 export function MockupSkeleton({ aspectRatio = 1.7778, className = "" }: Props) {
   return (
     <div
-      className={`overflow-hidden rounded-3xl border border-black/5 bg-[#F0EFED] ${className}`}
-      style={{ aspectRatio: `${aspectRatio}` }}
+      className={`overflow-hidden rounded-3xl border border-black/5 ${className}`}
+      style={{ aspectRatio: `${aspectRatio}`, backgroundColor: "rgba(253,246,238,0.8)" }}
     >
-      <div className="h-full w-full animate-pulse bg-gradient-to-r from-[#E8E6E4] via-[#F2F0EE] to-[#E8E6E4] bg-[length:200%_100%]" />
+      <div className="h-full w-full animate-pulse bg-gradient-to-r from-[rgba(253,246,238,0.6)] via-[rgba(253,246,238,1)] to-[rgba(253,246,238,0.6)] bg-[length:200%_100%]" />
     </div>
   );
 }

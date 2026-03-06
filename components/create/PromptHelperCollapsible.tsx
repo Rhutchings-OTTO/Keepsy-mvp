@@ -32,25 +32,25 @@ export function PromptHelperCollapsible({ onUsePrompt }: Props) {
   );
 
   return (
-    <section className="mt-5 w-full rounded-2xl border border-black/10 bg-white/80 p-4 shadow-sm">
+    <section className="mt-5 w-full rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] p-4 shadow-warm-sm backdrop-blur-sm">
       <button
         type="button"
         onClick={() => setExpanded((prev) => !prev)}
         className="flex w-full items-center justify-between py-1 text-left"
         aria-expanded={expanded}
       >
-        <span className="text-sm font-semibold text-black/75">Need help writing it?</span>
-        {expanded ? <ChevronUp size={18} className="text-black/50" /> : <ChevronDown size={18} className="text-black/50" />}
+        <span className="text-sm font-semibold text-charcoal/75">Need help writing it?</span>
+        {expanded ? <ChevronUp size={18} className="text-charcoal/50" /> : <ChevronDown size={18} className="text-charcoal/50" />}
       </button>
       {expanded && (
         <div className="mt-4 space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
-              <span className="text-xs font-semibold text-black/55">Who or what?</span>
+              <span className="text-xs font-semibold text-charcoal/55">Who or what?</span>
               <select
                 value={who}
                 onChange={(e) => setWho(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm font-medium text-black"
+                className="mt-1 w-full rounded-xl border border-black/12 bg-white/90 px-3 py-2.5 text-sm font-medium text-charcoal focus:outline-none focus:ring-2 focus:ring-terracotta/30"
               >
                 {WHO_OPTIONS.map((o) => (
                   <option key={o} value={o}>{o}</option>
@@ -58,11 +58,11 @@ export function PromptHelperCollapsible({ onUsePrompt }: Props) {
               </select>
             </label>
             <label className="block">
-              <span className="text-xs font-semibold text-black/55">Style</span>
+              <span className="text-xs font-semibold text-charcoal/55">Style</span>
               <select
                 value={style}
                 onChange={(e) => setStyle(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm font-medium text-black"
+                className="mt-1 w-full rounded-xl border border-black/12 bg-white/90 px-3 py-2.5 text-sm font-medium text-charcoal focus:outline-none focus:ring-2 focus:ring-terracotta/30"
               >
                 {STYLE_OPTIONS.map((o) => (
                   <option key={o} value={o}>{o}</option>
@@ -70,11 +70,11 @@ export function PromptHelperCollapsible({ onUsePrompt }: Props) {
               </select>
             </label>
             <label className="block">
-              <span className="text-xs font-semibold text-black/55">Mood</span>
+              <span className="text-xs font-semibold text-charcoal/55">Mood</span>
               <select
                 value={mood}
                 onChange={(e) => setMood(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm font-medium text-black"
+                className="mt-1 w-full rounded-xl border border-black/12 bg-white/90 px-3 py-2.5 text-sm font-medium text-charcoal focus:outline-none focus:ring-2 focus:ring-terracotta/30"
               >
                 {MOOD_OPTIONS.map((o) => (
                   <option key={o} value={o}>{o}</option>
@@ -82,11 +82,11 @@ export function PromptHelperCollapsible({ onUsePrompt }: Props) {
               </select>
             </label>
             <label className="block">
-              <span className="text-xs font-semibold text-black/55">Background</span>
+              <span className="text-xs font-semibold text-charcoal/55">Background</span>
               <select
                 value={background}
                 onChange={(e) => setBackground(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm font-medium text-black"
+                className="mt-1 w-full rounded-xl border border-black/12 bg-white/90 px-3 py-2.5 text-sm font-medium text-charcoal focus:outline-none focus:ring-2 focus:ring-terracotta/30"
               >
                 {BG_OPTIONS.map((o) => (
                   <option key={o} value={o}>{o}</option>
@@ -97,7 +97,7 @@ export function PromptHelperCollapsible({ onUsePrompt }: Props) {
           <button
             type="button"
             onClick={() => onUsePrompt(builtPrompt)}
-            className="w-full rounded-xl bg-black px-4 py-3 text-sm font-bold text-white transition hover:bg-black/90"
+            className="w-full rounded-full bg-terracotta px-4 py-3 text-sm font-bold text-white shadow-terra-glow transition hover:opacity-90"
           >
             Use this prompt
           </button>

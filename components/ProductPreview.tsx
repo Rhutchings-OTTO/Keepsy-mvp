@@ -95,8 +95,8 @@ export const ProductPreview = memo(function ProductPreview({
         </svg>
       )}
       <div
-        className={`relative w-full overflow-hidden rounded-2xl border border-black/[0.06] bg-[#FAF9F7] shadow-[0_4px_24px_rgba(0,0,0,0.06)] ${className}`}
-        style={{ aspectRatio: placement.aspectRatio }}
+        className={`relative w-full overflow-hidden rounded-2xl border border-black/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.06)] ${className}`}
+        style={{ aspectRatio: placement.aspectRatio, backgroundColor: "var(--color-cream)" }}
       >
         <div className="absolute inset-0">
           {/* Layer 1: Base product */}

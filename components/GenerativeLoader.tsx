@@ -172,7 +172,7 @@ export function GenerativeLoader({
   return (
     <div className="flex flex-col items-center justify-center gap-6">
       <div
-        className={`relative text-[#1A1A1A]/25 ${
+        className={`relative text-charcoal/25 ${
           bananaActive && !prefersReducedMotion ? "h-36 w-36" : "h-24 w-24"
         }`}
       >
@@ -225,8 +225,8 @@ export function GenerativeLoader({
           <svg viewBox="0 0 100 100" className="h-full w-full" fill="none">
             <defs>
               <linearGradient id="sketchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#1A1A1A" stopOpacity="0.12" />
-                <stop offset="100%" stopColor="#1A1A1A" stopOpacity="0.35" />
+                <stop offset="0%" stopColor="#2D2926" stopOpacity="0.12" />
+                <stop offset="100%" stopColor="#2D2926" stopOpacity="0.35" />
               </linearGradient>
             </defs>
             <motion.path
@@ -250,7 +250,7 @@ export function GenerativeLoader({
             <motion.path
               d="M30 45 Q42 28, 50 38 T70 50 Q58 72, 50 62 T30 45"
               fill="none"
-              stroke="rgba(26,26,26,0.06)"
+              stroke="rgba(45,41,38,0.06)"
               strokeWidth="0.35"
               strokeLinecap="round"
               strokeDasharray="80"
@@ -275,7 +275,7 @@ export function GenerativeLoader({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.25 }}
-          className="text-center text-base font-semibold text-[#1A1A1A]/80"
+          className="text-center text-base font-semibold text-charcoal/80"
         >
           {displayMessage}
         </motion.p>
@@ -284,14 +284,14 @@ export function GenerativeLoader({
       {startedAt != null && (
         <div className="w-full max-w-[240px]">
           <div
-            className="h-1 w-full overflow-hidden rounded-full bg-[#1A1A1A]/10"
+            className="h-1 w-full overflow-hidden rounded-full bg-charcoal/10"
             role="progressbar"
             aria-valuenow={Math.round(progress * 100)}
             aria-valuemin={0}
             aria-valuemax={100}
           >
             <motion.div
-              className="h-full rounded-full bg-[#1A1A1A]/35"
+              className="h-full rounded-full bg-charcoal/35"
               initial={{ width: 0 }}
               animate={{ width: `${progress * 100}%` }}
               transition={{ duration: 0.15 }}

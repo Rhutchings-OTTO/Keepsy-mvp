@@ -36,7 +36,7 @@ export function GenerationLoadingOverlay({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: prefersReducedMotion ? 0.15 : 0.3 }}
-          className="fixed inset-0 z-[120] flex items-center justify-center bg-[#F9F8F6]/94 px-6 backdrop-blur-sm"
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-cream/94 px-6 backdrop-blur-sm"
           role="status"
           aria-live="polite"
           aria-label="Synthesizing your design"
@@ -49,12 +49,12 @@ export function GenerationLoadingOverlay({
               transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
             >
               <motion.div
-                className="absolute left-[-20%] top-[-20%] h-[52vh] w-[52vh] rounded-full bg-[#F6DCC6]/30 blur-3xl"
+                className="absolute left-[-20%] top-[-20%] h-[52vh] w-[52vh] rounded-full bg-terracotta/15 blur-3xl"
                 animate={{ x: [0, 90, 0], y: [0, 40, 0] }}
                 transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute bottom-[-25%] right-[-20%] h-[55vh] w-[55vh] rounded-full bg-[#DDECF5]/30 blur-3xl"
+                className="absolute bottom-[-25%] right-[-20%] h-[55vh] w-[55vh] rounded-full bg-forest/10 blur-3xl"
                 animate={{ x: [0, -70, 0], y: [0, -30, 0] }}
                 transition={{ duration: 12.5, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -64,9 +64,9 @@ export function GenerationLoadingOverlay({
           <div className="frosted-glass relative w-full max-w-md rounded-3xl p-8 text-center">
             <GenerativeLoader useInternalMessages={true} region={region} startedAt={startedAt} prompt={prompt} />
 
-            <p className="mt-4 text-sm font-medium text-[#1A1A1A]/60">Calibrating pigments — this usually takes a moment.</p>
+            <p className="mt-4 text-sm font-medium text-charcoal/60">Calibrating pigments — this usually takes a moment.</p>
             {showSavingHint ? (
-              <p className="mt-1 text-xs font-semibold text-[#1A1A1A]/45">Don&apos;t refresh — we&apos;re saving your progress.</p>
+              <p className="mt-1 text-xs font-semibold text-charcoal/45">Don&apos;t refresh — we&apos;re saving your progress.</p>
             ) : null}
           </div>
         </motion.div>

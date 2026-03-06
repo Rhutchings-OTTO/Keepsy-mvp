@@ -49,9 +49,13 @@ export function MockupControls({
               onClick={() => onProductSelect(p.id)}
               className={`min-h-[52px] rounded-2xl border p-4 text-left transition-all ${
                 selectedProductId === p.id
-                  ? "border-black bg-black text-white"
-                  : "border-black/10 bg-white hover:border-black/20"
+                  ? "border-black/80 text-white"
+                  : "border-black/10 hover:border-black/20"
               }`}
+              style={selectedProductId === p.id
+                ? { backgroundColor: "var(--color-charcoal)" }
+                : { backgroundColor: "var(--color-cream)" }
+              }
             >
               <div className="text-sm font-extrabold">{p.name}</div>
               <div

@@ -83,7 +83,7 @@ export function SizeAndMeasurements({
   };
 
   return (
-    <div className="rounded-2xl border border-black/10 bg-white/90 shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-black/10 shadow-sm overflow-hidden" style={{ backgroundColor: "rgba(253,246,238,0.92)" }}>
       <button
         type="button"
         onClick={() => setExpanded((e) => !e)}
@@ -92,7 +92,7 @@ export function SizeAndMeasurements({
         aria-controls="size-measurements-panel"
         id="size-measurements-trigger"
       >
-        <span className="font-bold text-black">Size & measurements</span>
+        <span className="font-bold text-charcoal">Size & measurements</span>
         {expanded ? (
           <ChevronUp size={20} className="text-black/50 shrink-0" aria-hidden />
         ) : (
@@ -118,9 +118,10 @@ export function SizeAndMeasurements({
                   onClick={() => handleSizeSelect(size)}
                   className={`min-h-[44px] min-w-[44px] px-3 py-2 rounded-xl text-sm font-bold transition ${
                     selectedSize === size
-                      ? "bg-black text-white"
-                      : "bg-black/5 text-black/80 hover:bg-black/10"
+                      ? "text-white"
+                      : "bg-black/5 text-charcoal/80 hover:bg-black/10"
                   }`}
+                  style={selectedSize === size ? { backgroundColor: "var(--color-charcoal)" } : undefined}
                 >
                   {size}
                 </button>

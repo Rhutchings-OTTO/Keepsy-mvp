@@ -146,7 +146,7 @@ function CartItemRow({
 
         {/* Qty + remove */}
         <div className="mt-1 flex items-center justify-between">
-          <div className="flex items-center gap-1 rounded-full border border-black/10 bg-white">
+          <div className="flex items-center gap-1 rounded-full border border-black/10" style={{ backgroundColor: "var(--color-cream)" }}>
             <button
               type="button"
               aria-label="Decrease quantity"
@@ -305,7 +305,8 @@ export function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-y-0 right-0 z-[301] flex w-full flex-col bg-white shadow-2xl md:w-[420px]"
+            className="fixed inset-y-0 right-0 z-[301] flex w-full flex-col shadow-2xl md:w-[420px]"
+            style={{ backgroundColor: "var(--color-cream)" }}
             aria-label="Shopping cart"
             role="dialog"
             aria-modal="true"

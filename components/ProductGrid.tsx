@@ -29,9 +29,12 @@ export function ProductGrid({ selected, onSelect }: ProductGridProps) {
           key={product.type}
           aria-label={`Choose ${product.name}`}
           onClick={() => onSelect?.(product.type)}
-          className={`rounded-2xl border p-3 text-left transition-transform duration-200 ease-out hover:-translate-y-0.5 ${selected === product.type ? "border-black bg-black !text-white" : "border-black/10 bg-white"}`}
+          className={`rounded-2xl border p-3 text-left transition-transform duration-200 ease-out hover:-translate-y-0.5 ${selected === product.type ? "border-black !text-white" : "border-black/10"}`}
+          style={selected === product.type ? { backgroundColor: "var(--color-charcoal)" } : { backgroundColor: "var(--color-cream)" }}
         >
-          <div className={`rounded-xl border ${selected === product.type ? "border-white/10 bg-white/5" : "border-black/6 bg-[#faf6f1]"} p-2`}>
+          <div className={`rounded-xl border ${selected === product.type ? "border-white/10 bg-white/5" : "border-black/6"} p-2`}
+            style={selected !== product.type ? { backgroundColor: "rgba(253,246,238,0.6)" } : undefined}
+          >
             <Image src={product.image} alt={product.name} width={360} height={220} className="h-28 w-full object-contain" />
           </div>
           <p className="mt-2 font-bold">{product.name}</p>

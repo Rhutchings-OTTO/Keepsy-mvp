@@ -14,16 +14,22 @@ type GiftingStepProps = {
   hidden: boolean;
 };
 
+const inputCls = "mt-1 w-full rounded-xl border border-black/12 bg-white/90 px-3 py-2 text-sm text-charcoal placeholder:text-charcoal/35 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-transparent";
+const labelCls = "block text-xs font-medium text-charcoal/65";
+
 export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden }: GiftingStepProps) {
   if (hidden) {
     return (
-      <section className="rounded-2xl border border-[#E7DBCF] bg-white/80 p-4">
+      <section
+        className="rounded-[1.5rem] border border-white/65 p-4 shadow-warm-sm backdrop-blur-sm"
+        style={{ backgroundColor: "rgba(253,246,238,0.88)" }}
+      >
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm text-[#5E4A38]">Personalised gifting is skipped.</p>
+          <p className="text-sm text-charcoal/65">Personalised gifting is skipped.</p>
           <button
             type="button"
             onClick={() => onReopen?.()}
-            className="rounded-full border border-[#DDCBB8] px-3 py-1 text-xs font-semibold text-[#5D4938]"
+            className="rounded-full border border-black/12 bg-white/80 px-3 py-1 text-xs font-semibold text-charcoal transition hover:border-terracotta/40 hover:bg-white"
           >
             Reopen
           </button>
@@ -33,35 +39,38 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
   }
 
   return (
-    <section className="rounded-2xl border border-[#E7DBCF] bg-white/85 p-4">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-[#4E3C2E]">Optional gifting details</p>
+    <section
+      className="rounded-[1.5rem] border border-white/65 p-5 shadow-warm-sm backdrop-blur-sm"
+      style={{ backgroundColor: "rgba(253,246,238,0.88)" }}
+    >
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-charcoal">Optional gifting details</p>
         <button
           type="button"
           onClick={onSkip}
-          className="rounded-full border border-[#DDCCBC] px-3 py-1 text-xs font-semibold text-[#6A5644]"
+          className="rounded-full border border-black/12 bg-white/80 px-3 py-1 text-xs font-semibold text-charcoal/70 transition hover:border-terracotta/40 hover:text-charcoal"
         >
           Skip
         </button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="text-xs text-[#7A6755]">
+        <label className={labelCls}>
           Recipient name (optional)
           <input
             value={value.recipientName}
             onChange={(e) => onChange({ recipientName: e.target.value })}
-            className="mt-1 w-full rounded-xl border border-[#E4D5C6] bg-white px-3 py-2 text-sm text-[#3E3024]"
+            className={inputCls}
             placeholder="e.g. Mum"
           />
         </label>
 
-        <label className="text-xs text-[#7A6755]">
+        <label className={labelCls}>
           Relationship
           <select
             value={value.relationship}
             onChange={(e) => onChange({ relationship: e.target.value as RelationshipOption })}
-            className="mt-1 w-full rounded-xl border border-[#E4D5C6] bg-white px-3 py-2 text-sm text-[#3E3024]"
+            className={inputCls}
           >
             {RELATIONSHIPS.map((option) => (
               <option key={option || "none"} value={option}>
@@ -71,12 +80,12 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
           </select>
         </label>
 
-        <label className="text-xs text-[#7A6755]">
+        <label className={labelCls}>
           Occasion
           <select
             value={value.occasion}
             onChange={(e) => onChange({ occasion: e.target.value })}
-            className="mt-1 w-full rounded-xl border border-[#E4D5C6] bg-white px-3 py-2 text-sm text-[#3E3024]"
+            className={inputCls}
           >
             {OCCASIONS.map((option) => (
               <option key={option || "none"} value={option}>
@@ -86,40 +95,39 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
           </select>
         </label>
 
-        <label className="text-xs text-[#7A6755]">
+        <label className={labelCls}>
           Delivery date (optional)
           <input
             type="date"
             value={value.deliveryDate}
             onChange={(e) => onChange({ deliveryDate: e.target.value })}
-            className="mt-1 w-full rounded-xl border border-[#E4D5C6] bg-white px-3 py-2 text-sm text-[#3E3024]"
+            className={inputCls}
           />
         </label>
       </div>
 
-      <label className="mt-3 block text-xs text-[#7A6755]">
+      <label className={`mt-3 ${labelCls}`}>
         Gift message
         <textarea
           value={value.giftMessage}
           onChange={(e) => onChange({ giftMessage: e.target.value.slice(0, MESSAGE_LIMIT) })}
-          className="mt-1 h-20 w-full rounded-xl border border-[#E4D5C6] bg-white px-3 py-2 text-sm text-[#3E3024]"
+          className={`${inputCls} h-20 resize-none`}
           placeholder="Add a short note..."
         />
       </label>
-      <p className="mt-1 text-right text-[11px] text-[#8A7561]">
+      <p className="mt-1 text-right text-[11px] text-charcoal/40">
         {value.giftMessage.length}/{MESSAGE_LIMIT}
       </p>
 
-      <label className="mt-2 flex items-center gap-2 text-xs text-[#6B5846]">
+      <label className="mt-3 flex items-center gap-2 text-xs font-medium text-charcoal/65">
         <input
           type="checkbox"
-          className="h-4 w-4 rounded border-[#D7C5B4]"
+          className="h-4 w-4 rounded border-black/20 accent-terracotta"
           checked={value.includeGiftMessage}
           onChange={(e) => onChange({ includeGiftMessage: e.target.checked })}
         />
-        Include message in package (Gift message saved for your order)
+        Include message in package
       </label>
     </section>
   );
 }
-

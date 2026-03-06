@@ -93,15 +93,15 @@ export default function RegionSelector({ open, onSelect, onClose, currentRegion 
             role="dialog"
             aria-modal="true"
             aria-label="Choose your region"
-            className="fixed left-1/2 top-1/2 z-[81] w-[min(92vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-[#E5DBD1] bg-[#FCFAF7] p-6 shadow-2xl"
+            className="fixed left-1/2 top-1/2 z-[81] w-[min(92vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(253,246,238,0.96),rgba(247,236,224,0.98))] p-7 shadow-warm-xl backdrop-blur-xl"
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            <p className="text-sm font-semibold uppercase tracking-wider text-[#8A7562]">Choose region</p>
-            <h2 className="mt-1 text-2xl font-black text-[#2D241E]">View your local Keepsy experience</h2>
-            <p className="mt-2 text-sm text-[#5D4B3E]">See local gift ideas and holiday inspiration.</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/45">Choose region</p>
+            <h2 className="mt-2 font-serif text-3xl font-bold tracking-tight text-charcoal">View your local Keepsy experience</h2>
+            <p className="mt-2 text-sm leading-7 text-charcoal/65">See local gift ideas and holiday inspiration.</p>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {OPTIONS.map((option, index) => (
@@ -110,10 +110,10 @@ export default function RegionSelector({ open, onSelect, onClose, currentRegion 
                   type="button"
                   ref={index === 0 ? firstButtonRef : null}
                   onClick={() => handleRegionClick(option.region)}
-                  className="rounded-2xl border border-[#DDCFC2] bg-white px-4 py-4 text-left transition hover:border-[#C9B49F] hover:bg-[#FFFCF8] focus:outline-none focus:ring-2 focus:ring-[#C9B49F]"
+                  className="rounded-[1.5rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,244,238,0.92))] px-5 py-5 text-left shadow-warm-sm backdrop-blur-sm transition hover:shadow-warm-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-terracotta/30"
                 >
-                  <p className="text-lg font-bold text-[#3A2E25]">{option.title}</p>
-                  <p className="mt-1 text-xs text-[#7A6552]">See local gift ideas & holidays</p>
+                  <p className="text-lg font-bold text-charcoal">{option.title}</p>
+                  <p className="mt-0.5 text-xs text-charcoal/55">See local gift ideas & holidays</p>
                 </button>
               ))}
             </div>

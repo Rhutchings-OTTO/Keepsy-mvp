@@ -42,7 +42,7 @@ export default function BeforeAfterCarousel({ region }: BeforeAfterCarouselProps
           {CREATE_EXAMPLES[region].beforeAfterTiles.map((tile) => (
             <article
               key={tile.caption}
-              className="min-w-[20rem] rounded-[1.5rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(249,246,241,0.96))] p-3 shadow-[0_18px_45px_-32px_rgba(34,24,16,0.4)]"
+              className="min-w-[17.5rem] rounded-[1.5rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(249,246,241,0.96))] p-3 shadow-[0_18px_45px_-32px_rgba(34,24,16,0.4)] sm:min-w-[20rem]"
             >
               <div className="grid grid-cols-3 gap-2">
                 <div className="relative overflow-hidden rounded-xl border border-black/10 bg-[#F4EFE8]">
@@ -70,7 +70,7 @@ export default function BeforeAfterCarousel({ region }: BeforeAfterCarouselProps
                 </div>
               </div>
               <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-black/45">{tile.beforeLabel} to {tile.afterLabel}</p>
-              <p className="mt-1 text-sm font-semibold text-black/80">{tile.caption}</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-black/80">{tile.caption}</p>
             </article>
           ))}
         </div>

@@ -1,126 +1,67 @@
 "use client";
 
-import React, { useState } from "react";
 import Link from "next/link";
-import { DynamicLogo } from "@/components/DynamicLogo";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Menu, X, Gift, PlusCircle, Star, Mail } from "lucide-react";
+import { Home, ShoppingBag, Sparkles, User } from "lucide-react";
 
-const NAV_ITEMS = [
-  { href: "/", label: "Home", Icon: Gift },
-  { href: "/gift-ideas", label: "Gift Ideas", Icon: Gift },
-  { href: "/create", label: "Create", Icon: PlusCircle },
-  { href: "/#reviews", label: "Reviews", Icon: Star },
-  { href: "mailto:support@keepsy.store", label: "Support", Icon: Mail },
+const TABS = [
+  { href: "/", label: "Home", Icon: Home },
+  { href: "/shop", label: "Shop", Icon: ShoppingBag },
+  { href: "/create", label: "Create", Icon: Sparkles },
+  { href: "/account", label: "Account", Icon: User },
 ];
 
 export function BottomSheetNav() {
-  const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   return (
-    <>
-      {/* Trigger — fixed bottom on mobile */}
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-5 left-1/2 z-40 flex h-14 min-w-[13rem] -translate-x-1/2 items-center justify-between rounded-full border border-white/70 bg-[rgba(255,255,255,0.84)] px-4 shadow-[0_24px_50px_-28px_rgba(0,0,0,0.42)] backdrop-blur-xl md:hidden"
-        aria-label="Open navigation"
-      >
-        <span className="text-sm font-semibold text-[#221d1a]">Menu</span>
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#1f2937] text-white">
-          <Menu size={18} />
-        </span>
-      </button>
+    <nav
+      aria-label="Bottom navigation"
+      className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
+      style={{
+        backgroundColor: "rgba(253, 246, 238, 0.92)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderTop: "1px solid var(--border)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
+    >
+      <div className="flex items-stretch">
+        {TABS.map(({ href, label, Icon }) => {
+          const active =
+            href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setOpen(false)}
-              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm md:hidden"
-            />
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 z-50 rounded-t-[2rem] border-t border-white/40 bg-[rgba(248,244,238,0.96)] shadow-[0_-24px_60px_-34px_rgba(0,0,0,0.48)] backdrop-blur-2xl md:hidden"
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 transition"
+              style={{
+                minHeight: "56px",
+                color: active
+                  ? "var(--color-terracotta)"
+                  : "var(--ink-muted)",
+              }}
             >
-              <div className="flex items-center justify-between p-5">
-                <Link
-                  href="/"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 text-[#201d1b]"
-                >
-                  <DynamicLogo
-                    href={null}
-                    width={92}
-                    className="h-7 w-auto text-[#201d1b]"
-                  />
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-full border border-black/8 bg-white/75 p-2 hover:bg-white"
-                  aria-label="Close"
-                >
-                  <X size={18} className="text-[#201d1b]" />
-                </button>
-              </div>
-              <div className="px-5">
-                <div className="rounded-[1.5rem] border border-white/60 bg-white/68 p-3 shadow-[0_16px_34px_-24px_rgba(0,0,0,0.28)]">
-                  <p className="px-2 pb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-black/40">
-                    Navigate
-                  </p>
-                  <nav className="flex flex-col gap-1 pb-1">
-                {NAV_ITEMS.map(({ href, label, Icon }) => {
-                  const isExternal = href.startsWith("mailto:");
-                  const active =
-                    href === "/" ? pathname === "/" : !isExternal && pathname.startsWith(href.replace("/#reviews", ""));
-                  return isExternal ? (
-                    <a
-                      key={href}
-                      href={href}
-                      className="flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold text-[#201d1b] hover:bg-black/[0.04]"
-                    >
-                      <Icon size={18} className="text-black/55" />
-                      {label}
-                    </a>
-                  ) : (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={() => setOpen(false)}
-                      className={`flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold ${
-                        active ? "bg-[#1f2937] text-white" : "text-[#201d1b] hover:bg-black/[0.04]"
-                      }`}
-                    >
-                      <Icon size={18} className={active ? "text-white/75" : "text-black/55"} />
-                      {label}
-                    </Link>
-                  );
-                })}
-                  </nav>
-                </div>
-                <Link
-                  href="/create"
-                  onClick={() => setOpen(false)}
-                  className="mt-4 flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1f2937] px-5 text-sm font-semibold text-white shadow-[0_18px_30px_-18px_rgba(17,24,39,0.5)] !text-white"
-                >
-                  Start creating
-                  <ArrowRight size={16} />
-                </Link>
-              </div>
-              <div className="pb-8" />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </>
+              <Icon size={22} strokeWidth={active ? 2.2 : 1.8} />
+              <span
+                className="text-[10px] font-semibold tracking-wide"
+                style={{ lineHeight: 1 }}
+              >
+                {label}
+              </span>
+              {/* Active indicator dot */}
+              {active && (
+                <span
+                  className="absolute bottom-1.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full"
+                  style={{ backgroundColor: "var(--color-terracotta)" }}
+                />
+              )}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 }

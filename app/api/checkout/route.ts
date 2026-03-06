@@ -168,6 +168,9 @@ export async function POST(req: Request) {
       {
         mode: "payment",
         payment_method_types: ["card"],
+        shipping_address_collection: {
+          allowed_countries: ["GB", "US", "CA", "AU", "DE", "FR", "NL", "SE", "NO", "DK", "IE"],
+        },
         line_items: lines.map((item) => ({
           price_data: {
             currency: "gbp",

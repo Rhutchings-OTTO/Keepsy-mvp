@@ -7,6 +7,7 @@ import { BottomSheetNav } from "@/components/BottomSheetNav";
 import { PremiumEffects } from "@/components/PremiumEffects";
 import { EasterEggProvider } from "@/components/EasterEggProvider";
 import { MeshGradientBackground } from "@/components/MeshGradientBackground";
+import { CartDrawer } from "@/components/CartDrawer";
 
 type SiteChromeProps = {
   children: React.ReactNode;
@@ -36,6 +37,8 @@ export function SiteChrome({ children }: SiteChromeProps) {
           <BottomSheetNav />
         </div>
       )}
+      {/* CartDrawer is always mounted; it opens via "open-cart-drawer" event */}
+      <CartDrawer />
     </>
   );
 }

@@ -19,8 +19,12 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Keepsy",
-  description: "Keep what matters — turn it into a gift.",
+  title: {
+    default: "Keepsy — Personalised Gifts She'll Never Forget",
+    template: "%s — Keepsy",
+  },
+  description: "Turn your favourite photos and memories into beautiful, personalised keepsakes. Custom mugs, greeting cards, tees and hoodies — gift-wrapped free, shipped to US & UK.",
+  keywords: ["personalised gifts", "custom mugs", "custom hoodies", "keepsake gifts", "photo gifts", "personalised cards"],
   metadataBase: new URL("https://keepsy.store"),
   alternates: {
     canonical: "/",

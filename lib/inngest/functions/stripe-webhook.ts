@@ -3,6 +3,7 @@ import { inngest } from "../client";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { sendAtelierCreationEmail } from "@/lib/emails/sendAtelierEmail";
 import { clearDesignCacheForOrder } from "@/lib/cache/designCache";
+import { submitPrintfulOrder } from "@/lib/printful/createOrder";
 
 export const stripeWebhookProcess = inngest.createFunction(
   {
@@ -106,6 +107,25 @@ export const stripeWebhookProcess = inngest.createFunction(
             designPrompt: prompt || undefined,
             orderRef,
           });
+        }
+      });
+
+      await step.run("submit-printful-order", async () => {
+        try {
+          const { printfulOrderId } = await submitPrintfulOrder(
+            session,
+            lineItems,
+            { confirm: process.env.NODE_ENV === "production" }
+          );
+          if (supabase) {
+            await supabase
+              .from("orders")
+              .update({ printful_order_id: printfulOrderId })
+              .eq("order_ref", orderRef);
+          }
+        } catch (err) {
+          // Log but don't fail the whole webhook — manual retry possible
+          console.error("[printful] Failed to create order:", err instanceof Error ? err.message : err);
         }
       });
 

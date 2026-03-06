@@ -4,9 +4,23 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Check, Gift, ImageIcon, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Gift,
+  ImageIcon,
+  Sparkles,
+  ShoppingBag,
+  Star,
+  Package,
+  Printer,
+  BadgeCheck,
+  Truck,
+  RotateCcw,
+  Lock,
+} from "lucide-react";
 import { DynamicLogo } from "@/components/DynamicLogo";
 import RegionSelector from "@/components/RegionSelector";
 import { getRegion, setRegion, type Region } from "@/lib/region";
@@ -19,98 +33,277 @@ const PremiumGateway = dynamic(
 
 const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-6";
 
+// ─── Data ────────────────────────────────────────────────────────────────────
+
 const HERO_BULLETS = [
-  "Write your idea in everyday language",
-  "Upload a photo if you already have one",
-  "Preview it on cards, mugs, hoodies and tees",
+  "See it on the product before you buy",
+  "Gift-wrapped free with every order",
+  "Shipped to US & UK",
 ];
 
-const TRUST_POINTS = [
-  { title: "Clear and simple", body: "Everything is explained in plain English, with no design jargon." },
-  { title: "Preview before you buy", body: "You see the artwork on the real product before checkout." },
-  { title: "Premium print feel", body: "Examples are tuned for soft, gift-ready finishes rather than harsh AI styling." },
-];
-
-const STEPS = [
+const PRODUCT_IMAGES = [
   {
-    title: "Bring the memory",
-    body: "Start with a photo, a person, a pet, a home, or a moment you want to turn into something meaningful.",
+    src: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
+    alt: "Custom personalised mug",
+    label: "Mugs",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400",
+    alt: "Personalised greeting card",
+    label: "Cards",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
+    alt: "Custom printed tee",
+    label: "Tees",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400",
+    alt: "Custom hoodie",
+    label: "Hoodies",
+  },
+];
+
+const SOCIAL_PROOF_ITEMS = [
+  "★★★★★  2,847 Happy Customers",
+  "🎁  Free Gift Wrapping",
+  "🇺🇸  Made & Shipped with Love",
+  "↩️  30-Day Returns",
+];
+
+const FEATURED_PRODUCTS = [
+  {
+    name: "Best Mom Ever Mug",
+    price: "$24.99",
+    rating: "★★★★★",
+    reviews: 847,
+    src: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
+    alt: "Best Mom Ever custom mug",
+  },
+  {
+    name: "Custom Photo Card Pack",
+    price: "$18.99",
+    rating: "★★★★★",
+    reviews: 1203,
+    src: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400",
+    alt: "Custom photo greeting card",
+  },
+  {
+    name: "The Cozy Custom Hoodie",
+    price: "$54.99",
+    rating: "★★★★★",
+    reviews: 276,
+    src: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400",
+    alt: "Custom personalised hoodie",
+  },
+  {
+    name: "Personalised Family Tee",
+    price: "$32.99",
+    rating: "★★★★★",
+    reviews: 328,
+    src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
+    alt: "Personalised family t-shirt",
+  },
+];
+
+const HOW_IT_WORKS_STEPS = [
+  {
     icon: ImageIcon,
+    step: "01",
+    title: "Choose Your Product",
+    body: "Pick a mug, card, tee, or hoodie from our collection of beautiful keepsakes.",
   },
   {
-    title: "Choose the style",
-    body: "Keepsy turns it into polished artwork and lets you compare versions without feeling overwhelmed.",
     icon: Sparkles,
+    step: "02",
+    title: "Make It Personal",
+    body: "Upload a photo or describe your idea in plain words — no design skills needed.",
   },
   {
-    title: "Order the keepsake",
-    body: "Pick the product you want and order only when the preview looks genuinely gift-worthy.",
     icon: Gift,
+    step: "03",
+    title: "We Do the Rest",
+    body: "We create the artwork, wrap it beautifully, and ship it to your door.",
   },
 ];
 
 const REVIEWS = [
   {
-    name: "Helen, 54",
-    quote: "The mug preview looked like a proper finished gift, not just a picture dropped onto a template.",
+    quote:
+      "I ordered the custom mug with my daughter's artwork on it for my mom's 70th birthday. She cried. Literally cried. The quality is incredible — it feels expensive and the print is crystal clear.",
+    name: "Sarah M.",
+    state: "Ohio",
+    occasion: "Birthday Gift",
   },
   {
-    name: "Rachel, 47",
-    quote: "I liked that it felt guided. I always knew what to do next.",
+    quote:
+      "Got the personalised hoodie for my best friend for Mother's Day and she texted me at 7am when she opened it. She said it was the most thoughtful gift she'd ever received. I'll definitely be ordering again.",
+    name: "Jennifer K.",
+    state: "Texas",
+    occasion: "Mother's Day",
   },
   {
-    name: "Emma, 51",
-    quote: "The card example sold it for me. It felt warm, polished and easy to trust.",
+    quote:
+      "My husband passed away last year and I had a photo card made of our favourite family memory for Christmas. Every one of my kids got one. It was the most meaningful thing I've ever given.",
+    name: "Diane R.",
+    state: "Colorado",
+    occasion: "Memorial Gift",
+  },
+  {
+    quote:
+      "Ordered the custom tee for my sister's anniversary trip. The colours are so vibrant and it arrived beautifully wrapped. Felt like I'd spent twice what I did. Absolute steal.",
+    name: "Michelle T.",
+    state: "Florida",
+    occasion: "Anniversary",
+  },
+  {
+    quote:
+      "I am NOT a tech person but this was so easy. I uploaded a photo of my granddaughter and had a mug ordered in literally ten minutes. My daughter loved it for Christmas.",
+    name: "Carol B.",
+    state: "Virginia",
+    occasion: "Christmas Gift",
+  },
+  {
+    quote:
+      "Bought the photo card pack just because I wanted to do something special, no occasion. My best friend called me sobbing. The photo quality is gorgeous — not like a drugstore print at all.",
+    name: "Lisa H.",
+    state: "California",
+    occasion: "Just Because",
+  },
+  {
+    quote:
+      "I was skeptical ordering custom stuff online but the preview feature totally won me over. I could see exactly what the hoodie would look like before I bought it. Zero surprises, all good ones.",
+    name: "Patricia W.",
+    state: "Illinois",
+    occasion: "Birthday Gift",
+  },
+  {
+    quote:
+      "Ordered mugs for our whole book club with our group photo. Everyone went crazy for them. The turnaround was fast and the packaging was so pretty — it honestly felt like a luxury brand.",
+    name: "Nancy G.",
+    state: "Georgia",
+    occasion: "Group Gift",
   },
 ];
 
-type LandingPageProps = {
-  initialRegion?: Region | null;
-};
+const TRUST_BADGES = [
+  { icon: Package, label: "Premium Materials", color: "text-terracotta" },
+  { icon: Printer, label: "Vivid Lasting Prints", color: "text-forest" },
+  { icon: BadgeCheck, label: "Gift-Ready Packaging", color: "text-terracotta" },
+  { icon: Truck, label: "Fast US & UK Shipping", color: "text-forest" },
+  { icon: RotateCcw, label: "Easy 30-Day Returns", color: "text-terracotta" },
+  { icon: Lock, label: "Secure Checkout", color: "text-forest" },
+];
 
-function StorybookJourney() {
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function ProductImageCard({ src, alt, label }: { src: string; alt: string; label: string }) {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
   return (
-    <div className="flex h-full rounded-[1.7rem] border border-black/8 bg-white/82 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
-      <div className="relative aspect-[4/7] w-full overflow-hidden rounded-[1.35rem] border border-black/8 bg-[linear-gradient(145deg,#f7f2eb_0%,#f1ece5_54%,#e8e0d5_100%)]">
-        <Image
-          src="/generated-hero/house-journey.png"
-          alt="Storybook illustration showing a house photo becoming artwork and then a final keepsake"
-          fill
-          className="object-contain object-center"
-          priority
-          sizes="(max-width: 1024px) 100vw, 640px"
-        />
-        <motion.div
-          initial={{ opacity: 0, y: 6, rotate: -4 }}
-          whileInView={{ opacity: 1, y: 0, rotate: -3 }}
-          viewport={{ once: true, amount: 0.65 }}
-          transition={{ duration: 0.45, ease: "easeOut", delay: 0.1 }}
-          className="absolute left-[4%] top-[8%] rounded-[1rem] border border-[#cdb79d] bg-[rgba(255,250,243,0.88)] px-3 py-2 shadow-[0_12px_24px_-18px_rgba(70,52,34,0.42)] backdrop-blur-sm"
-        >
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#88694e]">Original photo</p>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 6, rotate: 3 }}
-          whileInView={{ opacity: 1, y: 0, rotate: 2 }}
-          viewport={{ once: true, amount: 0.65 }}
-          transition={{ duration: 0.45, ease: "easeOut", delay: 0.24 }}
-          className="absolute right-[7%] top-[31%] rounded-[1rem] border border-[#c8c2b2] bg-[rgba(247,249,252,0.9)] px-3 py-2 shadow-[0_12px_24px_-18px_rgba(70,52,34,0.38)] backdrop-blur-sm"
-        >
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6f7382]">Artwork style</p>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 6, rotate: -2 }}
-          whileInView={{ opacity: 1, y: 0, rotate: -1 }}
-          viewport={{ once: true, amount: 0.65 }}
-          transition={{ duration: 0.45, ease: "easeOut", delay: 0.38 }}
-          className="absolute bottom-[13%] left-[7%] rounded-[1rem] border border-[#cdb79d] bg-[rgba(255,249,241,0.9)] px-3 py-2 shadow-[0_12px_24px_-18px_rgba(70,52,34,0.42)] backdrop-blur-sm"
-        >
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#88694e]">Final keepsake</p>
-        </motion.div>
+    <div className="relative aspect-square overflow-hidden rounded-[1.5rem] bg-[#F5EDE0] shadow-md">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        className="object-cover"
+        sizes="(max-width: 1024px) 50vw, 300px"
+        onError={() => setVisible(false)}
+      />
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-3">
+        <span className="text-xs font-semibold uppercase tracking-widest text-white/90">{label}</span>
       </div>
     </div>
   );
 }
+
+function FeaturedProductCard({
+  product,
+  index,
+}: {
+  product: (typeof FEATURED_PRODUCTS)[0];
+  index: number;
+}) {
+  const [imgVisible, setImgVisible] = useState(true);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+      whileHover={{ scale: 1.02 }}
+      className="group relative flex flex-col overflow-hidden rounded-[1.75rem] border border-black/8 bg-white/90 shadow-[0_18px_44px_-28px_rgba(0,0,0,0.25)] transition-shadow duration-300 hover:shadow-[0_28px_56px_-24px_rgba(0,0,0,0.32)] backdrop-blur-md"
+    >
+      {/* Bestseller badge */}
+      <div className="absolute left-3 top-3 z-10 rounded-full bg-[#C9A84C] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow-sm">
+        Bestseller
+      </div>
+
+      {/* Image */}
+      <div className="relative aspect-square overflow-hidden bg-[#F5EDE0]">
+        {imgVisible ? (
+          <Image
+            src={product.src}
+            alt={product.alt}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 50vw, 25vw"
+            onError={() => setImgVisible(false)}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <ShoppingBag size={40} className="text-[#C4714A]/40" />
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex flex-1 flex-col p-4">
+        <p className="font-serif text-base font-semibold leading-tight text-charcoal sm:text-lg">
+          {product.name}
+        </p>
+        <div className="mt-1.5 flex items-center gap-1.5">
+          <span className="text-sm text-[#C9A84C]">{product.rating}</span>
+          <span className="text-xs text-[#8b7f74]">({product.reviews.toLocaleString()})</span>
+        </div>
+        <div className="mt-auto flex items-center justify-between pt-3">
+          <span className="text-lg font-bold text-charcoal">{product.price}</span>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-1 rounded-full bg-[#C4714A] px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            Shop Now
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function ReviewCard({ review }: { review: (typeof REVIEWS)[0] }) {
+  return (
+    <div className="w-[280px] flex-shrink-0 snap-start rounded-[1.5rem] border border-black/8 bg-white/90 p-5 shadow-[0_16px_38px_-24px_rgba(0,0,0,0.22)] backdrop-blur-md">
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-[#C9A84C]">★★★★★</span>
+        <span className="rounded-full border border-[#d8cdc0] bg-[#FDF6EE] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#8b7468]">
+          Verified Purchase
+        </span>
+      </div>
+      <p className="mt-3 text-[14px] leading-6 text-[#47413c]">&quot;{review.quote}&quot;</p>
+      <p className="mt-3 text-sm font-semibold text-[#2D2926]">
+        — {review.name}, {review.state}
+      </p>
+      <p className="mt-0.5 text-xs text-[#8b7f74]">{review.occasion}</p>
+    </div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
+type LandingPageProps = {
+  initialRegion?: Region | null;
+};
 
 export default function LandingPage({ initialRegion = null }: LandingPageProps) {
   const router = useRouter();
@@ -120,13 +313,16 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     return !resolvedRegion;
   });
   const [isRegionSelectorOpen, setIsRegionSelectorOpen] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+
+  // Mouse-move parallax glow
   const glowX = useMotionValue(50);
   const glowY = useMotionValue(28);
-  const heroGlow = useMotionTemplate`radial-gradient(520px circle at ${glowX}% ${glowY}%, rgba(250, 225, 197, 0.58), transparent 58%)`;
+  const heroGlow = useMotionTemplate`radial-gradient(560px circle at ${glowX}% ${glowY}%, rgba(196, 113, 74, 0.18), transparent 60%)`;
 
-  const activeRegion = region ?? "UK";
+  const activeRegion = region ?? "US";
   const showcase = CREATE_EXAMPLES[activeRegion];
-  const heroOccasions = showcase.occasionTiles.slice(0, 3);
 
   useEffect(() => {
     if (showGateway) {
@@ -153,15 +349,27 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     setShowGateway(false);
   };
 
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (emailValue.trim()) {
+      setEmailSubmitted(true);
+    }
+  };
+
   return (
-    <div className={`relative min-h-screen overflow-hidden bg-transparent text-[#201d1b] ${showGateway ? "fixed inset-0 h-screen" : ""}`}>
+    <div
+      className={`relative min-h-screen overflow-hidden bg-transparent text-charcoal ${
+        showGateway ? "fixed inset-0 h-screen" : ""
+      }`}
+    >
       {showGateway ? (
         <PremiumGateway onComplete={handleGatewayComplete} />
       ) : (
         <>
+          {/* ── Header ── */}
           <header className="relative z-30">
             <div className={`${CONTAINER} flex items-center justify-between py-5`}>
-              <DynamicLogo href="/" width={148} className="text-[#201d1b]" />
+              <DynamicLogo href="/" width={148} className="text-charcoal" />
               <div className="flex items-center gap-3">
                 <button
                   type="button"
@@ -170,22 +378,22 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                 >
                   {activeRegion} shipping
                 </button>
-                <button
-                  type="button"
-                  onClick={() => router.push("/create")}
-                  className="hidden rounded-full bg-[#1f2937] px-5 py-2.5 text-sm font-semibold !text-white shadow-[0_14px_28px_-18px_rgba(17,24,39,0.5)] sm:inline-flex"
+                <Link
+                  href="/shop"
+                  className="hidden rounded-full bg-[#C4714A] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_-18px_rgba(196,113,74,0.55)] sm:inline-flex"
                 >
-                  Start now
-                </button>
+                  Shop Now
+                </Link>
               </div>
             </div>
           </header>
 
           <main className="relative z-20">
-            <section className="pb-20 pt-6 sm:pb-24 sm:pt-10">
+            {/* ── 1. Hero ── */}
+            <section className="pb-10 pt-4 sm:pb-14 sm:pt-6">
               <div className={CONTAINER}>
                 <motion.div
-                  className="relative overflow-hidden rounded-[2.25rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(248,243,236,0.76))] p-5 shadow-[0_40px_110px_-56px_rgba(31,24,18,0.55)] backdrop-blur-xl sm:p-7"
+                  className="relative overflow-hidden rounded-[2.5rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,243,236,0.78))] p-4 shadow-[0_40px_110px_-56px_rgba(31,24,18,0.50)] backdrop-blur-xl sm:p-8"
                   onMouseMove={(event) => {
                     const rect = event.currentTarget.getBoundingClientRect();
                     glowX.set(((event.clientX - rect.left) / rect.width) * 100);
@@ -196,164 +404,433 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     glowY.set(28);
                   }}
                 >
-                  <motion.div className="pointer-events-none absolute inset-0" style={{ backgroundImage: heroGlow }} />
-                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.36),transparent_40%,rgba(255,255,255,0.2)_75%,transparent)]" />
-                  <div className="relative z-10 grid gap-6 lg:grid-cols-[0.94fr_1.06fr] lg:gap-8">
+                  {/* Glow layer */}
+                  <motion.div
+                    className="pointer-events-none absolute inset-0"
+                    style={{ backgroundImage: heroGlow }}
+                  />
+                  {/* Shimmer */}
+                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.34),transparent_40%,rgba(255,255,255,0.18)_75%,transparent)]" />
+
+                  <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_1fr] lg:gap-10">
+                    {/* Left */}
                     <motion.div
-                      initial={{ opacity: 0, y: 18 }}
+                      initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.55, ease: "easeOut" }}
-                      className="max-w-xl"
+                      className="flex flex-col justify-center"
                     >
-                      <div className="inline-flex items-center gap-2 rounded-full border border-[#d8cdc0] bg-white/78 px-3 py-1.5 text-sm font-medium text-[#62584e]">
-                        <ShieldCheck size={16} className="text-[#8b6f47]" />
-                        Personalised gifts without the faff
+                      {/* Star badge */}
+                      <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d8cdc0] bg-white/78 px-3 py-1.5 text-sm font-medium text-[#62584e]">
+                        <span className="text-[#C9A84C]">★★★★★</span>
+                        2,847 Happy Customers
                       </div>
-                      <h1 className="mt-6 font-serif text-[clamp(2.5rem,5vw,4.8rem)] leading-[0.98] tracking-[-0.045em] text-[#1d1917]">
-                        Turn a photo or memory into a premium keepsake.
+
+                      <h1
+                        className="mt-5 font-serif leading-[1.0] tracking-[-0.04em] text-charcoal"
+                        style={{ fontSize: "clamp(2.8rem, 5.5vw, 5rem)" }}
+                      >
+                        Gifts They&apos;ll Never Forget
                       </h1>
-                      <p className="mt-5 max-w-lg text-lg leading-8 text-[#5e5852]">
-                        Keepsy creates finished artwork and shows it on the actual product, so the whole process feels simple, warm and easy to trust.
+
+                      <p className="mt-4 max-w-lg text-[17px] leading-8 text-[#5e5852]">
+                        Turn your favourite photos and memories into beautiful, personalised
+                        keepsakes. Mugs, cards, tees, hoodies — all custom made.
                       </p>
 
-                      <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                        <button
-                          type="button"
-                          onClick={() => router.push("/create")}
-                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1f2937] px-6 text-base font-semibold !text-white shadow-[0_18px_34px_-22px_rgba(17,24,39,0.6)] transition-transform duration-200 ease-out hover:-translate-y-0.5"
-                        >
-                          Create your gift
-                          <ArrowRight size={18} />
-                        </button>
+                      {/* CTAs */}
+                      <div className="mt-7 flex flex-wrap gap-3">
                         <Link
-                          href="/gift-ideas"
-                          className="inline-flex min-h-12 items-center justify-center rounded-full border border-black/10 bg-white/80 px-6 text-base font-semibold text-[#312d2a] shadow-[0_16px_34px_-24px_rgba(0,0,0,0.35)] transition-transform duration-200 ease-out hover:-translate-y-0.5"
+                          href="/shop"
+                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#C4714A] px-6 text-base font-semibold text-white shadow-[0_18px_34px_-18px_rgba(196,113,74,0.6)] transition-transform duration-200 ease-out hover:-translate-y-0.5"
                         >
-                          Browse gift ideas
+                          Shop Our Collection
+                          <ShoppingBag size={17} />
+                        </Link>
+                        <Link
+                          href="/create"
+                          className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-charcoal bg-transparent px-6 text-base font-semibold text-charcoal transition-transform duration-200 ease-out hover:-translate-y-0.5"
+                        >
+                          Create Your Own
                         </Link>
                       </div>
 
-                      <ul className="mt-8 space-y-3">
+                      {/* Trust bullets */}
+                      <ul className="mt-7 space-y-2.5">
                         {HERO_BULLETS.map((item) => (
-                          <li key={item} className="flex items-start gap-3 text-[15px] leading-6 text-[#514b46]">
-                            <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#8b6f47] shadow-sm">
-                              <Check size={14} />
+                          <li
+                            key={item}
+                            className="flex items-center gap-3 text-[15px] text-[#514b46]"
+                          >
+                            <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#C4714A]/15 text-[#C4714A]">
+                              <Check size={13} strokeWidth={3} />
                             </span>
-                            <span>{item}</span>
+                            {item}
                           </li>
                         ))}
                       </ul>
-
-                      <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                        {heroOccasions.map((item) => (
-                          <div key={`${item.id}-${item.productType}`} className="rounded-[1.35rem] border border-black/8 bg-white/72 p-3 shadow-[0_14px_30px_-24px_rgba(23,18,12,0.36)]">
-                            <div className="relative h-12 w-12 overflow-hidden rounded-2xl border border-black/8 bg-[#f7f0e8]">
-                              <Image src={item.artworkImage} alt={item.chip} fill className="object-cover" sizes="48px" />
-                            </div>
-                            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.16em] text-black/40">{item.id.replace(/-/g, " ")}</p>
-                            <p className="mt-1 text-sm font-semibold text-[#26211d]">{item.chip}</p>
-                          </div>
-                        ))}
-                      </div>
                     </motion.div>
 
+                    {/* Right: 2x2 product image grid */}
                     <motion.div
-                      initial={{ opacity: 0, y: 24 }}
+                      initial={{ opacity: 0, y: 28 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.65, delay: 0.08, ease: "easeOut" }}
-                      className="relative"
+                      transition={{ duration: 0.65, delay: 0.1, ease: "easeOut" }}
+                      className="grid grid-cols-2 gap-3"
                     >
-                      <StorybookJourney />
+                      {PRODUCT_IMAGES.map((img) => (
+                        <ProductImageCard key={img.label} {...img} />
+                      ))}
                     </motion.div>
                   </div>
                 </motion.div>
               </div>
             </section>
 
-            <section className="pb-18 sm:pb-24">
-              <div className={CONTAINER}>
-                <div className="grid gap-4 md:grid-cols-3">
-                  {TRUST_POINTS.map((point) => (
-                    <article
-                      key={point.title}
-                      className="rounded-[28px] border border-black/8 bg-white/82 p-6 shadow-[0_20px_44px_-34px_rgba(0,0,0,0.3)] backdrop-blur-md"
-                    >
-                      <h2 className="text-xl font-semibold text-[#201d1b]">{point.title}</h2>
-                      <p className="mt-3 text-[15px] leading-7 text-[#5e5852]">{point.body}</p>
-                    </article>
+            {/* ── 2. Social proof bar ── */}
+            <section className="overflow-hidden bg-[#F5EDE0] py-4">
+              {/* Desktop: flex row */}
+              <div className="hidden sm:block">
+                <div className={`${CONTAINER} flex items-center justify-center gap-6`}>
+                  {SOCIAL_PROOF_ITEMS.map((item, i) => (
+                    <div key={item} className="flex items-center gap-6">
+                      <span className="text-sm font-semibold text-[#5e4a3a]">{item}</span>
+                      {i < SOCIAL_PROOF_ITEMS.length - 1 && (
+                        <span className="text-[#c4a882]">·</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Mobile: scrolling marquee */}
+              <div className="sm:hidden">
+                <style>{`
+                  @keyframes marquee-scroll {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                  }
+                  .marquee-track {
+                    display: flex;
+                    width: max-content;
+                    animation: marquee-scroll 18s linear infinite;
+                  }
+                  .marquee-track:hover {
+                    animation-play-state: paused;
+                  }
+                `}</style>
+                <div className="marquee-track">
+                  {[...SOCIAL_PROOF_ITEMS, ...SOCIAL_PROOF_ITEMS].map((item, i) => (
+                    <span key={i} className="px-6 text-sm font-semibold text-[#5e4a3a]">
+                      {item}
+                      <span className="ml-6 text-[#c4a882]">·</span>
+                    </span>
                   ))}
                 </div>
               </div>
             </section>
 
-            <section className="pb-18 sm:pb-24">
+            {/* ── 3. Featured Products ── */}
+            <section className="py-16 sm:py-24">
               <div className={CONTAINER}>
-                <div className="max-w-2xl">
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#8b7f74]">How it works</p>
-                  <h2 className="mt-3 font-serif text-4xl tracking-[-0.03em] text-[#1f1a17] sm:text-5xl">
-                    A simple path from memory to finished gift.
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="text-center"
+                >
+                  <h2 className="font-serif text-4xl tracking-[-0.03em] text-charcoal sm:text-5xl">
+                    Most Loved This Month
                   </h2>
+                  <p className="mt-3 text-[17px] text-[#5e5852]">
+                    Bestsellers our customers keep coming back for
+                  </p>
+                </motion.div>
+
+                <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                  {FEATURED_PRODUCTS.map((product, i) => (
+                    <FeaturedProductCard key={product.name} product={product} index={i} />
+                  ))}
                 </div>
-                <div className="mt-10 grid gap-4 lg:grid-cols-3">
-                  {STEPS.map((step, index) => {
+              </div>
+            </section>
+
+            {/* ── 4. Emotional Storytelling ── */}
+            <section className="py-16 sm:py-24">
+              <div className={CONTAINER}>
+                <div className="grid gap-10 lg:grid-cols-2 lg:gap-14 lg:items-center">
+                  {/* Image */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -24 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-[#F5EDE0] shadow-[0_32px_72px_-40px_rgba(0,0,0,0.28)]"
+                  >
+                    <Image
+                      src="https://images.unsplash.com/photo-1536010305525-f7aa0834e2c7?w=800"
+                      alt="Woman smiling while receiving a gift"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                    {/* Warm terracotta overlay at bottom */}
+                    <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#C4714A]/60 to-transparent" />
+                  </motion.div>
+
+                  {/* Text */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.55, delay: 0.12, ease: "easeOut" }}
+                  >
+                    <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#C4714A]">
+                      Our Story
+                    </p>
+                    <h2 className="mt-4 font-serif text-4xl leading-[1.1] tracking-[-0.03em] text-charcoal sm:text-5xl">
+                      Every Keepsake Tells a Story
+                    </h2>
+                    <p className="mt-5 text-[17px] leading-8 text-[#5e5852]">
+                      We built Keepsy because the most meaningful gifts aren&apos;t expensive —
+                      they&apos;re personal. A photo turned into art. A memory preserved on
+                      something beautiful. Something she&apos;ll look at every day and think of
+                      you.
+                    </p>
+                    <div className="mt-8">
+                      <Link
+                        href="/create"
+                        className="inline-flex items-center gap-2 rounded-full bg-[#C4714A] px-7 py-3.5 text-base font-semibold text-white shadow-[0_18px_34px_-18px_rgba(196,113,74,0.55)] transition-transform duration-200 hover:-translate-y-0.5"
+                      >
+                        Create Your First Keepsake
+                        <ArrowRight size={17} />
+                      </Link>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </section>
+
+            {/* ── 5. How It Works ── */}
+            <section className="py-16 sm:py-24">
+              <div className={CONTAINER}>
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="text-center"
+                >
+                  <h2 className="font-serif text-4xl tracking-[-0.03em] text-charcoal sm:text-5xl">
+                    Three Simple Steps
+                  </h2>
+                </motion.div>
+
+                <div className="mt-10 grid gap-5 sm:grid-cols-3">
+                  {HOW_IT_WORKS_STEPS.map((step, index) => {
                     const Icon = step.icon;
                     return (
-                      <article
+                      <motion.div
                         key={step.title}
-                        className="rounded-[30px] border border-black/8 bg-white/82 p-6 shadow-[0_20px_46px_-36px_rgba(0,0,0,0.34)] backdrop-blur-md"
+                        initial={{ opacity: 0, y: 28 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.15,
+                          ease: "easeOut",
+                        }}
+                        className="rounded-[1.75rem] border border-black/8 bg-white/90 p-6 shadow-[0_20px_46px_-32px_rgba(0,0,0,0.28)] backdrop-blur-md"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#efe4d7] text-[#8b6f47]">
-                            <Icon size={18} />
+                          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#C4714A]/15 text-[#C4714A]">
+                            <Icon size={22} />
                           </div>
-                          <span className="text-sm font-semibold text-[#8a7c71]">Step {index + 1}</span>
+                          <span className="font-serif text-2xl font-bold text-[#C9A84C]">
+                            {step.step}
+                          </span>
                         </div>
-                        <h3 className="mt-6 text-xl font-semibold text-[#201d1b]">{step.title}</h3>
-                        <p className="mt-3 text-[15px] leading-7 text-[#5e5852]">{step.body}</p>
-                      </article>
+                        <h3 className="mt-5 text-xl font-bold text-charcoal">{step.title}</h3>
+                        <p className="mt-2.5 text-[15px] leading-7 text-[#5e5852]">{step.body}</p>
+                      </motion.div>
                     );
                   })}
                 </div>
               </div>
             </section>
 
-            <section id="reviews" className="pb-20 sm:pb-24">
+            {/* ── 6. Reviews Carousel ── */}
+            <section className="py-16 sm:py-24">
               <div className={CONTAINER}>
-                <div className="rounded-[36px] border border-black/8 bg-white/82 p-6 shadow-[0_24px_56px_-40px_rgba(0,0,0,0.36)] backdrop-blur-md sm:p-8">
-                  <div className="max-w-2xl">
-                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#8b7f74]">Reviews</p>
-                    <h2 className="mt-3 font-serif text-3xl tracking-[-0.03em] text-[#1f1a17] sm:text-4xl">
-                      Trusted by people who want something personal, not complicated.
-                    </h2>
-                  </div>
-                  <div className="mt-8 grid gap-4 lg:grid-cols-3">
-                    {REVIEWS.map((review) => (
-                      <article key={review.name} className="rounded-[28px] bg-[#fbf7f2] p-5">
-                        <p className="text-base leading-7 text-[#47413c]">&quot;{review.quote}&quot;</p>
-                        <p className="mt-4 text-sm font-semibold text-[#7a6f66]">{review.name}</p>
-                      </article>
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <h2 className="font-serif text-4xl tracking-[-0.03em] text-charcoal sm:text-5xl">
+                    What Our Customers Are Saying
+                  </h2>
+                </motion.div>
+
+                {/* Auto-scroll marquee */}
+                <div className="mt-8 overflow-hidden">
+                  <style>{`
+                    @keyframes review-scroll {
+                      0% { transform: translateX(0); }
+                      100% { transform: translateX(-50%); }
+                    }
+                    .review-track {
+                      display: flex;
+                      gap: 1rem;
+                      width: max-content;
+                      animation: review-scroll 38s linear infinite;
+                    }
+                    .review-track:hover {
+                      animation-play-state: paused;
+                    }
+                  `}</style>
+                  <div className="review-track">
+                    {[...REVIEWS, ...REVIEWS].map((review, i) => (
+                      <ReviewCard key={i} review={review} />
                     ))}
                   </div>
                 </div>
               </div>
             </section>
+
+            {/* ── 7. Trust & Quality grid ── */}
+            <section className="bg-[#F5EDE0] py-16 sm:py-24">
+              <div className={CONTAINER}>
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="text-center"
+                >
+                  <h2 className="font-serif text-3xl tracking-[-0.03em] text-charcoal sm:text-4xl">
+                    Why Thousands Choose Keepsy
+                  </h2>
+                </motion.div>
+
+                <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                  {TRUST_BADGES.map((badge, index) => {
+                    const Icon = badge.icon;
+                    return (
+                      <motion.div
+                        key={badge.label}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.4, delay: index * 0.07, ease: "easeOut" }}
+                        className="flex flex-col items-center gap-3 rounded-[1.5rem] border border-black/8 bg-white/80 px-4 py-5 text-center shadow-sm backdrop-blur-md"
+                      >
+                        <Icon size={28} className={badge.color} />
+                        <p className="text-sm font-semibold leading-snug text-charcoal">
+                          {badge.label}
+                        </p>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+
+            {/* ── 8. Email capture ── */}
+            <section className="bg-[#2C4A3E] py-16 sm:py-24">
+              <div className={`${CONTAINER} text-center`}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.55, ease: "easeOut" }}
+                >
+                  <h2 className="font-serif text-4xl tracking-[-0.03em] text-white sm:text-5xl">
+                    Join the Keepsy Family
+                  </h2>
+                  <p className="mx-auto mt-4 max-w-md text-[17px] leading-7 text-[#FDF6EE]/80">
+                    Get 10% off your first order — plus gifting ideas, new designs & seasonal
+                    inspiration.
+                  </p>
+
+                  <AnimatePresence mode="wait">
+                    {emailSubmitted ? (
+                      <motion.div
+                        key="success"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.35 }}
+                        className="mt-8 inline-block rounded-2xl bg-white/15 px-8 py-5 text-lg font-semibold text-white"
+                      >
+                        🎉 You&apos;re in! Check your inbox for your code.
+                      </motion.div>
+                    ) : (
+                      <motion.form
+                        key="form"
+                        onSubmit={handleEmailSubmit}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+                      >
+                        <input
+                          type="email"
+                          required
+                          value={emailValue}
+                          onChange={(e) => setEmailValue(e.target.value)}
+                          placeholder="Your email address"
+                          className="w-full max-w-sm rounded-full border-0 bg-[#FDF6EE] px-5 py-3.5 text-charcoal placeholder-[#9c8b7e] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C9A84C] sm:w-72"
+                        />
+                        <button
+                          type="submit"
+                          className="w-full rounded-full bg-[#C9A84C] px-7 py-3.5 font-semibold text-charcoal shadow-[0_14px_28px_-16px_rgba(201,168,76,0.6)] transition-opacity hover:opacity-90 sm:w-auto"
+                        >
+                          Claim My 10% Off
+                        </button>
+                      </motion.form>
+                    )}
+                  </AnimatePresence>
+
+                  <p className="mt-5 text-sm text-[#FDF6EE]/55">
+                    Join 15,000+ women who love thoughtful gifting · Unsubscribe anytime
+                  </p>
+                </motion.div>
+              </div>
+            </section>
           </main>
 
+          {/* ── Footer ── */}
           <footer className="relative z-20 border-t border-black/8 bg-white/65 py-10 backdrop-blur-md">
-            <div className={`${CONTAINER} flex flex-col gap-5 text-sm text-[#5d5650] sm:flex-row sm:items-center sm:justify-between`}>
+            <div
+              className={`${CONTAINER} flex flex-col gap-5 text-sm text-[#5d5650] sm:flex-row sm:items-center sm:justify-between`}
+            >
               <div>
-                <p className="font-semibold text-[#27221f]">Keepsy</p>
+                <p className="font-semibold text-charcoal">Keepsy</p>
                 <p className="mt-1">Beautiful personalised gifts, made simple.</p>
               </div>
               <div className="flex flex-wrap gap-4">
-                <Link href="/gift-ideas" className="hover:text-[#1f1a17]">Gift ideas</Link>
-                <Link href="/create" className="hover:text-[#1f1a17]">Create</Link>
-                <Link href="/terms" className="hover:text-[#1f1a17]">Terms</Link>
-                <Link href="/privacy" className="hover:text-[#1f1a17]">Privacy</Link>
+                <Link href="/shop" className="hover:text-charcoal">
+                  Shop
+                </Link>
+                <Link href="/gift-ideas" className="hover:text-charcoal">
+                  Gift ideas
+                </Link>
+                <Link href="/create" className="hover:text-charcoal">
+                  Create
+                </Link>
+                <Link href="/terms" className="hover:text-charcoal">
+                  Terms
+                </Link>
+                <Link href="/privacy" className="hover:text-charcoal">
+                  Privacy
+                </Link>
               </div>
             </div>
           </footer>
 
+          {/* ── Region Selector ── */}
           <RegionSelector
             open={isRegionSelectorOpen}
             onSelect={(nextRegion) => {

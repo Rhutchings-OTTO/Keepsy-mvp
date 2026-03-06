@@ -12,6 +12,7 @@ import {
   AdaptiveDpr,
   AdaptiveEvents,
   usePerformanceMonitor,
+  Edges,
 } from "@react-three/drei";
 import { easing } from "maath";
 import * as THREE from "three";
@@ -259,6 +260,39 @@ type CityBlock = {
   glow?: string;
 };
 
+type HoloPrimitiveProps = React.ComponentProps<"mesh"> & {
+  color?: string;
+  wireColor?: string;
+  opacity?: number;
+  children: React.ReactNode;
+};
+
+function HoloPrimitive({
+  color = "#eaf6ff",
+  wireColor = "#9fd7ff",
+  opacity = 0.4,
+  children,
+  ...props
+}: HoloPrimitiveProps) {
+  return (
+    <mesh castShadow receiveShadow {...props}>
+      {children}
+      <meshPhysicalMaterial
+        color={color}
+        metalness={0.18}
+        roughness={0.12}
+        transparent
+        opacity={opacity}
+        transmission={0.2}
+        thickness={1.1}
+        clearcoat={1}
+        clearcoatRoughness={0.08}
+      />
+      <Edges color={wireColor} threshold={12} />
+    </mesh>
+  );
+}
+
 function TonalCityScene({ region }: { region: Region }) {
   const rootRef = useRef<THREE.Group>(null!);
   const blocks = React.useMemo<CityBlock[]>(
@@ -312,24 +346,9 @@ function HologramTower({ block }: { block: CityBlock }) {
   const wireColor = block.glow ?? "#93cfff";
   return (
     <group position={block.position} scale={block.scale}>
-      <mesh castShadow receiveShadow>
+      <HoloPrimitive color={block.color} wireColor={wireColor} opacity={0.42}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshPhysicalMaterial
-          color={block.color}
-          metalness={0.25}
-          roughness={0.18}
-          transparent
-          opacity={0.45}
-          transmission={0.2}
-          thickness={1.2}
-          clearcoat={1}
-          clearcoatRoughness={0.08}
-        />
-      </mesh>
-      <mesh scale={[1.028, 1.028, 1.028]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color={wireColor} wireframe transparent opacity={0.22} />
-      </mesh>
+      </HoloPrimitive>
       <mesh position={[0, 0.51, 0]} scale={[0.72, 0.02, 0.72]}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#e2f4ff" transparent opacity={0.5} />
@@ -342,31 +361,21 @@ function LondonLandmarks() {
   return (
     <>
       <group position={[-2.9, 0, -0.2]}>
-        <mesh position={[0, 2.55, 0]} castShadow receiveShadow>
+        <HoloPrimitive position={[0, 2.55, 0]} color="#dceffc" wireColor="#8ecbff" opacity={0.34}>
           <cylinderGeometry args={[0.34, 0.72, 5.3, 18, 1, true]} />
-          <meshPhysicalMaterial color="#dceffc" transparent opacity={0.34} transmission={0.18} roughness={0.14} />
-        </mesh>
-        <mesh position={[0, 2.55, 0]} scale={[1.04, 1.02, 1.04]}>
-          <cylinderGeometry args={[0.34, 0.72, 5.3, 18, 1, true]} />
-          <meshBasicMaterial color="#8ecbff" wireframe transparent opacity={0.24} />
-        </mesh>
+        </HoloPrimitive>
         <mesh position={[0, 5.45, 0]} castShadow>
           <sphereGeometry args={[0.22, 18, 18]} />
           <meshBasicMaterial color="#cceeff" transparent opacity={0.7} />
         </mesh>
       </group>
       <group position={[2.35, 0, -0.15]}>
-        <mesh position={[0, 3.25, 0]} castShadow receiveShadow>
+        <HoloPrimitive position={[0, 3.25, 0]} color="#edf8ff" wireColor="#97cdff" opacity={0.42}>
           <boxGeometry args={[0.9, 6.5, 0.9]} />
-          <meshPhysicalMaterial color="#edf8ff" transparent opacity={0.42} transmission={0.18} roughness={0.12} />
-        </mesh>
+        </HoloPrimitive>
         <mesh position={[0, 6.95, 0]} castShadow>
           <coneGeometry args={[0.18, 1.1, 12]} />
           <meshBasicMaterial color="#a9ddff" transparent opacity={0.7} />
-        </mesh>
-        <mesh position={[0, 3.25, 0]} scale={[1.04, 1.02, 1.04]}>
-          <boxGeometry args={[0.9, 6.5, 0.9]} />
-          <meshBasicMaterial color="#97cdff" wireframe transparent opacity={0.2} />
         </mesh>
         <mesh position={[0, 4.8, 0.47]}>
           <boxGeometry args={[0.56, 0.26, 0.08]} />
@@ -382,24 +391,19 @@ function LondonLandmarks() {
           <torusGeometry args={[1.65, 0.08, 12, 72]} />
           <meshBasicMaterial color="#9fd5ff" transparent opacity={0.42} />
         </mesh>
-        <mesh scale={[1.01, 1.01, 1.01]}>
-          <torusGeometry args={[1.65, 0.08, 12, 72]} />
-          <meshBasicMaterial color="#e1f4ff" wireframe transparent opacity={0.2} />
-        </mesh>
+        <lineSegments scale={[1.01, 1.01, 1.01]}>
+          <edgesGeometry args={[new THREE.TorusGeometry(1.65, 0.08, 12, 72)]} />
+          <lineBasicMaterial color="#e1f4ff" transparent opacity={0.32} />
+        </lineSegments>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[1.65, 0.02, 6, 36]} />
           <meshBasicMaterial color="#ddf3ff" transparent opacity={0.55} />
         </mesh>
       </group>
       <group position={[3.85, 0.78, 1.4]}>
-        <mesh rotation={[0, 0, Math.PI / 4]} castShadow receiveShadow>
+        <HoloPrimitive rotation={[0, 0, Math.PI / 4]} color="#e4f4ff" wireColor="#a7dbff" opacity={0.34}>
           <cylinderGeometry args={[0.62, 0.62, 2.1, 6]} />
-          <meshPhysicalMaterial color="#e4f4ff" transparent opacity={0.34} transmission={0.2} roughness={0.14} />
-        </mesh>
-        <mesh rotation={[0, 0, Math.PI / 4]} scale={[1.03, 1.03, 1.03]}>
-          <cylinderGeometry args={[0.62, 0.62, 2.1, 6]} />
-          <meshBasicMaterial color="#a7dbff" wireframe transparent opacity={0.24} />
-        </mesh>
+        </HoloPrimitive>
       </group>
     </>
   );
@@ -409,45 +413,30 @@ function NewYorkLandmarks() {
   return (
     <>
       <group position={[0.3, 0, -0.2]}>
-        <mesh position={[0, 4.1, 0]} castShadow receiveShadow>
+        <HoloPrimitive position={[0, 4.1, 0]} color="#eef8ff" wireColor="#8ecfff" opacity={0.42}>
           <boxGeometry args={[1.02, 8.2, 1.02]} />
-          <meshPhysicalMaterial color="#eef8ff" transparent opacity={0.42} transmission={0.2} roughness={0.12} />
-        </mesh>
+        </HoloPrimitive>
         <mesh position={[0, 8.8, 0]} castShadow>
           <coneGeometry args={[0.14, 1.2, 12]} />
           <meshBasicMaterial color="#9fd7ff" transparent opacity={0.82} />
         </mesh>
-        <mesh position={[0, 4.1, 0]} scale={[1.04, 1.02, 1.04]}>
-          <boxGeometry args={[1.02, 8.2, 1.02]} />
-          <meshBasicMaterial color="#8ecfff" wireframe transparent opacity={0.22} />
-        </mesh>
       </group>
       <group position={[-2.75, 0, 0.78]}>
-        <mesh position={[0, 2.75, 0]} castShadow receiveShadow>
+        <HoloPrimitive position={[0, 2.75, 0]} color="#dcefff" wireColor="#99d7ff" opacity={0.34}>
           <cylinderGeometry args={[0.82, 1.02, 5.5, 8]} />
-          <meshPhysicalMaterial color="#dcefff" transparent opacity={0.34} transmission={0.16} roughness={0.16} />
-        </mesh>
+        </HoloPrimitive>
         <mesh position={[0, 5.9, 0]} castShadow>
           <coneGeometry args={[0.42, 1.05, 8]} />
           <meshBasicMaterial color="#bee7ff" transparent opacity={0.62} />
         </mesh>
-        <mesh position={[0, 2.75, 0]} scale={[1.04, 1.02, 1.04]}>
-          <cylinderGeometry args={[0.82, 1.02, 5.5, 8]} />
-          <meshBasicMaterial color="#99d7ff" wireframe transparent opacity={0.22} />
-        </mesh>
       </group>
       <group position={[3.05, 0, 0.35]}>
-        <mesh position={[0, 3.05, 0]} castShadow receiveShadow>
+        <HoloPrimitive position={[0, 3.05, 0]} color="#deefff" wireColor="#a3d9ff" opacity={0.3}>
           <cylinderGeometry args={[0.72, 0.9, 6.1, 24]} />
-          <meshPhysicalMaterial color="#deefff" transparent opacity={0.3} transmission={0.18} roughness={0.16} />
-        </mesh>
+        </HoloPrimitive>
         <mesh position={[0, 6.35, 0]} castShadow>
           <coneGeometry args={[0.3, 0.95, 16]} />
           <meshBasicMaterial color="#c4e9ff" transparent opacity={0.56} />
-        </mesh>
-        <mesh position={[0, 3.05, 0]} scale={[1.04, 1.02, 1.04]}>
-          <cylinderGeometry args={[0.72, 0.9, 6.1, 24]} />
-          <meshBasicMaterial color="#a3d9ff" wireframe transparent opacity={0.22} />
         </mesh>
       </group>
       <group position={[-0.25, 0.62, 2.5]}>
@@ -455,14 +444,12 @@ function NewYorkLandmarks() {
           <boxGeometry args={[5.8, 0.08, 0.08]} />
           <meshBasicMaterial color="#d9f3ff" transparent opacity={0.5} />
         </mesh>
-        <mesh position={[-2.5, 1.15, 0]}>
+        <HoloPrimitive position={[-2.5, 1.15, 0]} color="#eaf8ff" wireColor="#b7e5ff" opacity={0.36}>
           <boxGeometry args={[0.18, 2.1, 0.18]} />
-          <meshPhysicalMaterial color="#eaf8ff" transparent opacity={0.36} transmission={0.14} roughness={0.18} />
-        </mesh>
-        <mesh position={[2.5, 1.15, 0]}>
+        </HoloPrimitive>
+        <HoloPrimitive position={[2.5, 1.15, 0]} color="#eaf8ff" wireColor="#b7e5ff" opacity={0.36}>
           <boxGeometry args={[0.18, 2.1, 0.18]} />
-          <meshPhysicalMaterial color="#eaf8ff" transparent opacity={0.36} transmission={0.14} roughness={0.18} />
-        </mesh>
+        </HoloPrimitive>
         <mesh position={[-1.25, 0.82, 0]}>
           <cylinderGeometry args={[0.03, 0.03, 2.55, 8]} />
           <meshBasicMaterial color="#9ad7ff" transparent opacity={0.48} />

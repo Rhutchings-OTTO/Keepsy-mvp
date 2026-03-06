@@ -71,12 +71,12 @@ type LandingPageProps = {
 function StorybookJourney() {
   return (
     <div className="flex h-full rounded-[1.7rem] border border-black/8 bg-white/82 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
-      <div className="relative min-h-[28rem] w-full flex-1 overflow-hidden rounded-[1.35rem] border border-black/8 bg-[linear-gradient(145deg,#f7f2eb_0%,#f1ece5_54%,#e8e0d5_100%)] sm:min-h-[34rem]">
+      <div className="relative aspect-[4/7] w-full overflow-hidden rounded-[1.35rem] border border-black/8 bg-[linear-gradient(145deg,#f7f2eb_0%,#f1ece5_54%,#e8e0d5_100%)]">
         <Image
           src="/generated-hero/house-journey.png"
           alt="Storybook illustration showing a house photo becoming artwork and then a final keepsake"
           fill
-          className="object-contain"
+          className="object-contain object-center"
           priority
           sizes="(max-width: 1024px) 100vw, 640px"
         />

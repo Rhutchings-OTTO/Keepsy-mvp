@@ -5,7 +5,7 @@ const OUT_DIR = join(process.cwd(), "public", "generated-examples");
 const API_URL = process.env.GATEWAY_API_URL || "https://www.keepsy.store/api/generate-image";
 
 const PROMPT =
-  "A photoreal front elevation photo of a traditional family house, warm brick and cream facade, classic windows, welcoming front door, soft natural daylight, tasteful residential street, realistic photography, no people, no text, premium home portrait composition";
+  "An ultra realistic front elevation photograph of a traditional English family house, warm brick and cream facade, classic sash windows, welcoming front door, soft overcast daylight, tasteful residential street, realistic camera photography, natural lens perspective, no painting, no illustration, no people, no text, premium home portrait composition";
 
 function decodeDataUrl(dataUrl) {
   const match = dataUrl.match(/^data:(image\/png|image\/jpeg);base64,(.+)$/);

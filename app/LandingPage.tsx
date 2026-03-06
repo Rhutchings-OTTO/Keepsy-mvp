@@ -97,6 +97,72 @@ function FlowStage({
   );
 }
 
+function StoryPath({
+  className,
+  path,
+}: {
+  className?: string;
+  path: string;
+}) {
+  return (
+    <motion.svg
+      viewBox="0 0 220 96"
+      className={className}
+      aria-hidden
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.7 }}
+    >
+      <motion.path
+        d={path}
+        fill="none"
+        stroke="#b38d69"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray="0 1"
+        variants={{
+          hidden: { pathLength: 0, opacity: 0 },
+          visible: { pathLength: 1, opacity: 0.8, transition: { duration: 1.1, ease: "easeOut" } },
+        }}
+      />
+      <motion.path
+        d={path}
+        fill="none"
+        stroke="#f5ecdf"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray="0 1"
+        variants={{
+          hidden: { pathLength: 0, opacity: 0 },
+          visible: { pathLength: 1, opacity: 0.95, transition: { duration: 1.1, ease: "easeOut", delay: 0.08 } },
+        }}
+      />
+      <motion.circle
+        cx="24"
+        cy="52"
+        r="4"
+        fill="#d6c2a7"
+        variants={{
+          hidden: { opacity: 0, scale: 0.7 },
+          visible: { opacity: 0.9, scale: 1, transition: { duration: 0.3, delay: 0.2 } },
+        }}
+      />
+      <motion.circle
+        cx="194"
+        cy="44"
+        r="4"
+        fill="#d6c2a7"
+        variants={{
+          hidden: { opacity: 0, scale: 0.7 },
+          visible: { opacity: 0.9, scale: 1, transition: { duration: 0.3, delay: 0.82 } },
+        }}
+      />
+    </motion.svg>
+  );
+}
+
 export default function LandingPage({ initialRegion = null }: LandingPageProps) {
   const router = useRouter();
   const [region, setCurrentRegion] = useState<Region | null>(() => initialRegion ?? getRegion());
@@ -251,44 +317,112 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       initial={{ opacity: 0, y: 24 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.65, delay: 0.08, ease: "easeOut" }}
-                      className="grid auto-rows-fr gap-4 lg:grid-cols-3"
+                      className="relative"
                     >
-                      <FlowStage
-                        label="1. Original photo"
-                        image={heroExample.beforeImage}
-                        alt={heroExample.beforeLabel}
-                        tone="linear-gradient(145deg,#f9dfd2 0%,#fffaf5 55%,#efe9e3 100%)"
-                        blurb="Start with a real memory, home, pet or family photo."
-                      />
-                      <FlowStage
-                        label="2. Artwork style"
-                        image={heroExample.afterImage}
-                        alt={heroExample.afterLabel}
-                        tone="linear-gradient(145deg,#e8eef8 0%,#f4f7fb 55%,#ece7df 100%)"
-                        blurb="We turn that exact scene into a calmer, gift-ready illustration."
-                      />
-
-                      <div className="flex h-full min-h-[17.5rem] flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md sm:min-h-[20rem]">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">3. Final keepsake</p>
-                            <h2 className="mt-2 text-lg font-semibold text-[#201d1b]">Preview on the gift</h2>
-                          </div>
-                          <div className="rounded-full border border-black/8 bg-[#fbf7f2] px-3 py-1 text-xs font-semibold text-[#6f655d]">
-                            Preview first
-                          </div>
-                        </div>
-                        <div className="mt-3 flex min-h-[11.5rem] flex-1 items-center sm:min-h-[13.5rem]">
-                          <MockupStage
-                            productType={heroExample.gift.productType}
-                            color={heroExample.gift.color}
-                            generatedImage={heroExample.gift.artworkImage}
-                            className="!rounded-[1.25rem]"
+                      <div className="grid gap-4 lg:hidden">
+                        <FlowStage
+                          label="1. Original photo"
+                          image={heroExample.beforeImage}
+                          alt={heroExample.beforeLabel}
+                          tone="linear-gradient(145deg,#f3e6d9 0%,#fffaf5 58%,#eee4d8 100%)"
+                          blurb="Start with the real home, memory or moment you want to keep."
+                        />
+                        <div className="flex justify-center">
+                          <StoryPath
+                            className="h-16 w-28 rotate-90"
+                            path="M24 52 C58 20, 96 22, 126 48 S172 82, 194 44"
                           />
                         </div>
-                        <p className="mt-3 text-sm leading-6 text-[#5e5852]">
-                          The same artwork carries through to the finished product preview.
-                        </p>
+                        <FlowStage
+                          label="2. Artwork style"
+                          image={heroExample.afterImage}
+                          alt={heroExample.afterLabel}
+                          tone="linear-gradient(145deg,#e9edf3 0%,#f7f5ef 54%,#e8dfd3 100%)"
+                          blurb="It becomes a gentle storybook illustration with the same character and shape."
+                        />
+                        <div className="flex justify-center">
+                          <StoryPath
+                            className="h-16 w-28 rotate-90"
+                            path="M24 52 C58 20, 96 22, 126 48 S172 82, 194 44"
+                          />
+                        </div>
+                        <div className="flex h-full min-h-[17.5rem] flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md sm:min-h-[20rem]">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">3. Final keepsake</p>
+                              <h2 className="mt-2 text-lg font-semibold text-[#201d1b]">Final keepsake</h2>
+                            </div>
+                            <div className="rounded-full border border-black/8 bg-[#fbf7f2] px-3 py-1 text-xs font-semibold text-[#6f655d]">
+                              Preview first
+                            </div>
+                          </div>
+                          <div className="mt-3 flex min-h-[11.5rem] flex-1 items-center sm:min-h-[13.5rem]">
+                            <MockupStage
+                              productType={heroExample.gift.productType}
+                              color={heroExample.gift.color}
+                              generatedImage={heroExample.gift.artworkImage}
+                              className="!rounded-[1.25rem]"
+                            />
+                          </div>
+                          <p className="mt-3 text-sm leading-6 text-[#5e5852]">
+                            The same artwork carries through onto the finished gift preview.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="hidden gap-4 lg:grid lg:grid-cols-[1fr_120px_1fr_120px_1fr] lg:items-center">
+                        <FlowStage
+                          label="1. Original photo"
+                          image={heroExample.beforeImage}
+                          alt={heroExample.beforeLabel}
+                          tone="linear-gradient(145deg,#f3e6d9 0%,#fffaf5 58%,#eee4d8 100%)"
+                          blurb="Start with the real home, memory or moment you want to keep."
+                        />
+
+                        <div className="hidden lg:flex items-center justify-center">
+                          <StoryPath
+                            className="h-24 w-full max-w-[7rem]"
+                            path="M24 52 C58 20, 96 22, 126 48 S172 82, 194 44"
+                          />
+                        </div>
+
+                        <FlowStage
+                          label="2. Artwork style"
+                          image={heroExample.afterImage}
+                          alt={heroExample.afterLabel}
+                          tone="linear-gradient(145deg,#e9edf3 0%,#f7f5ef 54%,#e8dfd3 100%)"
+                          blurb="It becomes a gentle storybook illustration with the same character and shape."
+                        />
+
+                        <div className="hidden lg:flex items-center justify-center">
+                          <StoryPath
+                            className="h-24 w-full max-w-[7rem] scale-y-[-1]"
+                            path="M24 52 C58 20, 96 22, 126 48 S172 82, 194 44"
+                          />
+                        </div>
+
+                        <div className="flex h-full min-h-[17.5rem] flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md sm:min-h-[20rem]">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">3. Final keepsake</p>
+                              <h2 className="mt-2 text-lg font-semibold text-[#201d1b]">Final keepsake</h2>
+                            </div>
+                            <div className="rounded-full border border-black/8 bg-[#fbf7f2] px-3 py-1 text-xs font-semibold text-[#6f655d]">
+                              Preview first
+                            </div>
+                          </div>
+                          <div className="mt-3 flex min-h-[11.5rem] flex-1 items-center sm:min-h-[13.5rem]">
+                            <MockupStage
+                              productType={heroExample.gift.productType}
+                              color={heroExample.gift.color}
+                              generatedImage={heroExample.gift.artworkImage}
+                              className="!rounded-[1.25rem]"
+                            />
+                          </div>
+                          <p className="mt-3 text-sm leading-6 text-[#5e5852]">
+                            The same artwork carries through onto the finished gift preview.
+                          </p>
+                        </div>
                       </div>
                     </motion.div>
                   </div>

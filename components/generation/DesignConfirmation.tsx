@@ -178,7 +178,7 @@ export function DesignConfirmation({
           type="button"
           onClick={onContinue}
           disabled={isRefining}
-          className="min-h-[72px] rounded-[1.5rem] bg-[#1f2937] px-6 py-4 text-left text-base font-bold text-white shadow-[0_18px_34px_-20px_rgba(17,24,39,0.55)] transition-all hover:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px] sm:text-lg"
+          className="min-h-[72px] rounded-[1.5rem] bg-[#1f2937] px-6 py-4 text-left text-base font-bold !text-white shadow-[0_18px_34px_-20px_rgba(17,24,39,0.55)] transition-all hover:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px] sm:text-lg"
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
         >

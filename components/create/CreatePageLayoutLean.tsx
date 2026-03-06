@@ -256,7 +256,7 @@ export function CreatePageLayoutLean({
                 <MagneticButton
                   onClick={() => onGenerate()}
                   disabled={(!(typeof prompt === "string" ? prompt : "").trim() && !uploadedImage) || isBusy}
-                  className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-full bg-[#1f2937] px-6 text-base font-semibold text-white shadow-[0_20px_36px_-22px_rgba(17,24,39,0.6)] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-full bg-[#1f2937] px-6 text-base font-semibold !text-white shadow-[0_20px_36px_-22px_rgba(17,24,39,0.6)] disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   {isBusy ? (
                     <>

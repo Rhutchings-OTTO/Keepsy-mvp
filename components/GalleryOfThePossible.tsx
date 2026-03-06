@@ -58,7 +58,7 @@ export function GalleryOfThePossible({
       </div>
       <MagneticLink
         href={ctaHref}
-        className="mt-7 inline-block rounded-full bg-[#1f2937] px-6 py-3 font-semibold text-white shadow-[0_16px_32px_-20px_rgba(17,24,39,0.5)] transition hover:bg-[#111827]"
+        className="mt-7 inline-block rounded-full bg-[#1f2937] px-6 py-3 font-semibold !text-white shadow-[0_16px_32px_-20px_rgba(17,24,39,0.5)] transition hover:bg-[#111827]"
       >
         {ctaLabel}
       </MagneticLink>

@@ -908,7 +908,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               onClick={() => setView("home")}
               className={`rounded-full px-3 py-1.5 transition-colors ${
                 view === "home"
-                  ? "bg-[#1f2937] text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
+                  ? "bg-[#1f2937] !text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
                   : "text-black/65 hover:bg-black/[0.04] hover:text-black"
               }`}
             >
@@ -918,7 +918,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               onClick={() => setView("catalog")}
               className={`rounded-full px-3 py-1.5 transition-colors ${
                 view === "catalog"
-                  ? "bg-[#1f2937] text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
+                  ? "bg-[#1f2937] !text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
                   : "text-black/65 hover:bg-black/[0.04] hover:text-black"
               }`}
             >
@@ -928,9 +928,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   onClick={() => setView("community")}
                   className={`rounded-full px-3 py-1.5 transition-colors ${
                     view === "community"
-                      ? "bg-[#1f2937] text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
-                      : "text-black/65 hover:bg-black/[0.04] hover:text-black"
-                  }`}
+? "bg-[#1f2937] !text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
+                  : "text-black/65 hover:bg-black/[0.04] hover:text-black"
+              }`}
                 >
                   Community
                 </button>
@@ -939,7 +939,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               <button
                 onClick={() => setIsCartOpen(true)}
                 className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all ${
-                  isMagicpathSkin ? "bg-black text-white shadow-xl" : "bg-[#1f2937] text-white shadow-[0_14px_28px_-20px_rgba(17,24,39,0.55)]"
+                  isMagicpathSkin ? "bg-black !text-white shadow-xl" : "bg-[#1f2937] !text-white shadow-[0_14px_28px_-20px_rgba(17,24,39,0.55)]"
                 }`}
               >
                 <ShoppingCart size={18} className="text-white" />
@@ -1240,7 +1240,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             whileTap={{ scale: 0.98 }}
                             onClick={handleAddToCart}
                               disabled={!generatedImage || (selectedProduct.hasSize && !selectedSize)}
-                              className="flex w-full items-center justify-center gap-2 rounded-[1.35rem] bg-[#1f2937] py-4 font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
+                              className="flex w-full items-center justify-center gap-2 rounded-[1.35rem] bg-[#1f2937] py-4 font-black !text-white disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             Add <Plus size={18} />
                           </motion.button>
@@ -1548,7 +1548,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 <MagneticButton
                   onClick={() => requestCheckout("cart")}
                   disabled={isBusy || cartItems.length === 0}
-                  className="w-full py-3 rounded-xl bg-black text-white font-extrabold disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3 rounded-xl bg-black !text-white font-extrabold disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {isBusy ? "Securing…" : "Checkout"}
                 </MagneticButton>

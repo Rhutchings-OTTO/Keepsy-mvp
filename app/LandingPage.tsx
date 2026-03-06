@@ -173,7 +173,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                 <button
                   type="button"
                   onClick={() => router.push("/create")}
-                  className="hidden rounded-full bg-[#1f2937] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_-18px_rgba(17,24,39,0.5)] sm:inline-flex"
+                  className="hidden rounded-full bg-[#1f2937] px-5 py-2.5 text-sm font-semibold !text-white shadow-[0_14px_28px_-18px_rgba(17,24,39,0.5)] sm:inline-flex"
                 >
                   Start now
                 </button>
@@ -220,7 +220,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         <button
                           type="button"
                           onClick={() => router.push("/create")}
-                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1f2937] px-6 text-base font-semibold text-white shadow-[0_18px_34px_-22px_rgba(17,24,39,0.6)] transition-transform duration-200 ease-out hover:-translate-y-0.5"
+                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1f2937] px-6 text-base font-semibold !text-white shadow-[0_18px_34px_-22px_rgba(17,24,39,0.6)] transition-transform duration-200 ease-out hover:-translate-y-0.5"
                         >
                           Create your gift
                           <ArrowRight size={18} />

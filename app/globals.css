@@ -38,6 +38,19 @@ a {
   text-decoration: none;
 }
 
+/* Dark buttons/links: always white text for contrast */
+button[class*="bg-[#1f2937]"],
+button[class*="bg-black"]:not([class*="bg-black/"]),
+a[class*="bg-[#1f2937]"],
+a[class*="bg-black"]:not([class*="bg-black/"]) {
+  color: white !important;
+}
+
+/* Active nav link (e.g. Gift Ideas when on that page) - force white text on dark bg */
+nav a[data-active-nav="true"] {
+  color: white !important;
+}
+
 html {
   scroll-behavior: smooth;
 }

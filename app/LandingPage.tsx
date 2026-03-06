@@ -84,13 +84,13 @@ function FlowStage({
   blurb: string;
 }) {
   return (
-    <div className="flex h-full min-h-[20rem] flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_16px_36px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
+    <div className="flex h-full min-h-[17.5rem] flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_16px_36px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md sm:min-h-[20rem]">
       <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">{label}</p>
       <div
-        className="relative mt-3 flex min-h-[13.5rem] flex-1 items-center justify-center overflow-hidden rounded-[1.2rem] border border-black/8"
+        className="relative mt-3 flex min-h-[11.5rem] flex-1 items-center justify-center overflow-hidden rounded-[1.2rem] border border-black/8 sm:min-h-[13.5rem]"
         style={{ background: tone }}
       >
-        <Image src={image} alt={alt} width={320} height={320} className="h-44 w-full object-contain p-3" />
+        <Image src={image} alt={alt} width={320} height={320} className="h-36 w-full object-contain p-3 sm:h-44" />
       </div>
       <p className="mt-3 text-sm leading-6 text-[#5d5751]">{blurb}</p>
     </div>
@@ -234,7 +234,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         ))}
                       </ul>
 
-                      <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                      <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
                         {heroOccasions.map((item) => (
                           <div key={`${item.id}-${item.productType}`} className="rounded-[1.35rem] border border-black/8 bg-white/72 p-3 shadow-[0_14px_30px_-24px_rgba(23,18,12,0.36)]">
                             <div className="relative h-12 w-12 overflow-hidden rounded-2xl border border-black/8 bg-[#f7f0e8]">
@@ -268,7 +268,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         blurb="We turn that exact scene into a calmer, gift-ready illustration."
                       />
 
-                      <div className="flex h-full min-h-[20rem] flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
+                      <div className="flex h-full min-h-[17.5rem] flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md sm:min-h-[20rem]">
                         <div className="flex items-start justify-between gap-3">
                           <div>
                             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">3. Final keepsake</p>
@@ -278,7 +278,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                             Preview first
                           </div>
                         </div>
-                        <div className="mt-3 flex min-h-[13.5rem] flex-1 items-center">
+                        <div className="mt-3 flex min-h-[11.5rem] flex-1 items-center sm:min-h-[13.5rem]">
                           <MockupStage
                             productType={heroExample.gift.productType}
                             color={heroExample.gift.color}

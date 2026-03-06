@@ -106,6 +106,8 @@ export function CreatePageLayoutLean({
 }: CreatePageLayoutLeanProps) {
   const [createMode, setCreateMode] = useState<"describe" | "upload">("describe");
   const [pendingReplace, setPendingReplace] = useState<string | null>(null);
+  const activeProduct = PRODUCTS.find((product) => product.type === (selectedProductType ?? "tshirt")) ?? PRODUCTS[0];
+  const ActiveProductIcon = activeProduct.Icon;
 
   const handleChipPrompt = (nextPrompt: string) => {
     if (!prompt.trim()) {
@@ -367,6 +369,34 @@ export function CreatePageLayoutLean({
               </motion.button>
             ))}
           </div>
+          <motion.div
+            key={activeProduct.type}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="mt-5 grid gap-4 rounded-[24px] border border-black/8 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(247,242,235,0.92))] p-4 shadow-[0_18px_38px_-28px_rgba(0,0,0,0.28)] sm:p-5 md:grid-cols-[0.86fr_1.14fr]"
+          >
+            <div className="flex flex-col justify-center">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#efe4d7] text-[#8b6f47]">
+                <ActiveProductIcon size={20} />
+              </div>
+              <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-[#8b7f74]">Selected preview</p>
+              <h3 className="mt-2 text-2xl font-semibold text-[#241f1c]">{activeProduct.label}</h3>
+              <p className="mt-3 max-w-md text-sm leading-7 text-[#645c55]">
+                This is the product we&apos;ll show when your design preview appears. Pick a different item above to switch the preview surface instantly.
+              </p>
+            </div>
+            <div className="relative overflow-hidden rounded-[22px] border border-black/8 bg-white/90 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.9),transparent_42%),linear-gradient(180deg,rgba(249,244,238,0.1),rgba(232,226,219,0.28))]" />
+              <Image
+                src={PRODUCT_PREVIEW_IMAGES[activeProduct.type]}
+                alt={`${activeProduct.label} large preview`}
+                width={560}
+                height={400}
+                className="relative z-10 h-52 w-full object-contain sm:h-60"
+              />
+            </div>
+          </motion.div>
         </div>
       </motion.section>
 

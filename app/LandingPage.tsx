@@ -75,21 +75,24 @@ function FlowStage({
   image,
   alt,
   tone,
+  blurb,
 }: {
   label: string;
   image: string;
   alt: string;
   tone: string;
+  blurb: string;
 }) {
   return (
-    <div className="rounded-[1.4rem] border border-black/8 bg-white/78 p-3 shadow-[0_16px_36px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
-      <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">{label}</p>
+    <div className="flex h-full flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_16px_36px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">{label}</p>
       <div
-        className="relative overflow-hidden rounded-[1.2rem] border border-black/8"
+        className="relative mt-2 overflow-hidden rounded-[1.2rem] border border-black/8"
         style={{ background: tone }}
       >
-        <Image src={image} alt={alt} width={320} height={320} className="h-32 w-full object-contain p-2" />
+        <Image src={image} alt={alt} width={320} height={320} className="h-40 w-full object-contain p-2" />
       </div>
+      <p className="mt-3 text-sm leading-6 text-[#5d5751]">{blurb}</p>
     </div>
   );
 }
@@ -248,43 +251,43 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       initial={{ opacity: 0, y: 24 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.65, delay: 0.08, ease: "easeOut" }}
-                      className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]"
+                      className="grid gap-4 lg:grid-cols-3"
                     >
-                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                        <FlowStage
-                          label="1. Original photo"
-                          image={heroExample.beforeImage}
-                          alt={heroExample.beforeLabel}
-                          tone="linear-gradient(145deg,#f9dfd2 0%,#fffaf5 55%,#efe9e3 100%)"
-                        />
-                        <FlowStage
-                          label="2. Artwork style"
-                          image={heroExample.afterImage}
-                          alt={heroExample.afterLabel}
-                          tone="linear-gradient(145deg,#e8eef8 0%,#f4f7fb 55%,#ece7df 100%)"
-                        />
-                      </div>
+                      <FlowStage
+                        label="1. Original photo"
+                        image={heroExample.beforeImage}
+                        alt={heroExample.beforeLabel}
+                        tone="linear-gradient(145deg,#f9dfd2 0%,#fffaf5 55%,#efe9e3 100%)"
+                        blurb="Start with a real memory, home, pet or family photo."
+                      />
+                      <FlowStage
+                        label="2. Artwork style"
+                        image={heroExample.afterImage}
+                        alt={heroExample.afterLabel}
+                        tone="linear-gradient(145deg,#e8eef8 0%,#f4f7fb 55%,#ece7df 100%)"
+                        blurb="We turn that exact scene into a calmer, gift-ready illustration."
+                      />
 
-                      <div className="rounded-[1.7rem] border border-black/8 bg-white/74 p-4 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
-                        <div className="flex items-center justify-between gap-3">
+                      <div className="flex h-full flex-col rounded-[1.4rem] border border-black/8 bg-white/84 p-3 shadow-[0_22px_46px_-28px_rgba(23,18,12,0.38)] backdrop-blur-md">
+                        <div className="flex items-start justify-between gap-3">
                           <div>
                             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-black/45">3. Final keepsake</p>
-                            <h2 className="mt-2 text-xl font-semibold text-[#201d1b]">Photo to artwork to gift</h2>
+                            <h2 className="mt-2 text-lg font-semibold text-[#201d1b]">Preview on the gift</h2>
                           </div>
                           <div className="rounded-full border border-black/8 bg-[#fbf7f2] px-3 py-1 text-xs font-semibold text-[#6f655d]">
                             Preview first
                           </div>
                         </div>
-                        <div className="mt-4">
+                        <div className="mt-3">
                           <MockupStage
                             productType={heroExample.gift.productType}
                             color={heroExample.gift.color}
                             generatedImage={heroExample.gift.artworkImage}
-                            className="!rounded-[1.6rem]"
+                            className="!rounded-[1.3rem]"
                           />
                         </div>
-                        <p className="mt-4 text-sm leading-7 text-[#5e5852]">
-                          One image goes all the way through: the original photo, a matching illustrated version, then that exact design on the finished gift.
+                        <p className="mt-3 text-sm leading-6 text-[#5e5852]">
+                          The same artwork carries through to the finished product preview.
                         </p>
                       </div>
                     </motion.div>

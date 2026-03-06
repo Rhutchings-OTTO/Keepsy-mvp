@@ -156,13 +156,9 @@ export function MockupStage({
       w: (rect.wPct / 100) * containerSize.width,
       h: (rect.hPct / 100) * containerSize.height,
     };
-    const matteRect =
-      productType === "card"
-        ? insetRect(boundary, boundary.w * 0.055, boundary.h * 0.07)
-        : null;
     const artworkBoundary =
-      productType === "card" && matteRect
-        ? insetRect(matteRect, matteRect.w * 0.055, matteRect.h * 0.07)
+      productType === "card"
+        ? insetRect(boundary, boundary.w * 0.1, boundary.h * 0.1)
         : boundary;
     const artworkRect = fitArtworkToBoundary({
       boundary: artworkBoundary,
@@ -170,7 +166,7 @@ export function MockupStage({
       imageHeight: artNaturalSize.height,
       mode: "contain",
     });
-    return { boundary, matteRect, artworkRect, rotateDeg: rect.rotateDeg };
+    return { boundary, artworkRect, rotateDeg: rect.rotateDeg };
   }, [artNaturalSize, containerSize, entry.placement, productType]);
 
   useEffect(() => {

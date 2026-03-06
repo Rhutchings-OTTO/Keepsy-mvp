@@ -341,31 +341,43 @@ function HologramTower({ block }: { block: CityBlock }) {
 function LondonLandmarks() {
   return (
     <>
-      <group position={[-2.6, 0, -0.1]}>
-        <mesh position={[0, 2.5, 0]} castShadow receiveShadow>
-          <cylinderGeometry args={[0.32, 0.68, 5.2, 18, 1, true]} />
+      <group position={[-2.9, 0, -0.2]}>
+        <mesh position={[0, 2.55, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.34, 0.72, 5.3, 18, 1, true]} />
           <meshPhysicalMaterial color="#dceffc" transparent opacity={0.34} transmission={0.18} roughness={0.14} />
         </mesh>
-        <mesh position={[0, 2.5, 0]} scale={[1.04, 1.02, 1.04]}>
-          <cylinderGeometry args={[0.32, 0.68, 5.2, 18, 1, true]} />
+        <mesh position={[0, 2.55, 0]} scale={[1.04, 1.02, 1.04]}>
+          <cylinderGeometry args={[0.34, 0.72, 5.3, 18, 1, true]} />
           <meshBasicMaterial color="#8ecbff" wireframe transparent opacity={0.24} />
         </mesh>
+        <mesh position={[0, 5.45, 0]} castShadow>
+          <sphereGeometry args={[0.22, 18, 18]} />
+          <meshBasicMaterial color="#cceeff" transparent opacity={0.7} />
+        </mesh>
       </group>
-      <group position={[2.2, 0, 0]}>
-        <mesh position={[0, 3.2, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.86, 6.4, 0.86]} />
+      <group position={[2.35, 0, -0.15]}>
+        <mesh position={[0, 3.25, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.9, 6.5, 0.9]} />
           <meshPhysicalMaterial color="#edf8ff" transparent opacity={0.42} transmission={0.18} roughness={0.12} />
         </mesh>
-        <mesh position={[0, 6.9, 0]} castShadow>
+        <mesh position={[0, 6.95, 0]} castShadow>
           <coneGeometry args={[0.18, 1.1, 12]} />
           <meshBasicMaterial color="#a9ddff" transparent opacity={0.7} />
         </mesh>
-        <mesh position={[0, 3.2, 0]} scale={[1.04, 1.02, 1.04]}>
-          <boxGeometry args={[0.86, 6.4, 0.86]} />
+        <mesh position={[0, 3.25, 0]} scale={[1.04, 1.02, 1.04]}>
+          <boxGeometry args={[0.9, 6.5, 0.9]} />
           <meshBasicMaterial color="#97cdff" wireframe transparent opacity={0.2} />
         </mesh>
+        <mesh position={[0, 4.8, 0.47]}>
+          <boxGeometry args={[0.56, 0.26, 0.08]} />
+          <meshBasicMaterial color="#dff4ff" transparent opacity={0.58} />
+        </mesh>
+        <mesh position={[0, 3.95, 0.47]}>
+          <boxGeometry args={[0.56, 0.16, 0.08]} />
+          <meshBasicMaterial color="#dff4ff" transparent opacity={0.44} />
+        </mesh>
       </group>
-      <group position={[0.6, 2.15, 1.7]} rotation={[Math.PI / 2, 0.2, 0.4]}>
+      <group position={[0.25, 2.1, 1.85]} rotation={[Math.PI / 2, 0.18, 0.36]}>
         <mesh>
           <torusGeometry args={[1.65, 0.08, 12, 72]} />
           <meshBasicMaterial color="#9fd5ff" transparent opacity={0.42} />
@@ -373,6 +385,20 @@ function LondonLandmarks() {
         <mesh scale={[1.01, 1.01, 1.01]}>
           <torusGeometry args={[1.65, 0.08, 12, 72]} />
           <meshBasicMaterial color="#e1f4ff" wireframe transparent opacity={0.2} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[1.65, 0.02, 6, 36]} />
+          <meshBasicMaterial color="#ddf3ff" transparent opacity={0.55} />
+        </mesh>
+      </group>
+      <group position={[3.85, 0.78, 1.4]}>
+        <mesh rotation={[0, 0, Math.PI / 4]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.62, 0.62, 2.1, 6]} />
+          <meshPhysicalMaterial color="#e4f4ff" transparent opacity={0.34} transmission={0.2} roughness={0.14} />
+        </mesh>
+        <mesh rotation={[0, 0, Math.PI / 4]} scale={[1.03, 1.03, 1.03]}>
+          <cylinderGeometry args={[0.62, 0.62, 2.1, 6]} />
+          <meshBasicMaterial color="#a7dbff" wireframe transparent opacity={0.24} />
         </mesh>
       </group>
     </>
@@ -396,24 +422,54 @@ function NewYorkLandmarks() {
           <meshBasicMaterial color="#8ecfff" wireframe transparent opacity={0.22} />
         </mesh>
       </group>
-      <group position={[-2.7, 0, 0.75]}>
-        <mesh position={[0, 2.7, 0]} castShadow receiveShadow>
-          <cylinderGeometry args={[0.78, 0.98, 5.4, 8]} />
+      <group position={[-2.75, 0, 0.78]}>
+        <mesh position={[0, 2.75, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.82, 1.02, 5.5, 8]} />
           <meshPhysicalMaterial color="#dcefff" transparent opacity={0.34} transmission={0.16} roughness={0.16} />
         </mesh>
-        <mesh position={[0, 5.75, 0]} castShadow>
-          <coneGeometry args={[0.4, 0.95, 8]} />
+        <mesh position={[0, 5.9, 0]} castShadow>
+          <coneGeometry args={[0.42, 1.05, 8]} />
           <meshBasicMaterial color="#bee7ff" transparent opacity={0.62} />
         </mesh>
-      </group>
-      <group position={[2.8, 1.35, 0.5]}>
-        <mesh castShadow receiveShadow>
-          <boxGeometry args={[1.2, 2.7, 1.2]} />
-          <meshPhysicalMaterial color="#deefff" transparent opacity={0.28} transmission={0.18} roughness={0.16} />
+        <mesh position={[0, 2.75, 0]} scale={[1.04, 1.02, 1.04]}>
+          <cylinderGeometry args={[0.82, 1.02, 5.5, 8]} />
+          <meshBasicMaterial color="#99d7ff" wireframe transparent opacity={0.22} />
         </mesh>
-        <mesh position={[0, 1.7, 0]}>
-          <coneGeometry args={[0.26, 0.8, 8]} />
+      </group>
+      <group position={[3.05, 0, 0.35]}>
+        <mesh position={[0, 3.05, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.72, 0.9, 6.1, 24]} />
+          <meshPhysicalMaterial color="#deefff" transparent opacity={0.3} transmission={0.18} roughness={0.16} />
+        </mesh>
+        <mesh position={[0, 6.35, 0]} castShadow>
+          <coneGeometry args={[0.3, 0.95, 16]} />
           <meshBasicMaterial color="#c4e9ff" transparent opacity={0.56} />
+        </mesh>
+        <mesh position={[0, 3.05, 0]} scale={[1.04, 1.02, 1.04]}>
+          <cylinderGeometry args={[0.72, 0.9, 6.1, 24]} />
+          <meshBasicMaterial color="#a3d9ff" wireframe transparent opacity={0.22} />
+        </mesh>
+      </group>
+      <group position={[-0.25, 0.62, 2.5]}>
+        <mesh position={[0, 0.2, 0]}>
+          <boxGeometry args={[5.8, 0.08, 0.08]} />
+          <meshBasicMaterial color="#d9f3ff" transparent opacity={0.5} />
+        </mesh>
+        <mesh position={[-2.5, 1.15, 0]}>
+          <boxGeometry args={[0.18, 2.1, 0.18]} />
+          <meshPhysicalMaterial color="#eaf8ff" transparent opacity={0.36} transmission={0.14} roughness={0.18} />
+        </mesh>
+        <mesh position={[2.5, 1.15, 0]}>
+          <boxGeometry args={[0.18, 2.1, 0.18]} />
+          <meshPhysicalMaterial color="#eaf8ff" transparent opacity={0.36} transmission={0.14} roughness={0.18} />
+        </mesh>
+        <mesh position={[-1.25, 0.82, 0]}>
+          <cylinderGeometry args={[0.03, 0.03, 2.55, 8]} />
+          <meshBasicMaterial color="#9ad7ff" transparent opacity={0.48} />
+        </mesh>
+        <mesh position={[1.25, 0.82, 0]}>
+          <cylinderGeometry args={[0.03, 0.03, 2.55, 8]} />
+          <meshBasicMaterial color="#9ad7ff" transparent opacity={0.48} />
         </mesh>
       </group>
     </>

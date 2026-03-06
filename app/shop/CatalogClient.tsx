@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { getRegion, type Region } from "@/lib/region";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -186,7 +187,14 @@ function productHref(category: CatalogProduct["category"]) {
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
 
-function ProductCard({ product, index }: { product: CatalogProduct; index: number }) {
+const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+const USD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+
+function fmtPrice(price: number, region: Region | null): string {
+  return region === "UK" ? GBP.format(price) : USD.format(price);
+}
+
+function ProductCard({ product, index, region }: { product: CatalogProduct; index: number; region: Region | null }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -230,7 +238,7 @@ function ProductCard({ product, index }: { product: CatalogProduct; index: numbe
         <p className="font-semibold text-charcoal text-sm leading-snug">{product.name}</p>
 
         {/* Price */}
-        <p className="font-bold text-charcoal text-base">${product.price.toFixed(2)}</p>
+        <p className="font-bold text-charcoal text-base">{fmtPrice(product.price, region)}</p>
 
         {/* Sold this week */}
         <p className="text-terracotta font-medium" style={{ fontSize: "11px" }}>
@@ -332,6 +340,11 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 export function CatalogClient() {
   const [activeCategory, setActiveCategory] = useState<Category>("all");
   const [sortKey, setSortKey] = useState<SortKey>("popular");
+  const [region, setRegion] = useState<Region | null>(null);
+
+  useEffect(() => {
+    setRegion(getRegion());
+  }, []);
 
   // Filter
   const filtered =
@@ -425,7 +438,7 @@ export function CatalogClient() {
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {sorted.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
+            <ProductCard key={product.id} product={product} index={i} region={region} />
           ))}
         </div>
       </div>

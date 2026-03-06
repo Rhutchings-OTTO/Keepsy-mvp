@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Sparkles, Package, RotateCcw, Gift } from "lucide-react";
@@ -12,6 +12,7 @@ import {
   type Product,
   type ProductType,
 } from "@/lib/products";
+import { getRegion, type Region } from "@/lib/region";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -41,9 +42,8 @@ function slugToProduct(slug: string): Product | null {
   return type ? PRODUCT_LIST.find((p) => p.id === type) ?? null : null;
 }
 
-function gbp(n: number): string {
-  return `£${n}`;
-}
+const GBP_FMT = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+const USD_FMT = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 function renderStars(rating: number) {
   return "★".repeat(Math.floor(rating));
@@ -217,6 +217,13 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
     initialProduct.colors?.[0]?.hex ?? "#FFFFFF"
   );
   const [selectedSize, setSelectedSize] = useState<string>("M");
+  const [region, setRegion] = useState<Region | null>(null);
+
+  useEffect(() => {
+    setRegion(getRegion());
+  }, []);
+
+  const fmt = (n: number) => region === "UK" ? GBP_FMT.format(n) : USD_FMT.format(n);
 
   const mockupProductType = getMockupProductType(selectedProduct.id);
   const mockupColor = getMockupColor(selectedColor);
@@ -296,7 +303,7 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
               {selectedProduct.name}
             </h1>
             <p className="mt-2 text-xl font-bold text-charcoal">
-              {gbp(selectedProduct.basePrice)}
+              {fmt(selectedProduct.basePrice)}
             </p>
             <p className="mt-2 text-charcoal/60 font-sans text-sm leading-relaxed">
               {selectedProduct.description} Personalised just for her — every detail crafted with care.
@@ -328,7 +335,7 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
                       selectedProduct.id === prod.id ? "text-white/75" : "text-charcoal/45"
                     }`}
                   >
-                    {gbp(prod.basePrice)}
+                    {fmt(prod.basePrice)}
                   </span>
                 </motion.button>
               ))}
@@ -466,7 +473,7 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
                   />
                   <div className="p-2.5">
                     <p className="text-xs font-semibold text-charcoal leading-snug">{label}</p>
-                    <p className="text-xs text-charcoal/50 mt-0.5">{gbp(price)}</p>
+                    <p className="text-xs text-charcoal/50 mt-0.5">{fmt(price)}</p>
                   </div>
                 </Link>
               ))}

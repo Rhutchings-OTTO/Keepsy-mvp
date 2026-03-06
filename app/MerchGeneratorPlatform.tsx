@@ -1409,7 +1409,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   <Link
                     key={p.id}
                     href={getProductPreviewHref(p.id)}
-                    className="block text-left bg-white/80 border border-black/10 rounded-3xl p-5 shadow-sm transition hover:border-black/20 hover:-translate-y-1"
+                    className="block text-left bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] border border-white/65 rounded-3xl p-5 shadow-warm-md backdrop-blur-sm transition hover:shadow-warm-lg hover:-translate-y-1"
                   >
                     <div className="text-lg font-black">{p.name}</div>
                     <div className="text-sm text-black/55 font-semibold mt-1">{p.description}</div>
@@ -1434,7 +1434,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     key={`${img}-${idx}`}
                     maxTilt={8}
                     hoverScale={1.02}
-                    className="break-inside-avoid rounded-2xl overflow-hidden bg-white border border-black/10 shadow-sm"
+                    className="break-inside-avoid rounded-2xl overflow-hidden bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] border border-white/65 shadow-warm-md backdrop-blur-sm"
                   >
                     <Image src={img} alt="Community design" width={400} height={500} className="w-full h-auto" />
                     <div className="p-3 text-sm font-semibold text-black/55">@creator_{idx + 1}</div>

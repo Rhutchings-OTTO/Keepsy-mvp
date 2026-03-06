@@ -12,9 +12,7 @@ import {
   AdaptiveDpr,
   AdaptiveEvents,
   usePerformanceMonitor,
-  Edges,
 } from "@react-three/drei";
-import { easing } from "maath";
 import * as THREE from "three";
 import type { Region } from "@/lib/region";
 import { setRegion } from "@/lib/region";
@@ -221,22 +219,9 @@ function RegionSide({ name, region, onSelect }: RegionSideProps) {
       aria-label={`Shop ${name}`}
     >
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(255,255,255,0.98),rgba(255,255,255,0.45)_24%,transparent_54%),linear-gradient(180deg,#f8fbff_0%,#eaf0f8_42%,#d8e3ef_100%)]" />
-        <div className="absolute inset-0">
-          <ErrorBoundary fallback={<div className="absolute inset-0 bg-[linear-gradient(180deg,#dbe2ea_0%,#39485b_100%)]" />}>
-            <Suspense fallback={<div className="absolute inset-0 bg-[linear-gradient(180deg,#dbe2ea_0%,#39485b_100%)]" />}>
-              <Canvas
-                camera={{ position: [0, 7.5, 14], fov: 42 }}
-                gl={{ alpha: true, antialias: true }}
-                dpr={[1, 1.75]}
-                className="h-full w-full"
-              >
-                <TonalCityScene region={region} />
-              </Canvas>
-            </Suspense>
-          </ErrorBoundary>
-        </div>
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(241,246,251,0.1)_36%,rgba(71,91,117,0.26)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(255,255,255,0.98),rgba(255,255,255,0.45)_24%,transparent_54%),linear-gradient(180deg,#f8fbff_0%,#edf2f7_42%,#d9e1ea_100%)]" />
+        <WatercolorCity region={region} />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(241,246,251,0.06)_36%,rgba(71,91,117,0.18)_100%)]" />
       </div>
       <div className="relative z-10 w-full p-6 sm:p-7">
         <div className="max-w-[14rem] rounded-[1.5rem] border border-white/80 bg-[rgba(255,255,255,0.52)] p-4 backdrop-blur-xl">
@@ -253,275 +238,64 @@ function RegionSide({ name, region, onSelect }: RegionSideProps) {
   );
 }
 
-type CityBlock = {
-  position: [number, number, number];
-  scale: [number, number, number];
-  color: string;
-  glow?: string;
-};
-
-type HoloPrimitiveProps = React.ComponentProps<"mesh"> & {
-  color?: string;
-  wireColor?: string;
-  opacity?: number;
-  children: React.ReactNode;
-};
-
-function HoloPrimitive({
-  color = "#eaf6ff",
-  wireColor = "#9fd7ff",
-  opacity = 0.4,
-  children,
-  ...props
-}: HoloPrimitiveProps) {
+function WatercolorCity({ region }: { region: Region }) {
+  const isUK = region === "UK";
   return (
-    <mesh castShadow receiveShadow {...props}>
-      {children}
-      <meshPhysicalMaterial
-        color={color}
-        metalness={0.18}
-        roughness={0.12}
-        transparent
-        opacity={opacity}
-        transmission={0.2}
-        thickness={1.1}
-        clearcoat={1}
-        clearcoatRoughness={0.08}
-      />
-      <Edges color={wireColor} threshold={12} />
-    </mesh>
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-x-[-10%] top-[8%] h-32 rounded-full blur-3xl" style={{ background: isUK ? "rgba(198,212,226,0.55)" : "rgba(206,216,229,0.54)" }} />
+      <div className="absolute right-[8%] top-[18%] h-28 w-28 rounded-full blur-2xl" style={{ background: isUK ? "rgba(223,205,187,0.34)" : "rgba(213,201,186,0.34)" }} />
+      <svg
+        viewBox="0 0 600 380"
+        className="absolute inset-0 h-full w-full scale-[1.06] opacity-95"
+        aria-hidden
+      >
+        <defs>
+          <filter id={`wash-${region}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="8" />
+          </filter>
+          <filter id={`soft-${region}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.4" />
+          </filter>
+          <linearGradient id={`sky-${region}`} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor={isUK ? "#f7fbff" : "#f8fbfd"} />
+            <stop offset="65%" stopColor={isUK ? "#e8eef4" : "#e7edf3"} />
+            <stop offset="100%" stopColor={isUK ? "#d4dde7" : "#d3dbe4"} />
+          </linearGradient>
+        </defs>
+        <rect width="600" height="380" fill={`url(#sky-${region})`} />
+        <ellipse cx="300" cy="120" rx="210" ry="78" fill={isUK ? "#f5efe8" : "#eef2f6"} opacity="0.7" filter={`url(#wash-${region})`} />
+        <ellipse cx="170" cy="165" rx="140" ry="56" fill={isUK ? "#dce7ef" : "#d8e0ea"} opacity="0.72" filter={`url(#wash-${region})`} />
+        <ellipse cx="430" cy="190" rx="150" ry="58" fill={isUK ? "#e7ddd1" : "#dfe3ea"} opacity="0.5" filter={`url(#wash-${region})`} />
+
+        {isUK ? (
+          <>
+            <circle cx="282" cy="185" r="46" fill="none" stroke="#8da1b8" strokeWidth="5" opacity="0.52" filter="url(#soft-UK)" />
+            <line x1="282" y1="139" x2="282" y2="232" stroke="#97a9bd" strokeWidth="3" opacity="0.34" />
+            <line x1="236" y1="185" x2="328" y2="185" stroke="#97a9bd" strokeWidth="3" opacity="0.28" />
+            <rect x="388" y="105" width="26" height="140" rx="5" fill="#8b9db1" opacity="0.48" filter="url(#soft-UK)" />
+            <polygon points="401,82 392,106 410,106" fill="#8b9db1" opacity="0.42" />
+            <rect x="118" y="82" width="28" height="164" rx="10" fill="#92a5b7" opacity="0.42" filter="url(#soft-UK)" />
+            <polygon points="132,46 108,84 156,84" fill="#92a5b7" opacity="0.36" />
+            <polygon points="492,106 522,142 508,244 474,244 460,142" fill="#98a9ba" opacity="0.36" filter="url(#soft-UK)" />
+            <path d="M70 248 C120 228, 160 236, 194 248 S278 262, 338 250 430 232, 530 248 L530 332 L70 332 Z" fill="#8799ae" opacity="0.34" filter="url(#wash-UK)" />
+          </>
+        ) : (
+          <>
+            <rect x="287" y="72" width="34" height="168" rx="7" fill="#8da0b3" opacity="0.5" filter="url(#soft-US)" />
+            <polygon points="304,38 296,72 312,72" fill="#8da0b3" opacity="0.44" />
+            <path d="M176 110 L198 92 L220 110 L220 236 L176 236 Z" fill="#95a6b7" opacity="0.42" filter="url(#soft-US)" />
+            <path d="M424 100 L444 88 L466 100 L466 236 L424 236 Z" fill="#93a4b6" opacity="0.4" filter="url(#soft-US)" />
+            <path d="M122 248 C160 202, 222 202, 260 248" fill="none" stroke="#95aabf" strokeWidth="4" opacity="0.42" />
+            <path d="M340 248 C378 202, 440 202, 478 248" fill="none" stroke="#95aabf" strokeWidth="4" opacity="0.42" />
+            <line x1="122" y1="248" x2="260" y2="248" stroke="#95aabf" strokeWidth="3" opacity="0.3" />
+            <line x1="340" y1="248" x2="478" y2="248" stroke="#95aabf" strokeWidth="3" opacity="0.3" />
+            <path d="M88 248 C146 234, 196 242, 232 248 S332 258, 392 248 480 234, 530 248 L530 332 L88 332 Z" fill="#8798aa" opacity="0.34" filter="url(#wash-US)" />
+          </>
+        )}
+
+        <path d="M0 270 C92 246, 154 258, 222 268 S356 280, 438 264 538 250, 600 270 L600 380 L0 380 Z" fill="#bcc8d3" opacity="0.52" filter={`url(#wash-${region})`} />
+        <path d="M0 294 C118 278, 206 286, 302 300 S470 316, 600 298 L600 380 L0 380 Z" fill="#d9e1e8" opacity="0.78" />
+      </svg>
+    </div>
   );
-}
-
-function TonalCityScene({ region }: { region: Region }) {
-  const rootRef = useRef<THREE.Group>(null!);
-  const blocks = React.useMemo<CityBlock[]>(
-    () => (region === "UK" ? buildLondonBlocks() : buildNewYorkBlocks()),
-    [region]
-  );
-
-  useFrame(({ clock, pointer }) => {
-    if (!rootRef.current) return;
-    const t = clock.getElapsedTime();
-    easing.dampE(rootRef.current.rotation, [-0.16 + pointer.y * 0.06, pointer.x * 0.24 + Math.sin(t * 0.18) * 0.05, 0], 0.18, 0.016);
-    rootRef.current.position.y = Math.sin(t * 0.42) * 0.08;
-  });
-
-  return (
-    <>
-      <fog attach="fog" args={["#edf4fb", 12, 30]} />
-      <ambientLight intensity={1.7} />
-      <hemisphereLight intensity={1.3} groundColor="#b8cbdf" color="#ffffff" />
-      <directionalLight position={[10, 12, 6]} intensity={1.45} color="#ffffff" />
-      <directionalLight position={[-8, 6, -8]} intensity={0.9} color="#8fcbff" />
-      <pointLight position={[0, 9, 3]} intensity={1.2} color="#d5ebff" />
-      <group ref={rootRef} position={[0, -1.45, 0]} scale={1.04}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[10, 96]} />
-          <meshPhysicalMaterial color="#eef5fb" metalness={0.18} roughness={0.18} clearcoat={1} clearcoatRoughness={0.08} />
-        </mesh>
-        <mesh position={[0, 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[5.5, 8.9, 80]} />
-          <meshBasicMaterial color="#9ac7ff" transparent opacity={0.22} />
-        </mesh>
-        <mesh position={[0, 0.045, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[2.8, 4.6, 64]} />
-          <meshBasicMaterial color="#c2e2ff" transparent opacity={0.26} />
-        </mesh>
-        <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[16, 16, 22, 22]} />
-          <meshBasicMaterial color="#d8e8f6" wireframe transparent opacity={0.12} />
-        </mesh>
-        {blocks.map((block, index) => (
-          <HologramTower key={`${region}-${index}`} block={block} />
-        ))}
-        {region === "UK" ? <LondonLandmarks /> : <NewYorkLandmarks />}
-        <HologramOrbs />
-      </group>
-    </>
-  );
-}
-
-function HologramTower({ block }: { block: CityBlock }) {
-  const wireColor = block.glow ?? "#93cfff";
-  return (
-    <group position={block.position} scale={block.scale}>
-      <HoloPrimitive color={block.color} wireColor={wireColor} opacity={0.42}>
-        <boxGeometry args={[1, 1, 1]} />
-      </HoloPrimitive>
-      <mesh position={[0, 0.51, 0]} scale={[0.72, 0.02, 0.72]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#e2f4ff" transparent opacity={0.5} />
-      </mesh>
-    </group>
-  );
-}
-
-function LondonLandmarks() {
-  return (
-    <>
-      <group position={[-2.9, 0, -0.2]}>
-        <HoloPrimitive position={[0, 2.55, 0]} color="#dceffc" wireColor="#8ecbff" opacity={0.34}>
-          <cylinderGeometry args={[0.34, 0.72, 5.3, 18, 1, true]} />
-        </HoloPrimitive>
-        <mesh position={[0, 5.45, 0]} castShadow>
-          <sphereGeometry args={[0.22, 18, 18]} />
-          <meshBasicMaterial color="#cceeff" transparent opacity={0.7} />
-        </mesh>
-      </group>
-      <group position={[2.35, 0, -0.15]}>
-        <HoloPrimitive position={[0, 3.25, 0]} color="#edf8ff" wireColor="#97cdff" opacity={0.42}>
-          <boxGeometry args={[0.9, 6.5, 0.9]} />
-        </HoloPrimitive>
-        <mesh position={[0, 6.95, 0]} castShadow>
-          <coneGeometry args={[0.18, 1.1, 12]} />
-          <meshBasicMaterial color="#a9ddff" transparent opacity={0.7} />
-        </mesh>
-        <mesh position={[0, 4.8, 0.47]}>
-          <boxGeometry args={[0.56, 0.26, 0.08]} />
-          <meshBasicMaterial color="#dff4ff" transparent opacity={0.58} />
-        </mesh>
-        <mesh position={[0, 3.95, 0.47]}>
-          <boxGeometry args={[0.56, 0.16, 0.08]} />
-          <meshBasicMaterial color="#dff4ff" transparent opacity={0.44} />
-        </mesh>
-      </group>
-      <group position={[0.25, 2.1, 1.85]} rotation={[Math.PI / 2, 0.18, 0.36]}>
-        <mesh>
-          <torusGeometry args={[1.65, 0.08, 12, 72]} />
-          <meshBasicMaterial color="#9fd5ff" transparent opacity={0.42} />
-        </mesh>
-        <lineSegments scale={[1.01, 1.01, 1.01]}>
-          <edgesGeometry args={[new THREE.TorusGeometry(1.65, 0.08, 12, 72)]} />
-          <lineBasicMaterial color="#e1f4ff" transparent opacity={0.32} />
-        </lineSegments>
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[1.65, 0.02, 6, 36]} />
-          <meshBasicMaterial color="#ddf3ff" transparent opacity={0.55} />
-        </mesh>
-      </group>
-      <group position={[3.85, 0.78, 1.4]}>
-        <HoloPrimitive rotation={[0, 0, Math.PI / 4]} color="#e4f4ff" wireColor="#a7dbff" opacity={0.34}>
-          <cylinderGeometry args={[0.62, 0.62, 2.1, 6]} />
-        </HoloPrimitive>
-      </group>
-    </>
-  );
-}
-
-function NewYorkLandmarks() {
-  return (
-    <>
-      <group position={[0.3, 0, -0.2]}>
-        <HoloPrimitive position={[0, 4.1, 0]} color="#eef8ff" wireColor="#8ecfff" opacity={0.42}>
-          <boxGeometry args={[1.02, 8.2, 1.02]} />
-        </HoloPrimitive>
-        <mesh position={[0, 8.8, 0]} castShadow>
-          <coneGeometry args={[0.14, 1.2, 12]} />
-          <meshBasicMaterial color="#9fd7ff" transparent opacity={0.82} />
-        </mesh>
-      </group>
-      <group position={[-2.75, 0, 0.78]}>
-        <HoloPrimitive position={[0, 2.75, 0]} color="#dcefff" wireColor="#99d7ff" opacity={0.34}>
-          <cylinderGeometry args={[0.82, 1.02, 5.5, 8]} />
-        </HoloPrimitive>
-        <mesh position={[0, 5.9, 0]} castShadow>
-          <coneGeometry args={[0.42, 1.05, 8]} />
-          <meshBasicMaterial color="#bee7ff" transparent opacity={0.62} />
-        </mesh>
-      </group>
-      <group position={[3.05, 0, 0.35]}>
-        <HoloPrimitive position={[0, 3.05, 0]} color="#deefff" wireColor="#a3d9ff" opacity={0.3}>
-          <cylinderGeometry args={[0.72, 0.9, 6.1, 24]} />
-        </HoloPrimitive>
-        <mesh position={[0, 6.35, 0]} castShadow>
-          <coneGeometry args={[0.3, 0.95, 16]} />
-          <meshBasicMaterial color="#c4e9ff" transparent opacity={0.56} />
-        </mesh>
-      </group>
-      <group position={[-0.25, 0.62, 2.5]}>
-        <mesh position={[0, 0.2, 0]}>
-          <boxGeometry args={[5.8, 0.08, 0.08]} />
-          <meshBasicMaterial color="#d9f3ff" transparent opacity={0.5} />
-        </mesh>
-        <HoloPrimitive position={[-2.5, 1.15, 0]} color="#eaf8ff" wireColor="#b7e5ff" opacity={0.36}>
-          <boxGeometry args={[0.18, 2.1, 0.18]} />
-        </HoloPrimitive>
-        <HoloPrimitive position={[2.5, 1.15, 0]} color="#eaf8ff" wireColor="#b7e5ff" opacity={0.36}>
-          <boxGeometry args={[0.18, 2.1, 0.18]} />
-        </HoloPrimitive>
-        <mesh position={[-1.25, 0.82, 0]}>
-          <cylinderGeometry args={[0.03, 0.03, 2.55, 8]} />
-          <meshBasicMaterial color="#9ad7ff" transparent opacity={0.48} />
-        </mesh>
-        <mesh position={[1.25, 0.82, 0]}>
-          <cylinderGeometry args={[0.03, 0.03, 2.55, 8]} />
-          <meshBasicMaterial color="#9ad7ff" transparent opacity={0.48} />
-        </mesh>
-      </group>
-    </>
-  );
-}
-
-function HologramOrbs() {
-  return (
-    <>
-      <mesh position={[-5.8, 4.2, 1.5]}>
-        <sphereGeometry args={[0.14, 16, 16]} />
-        <meshBasicMaterial color="#9ad8ff" transparent opacity={0.72} />
-      </mesh>
-      <mesh position={[5.4, 5.3, -1.4]}>
-        <sphereGeometry args={[0.18, 16, 16]} />
-        <meshBasicMaterial color="#b7e8ff" transparent opacity={0.68} />
-      </mesh>
-      <mesh position={[0.6, 6.4, 2.1]}>
-        <sphereGeometry args={[0.11, 16, 16]} />
-        <meshBasicMaterial color="#dbf6ff" transparent opacity={0.78} />
-      </mesh>
-    </>
-  );
-}
-
-function buildLondonBlocks(): CityBlock[] {
-  return [
-    [-4.8, 1.3, 0.9, 0.6, 2.6, 0.6, "#cddceb", "#9fd6ff"],
-    [-3.7, 1.9, -1.4, 0.8, 3.8, 0.8, "#dce7f1", "#a7dbff"],
-    [-2.8, 1.1, 1.7, 0.7, 2.2, 0.7, "#c6d7e6", "#8eceff"],
-    [-1.2, 1.6, -1.9, 0.75, 3.2, 0.75, "#e2ebf3", "#b4e1ff"],
-    [0, 1.1, 2.2, 0.72, 2.2, 0.72, "#d4e1ed", "#a8dbff"],
-    [1.1, 1.8, -1.5, 0.82, 3.6, 0.82, "#e8eff6", "#c2e8ff"],
-    [2.9, 1.2, 1.5, 0.7, 2.4, 0.7, "#c8d9e7", "#9ed2ff"],
-    [4.2, 1.7, -0.9, 0.85, 3.4, 0.85, "#d8e4ef", "#b4e0ff"],
-    [-4.1, 0.8, -3.4, 0.55, 1.6, 0.55, "#c3d3e1", "#8fc8ff"],
-    [-2.1, 1.05, -3.1, 0.62, 2.1, 0.62, "#cddcea", "#9fd1ff"],
-    [0.6, 0.9, -3.4, 0.58, 1.8, 0.58, "#c0d1df", "#90c7ff"],
-    [3.4, 0.95, -3.2, 0.64, 1.9, 0.64, "#c9d8e6", "#a2d6ff"],
-  ].map(([x, y, z, sx, sy, sz, color, glow]) => ({
-    position: [x as number, y as number, z as number],
-    scale: [sx as number, sy as number, sz as number],
-    color: color as string,
-    glow: glow as string,
-  }));
-}
-
-function buildNewYorkBlocks(): CityBlock[] {
-  return [
-    [-5.2, 1.4, 0.8, 0.72, 2.8, 0.72, "#ccdbea", "#a6dcff"],
-    [-4.1, 2.2, -1.2, 0.95, 4.4, 0.95, "#dbe6f1", "#b4e2ff"],
-    [-3, 1.5, 1.7, 0.8, 3, 0.8, "#cfdeeb", "#9ad3ff"],
-    [-1.6, 2.6, -1.9, 0.86, 5.2, 0.86, "#e4edf5", "#c2e8ff"],
-    [1.5, 2.1, 1.6, 0.9, 4.2, 0.9, "#d4e1ed", "#a8dcff"],
-    [3.3, 2.5, -1.4, 0.94, 5, 0.94, "#e6eef5", "#c9ecff"],
-    [4.8, 1.6, 1.1, 0.78, 3.2, 0.78, "#c9dae7", "#9fd3ff"],
-    [-4.6, 1.1, -3.3, 0.62, 2.2, 0.62, "#c0d2e2", "#8ecaff"],
-    [-2.4, 1.25, -3.2, 0.66, 2.5, 0.66, "#cad9e8", "#9fd4ff"],
-    [0.2, 1.2, -3.4, 0.64, 2.4, 0.64, "#c3d5e4", "#97ceff"],
-    [2.3, 1.3, -3.1, 0.68, 2.6, 0.68, "#cbdae9", "#a8daff"],
-    [4.4, 1.15, -3.3, 0.6, 2.3, 0.6, "#bed0e0", "#91cbff"],
-  ].map(([x, y, z, sx, sy, sz, color, glow]) => ({
-    position: [x as number, y as number, z as number],
-    scale: [sx as number, sy as number, sz as number],
-    color: color as string,
-    glow: glow as string,
-  }));
 }

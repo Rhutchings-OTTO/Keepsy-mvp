@@ -3,7 +3,6 @@
 import React, { useState, useRef, Suspense } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useFrame } from "@react-three/fiber";
 import {
@@ -24,9 +23,6 @@ const Canvas = dynamic(
 );
 
 const IVORY = "#F9F8F6";
-
-const UK_IMAGE = "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1920&q=80";
-const US_IMAGE = "https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=1920&q=80";
 
 type PremiumGatewayProps = {
   onComplete: (region: Region) => void;
@@ -77,12 +73,12 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
             <div className="mt-8 grid gap-4 md:grid-cols-2">
               <RegionSide
                 name="UK"
-                image={UK_IMAGE}
+                region="UK"
                 onSelect={(e) => startTransition("UK", e)}
               />
               <RegionSide
                 name="US"
-                image={US_IMAGE}
+                region="US"
                 onSelect={(e) => startTransition("US", e)}
               />
             </div>
@@ -208,11 +204,11 @@ function CloudSceneWithPerf({ isAccelerating }: { isAccelerating: boolean }) {
 
 type RegionSideProps = {
   name: string;
-  image: string;
+  region: Region;
   onSelect: (e: React.MouseEvent) => void;
 };
 
-function RegionSide({ name, image, onSelect }: RegionSideProps) {
+function RegionSide({ name, region, onSelect }: RegionSideProps) {
   return (
     <motion.button
       type="button"
@@ -223,8 +219,22 @@ function RegionSide({ name, image, onSelect }: RegionSideProps) {
       aria-label={`Shop ${name}`}
     >
       <div className="absolute inset-0">
-        <Image src={image} alt={name} fill className="object-cover" sizes="50vw" priority />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(16,18,21,0.12),rgba(16,18,21,0.52))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,0.88),rgba(255,255,255,0.08)_28%,transparent_54%),linear-gradient(180deg,#d6dde6_0%,#8998a8_36%,#2a3341_100%)]" />
+        <div className="absolute inset-0">
+          <ErrorBoundary fallback={<div className="absolute inset-0 bg-[linear-gradient(180deg,#dbe2ea_0%,#39485b_100%)]" />}>
+            <Suspense fallback={<div className="absolute inset-0 bg-[linear-gradient(180deg,#dbe2ea_0%,#39485b_100%)]" />}>
+              <Canvas
+                camera={{ position: [0, 7.5, 14], fov: 42 }}
+                gl={{ alpha: true, antialias: true }}
+                dpr={[1, 1.75]}
+                className="h-full w-full"
+              >
+                <TonalCityScene region={region} />
+              </Canvas>
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,16,22,0.02),rgba(10,14,20,0.34)_58%,rgba(10,14,20,0.72)_100%)]" />
       </div>
       <div className="relative z-10 w-full p-6 sm:p-7">
         <div className="max-w-[14rem] rounded-[1.5rem] border border-white/25 bg-[rgba(255,255,255,0.14)] p-4 backdrop-blur-md">
@@ -239,4 +249,156 @@ function RegionSide({ name, image, onSelect }: RegionSideProps) {
       </div>
     </motion.button>
   );
+}
+
+type CityBlock = {
+  position: [number, number, number];
+  scale: [number, number, number];
+  color: string;
+};
+
+function TonalCityScene({ region }: { region: Region }) {
+  const rootRef = useRef<THREE.Group>(null!);
+  const blocks = React.useMemo<CityBlock[]>(
+    () => (region === "UK" ? buildLondonBlocks() : buildNewYorkBlocks()),
+    [region]
+  );
+
+  useFrame(({ clock, pointer }) => {
+    if (!rootRef.current) return;
+    const t = clock.getElapsedTime();
+    rootRef.current.rotation.y = pointer.x * 0.18 + Math.sin(t * 0.18) * 0.04;
+    rootRef.current.rotation.x = -0.08 + pointer.y * 0.08;
+    rootRef.current.position.y = Math.sin(t * 0.35) * 0.08;
+  });
+
+  return (
+    <>
+      <color attach="background" args={["#000000"]} />
+      <fog attach="fog" args={["#9aa7b5", 10, 28]} />
+      <ambientLight intensity={1.35} />
+      <hemisphereLight intensity={1} groundColor="#243140" color="#f7fbff" />
+      <directionalLight position={[8, 12, 6]} intensity={1.75} color="#ffffff" />
+      <directionalLight position={[-6, 5, -8]} intensity={0.8} color="#9fc4ff" />
+      <group ref={rootRef} position={[0, -1.45, 0]}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <circleGeometry args={[10, 64]} />
+          <meshStandardMaterial color="#2b3642" metalness={0.62} roughness={0.34} />
+        </mesh>
+        <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[5.8, 8.8, 64]} />
+          <meshBasicMaterial color="#dbe9ff" transparent opacity={0.16} />
+        </mesh>
+        <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[4.6, 48]} />
+          <meshBasicMaterial color="#9bc4ff" transparent opacity={0.08} />
+        </mesh>
+        {blocks.map((block, index) => (
+          <mesh
+            key={`${region}-${index}`}
+            position={block.position}
+            scale={block.scale}
+            castShadow
+            receiveShadow
+          >
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial color={block.color} metalness={0.76} roughness={0.26} />
+          </mesh>
+        ))}
+        {region === "UK" ? <LondonLandmarks /> : <NewYorkLandmarks />}
+      </group>
+    </>
+  );
+}
+
+function LondonLandmarks() {
+  return (
+    <>
+      <mesh position={[-2.2, 2.8, -0.2]} castShadow receiveShadow>
+        <coneGeometry args={[0.78, 5.5, 18, 10, true]} />
+        <meshStandardMaterial color="#dfe7f0" metalness={0.82} roughness={0.24} />
+      </mesh>
+      <mesh position={[1.8, 3.6, 0.1]} castShadow receiveShadow>
+        <boxGeometry args={[0.88, 7.2, 0.88]} />
+        <meshStandardMaterial color="#eef5ff" metalness={0.75} roughness={0.22} />
+      </mesh>
+      <mesh position={[1.8, 7.5, 0.1]} castShadow>
+        <coneGeometry args={[0.24, 1.3, 12]} />
+        <meshStandardMaterial color="#f7fbff" metalness={0.9} roughness={0.18} />
+      </mesh>
+      <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0.18, 0]}>
+        <torusGeometry args={[6, 0.08, 12, 64]} />
+        <meshBasicMaterial color="#bed7ff" transparent opacity={0.16} />
+      </mesh>
+    </>
+  );
+}
+
+function NewYorkLandmarks() {
+  return (
+    <>
+      <mesh position={[0.2, 4.2, -0.3]} castShadow receiveShadow>
+        <boxGeometry args={[1.1, 8.4, 1.1]} />
+        <meshStandardMaterial color="#eff6ff" metalness={0.78} roughness={0.2} />
+      </mesh>
+      <mesh position={[0.2, 8.9, -0.3]} castShadow>
+        <coneGeometry args={[0.18, 1.2, 10]} />
+        <meshStandardMaterial color="#ffffff" metalness={0.94} roughness={0.14} />
+      </mesh>
+      <mesh position={[-2.5, 2.8, 0.8]} castShadow receiveShadow>
+        <boxGeometry args={[1.4, 5.6, 1.4]} />
+        <meshStandardMaterial color="#d9e3f1" metalness={0.72} roughness={0.28} />
+      </mesh>
+      <mesh position={[2.8, 3.1, 0.4]} castShadow receiveShadow>
+        <boxGeometry args={[1.2, 6.2, 1.2]} />
+        <meshStandardMaterial color="#d0dceb" metalness={0.72} roughness={0.3} />
+      </mesh>
+      <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, -0.12, 0]}>
+        <torusGeometry args={[6.2, 0.07, 12, 64]} />
+        <meshBasicMaterial color="#dbe7ff" transparent opacity={0.14} />
+      </mesh>
+    </>
+  );
+}
+
+function buildLondonBlocks(): CityBlock[] {
+  return [
+    [-4.8, 1.3, 0.9, 0.6, 2.6, 0.6, "#a4b4c5"],
+    [-3.7, 1.9, -1.4, 0.8, 3.8, 0.8, "#b7c5d3"],
+    [-2.8, 1.1, 1.7, 0.7, 2.2, 0.7, "#95a6b8"],
+    [-1.2, 1.6, -1.9, 0.75, 3.2, 0.75, "#c6d3df"],
+    [0, 1.1, 2.2, 0.72, 2.2, 0.72, "#aab9c9"],
+    [1.1, 1.8, -1.5, 0.82, 3.6, 0.82, "#d3dee8"],
+    [2.9, 1.2, 1.5, 0.7, 2.4, 0.7, "#a0b2c4"],
+    [4.2, 1.7, -0.9, 0.85, 3.4, 0.85, "#b9c8d8"],
+    [-4.1, 0.8, -3.4, 0.55, 1.6, 0.55, "#8fa0b1"],
+    [-2.1, 1.05, -3.1, 0.62, 2.1, 0.62, "#9caec0"],
+    [0.6, 0.9, -3.4, 0.58, 1.8, 0.58, "#8d9eb0"],
+    [3.4, 0.95, -3.2, 0.64, 1.9, 0.64, "#9eaec0"],
+  ].map(([x, y, z, sx, sy, sz, color]) => ({
+    position: [x as number, y as number, z as number],
+    scale: [sx as number, sy as number, sz as number],
+    color: color as string,
+  }));
+}
+
+function buildNewYorkBlocks(): CityBlock[] {
+  return [
+    [-5.2, 1.4, 0.8, 0.72, 2.8, 0.72, "#9cacbe"],
+    [-4.1, 2.2, -1.2, 0.95, 4.4, 0.95, "#bac7d6"],
+    [-3, 1.5, 1.7, 0.8, 3, 0.8, "#a7b8ca"],
+    [-1.6, 2.6, -1.9, 0.86, 5.2, 0.86, "#d1dbe6"],
+    [1.5, 2.1, 1.6, 0.9, 4.2, 0.9, "#b1c0d1"],
+    [3.3, 2.5, -1.4, 0.94, 5, 0.94, "#d7e2ed"],
+    [4.8, 1.6, 1.1, 0.78, 3.2, 0.78, "#a2b3c5"],
+    [-4.6, 1.1, -3.3, 0.62, 2.2, 0.62, "#92a5b8"],
+    [-2.4, 1.25, -3.2, 0.66, 2.5, 0.66, "#9cafc1"],
+    [0.2, 1.2, -3.4, 0.64, 2.4, 0.64, "#95a7b9"],
+    [2.3, 1.3, -3.1, 0.68, 2.6, 0.68, "#9eb1c4"],
+    [4.4, 1.15, -3.3, 0.6, 2.3, 0.6, "#8fa1b4"],
+  ].map(([x, y, z, sx, sy, sz, color]) => ({
+    position: [x as number, y as number, z as number],
+    scale: [sx as number, sy as number, sz as number],
+    color: color as string,
+  }));
 }

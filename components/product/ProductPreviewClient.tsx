@@ -167,7 +167,7 @@ export function ProductPreviewClient({ initialSlug }: ProductPreviewClientProps)
             <section className="pt-4 border-t border-black/10">
               <Link
                 href={createHref}
-                className="block w-full py-4 rounded-2xl bg-black text-white text-center font-black text-base hover:bg-black/90 transition"
+                className="block w-full rounded-2xl bg-black py-4 text-center text-base font-black text-white hover:bg-black/90 transition !text-white"
               >
                 Start creating
               </Link>

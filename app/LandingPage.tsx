@@ -88,7 +88,7 @@ function FlowStage({
         className="relative overflow-hidden rounded-[1.2rem] border border-black/8"
         style={{ background: tone }}
       >
-        <Image src={image} alt={alt} width={320} height={320} className="h-32 w-full object-cover" />
+        <Image src={image} alt={alt} width={320} height={320} className="h-32 w-full object-contain p-2" />
       </div>
     </div>
   );
@@ -109,7 +109,6 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   const activeRegion = region ?? "UK";
   const showcase = CREATE_EXAMPLES[activeRegion];
   const heroExample = showcase.beforeAfterTiles[0];
-  const supportingExamples = showcase.beforeAfterTiles.slice(1, 3);
   const heroOccasions = showcase.occasionTiles.slice(0, 3);
 
   useEffect(() => {
@@ -284,21 +283,9 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                             className="!rounded-[1.6rem]"
                           />
                         </div>
-                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                          {supportingExamples.map((example) => (
-                            <div key={example.caption} className="rounded-[1.25rem] border border-black/8 bg-[#faf6f0] p-3">
-                              <div className="flex items-center gap-3">
-                                <div className="relative h-12 w-12 overflow-hidden rounded-2xl border border-black/8 bg-white">
-                                  <Image src={example.afterImage} alt={example.afterLabel} fill className="object-cover" sizes="48px" />
-                                </div>
-                                <div>
-                                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-black/40">{example.gift.productType}</p>
-                                  <p className="text-sm font-semibold text-[#26211d]">{example.caption}</p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <p className="mt-4 text-sm leading-7 text-[#5e5852]">
+                          One image goes all the way through: the original photo, a matching illustrated version, then that exact design on the finished gift.
+                        </p>
                       </div>
                     </motion.div>
                   </div>

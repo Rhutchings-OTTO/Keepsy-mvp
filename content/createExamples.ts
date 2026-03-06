@@ -54,19 +54,6 @@ export const CREATE_EXAMPLES: Record<
     ],
     beforeAfterTiles: [
       {
-        beforeLabel: "Family portrait",
-        afterLabel: "Caricature artwork",
-        caption: "Family photo -> caricature -> mug gift",
-        beforeImage:
-          "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=900&q=80",
-        afterImage: "/generated-examples/family-caricature.png",
-        gift: {
-          productType: "mug",
-          color: "white",
-          artworkImage: "/generated-examples/family-caricature.png",
-        },
-      },
-      {
         beforeLabel: "House portrait",
         afterLabel: "Christmas artwork",
         caption: "Front door photo -> festive watercolor -> flat card",
@@ -77,6 +64,19 @@ export const CREATE_EXAMPLES: Record<
           productType: "card",
           color: "white",
           artworkImage: "/generated-examples/house-christmas.png",
+        },
+      },
+      {
+        beforeLabel: "Family portrait",
+        afterLabel: "Caricature artwork",
+        caption: "Family photo -> caricature -> mug gift",
+        beforeImage:
+          "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=900&q=80",
+        afterImage: "/generated-examples/family-caricature.png",
+        gift: {
+          productType: "mug",
+          color: "white",
+          artworkImage: "/generated-examples/family-caricature.png",
         },
       },
       {
@@ -189,19 +189,6 @@ export const CREATE_EXAMPLES: Record<
     ],
     beforeAfterTiles: [
       {
-        beforeLabel: "Family portrait",
-        afterLabel: "Caricature artwork",
-        caption: "Family photo -> caricature -> mug gift",
-        beforeImage:
-          "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=900&q=80",
-        afterImage: "/generated-examples/family-caricature.png",
-        gift: {
-          productType: "mug",
-          color: "white",
-          artworkImage: "/generated-examples/family-caricature.png",
-        },
-      },
-      {
         beforeLabel: "House portrait",
         afterLabel: "Christmas artwork",
         caption: "Front door photo -> festive watercolor -> flat card",
@@ -212,6 +199,19 @@ export const CREATE_EXAMPLES: Record<
           productType: "card",
           color: "white",
           artworkImage: "/generated-examples/house-christmas.png",
+        },
+      },
+      {
+        beforeLabel: "Family portrait",
+        afterLabel: "Caricature artwork",
+        caption: "Family photo -> caricature -> mug gift",
+        beforeImage:
+          "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=900&q=80",
+        afterImage: "/generated-examples/family-caricature.png",
+        gift: {
+          productType: "mug",
+          color: "white",
+          artworkImage: "/generated-examples/family-caricature.png",
         },
       },
       {

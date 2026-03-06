@@ -31,6 +31,13 @@ const PRODUCTS = [
   { type: "hoodie" as const, Icon: Layout, label: "Hoodie" },
 ];
 
+const PRODUCT_PREVIEW_IMAGES: Record<(typeof PRODUCTS)[number]["type"], string> = {
+  tshirt: "/product-tiles/tee-white.png",
+  mug: "/product-tiles/plain-mug-front.png",
+  card: "/product-tiles/plain-card.png",
+  hoodie: "/product-tiles/hoodie-white.png",
+};
+
 const REVIEWS = [
   { name: "Helen", quote: "It felt simple and clear from the first screen.", initials: "H" },
   { name: "Rachel", quote: "The preview made it much easier to trust the final gift.", initials: "R" },
@@ -339,14 +346,23 @@ export function CreatePageLayoutLean({
                     : "border-black/10 bg-[#fbf8f4] text-[#2b2521]"
                 }`}
               >
-                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/80 text-[#8b6f47]">
+                <div className="relative mb-4 overflow-hidden rounded-[1rem] border border-black/8 bg-white/80">
+                  <Image
+                    src={PRODUCT_PREVIEW_IMAGES[type]}
+                    alt={`${label} preview`}
+                    width={240}
+                    height={160}
+                    className="h-24 w-full object-contain p-2"
+                  />
+                </div>
+                <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl ${selectedProductType === type ? "bg-white/12 text-white" : "bg-white/80 text-[#8b6f47]"}`}>
                   <Icon size={20} />
                 </div>
                 <p className={`mt-4 text-lg font-semibold ${selectedProductType === type ? "text-white" : "text-[#241f1c]"}`}>
                   {label}
                 </p>
                 <p className={`mt-1 text-sm ${selectedProductType === type ? "text-white/75" : "text-[#70675f]"}`}>
-                  Preview before you buy
+                  {selectedProductType === type ? "Selected for your preview" : "Choose this product for your preview"}
                 </p>
               </motion.button>
             ))}

@@ -110,7 +110,7 @@ export function BottomSheetNav() {
                 <Link
                   href="/create"
                   onClick={() => setOpen(false)}
-                  className="mt-4 flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1f2937] px-5 text-sm font-semibold text-white shadow-[0_18px_30px_-18px_rgba(17,24,39,0.5)]"
+                  className="mt-4 flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1f2937] px-5 text-sm font-semibold text-white shadow-[0_18px_30px_-18px_rgba(17,24,39,0.5)] !text-white"
                 >
                   Start creating
                   <ArrowRight size={16} />

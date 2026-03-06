@@ -34,8 +34,7 @@ export function DesignVaultSidebar({
   return (
     <div
       className={`flex flex-col border-r border-black/10 backdrop-blur-sm rounded-l-2xl overflow-hidden transition-all ${className}`}
-      style={{ backgroundColor: "rgba(253,246,238,0.7)" }}
-      style={{ width: collapsed ? 48 : 140 }}
+      style={{ backgroundColor: "rgba(253,246,238,0.7)", width: collapsed ? 48 : 140 }}
     >
       <button
         type="button"

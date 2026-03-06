@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { MagneticLink } from "@/components/ui/MagneticLink";
 import { Reveal } from "@/components/motion/Reveal";
@@ -61,72 +62,82 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
 
   if (status === "paid") {
     return (
-      <main className="min-h-screen bg-ivory">
-        <OrderSuccess
-          productName={primaryProductName}
-          designUrl={generatedImageUrl}
-        />
+      <main className="min-h-screen">
+        <Reveal variant="fadeUp">
+          <OrderSuccess
+            productName={primaryProductName}
+            designUrl={generatedImageUrl}
+          />
+        </Reveal>
       </main>
     );
   }
 
-  const headline =
-    status === "failed"
-      ? "Payment issue detected"
-      : "Payment received";
-
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-16">
       <Reveal variant="fadeUp">
-      <div className="rounded-3xl border border-black/10 bg-white p-8 shadow-sm">
-        <h1 className="text-4xl font-black">{headline} ✅</h1>
-        <p className="mt-3 text-black/70">
-          We are finalizing your order details and preparing it for fulfillment.
-        </p>
-
-        <div className="mt-6 space-y-2 text-sm text-black/65">
-          <p>Session: {sessionId || "—"}</p>
-          <p>Order reference: {orderRef || "Pending assignment"}</p>
-          <p>Status: <span className="font-bold uppercase">{status}</span></p>
-        </div>
-
-        {typeof totalGBP === "number" && (
-          <p className="mt-5 text-lg font-black">Total: £{totalGBP.toFixed(2)}</p>
-        )}
-
-        {items.length > 0 && (
-          <div className="mt-4 rounded-2xl border border-black/10 p-4">
-            <h2 className="text-sm font-extrabold uppercase tracking-wide text-black/55">Items</h2>
-            <ul className="mt-2 space-y-2 text-sm">
-              {items.map((item, index) => (
-                <li key={`${item.product_name}-${index}`} className="flex justify-between gap-2">
-                  <span>{item.product_name} × {item.quantity}</span>
-                  <span>£{Number(item.line_total_gbp).toFixed(2)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {errorMessage && (
-          <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-700">
-            {errorMessage}
+        <div className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(253,246,238,0.92),rgba(247,236,224,0.95))] p-8 shadow-warm-md backdrop-blur-xl sm:p-10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: status === "failed" ? "#C0392B" : "var(--color-terracotta)" }}>
+            {status === "failed" ? "Payment Issue" : "Order Received"}
           </p>
-        )}
+          <h1 className="mt-3 font-serif text-3xl font-semibold tracking-[-0.03em] sm:text-4xl" style={{ color: "var(--color-charcoal)" }}>
+            {status === "failed" ? "Payment issue detected" : "Thank you for your order!"}
+          </h1>
+          <p className="mt-4 text-base leading-8" style={{ color: "rgba(45,41,38,0.65)" }}>
+            {status === "failed"
+              ? "Something went wrong with your payment. Please try again or contact support."
+              : "We\u2019re finalising your order and preparing your design for print."}
+          </p>
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          <MagneticLink href="/create" className="rounded-xl bg-black px-4 py-2 font-bold text-white inline-block">
-            Create another design
-          </MagneticLink>
-          <MagneticLink href="/gift-ideas" className="rounded-xl border border-black/15 px-4 py-2 font-bold text-black inline-block">
-            Browse gift ideas
-          </MagneticLink>
+          <div className="mt-6 rounded-xl border border-white/60 bg-white/60 p-4 space-y-2 text-sm" style={{ color: "rgba(45,41,38,0.65)" }}>
+            {orderRef && <p>Order reference: <span className="font-semibold" style={{ color: "var(--color-charcoal)" }}>{orderRef}</span></p>}
+            {sessionId && <p>Session: <span className="font-mono text-xs">{sessionId}</span></p>}
+            <p>Status: <span className="font-bold uppercase" style={{ color: "var(--color-terracotta)" }}>{status}</span></p>
+          </div>
+
+          {typeof totalGBP === "number" && (
+            <p className="mt-5 text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>
+              Total: <span style={{ color: "var(--color-terracotta)" }}>£{totalGBP.toFixed(2)}</span>
+            </p>
+          )}
+
+          {items.length > 0 && (
+            <div className="mt-4 rounded-xl border border-white/60 bg-white/60 p-5">
+              <h2 className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "rgba(45,41,38,0.45)" }}>Items</h2>
+              <ul className="mt-3 space-y-2 text-sm">
+                {items.map((item, index) => (
+                  <li key={`${item.product_name}-${index}`} className="flex justify-between gap-2" style={{ color: "var(--color-charcoal)" }}>
+                    <span>{item.product_name} × {item.quantity}</span>
+                    <span style={{ color: "var(--color-terracotta)" }}>£{Number(item.line_total_gbp).toFixed(2)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {errorMessage && (
+            <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+              {errorMessage}
+            </p>
+          )}
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/create"
+              className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white shadow-terra-glow transition hover:opacity-90"
+              style={{ backgroundColor: "var(--color-terracotta)" }}
+            >
+              Create another design
+            </Link>
+            <Link
+              href="/gift-ideas"
+              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold transition hover:-translate-y-0.5"
+              style={{ borderColor: "rgba(45,41,38,0.15)", color: "var(--color-charcoal)", backgroundColor: "rgba(255,255,255,0.80)" }}
+            >
+              Browse gift ideas
+            </Link>
+          </div>
         </div>
-
-        <p className="mt-6 text-xs text-black/50">
-          Final remaining integration: Printify order execution after webhook-confirmed payment.
-        </p>
-      </div>
       </Reveal>
     </main>
   );

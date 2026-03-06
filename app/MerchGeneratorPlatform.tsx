@@ -877,7 +877,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
   return (
     <div
-      className={`min-h-screen flex flex-col text-[#23211F] selection:bg-indigo-100 overflow-x-hidden ${
+      className={`min-h-screen flex flex-col text-charcoal selection:bg-terracotta/20 overflow-x-hidden ${
         isMagicpathSkin ? "bg-[#FDFCFB]" : "bg-[#F7F1EB]"
       }`}
       aria-busy={isGenerating}
@@ -908,7 +908,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               onClick={() => setView("home")}
               className={`rounded-full px-3 py-1.5 transition-colors ${
                 view === "home"
-                  ? "bg-[#1f2937] !text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
+                  ? "bg-terracotta !text-white shadow-[0_12px_24px_-18px_rgba(196,113,74,0.45)]"
                   : "text-black/65 hover:bg-black/[0.04] hover:text-black"
               }`}
             >
@@ -918,7 +918,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               onClick={() => setView("catalog")}
               className={`rounded-full px-3 py-1.5 transition-colors ${
                 view === "catalog"
-                  ? "bg-[#1f2937] !text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
+                  ? "bg-terracotta !text-white shadow-[0_12px_24px_-18px_rgba(196,113,74,0.45)]"
                   : "text-black/65 hover:bg-black/[0.04] hover:text-black"
               }`}
             >
@@ -928,7 +928,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   onClick={() => setView("community")}
                   className={`rounded-full px-3 py-1.5 transition-colors ${
                     view === "community"
-? "bg-[#1f2937] !text-white shadow-[0_12px_24px_-18px_rgba(17,24,39,0.45)]"
+? "bg-terracotta !text-white shadow-[0_12px_24px_-18px_rgba(196,113,74,0.45)]"
                   : "text-black/65 hover:bg-black/[0.04] hover:text-black"
               }`}
                 >
@@ -939,7 +939,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               <button
                 onClick={() => setIsCartOpen(true)}
                 className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all ${
-                  isMagicpathSkin ? "bg-black !text-white shadow-xl" : "bg-[#1f2937] !text-white shadow-[0_14px_28px_-20px_rgba(17,24,39,0.55)]"
+                  isMagicpathSkin ? "bg-terracotta !text-white shadow-xl" : "bg-terracotta !text-white shadow-[0_14px_28px_-20px_rgba(196,113,74,0.55)]"
                 }`}
               >
                 <ShoppingCart size={18} className="text-white" />
@@ -964,7 +964,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               <div className="flex gap-2 md:hidden">
                 <button
                   onClick={() => setView("home")}
-                  className="rounded-full border border-[#1f2937] bg-[#1f2937] px-3 py-1.5 text-xs font-semibold text-white"
+                  className="rounded-full border border-terracotta bg-terracotta px-3 py-1.5 text-xs font-semibold text-white"
                 >
                   How it works
                 </button>
@@ -1141,7 +1141,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             }}
                             className={`rounded-[1.35rem] border p-4 text-left transition-all ${
                               selectedProduct.id === prod.id
-                                ? "border-[#1f2937] bg-[#1f2937] text-white shadow-[0_16px_34px_-24px_rgba(17,24,39,0.5)]"
+                                ? "border-terracotta bg-terracotta text-white shadow-[0_16px_34px_-24px_rgba(196,113,74,0.5)]"
                                 : "border-black/10 bg-white/84"
                             }`}
                           >
@@ -1164,7 +1164,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                 type="button"
                                 onClick={() => setSelectedColor(c.hex)}
                                 className={`w-10 h-10 rounded-full border-2 transition ${
-                                  selectedColor === c.hex ? "border-black ring-4 ring-black/5" : "border-black/10 hover:border-black/30"
+                                  selectedColor === c.hex ? "border-terracotta ring-4 ring-terracotta/20" : "border-black/10 hover:border-black/30"
                                 }`}
                                 style={{ backgroundColor: c.hex }}
                                 aria-pressed={selectedColor === c.hex}
@@ -1186,7 +1186,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                 onClick={() => setSelectedSize(size)}
                                 className={`min-h-[44px] min-w-[44px] px-3 py-2 rounded-xl text-sm font-bold transition ${
                                   selectedSize === size
-                                    ? "bg-black text-white"
+                                    ? "bg-terracotta text-white"
                                     : "bg-black/5 text-black/80 hover:bg-black/10"
                                 }`}
                                 aria-pressed={selectedSize === size}
@@ -1240,7 +1240,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             whileTap={{ scale: 0.98 }}
                             onClick={handleAddToCart}
                               disabled={!generatedImage || (selectedProduct.hasSize && !selectedSize)}
-                              className="flex w-full items-center justify-center gap-2 rounded-[1.35rem] bg-[#1f2937] py-4 font-black !text-white disabled:cursor-not-allowed disabled:opacity-40"
+                              className="flex w-full items-center justify-center gap-2 rounded-[1.35rem] bg-terracotta py-4 font-black !text-white disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             Add <Plus size={18} />
                           </motion.button>
@@ -1285,7 +1285,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <MagneticButton
                       onClick={() => requestCheckout(hasCartItems ? "cart" : "single")}
                       disabled={isBusy || !canProceedToCheckout}
-                      className="relative w-full overflow-hidden rounded-[1.5rem] bg-[#1f2937] py-5 text-lg font-black text-white shadow-[0_20px_42px_-24px_rgba(17,24,39,0.55)] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="relative w-full overflow-hidden rounded-[1.5rem] bg-terracotta py-5 text-lg font-black text-white shadow-terra-glow disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <AnimatePresence mode="wait">
                         {checkoutSuccess ? (
@@ -1376,12 +1376,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   <p className="text-lg font-black text-[#1A1A1A]">Securing your Masterpiece</p>
                   <p className="mt-2 text-sm font-semibold text-[#1A1A1A]/60">Redirecting to checkout…</p>
                   <motion.div
-                    className="mt-4 mx-auto h-1 w-32 rounded-full bg-[#1A1A1A]/10 overflow-hidden"
+                    className="mt-4 mx-auto h-1 w-32 rounded-full bg-terracotta/10 overflow-hidden"
                     animate={{ opacity: [0.6, 1, 0.6] }}
                     transition={{ duration: 1.2, repeat: Infinity }}
                   >
                     <motion.div
-                      className="h-full bg-[#1A1A1A]/30 rounded-full"
+                      className="h-full bg-terracotta/60 rounded-full"
                       animate={{ width: ["0%", "100%", "0%"] }}
                       transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                     />
@@ -1548,7 +1548,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 <MagneticButton
                   onClick={() => requestCheckout("cart")}
                   disabled={isBusy || cartItems.length === 0}
-                  className="w-full py-3 rounded-xl bg-black !text-white font-extrabold disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3 rounded-xl bg-terracotta !text-white font-extrabold disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {isBusy ? "Securing…" : "Checkout"}
                 </MagneticButton>

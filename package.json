@@ -13,6 +13,7 @@
     "safety-smoke": "node scripts/safety-smoke.mjs"
   },
   "dependencies": {
+    "@paper-design/shaders-react": "^0.0.71",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@supabase/supabase-js": "^2.98.0",

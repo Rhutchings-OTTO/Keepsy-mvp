@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Gift, ImageIcon, ShieldCheck, Sparkles } from "lucide-react";
-import AuroraBackground from "@/components/AuroraBackground";
+import { MeshGradientBackground } from "@/components/MeshGradientBackground";
 import { DynamicLogo } from "@/components/DynamicLogo";
 import RegionSelector from "@/components/RegionSelector";
 import { getRegion, setRegion, type Region } from "@/lib/region";
@@ -161,7 +161,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
       ) : (
         <>
           <div className="fixed inset-0 z-0">
-            <AuroraBackground />
+            <MeshGradientBackground />
           </div>
 
           <header className="relative z-30">

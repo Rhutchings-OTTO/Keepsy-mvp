@@ -74,7 +74,8 @@ const SOCIAL_PROOF_ITEMS = [
 const FEATURED_PRODUCTS = [
   {
     name: "Best Mom Ever Mug",
-    price: "$24.99",
+    priceUS: "$24.99",
+    priceUK: "£19.99",
     rating: "★★★★★",
     reviews: 847,
     src: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
@@ -82,7 +83,8 @@ const FEATURED_PRODUCTS = [
   },
   {
     name: "Custom Photo Card Pack",
-    price: "$18.99",
+    priceUS: "$18.99",
+    priceUK: "£14.99",
     rating: "★★★★★",
     reviews: 1203,
     src: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400",
@@ -90,7 +92,8 @@ const FEATURED_PRODUCTS = [
   },
   {
     name: "The Cozy Custom Hoodie",
-    price: "$54.99",
+    priceUS: "$54.99",
+    priceUK: "£44.99",
     rating: "★★★★★",
     reviews: 276,
     src: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400",
@@ -98,7 +101,8 @@ const FEATURED_PRODUCTS = [
   },
   {
     name: "Personalised Family Tee",
-    price: "$32.99",
+    priceUS: "$32.99",
+    priceUK: "£26.99",
     rating: "★★★★★",
     reviews: 328,
     src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
@@ -220,9 +224,11 @@ function ProductImageCard({ src, alt, label }: { src: string; alt: string; label
 function FeaturedProductCard({
   product,
   index,
+  region,
 }: {
   product: (typeof FEATURED_PRODUCTS)[0];
   index: number;
+  region: Region;
 }) {
   const [imgVisible, setImgVisible] = useState(true);
   return (
@@ -267,7 +273,7 @@ function FeaturedProductCard({
           <span className="text-xs text-[#8b7f74]">({product.reviews.toLocaleString()})</span>
         </div>
         <div className="mt-auto flex items-center justify-between pt-3">
-          <span className="text-lg font-bold text-charcoal">{product.price}</span>
+          <span className="text-lg font-bold text-charcoal">{region === "UK" ? product.priceUK : product.priceUS}</span>
           <Link
             href="/shop"
             className="inline-flex items-center gap-1 rounded-full bg-[#C4714A] px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -549,7 +555,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
                 <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
                   {FEATURED_PRODUCTS.map((product, i) => (
-                    <FeaturedProductCard key={product.name} product={product} index={i} />
+                    <FeaturedProductCard key={product.name} product={product} index={i} region={activeRegion} />
                   ))}
                 </div>
               </div>
@@ -802,31 +808,42 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
           </main>
 
           {/* ── Footer ── */}
-          <footer className="relative z-20 border-t border-black/8 bg-white/65 py-10 backdrop-blur-md">
-            <div
-              className={`${CONTAINER} flex flex-col gap-5 text-sm text-[#5d5650] sm:flex-row sm:items-center sm:justify-between`}
-            >
+          <footer className="relative z-20 py-12" style={{ backgroundColor: "var(--color-forest)" }}>
+            <div className={`${CONTAINER} flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between`}>
               <div>
-                <p className="font-semibold text-charcoal">Keepsy</p>
-                <p className="mt-1">Beautiful personalised gifts, made simple.</p>
+                <p className="font-serif text-2xl font-bold text-white">Keepsy</p>
+                <p className="mt-2 text-sm" style={{ color: "rgba(253,246,238,0.70)" }}>
+                  Beautiful personalised gifts, made simple.
+                </p>
+                <p className="mt-3 text-xs font-semibold" style={{ color: "rgba(253,246,238,0.50)" }}>
+                  🇬🇧 UK & 🇺🇸 US shipping · Powered by AI · Payments by Stripe
+                </p>
               </div>
-              <div className="flex flex-wrap gap-4">
-                <Link href="/shop" className="hover:text-charcoal">
-                  Shop
-                </Link>
-                <Link href="/gift-ideas" className="hover:text-charcoal">
-                  Gift ideas
-                </Link>
-                <Link href="/create" className="hover:text-charcoal">
-                  Create
-                </Link>
-                <Link href="/terms" className="hover:text-charcoal">
-                  Terms
-                </Link>
-                <Link href="/privacy" className="hover:text-charcoal">
-                  Privacy
-                </Link>
+              <div className="flex flex-wrap gap-x-8 gap-y-3">
+                {[
+                  { href: "/shop", label: "Shop" },
+                  { href: "/gift-ideas", label: "Gift Ideas" },
+                  { href: "/create", label: "Create" },
+                  { href: "/terms", label: "Terms" },
+                  { href: "/privacy", label: "Privacy" },
+                  { href: "/shipping", label: "Shipping" },
+                  { href: "/refunds", label: "Refunds" },
+                ].map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="text-sm transition hover:text-white"
+                    style={{ color: "rgba(253,246,238,0.65)" }}
+                  >
+                    {label}
+                  </Link>
+                ))}
               </div>
+            </div>
+            <div className={`${CONTAINER} mt-8 border-t pt-6`} style={{ borderColor: "rgba(253,246,238,0.12)" }}>
+              <p className="text-xs" style={{ color: "rgba(253,246,238,0.40)" }}>
+                © {new Date().getFullYear()} Keepsy Ltd. All rights reserved.
+              </p>
             </div>
           </footer>
 

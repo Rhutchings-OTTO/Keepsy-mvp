@@ -117,6 +117,10 @@ const GBP_FORMATTER = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
 });
+const USD_FORMATTER = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
 const CART_STORAGE_KEY = "keepsy_cart_v2";
 
 function gbp(n: number) {
@@ -354,6 +358,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [region] = useState<Region>(() => getRegion() ?? "UK");
+  const fmt = (n: number) => region === "US" ? USD_FORMATTER.format(n) : GBP_FORMATTER.format(n);
 
   const [prompt, setPromptState] = useState<string>("");
 
@@ -1147,7 +1152,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           >
                             <div className="text-sm font-extrabold">{prod.name}</div>
                             <div className={`text-xs mt-1 ${selectedProduct.id === prod.id ? "text-white/70" : "text-black/55"}`}>
-                                {gbp(prod.basePrice)}
+                                {fmt(prod.basePrice)}
                             </div>
                           </motion.button>
                         ))}
@@ -1211,7 +1216,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       <section className="border-t border-black/10 pt-4">
                         <div className="flex justify-between items-center mb-4">
                           <span className="text-black/55 font-semibold">Subtotal</span>
-                          <span className="text-2xl font-black">{gbp(selectedProduct.basePrice)}</span>
+                          <span className="text-2xl font-black">{fmt(selectedProduct.basePrice)}</span>
                         </div>
                         {FF.giftingFlow && generatedImage ? (
                           <div className="mb-4">
@@ -1294,7 +1299,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </motion.div>
                         ) : (
                           <motion.div key="default" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-2">
-                            {isBusy ? "Securing your Masterpiece…" : `Pay ${gbp(checkoutTotal)}`} <ArrowRight />
+                            {isBusy ? "Securing your Masterpiece…" : `Pay ${fmt(checkoutTotal)}`} <ArrowRight />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -1331,12 +1336,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           {hasCartItems ? "Mixed cart with custom AI-generated designs" : "Custom AI-generated design"}
                       </div>
                       </div>
-                      <div className="ml-auto font-black">{gbp(checkoutTotal)}</div>
+                      <div className="ml-auto font-black">{fmt(checkoutTotal)}</div>
                     </div>
 
                     <div className="mt-6 pt-5 border-t border-black/10 space-y-2 text-sm font-semibold text-black/60">
                       <div className="flex justify-between"><span>Shipping</span><span>Free</span></div>
-                      <div className="flex justify-between text-black font-black text-base pt-2"><span>Total</span><span>{gbp(checkoutTotal)}</span></div>
+                      <div className="flex justify-between text-black font-black text-base pt-2"><span>Total</span><span>{fmt(checkoutTotal)}</span></div>
                     </div>
 
                     <div className="mt-6 flex items-center gap-2 text-xs text-black/45 font-semibold">
@@ -1346,7 +1351,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       <div className="mt-4">
                         <CheckoutSummaryEnhancer
                           productName={checkoutItemDescription}
-                          priceText={gbp(checkoutTotal)}
+                          priceText={fmt(checkoutTotal)}
                           thumbnailSrc={checkoutPreviewImage}
                         />
                   </div>
@@ -1408,7 +1413,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   >
                     <div className="text-lg font-black">{p.name}</div>
                     <div className="text-sm text-black/55 font-semibold mt-1">{p.description}</div>
-                    <div className="text-sm font-black mt-3">{gbp(p.basePrice)}</div>
+                    <div className="text-sm font-black mt-3">{fmt(p.basePrice)}</div>
                   </Link>
                 ))}
               </div>
@@ -1518,7 +1523,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               {[item.size, item.color].filter(Boolean).join(" · ")}
                             </div>
                           )}
-                          <div className="text-black/55 text-sm">{gbp(item.unitPrice)}</div>
+                          <div className="text-black/55 text-sm">{fmt(item.unitPrice)}</div>
                         </div>
                         <button onClick={() => handleRemoveCartItem(item.id)} className="text-black/40 hover:text-red-600 shrink-0">
                           <X size={16} />
@@ -1534,7 +1539,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             +
                           </button>
                         </div>
-                        <div className="font-bold">{gbp(item.unitPrice * item.quantity)}</div>
+                        <div className="font-bold">{fmt(item.unitPrice * item.quantity)}</div>
                       </div>
                     </div>
                   ))
@@ -1543,7 +1548,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               <div className="pt-4 border-t border-black/10">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-black/55 font-semibold">Subtotal</span>
-                  <span className="text-xl font-black">{gbp(cartSubtotal)}</span>
+                  <span className="text-xl font-black">{fmt(cartSubtotal)}</span>
                 </div>
                 <MagneticButton
                   onClick={() => requestCheckout("cart")}

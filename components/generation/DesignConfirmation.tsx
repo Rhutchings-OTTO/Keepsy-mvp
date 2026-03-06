@@ -178,7 +178,7 @@ export function DesignConfirmation({
           type="button"
           onClick={onContinue}
           disabled={isRefining}
-          className="min-h-[72px] rounded-[1.5rem] bg-[#1f2937] px-6 py-4 text-left text-base font-bold !text-white shadow-[0_18px_34px_-20px_rgba(17,24,39,0.55)] transition-all hover:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px] sm:text-lg"
+          className="min-h-[72px] rounded-[1.5rem] bg-terracotta px-6 py-4 text-left text-base font-bold !text-white shadow-[0_18px_34px_-20px_rgba(196,113,74,0.5)] transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-terracotta focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px] sm:text-lg"
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
         >
@@ -209,7 +209,7 @@ export function DesignConfirmation({
                     <MagneticButton
                       type="button"
                       onClick={onStartFresh}
-                      className="px-4 py-2 rounded-xl bg-black text-white text-sm font-bold hover:bg-black/90"
+                      className="px-4 py-2 rounded-xl bg-terracotta text-white text-sm font-bold hover:opacity-90"
                     >
                       Start a fresh design
                     </MagneticButton>
@@ -261,7 +261,7 @@ export function DesignConfirmation({
                     <MagneticButton
                       type="submit"
                       disabled={!trimmedText || isRefining || !canRefine}
-                      className="px-6 py-3 rounded-xl bg-black text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-6 py-3 rounded-xl bg-terracotta text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >

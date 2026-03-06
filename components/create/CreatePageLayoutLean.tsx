@@ -256,7 +256,7 @@ export function CreatePageLayoutLean({
                 <MagneticButton
                   onClick={() => onGenerate()}
                   disabled={(!(typeof prompt === "string" ? prompt : "").trim() && !uploadedImage) || isBusy}
-                  className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-full bg-[#1f2937] px-6 text-base font-semibold !text-white shadow-[0_20px_36px_-22px_rgba(17,24,39,0.6)] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-full bg-terracotta px-6 text-base font-semibold !text-white shadow-[0_20px_36px_-22px_rgba(196,113,74,0.55)] disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   {isBusy ? (
                     <>
@@ -344,7 +344,7 @@ export function CreatePageLayoutLean({
                 whileTap={{ scale: 0.985 }}
                 className={`rounded-[22px] border p-4 text-left transition sm:p-5 ${
                   selectedProductType === type
-                    ? "border-[#1f2937] bg-[#1f2937] text-white shadow-[0_16px_34px_-22px_rgba(17,24,39,0.55)]"
+                    ? "border-terracotta bg-terracotta text-white shadow-[0_16px_34px_-22px_rgba(196,113,74,0.5)]"
                     : "border-black/10 bg-[#fbf8f4] text-[#2b2521]"
                 }`}
               >

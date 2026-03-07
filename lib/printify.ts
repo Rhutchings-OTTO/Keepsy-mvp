@@ -166,8 +166,12 @@ export async function createPrintifyProduct(params: {
   variantId: number;
   printImageId: string;
   printPosition: string;
+  productType: string;
 }): Promise<string> {
-  const { title, blueprintId, printProviderId, variantId, printImageId, printPosition } = params;
+  const { title, blueprintId, printProviderId, variantId, printImageId, printPosition, productType } = params;
+
+  const isMug = productType.includes("mug");
+  const scale = isMug ? 0.65 : 1;
 
   const body = {
     title,
@@ -186,7 +190,7 @@ export async function createPrintifyProduct(params: {
                 id: printImageId,
                 x: 0.5,
                 y: 0.5,
-                scale: 1,
+                scale,
                 angle: 0,
               },
             ],

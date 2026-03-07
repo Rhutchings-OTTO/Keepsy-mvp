@@ -332,6 +332,7 @@ async function handleCheckoutCompleted(
       variantId,
       printImageId: printifyImageId,
       printPosition: config.printPosition,
+      productType: productId,
     });
     await supabase
       .from("orders")

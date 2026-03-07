@@ -98,25 +98,20 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify({ error: message }), { status: 400 });
   }
 
-  // DEBUG: collect log messages to return in response body for Stripe delivery inspection
-  const debugLog: string[] = [];
-
   // Always return 200 after signature verification — catch all downstream errors
   // so Stripe does not retry on application-level failures.
   try {
-    await processEvent(event, stripe, payload, debugLog);
+    await processEvent(event, stripe, payload);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    debugLog.push(`Unhandled error: ${msg}`);
     console.error(
       "[stripe-webhook] Unhandled error processing event:",
       event.id,
       event.type,
-      msg
+      err instanceof Error ? err.message : err
     );
   }
 
-  return new Response(JSON.stringify({ received: true, debug: debugLog }), { status: 200 });
+  return new Response(JSON.stringify({ received: true }), { status: 200 });
 }
 
 // ─── Event processor ──────────────────────────────────────────────────────────
@@ -124,13 +119,11 @@ export async function POST(req: Request) {
 async function processEvent(
   event: Stripe.Event,
   stripe: Stripe,
-  rawPayload: string,
-  debugLog: string[]
+  rawPayload: string
 ): Promise<void> {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     console.warn("[stripe-webhook] Supabase not configured, skipping event:", event.id);
-    debugLog.push("Supabase not configured — event skipped");
     return;
   }
 
@@ -143,7 +136,6 @@ async function processEvent(
 
   if (existing) {
     console.log("[stripe-webhook] Duplicate event, skipping:", event.id);
-    debugLog.push(`Duplicate event ${event.id} — skipped`);
     return;
   }
 
@@ -156,20 +148,17 @@ async function processEvent(
   if (insertErr) {
     if (insertErr.code === "23505") {
       console.log("[stripe-webhook] Duplicate event (race condition), skipping:", event.id);
-      debugLog.push(`Duplicate event (race) ${event.id} — skipped`);
       return;
     }
     // Non-fatal — log but continue
     console.error("[stripe-webhook] Failed to persist event record:", insertErr.message);
-    debugLog.push(`stripe_events insert failed (non-fatal): ${insertErr.message}`);
   }
 
   if (event.type === "checkout.session.completed") {
     await handleCheckoutCompleted(
       event.data.object as Stripe.Checkout.Session,
       stripe,
-      supabase,
-      debugLog
+      supabase
     );
     return;
   }
@@ -204,8 +193,7 @@ async function processEvent(
 async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session,
   stripe: Stripe,
-  supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>,
-  debugLog: string[]
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>
 ): Promise<void> {
   const orderRef =
     session.metadata?.order_ref || session.client_reference_id || `order_${session.id}`;
@@ -218,7 +206,6 @@ async function handleCheckoutCompleted(
     (session.customer_email as string) ||
     null;
 
-  debugLog.push(`Started processing order: ${orderRef}, email: ${customerEmail}, designUrl: ${designUrl}`);
   console.log(
     "[webhook] Processing checkout.session.completed for order:", orderRef,
     "email:", customerEmail,
@@ -247,9 +234,10 @@ async function handleCheckoutCompleted(
       expand: ["data.price.product"],
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("[stripe-webhook] Failed to fetch line items:", msg);
-    debugLog.push(`Line items fetch failed: ${msg}`);
+    console.error(
+      "[stripe-webhook] Failed to fetch line items:",
+      err instanceof Error ? err.message : err
+    );
   }
 
   // Upsert order
@@ -270,9 +258,6 @@ async function handleCheckoutCompleted(
   );
   if (orderErr) {
     console.error("[stripe-webhook] Failed to upsert order:", orderErr.message);
-    debugLog.push(`Order upsert failed: ${orderErr.message}`);
-  } else {
-    debugLog.push("Order upserted to Supabase");
   }
 
   // Upsert order items
@@ -294,30 +279,20 @@ async function handleCheckoutCompleted(
 
   // Send confirmation email
   if (customerEmail) {
-    debugLog.push(`Attempting email send to: ${customerEmail}`);
-    try {
-      const emailResult = await sendAtelierCreationEmail({
-        to: customerEmail,
-        designPrompt: prompt || undefined,
-        orderRef,
-      });
-      console.log("[email] send result:", emailResult);
-      debugLog.push(`Email result: ${emailResult.ok}`);
-      if (!emailResult.ok) {
-        console.error("[email] sendAtelierCreationEmail returned false for", customerEmail);
-        debugLog.push(`Email error: ${emailResult.error ?? "unknown"}`);
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error("[email] sendAtelierCreationEmail threw:", msg);
-      debugLog.push(`Email error: ${msg}`);
+    const emailResult = await sendAtelierCreationEmail({
+      to: customerEmail,
+      designPrompt: prompt || undefined,
+      orderRef,
+    });
+    console.log("[email] send result:", emailResult);
+    if (!emailResult.ok) {
+      console.error("[email] sendAtelierCreationEmail returned false for", customerEmail, "error:", emailResult.error);
     }
   }
 
   // Printify fulfillment
   if (!designUrl || !process.env.PRINTIFY_API_TOKEN) {
     console.warn("[printify] Skipping fulfillment — missing designUrl or PRINTIFY_API_TOKEN");
-    debugLog.push(`Printify skipped — designUrl: ${designUrl}, token set: ${!!process.env.PRINTIFY_API_TOKEN}`);
     await clearDesignCacheForOrder(designUrl);
     return;
   }
@@ -342,16 +317,13 @@ async function handleCheckoutCompleted(
     const region = regionFromCountry(shippingCountry);
 
     // Upload design image to Printify
-    debugLog.push("Printify: uploading image...");
     const printifyImageId = await uploadImageToPrintify(designUrl, `keepsy-${orderRef}.png`);
-    debugLog.push(`Printify: image uploaded, id=${printifyImageId}`);
     await supabase
       .from("orders")
       .update({ printify_image_id: printifyImageId, printify_status: "image_uploaded" })
       .eq("order_ref", orderRef);
 
     // Create Printify product
-    debugLog.push("Printify: creating product...");
     const { config, variantId } = getPrintifyVariantId(productId, region, color, size);
     const printifyProductId = await createPrintifyProduct({
       title: `Keepsy ${productId} — ${orderRef}`,
@@ -361,7 +333,6 @@ async function handleCheckoutCompleted(
       printImageId: printifyImageId,
       printPosition: config.printPosition,
     });
-    debugLog.push(`Printify: product created, id=${printifyProductId}`);
     await supabase
       .from("orders")
       .update({
@@ -377,7 +348,6 @@ async function handleCheckoutCompleted(
     // Submit Printify order
     try {
       const address = buildPrintifyAddress(session);
-      debugLog.push("Printify: submitting order...");
       console.log("[printify] Submitting order — args:", JSON.stringify({
         externalId: orderRef,
         productId: printifyProductId,
@@ -393,7 +363,6 @@ async function handleCheckoutCompleted(
         shippingAddress: address,
       });
       console.log("[printify] Order submitted successfully, printifyOrderId:", printifyOrderId);
-      debugLog.push(`Printify: order submitted, id=${printifyOrderId}`);
       await supabase
         .from("orders")
         .update({
@@ -405,7 +374,6 @@ async function handleCheckoutCompleted(
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error("[printify] Failed to submit order:", msg, JSON.stringify(err, Object.getOwnPropertyNames(err)));
-      debugLog.push(`Printify submit failed: ${msg}`);
       await supabase
         .from("orders")
         .update({ printify_status: "needs_manual_review" })
@@ -419,7 +387,6 @@ async function handleCheckoutCompleted(
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[printify] Fulfillment pipeline failed:", msg);
-    debugLog.push(`Printify pipeline failed: ${msg}`);
     await supabase
       .from("orders")
       .update({ printify_status: "needs_manual_review" })

@@ -156,6 +156,20 @@ export async function uploadImageToPrintify(
 /* ─── 2. Create product ───────────────────────────────────────────────────── */
 
 /**
+ * Returns centered image placement values for each product type.
+ * The generated AI image is always square; scale leaves visible margin on all sides.
+ */
+function getImagePlacement(productType: string): { x: number; y: number; scale: number } {
+  const p = productType.toLowerCase();
+  if (p.includes("mug"))    return { x: 0.5, y: 0.5,  scale: 0.65 };
+  if (p.includes("card"))   return { x: 0.5, y: 0.5,  scale: 0.75 };
+  if (p.includes("hoodie")) return { x: 0.5, y: 0.38, scale: 0.5  };
+  if (p.includes("tee") || p.includes("tshirt") || p.includes("t-shirt"))
+                            return { x: 0.5, y: 0.42, scale: 0.55 };
+  return                           { x: 0.5, y: 0.5,  scale: 0.7  };
+}
+
+/**
  * Create a one-off product on Printify with the uploaded design.
  * Returns the Printify product ID.
  */
@@ -170,8 +184,7 @@ export async function createPrintifyProduct(params: {
 }): Promise<string> {
   const { title, blueprintId, printProviderId, variantId, printImageId, printPosition, productType } = params;
 
-  const isMug = productType.includes("mug");
-  const scale = isMug ? 0.65 : 1;
+  const { x, y, scale } = getImagePlacement(productType);
 
   const body = {
     title,
@@ -188,8 +201,8 @@ export async function createPrintifyProduct(params: {
             images: [
               {
                 id: printImageId,
-                x: 0.5,
-                y: 0.5,
+                x,
+                y,
                 scale,
                 angle: 0,
               },

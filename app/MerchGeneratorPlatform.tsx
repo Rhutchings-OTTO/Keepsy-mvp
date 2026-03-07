@@ -966,26 +966,31 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         <AnimatePresence mode="wait">
           {view === "home" && (
             <div className="space-y-20">
-              <div className="flex gap-2 md:hidden">
-                <button
-                  onClick={() => setView("home")}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${view === "home" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
-                >
-                  How it works
-                </button>
-                <button
-                  onClick={() => setView("catalog")}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${view === "catalog" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
-                >
-                  Catalog
-                </button>
-                <button
-                  onClick={() => setView("community")}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${view === "community" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
-                >
-                  Community
-                            </button>
-                          </div>
+              {(() => {
+                const currentView: string = view;
+                return (
+                  <div className="flex gap-2 md:hidden">
+                    <button
+                      onClick={() => setView("home")}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${currentView === "home" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
+                    >
+                      How it works
+                    </button>
+                    <button
+                      onClick={() => setView("catalog")}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${currentView === "catalog" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
+                    >
+                      Catalog
+                    </button>
+                    <button
+                      onClick={() => setView("community")}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${currentView === "community" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
+                    >
+                      Community
+                    </button>
+                  </div>
+                );
+              })()}
               {/* STEP 1 - Lean layout */}
               {step === 1 && (
                 <CreatePageLayoutLean

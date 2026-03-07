@@ -205,6 +205,12 @@ async function handleCheckoutCompleted(
     (session.customer_details?.email as string) ||
     (session.customer_email as string) ||
     null;
+
+  console.log(
+    "[webhook] Processing checkout.session.completed for order:", orderRef,
+    "email:", customerEmail,
+    "designUrl:", designUrl
+  );
   const customerName =
     session.collected_information?.shipping_details?.name ??
     session.customer_details?.name ??
@@ -270,18 +276,17 @@ async function handleCheckoutCompleted(
     }
   }
 
-  // Send confirmation email — fire-and-forget, never block fulfillment
+  // Send confirmation email
   if (customerEmail) {
-    sendAtelierCreationEmail({
+    const emailResult = await sendAtelierCreationEmail({
       to: customerEmail,
       designPrompt: prompt || undefined,
       orderRef,
-    }).catch((err) => {
-      console.error(
-        "[stripe-webhook] Confirmation email failed:",
-        err instanceof Error ? err.message : err
-      );
     });
+    console.log("[email] send result:", emailResult);
+    if (!emailResult) {
+      console.error("[email] sendAtelierCreationEmail returned false for", customerEmail);
+    }
   }
 
   // Printify fulfillment
@@ -342,6 +347,13 @@ async function handleCheckoutCompleted(
     // Submit Printify order
     try {
       const address = buildPrintifyAddress(session);
+      console.log("[printify] Submitting order — args:", JSON.stringify({
+        externalId: orderRef,
+        productId: printifyProductId,
+        variantId,
+        quantity,
+        shippingAddress: address,
+      }));
       const printifyOrderId = await submitPrintifyOrder({
         externalId: orderRef,
         productId: printifyProductId,
@@ -349,6 +361,7 @@ async function handleCheckoutCompleted(
         quantity,
         shippingAddress: address,
       });
+      console.log("[printify] Order submitted successfully, printifyOrderId:", printifyOrderId);
       await supabase
         .from("orders")
         .update({
@@ -359,7 +372,7 @@ async function handleCheckoutCompleted(
         .eq("order_ref", orderRef);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error("[printify] Failed to submit order:", msg);
+      console.error("[printify] Failed to submit order:", msg, JSON.stringify(err, Object.getOwnPropertyNames(err)));
       await supabase
         .from("orders")
         .update({ printify_status: "needs_manual_review" })

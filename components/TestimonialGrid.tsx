@@ -17,22 +17,26 @@ export function TestimonialGrid() {
   return (
     <section id="reviews" className="mx-auto max-w-7xl px-4 py-14">
       <div className="mb-6">
-        <p className="text-sm font-bold text-charcoal/60">Rated 4.8/5 by 2,400+ customers</p>
+        <p className="text-sm font-bold" style={{ color: "rgba(45,41,38,0.60)" }}>Rated 4.8/5 by 2,400+ customers</p>
         <h2 className="font-serif text-2xl font-bold text-charcoal sm:text-3xl">Loved by gift-givers across the UK and US</h2>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {TESTIMONIALS.map((t, idx) => (
-          <article key={`${t.name}-${idx}`} className="rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] p-4 shadow-warm-sm backdrop-blur-sm">
+          <article
+            key={`${t.name}-${idx}`}
+            className="rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] p-4 shadow-warm-sm backdrop-blur-sm"
+          >
             <div className="mb-3 flex items-center gap-3">
               <div
                 aria-hidden="true"
-                className="h-10 w-10 rounded-full border border-white/80 bg-gradient-to-br from-terracotta/30 to-forest/20 shadow-sm"
+                className="h-10 w-10 shrink-0 rounded-full border border-white/80 shadow-sm"
+                style={{ background: "linear-gradient(135deg, rgba(196,113,74,0.30), rgba(44,74,62,0.20))" }}
               />
-              <div className="font-semibold">
+              <p className="font-semibold text-charcoal">
                 {t.name}, {t.age}
-              </div>
+              </p>
             </div>
-            <p className=”leading-relaxed text-charcoal/70”>”{t.quote}”</p>
+            <p className="leading-relaxed" style={{ color: "rgba(45,41,38,0.70)" }}>&ldquo;{t.quote}&rdquo;</p>
           </article>
         ))}
       </div>

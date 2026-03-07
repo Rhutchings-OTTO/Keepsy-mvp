@@ -1175,9 +1175,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             whileTap={{ scale: 0.98 }}
                             onClick={handleAddToCart}
                               disabled={!generatedImage || (selectedProduct.hasSize && !selectedSize)}
-                              className="flex w-full items-center justify-center gap-2 rounded-xl bg-terracotta py-4 font-black !text-white disabled:cursor-not-allowed disabled:opacity-40"
+                              className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-bold text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                              style={{ backgroundColor: "var(--color-terracotta)" }}
                           >
-                            Add <Plus size={18} />
+                            Add to Cart <Plus size={18} />
                           </motion.button>
                           <motion.button
                             whileHover={{ scale: 1.01 }}

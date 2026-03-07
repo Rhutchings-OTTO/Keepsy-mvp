@@ -87,7 +87,7 @@ function OriginStory() {
           </h2>
           <div className="space-y-5 text-charcoal/70 leading-relaxed">
             <p>
-              Keepsy was born out of a very ordinary moment. Rory was looking
+              Keepsy was born out of a very ordinary moment. Dan was looking
               for a birthday gift for his mum — something personal, something
               that said "I really see you." Everything he found was either too
               generic or too complicated. The custom options required design
@@ -95,7 +95,7 @@ function OriginStory() {
               affordable things looked cheap.
             </p>
             <p>
-              He told his mate Dan about it. Dan had the exact same problem —
+              He told his mate Rory about it. Rory had the exact same problem —
               he'd been trying to find something meaningful for his mum for
               Mother's Day. So together, they built the thing they both wished
               existed. A place where you could describe a memory in plain
@@ -124,7 +124,7 @@ function OriginStory() {
               className="mt-2 text-sm font-medium"
               style={{ color: "var(--color-terracotta)" }}
             >
-              — Dan, Co-Founder of Keepsy
+              — Rory, Co-Founder of Keepsy
             </footer>
           </blockquote>
 

@@ -19,7 +19,7 @@ const PULL_QUOTES = [
     occasion: "Pet Portrait Mug",
   },
   {
-    quote: "Ordered Thursday, arrived Saturday. Beautifully wrapped too.",
+    quote: "Ordered Thursday, arrived Saturday. Beautiful quality too.",
     name: "Sophie M.",
     occasion: "Anniversary Print",
   },

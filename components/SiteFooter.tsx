@@ -185,7 +185,7 @@ export function SiteFooter() {
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:justify-start">
               <TrustBadge icon="✦" label="Premium Quality" />
               <TrustBadge icon="↩" label="30-Day Returns" />
-              <TrustBadge icon="🎁" label="Gift Wrapped Free" />
+              <TrustBadge icon="⚡" label="Fast Delivery" />
               <TrustBadge icon="✈" label="US & UK Shipping" />
             </div>
           </div>

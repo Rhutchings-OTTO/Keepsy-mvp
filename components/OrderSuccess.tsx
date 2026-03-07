@@ -18,8 +18,8 @@ const NEXT_STEPS = [
   },
   {
     step: "02",
-    title: "Packed & gift wrapped",
-    body: "Every order is hand-packed with tissue paper, a ribbon, and a note card. Free of charge.",
+    title: "Printed & packed",
+    body: "Every order is printed on premium materials and carefully packed before it ships.",
   },
   {
     step: "03",

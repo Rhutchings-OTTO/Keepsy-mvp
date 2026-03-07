@@ -65,7 +65,7 @@ const REVIEWS: Record<
     {
       name: "Sandra K.",
       location: "Texas",
-      text: "Ordered for Mother's Day and it arrived beautifully gift-wrapped. Mum uses it every single morning now.",
+      text: "Ordered for Mother's Day and the quality blew me away. Mum uses it every single morning now.",
       rating: 5,
     },
     {
@@ -201,7 +201,7 @@ const PRODUCT_UNSPLASH: Record<ProductType, string> = {
 const TRUST_BADGES = [
   { icon: Package, label: "Free Shipping" },
   { icon: RotateCcw, label: "30-Day Returns" },
-  { icon: Gift, label: "Gift Wrapped Free" },
+  { icon: Gift, label: "Handmade With Care" },
 ];
 
 // ─── Sizes (for apparel) ──────────────────────────────────────────────────────

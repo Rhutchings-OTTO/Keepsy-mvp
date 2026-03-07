@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     default: "Keepsy — Personalised Gifts She'll Never Forget",
     template: "%s — Keepsy",
   },
-  description: "Turn your favourite photos and memories into beautiful, personalised keepsakes. Custom mugs, greeting cards, tees and hoodies — gift-wrapped free, shipped to US & UK.",
+  description: "Turn your favourite photos and memories into beautiful, personalised keepsakes. Custom mugs, greeting cards, tees and hoodies — premium quality, shipped to US & UK.",
   keywords: ["personalised gifts", "custom mugs", "custom hoodies", "keepsake gifts", "photo gifts", "personalised cards"],
   metadataBase: new URL("https://keepsy.store"),
   alternates: {

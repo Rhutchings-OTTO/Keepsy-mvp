@@ -34,7 +34,7 @@ const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-8";
 
 const HERO_BULLETS = [
   "See it on the product before you buy",
-  "Gift-wrapped free with every order",
+  "Handmade with care, every single order",
   "Shipped to US & UK",
 ];
 
@@ -67,7 +67,7 @@ const PRODUCT_IMAGES = [
 
 const SOCIAL_PROOF_ITEMS = [
   "★★★★★  Thousands of Happy Customers",
-  "🎁  Free Gift Wrapping",
+  "🚀  Free Fast Shipping",
   "🇺🇸  Made & Shipped with Love",
   "↩️  30-Day Returns",
   "🔒  Secure Checkout",
@@ -130,7 +130,7 @@ const HOW_IT_WORKS_STEPS = [
     icon: Gift,
     step: "03",
     title: "We Do the Rest",
-    body: "We create the artwork, wrap it beautifully, and ship it to your door.",
+    body: "We create the artwork, print it on premium materials, and ship it to your door.",
   },
 ];
 
@@ -158,7 +158,7 @@ const REVIEWS = [
   },
   {
     quote:
-      "Ordered the custom tee for my sister's anniversary trip. The colours are so vibrant and it arrived beautifully wrapped. Felt like I'd spent twice what I did. Absolute steal.",
+      "Ordered the custom tee for my sister's anniversary trip. The colours are so vibrant and the quality is incredible. Felt like I'd spent twice what I did. Absolute steal.",
     name: "Michelle T.",
     state: "Florida",
     occasion: "Anniversary",

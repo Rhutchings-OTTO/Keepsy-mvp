@@ -4,7 +4,7 @@ const STEPS = [
   { label: "Upload photo", detail: "Share a photo or describe a moment in words." },
   { label: "Pick a style", detail: "Choose from watercolour, line art, portrait and more." },
   { label: "Choose product", detail: "See your art on mugs, tees, hoodies, and cards." },
-  { label: "Delivered", detail: "Gift-wrapped and shipped to your door." },
+  { label: "Delivered", detail: "Printed on premium materials and shipped to your door." },
 ];
 
 export function Explainer() {

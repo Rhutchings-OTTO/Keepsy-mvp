@@ -83,7 +83,7 @@ export default function GiftIdeasPage() {
               {
                 step: "03",
                 title: "Personalise and order",
-                body: "Tweak it until it's perfect, then we print, wrap, and ship it to your door.",
+                body: "Tweak it until it's perfect, then we print and ship it straight to your door.",
               },
             ].map((item, i) => (
               <Reveal key={item.step} variant="fadeUp" delay={i * 0.1}>

@@ -437,7 +437,7 @@ export function CartDrawer() {
 
                   {/* Trust badges */}
                   <p className="mt-3 text-center text-[11px] text-charcoal/40 leading-relaxed">
-                    Secure Checkout · Gift Wrapped Free · 30-Day Returns
+                    Secure Checkout · Handmade With Care · 30-Day Returns
                   </p>
                 </div>
               </>

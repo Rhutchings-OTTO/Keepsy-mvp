@@ -155,7 +155,7 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
               transition={{ duration: 0.4, delay: 0.65 }}
               className="mt-8 text-center text-xs text-charcoal/35"
             >
-              Free gift wrapping on every order · 30-day returns · Secure checkout
+              Premium quality on every order · 30-day returns · Secure checkout
             </motion.p>
           </div>
 

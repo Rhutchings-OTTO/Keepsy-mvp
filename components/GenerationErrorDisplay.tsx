@@ -22,6 +22,7 @@ export function GenerationErrorDisplay({
   error,
   contentBlock,
   onSuggestionClick,
+  onDismiss,
 }: GenerationErrorDisplayProps) {
   if (!error && !contentBlock) return null;
 
@@ -55,7 +56,24 @@ export function GenerationErrorDisplay({
             )}
           </>
         ) : (
-          <p className="text-sm text-charcoal/70">{error}</p>
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm text-charcoal/70">
+              {error}
+            </p>
+            {onDismiss && (
+              <button
+                type="button"
+                onClick={onDismiss}
+                className="flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+                style={{
+                  backgroundColor: "var(--color-terracotta)",
+                  color: "#fff",
+                }}
+              >
+                Try Again
+              </button>
+            )}
+          </div>
         )}
       </motion.div>
     </AnimatePresence>

@@ -35,13 +35,27 @@ async function printifyFetch(
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
-    const res = await fetch(`${PRINTIFY_API}${path}`, {
-      ...options,
-      headers: {
-        ...buildHeaders(),
-        ...(options?.headers ?? {}),
-      },
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30_000);
+
+    let res: Response;
+    try {
+      res = await fetch(`${PRINTIFY_API}${path}`, {
+        ...options,
+        headers: {
+          ...buildHeaders(),
+          ...(options?.headers ?? {}),
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+    } catch (err) {
+      clearTimeout(timeout);
+      if (err instanceof Error && err.name === "AbortError") {
+        throw new Error(`Printify API timeout after 30s on ${path}`);
+      }
+      throw err;
+    }
 
     if (res.status === 429) {
       const retryAfter = parseInt(res.headers.get("Retry-After") ?? "5", 10);

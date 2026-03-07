@@ -38,7 +38,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
         .eq("stripe_session_id", sessionId)
         .maybeSingle();
       if (error) {
-        errorMessage = "Could not load order status yet.";
+        errorMessage = "Your order is confirmed — we're just fetching the details. Check back shortly or email hello@keepsy.store with your session ID.";
       } else if (order) {
         status = order.status;
         orderRef = order.order_ref;

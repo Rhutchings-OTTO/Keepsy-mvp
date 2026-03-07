@@ -11,6 +11,7 @@ import {
   type PrintifyAddress,
 } from "@/lib/printify";
 import { getPrintifyVariantId } from "@/lib/printify-blueprints";
+import { notifyFounders } from "@/lib/notifications";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -56,6 +57,8 @@ export const stripeWebhookProcess = inngest.createFunction(
     id: "stripe-webhook-process",
     name: "Process Stripe Webhook Event",
     retries: 3,
+    concurrency: [{ limit: 20 }],
+    throttle: { limit: 5, period: "1s" },
   },
   { event: "stripe/webhook.received" },
   async ({ event, step }) => {
@@ -275,6 +278,13 @@ export const stripeWebhookProcess = inngest.createFunction(
               .from("orders")
               .update({ printify_status: "needs_manual_review" })
               .eq("order_ref", orderRef);
+
+            // Notify founders — fire and forget, don't await
+            notifyFounders(
+              `Printify fulfilment failed for order ${orderRef}`,
+              `Order: ${orderRef}\nError: ${msg}\nCustomer email: ${customerEmail ?? "unknown"}\nAction needed: manually process this order at https://app.printify.com`,
+              "critical"
+            ).catch(() => {}); // swallow any notification errors
 
             // Re-throw so Inngest retries this step
             throw err;

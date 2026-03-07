@@ -1,7 +1,18 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect } from "react";
 import { MagneticLink } from "@/components/ui/MagneticLink";
 
-export default function NotFound() {
+type ErrorPageProps = {
+  error: Error & { digest?: string };
+  reset: () => void;
+};
+
+export default function ErrorPage({ error, reset }: ErrorPageProps) {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+
   return (
     <main className="min-h-screen" style={{ backgroundColor: "var(--color-cream)" }}>
       {/* Forest hero strip */}
@@ -9,7 +20,7 @@ export default function NotFound() {
         className="relative overflow-hidden py-24 sm:py-32 text-center"
         style={{ backgroundColor: "var(--color-forest)" }}
       >
-        {/* Background "404" watermark */}
+        {/* Background "500" watermark */}
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 flex items-center justify-center font-serif font-bold select-none"
@@ -19,21 +30,21 @@ export default function NotFound() {
             lineHeight: 1,
           }}
         >
-          404
+          500
         </span>
 
         <div className="relative mx-auto max-w-2xl px-4 sm:px-6">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
-            404 — Page Not Found
+            Something went wrong
           </p>
           <h1
             className="mt-4 font-serif font-bold tracking-[-0.03em] text-white"
             style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
           >
-            We can&apos;t find that page
+            Something went wrong
           </h1>
           <p className="mx-auto mt-5 max-w-sm text-base leading-8 text-white/65">
-            It might have moved, or maybe it&apos;s taking a tea break. Let&apos;s get you back on track.
+            Our team has been notified. Try refreshing the page, or head back home.
           </p>
         </div>
       </section>
@@ -45,22 +56,23 @@ export default function NotFound() {
             className="text-[11px] font-bold uppercase tracking-[0.22em]"
             style={{ color: "var(--color-terracotta)" }}
           >
-            Where would you like to go?
+            What would you like to do?
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <MagneticLink
-              href="/shop"
+            <button
+              type="button"
+              onClick={reset}
               className="inline-flex min-h-[52px] items-center justify-center rounded-xl px-8 text-sm font-semibold text-white transition hover:opacity-90"
               style={{ backgroundColor: "var(--color-terracotta)" }}
             >
-              Browse Our Collection
-            </MagneticLink>
+              Try Again
+            </button>
             <MagneticLink
-              href="/create"
+              href="/"
               className="inline-flex min-h-[52px] items-center justify-center rounded-xl border border-charcoal/15 px-8 text-sm font-semibold transition hover:bg-charcoal/5"
               style={{ color: "var(--color-charcoal)" }}
             >
-              Create a Keepsake
+              Go Home
             </MagneticLink>
           </div>
         </div>

@@ -18,6 +18,7 @@ import {
   sendShippedEmail,
   sendDeliveredEmail,
 } from "@/lib/emails/orderEmails";
+import { notifyFounders } from "@/lib/notifications";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -198,6 +199,11 @@ export async function POST(req: Request): Promise<Response> {
   } catch (err) {
     console.error("[printify-webhook] Supabase update failed:", err instanceof Error ? err.message : err);
     // Return 200 so Printify doesn't retry — log the failure instead
+    notifyFounders(
+      `Printify webhook DB update failed (${eventType})`,
+      `Event: ${eventType}\nPrintify Order ID: ${printifyOrderId}\nError: ${err instanceof Error ? err.message : String(err)}\nTimestamp: ${new Date().toISOString()}`,
+      "warning"
+    ).catch(() => {});
   }
 
   return new Response(JSON.stringify({ received: true }), {

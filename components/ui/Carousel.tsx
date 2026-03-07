@@ -89,7 +89,7 @@ export function Carousel({ children, className = "", showArrows = true, showDots
             onClick={handlePrev}
             disabled={!canScrollLeft}
             aria-label="Previous slide"
-            className="absolute left-0 top-1/2 hidden -translate-y-1/2 rounded-full border border-black/10 bg-white/90 p-2 shadow-md transition hover:bg-white disabled:opacity-30 disabled:hover:bg-white/90 sm:flex"
+            className="absolute left-0 top-1/2 hidden -translate-y-1/2 rounded-full border border-charcoal/10 bg-white p-2 shadow-md transition hover:bg-[#F5EDE0] disabled:opacity-30 disabled:hover:bg-white sm:flex"
           >
             <ChevronLeft size={20} />
           </button>
@@ -98,7 +98,7 @@ export function Carousel({ children, className = "", showArrows = true, showDots
             onClick={handleNext}
             disabled={!canScrollRight}
             aria-label="Next slide"
-            className="absolute right-0 top-1/2 hidden -translate-y-1/2 rounded-full border border-black/10 bg-white/90 p-2 shadow-md transition hover:bg-white disabled:opacity-30 disabled:hover:bg-white/90 sm:flex"
+            className="absolute right-0 top-1/2 hidden -translate-y-1/2 rounded-full border border-charcoal/10 bg-white p-2 shadow-md transition hover:bg-[#F5EDE0] disabled:opacity-30 disabled:hover:bg-white sm:flex"
           >
             <ChevronRight size={20} />
           </button>
@@ -112,7 +112,7 @@ export function Carousel({ children, className = "", showArrows = true, showDots
               type="button"
               onClick={() => scrollToIndex(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`h-2 rounded-full transition ${i === index ? "w-6 bg-black/70" : "w-2 bg-black/25 hover:bg-black/40"}`}
+              className={`h-2 rounded-full transition ${i === index ? "w-6 bg-charcoal/70" : "w-2 bg-charcoal/25 hover:bg-charcoal/40"}`}
             />
           ))}
         </div>

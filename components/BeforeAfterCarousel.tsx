@@ -20,19 +20,19 @@ export default function BeforeAfterCarousel({ region }: BeforeAfterCarouselProps
   if (!FF.beforeAfter) return null;
 
   return (
-    <motion.section variants={revealUp} initial="initial" animate="animate" className="mt-4 w-full rounded-3xl border border-black/10 bg-white/70 p-4 text-left shadow-sm">
+    <motion.section variants={revealUp} initial="initial" animate="animate" className="mt-4 w-full rounded-2xl border border-charcoal/10 bg-white p-4 text-left shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)]">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-wider text-black/50">Gift-ready inspiration</p>
-          <h3 className="mt-1 text-lg font-black text-[#2D241E]">Gift ideas by occasion</h3>
+          <p className="text-xs font-extrabold uppercase tracking-wider text-charcoal/50">Gift-ready inspiration</p>
+          <h3 className="mt-1 text-lg font-black text-charcoal">Gift ideas by occasion</h3>
         </div>
-        <Sparkles size={16} className="text-black/45" />
+        <Sparkles size={16} className="text-charcoal/45" />
       </div>
 
       <button
         type="button"
         onClick={() => setShowMobile((prev) => !prev)}
-        className="mt-3 rounded-full border border-black/10 px-3 py-1 text-xs font-semibold text-black/60 sm:hidden"
+        className="mt-3 rounded-full border border-charcoal/15 px-3 py-1 text-xs font-semibold text-charcoal/60 sm:hidden"
       >
         {showMobile ? "Hide examples" : "Show examples"}
       </button>

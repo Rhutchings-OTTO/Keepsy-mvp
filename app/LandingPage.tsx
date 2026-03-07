@@ -4,8 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { motion, useMotionTemplate, useMotionValue, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Check,
@@ -13,7 +12,6 @@ import {
   ImageIcon,
   Sparkles,
   ShoppingBag,
-  Star,
   Package,
   Printer,
   BadgeCheck,
@@ -24,14 +22,13 @@ import {
 import { DynamicLogo } from "@/components/DynamicLogo";
 import RegionSelector from "@/components/RegionSelector";
 import { getRegion, setRegion, type Region } from "@/lib/region";
-import { CREATE_EXAMPLES } from "@/content/createExamples";
 
 const PremiumGateway = dynamic(
   () => import("@/components/PremiumGateway").then((mod) => mod.PremiumGateway),
   { ssr: false }
 );
 
-const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-6";
+const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-8";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -43,24 +40,28 @@ const HERO_BULLETS = [
 
 const PRODUCT_IMAGES = [
   {
-    src: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
+    src: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600",
     alt: "Custom personalised mug",
     label: "Mugs",
+    tag: "From $24",
   },
   {
-    src: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400",
+    src: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=600",
     alt: "Personalised greeting card",
     label: "Cards",
+    tag: "From $4",
   },
   {
-    src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
+    src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600",
     alt: "Custom printed tee",
     label: "Tees",
+    tag: "From $32",
   },
   {
-    src: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400",
+    src: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600",
     alt: "Custom hoodie",
     label: "Hoodies",
+    tag: "From $54",
   },
 ];
 
@@ -69,6 +70,8 @@ const SOCIAL_PROOF_ITEMS = [
   "🎁  Free Gift Wrapping",
   "🇺🇸  Made & Shipped with Love",
   "↩️  30-Day Returns",
+  "🔒  Secure Checkout",
+  "⚡  Fast US & UK Delivery",
 ];
 
 const FEATURED_PRODUCTS = [
@@ -78,7 +81,7 @@ const FEATURED_PRODUCTS = [
     priceUK: "£19.99",
     rating: "★★★★★",
     reviews: 847,
-    src: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
+    src: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=500",
     alt: "Best Mom Ever custom mug",
   },
   {
@@ -87,7 +90,7 @@ const FEATURED_PRODUCTS = [
     priceUK: "£14.99",
     rating: "★★★★★",
     reviews: 1203,
-    src: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400",
+    src: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=500",
     alt: "Custom photo greeting card",
   },
   {
@@ -96,7 +99,7 @@ const FEATURED_PRODUCTS = [
     priceUK: "£44.99",
     rating: "★★★★★",
     reviews: 276,
-    src: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400",
+    src: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=500",
     alt: "Custom personalised hoodie",
   },
   {
@@ -105,7 +108,7 @@ const FEATURED_PRODUCTS = [
     priceUK: "£26.99",
     rating: "★★★★★",
     reviews: 328,
-    src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
+    src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
     alt: "Personalised family t-shirt",
   },
 ];
@@ -174,50 +177,59 @@ const REVIEWS = [
     state: "California",
     occasion: "Just Because",
   },
-  {
-    quote:
-      "I was skeptical ordering custom stuff online but the preview feature totally won me over. I could see exactly what the hoodie would look like before I bought it. Zero surprises, all good ones.",
-    name: "Patricia W.",
-    state: "Illinois",
-    occasion: "Birthday Gift",
-  },
-  {
-    quote:
-      "Ordered mugs for our whole book club with our group photo. Everyone went crazy for them. The turnaround was fast and the packaging was so pretty — it honestly felt like a luxury brand.",
-    name: "Nancy G.",
-    state: "Georgia",
-    occasion: "Group Gift",
-  },
 ];
 
 const TRUST_BADGES = [
-  { icon: Package, label: "Premium Materials", color: "text-terracotta" },
-  { icon: Printer, label: "Vivid Lasting Prints", color: "text-forest" },
-  { icon: BadgeCheck, label: "Gift-Ready Packaging", color: "text-terracotta" },
-  { icon: Truck, label: "Fast US & UK Shipping", color: "text-forest" },
-  { icon: RotateCcw, label: "Easy 30-Day Returns", color: "text-terracotta" },
-  { icon: Lock, label: "Secure Checkout", color: "text-forest" },
+  { icon: Package, label: "Premium Materials" },
+  { icon: Printer, label: "Vivid Lasting Prints" },
+  { icon: BadgeCheck, label: "Gift-Ready Packaging" },
+  { icon: Truck, label: "Fast US & UK Shipping" },
+  { icon: RotateCcw, label: "Easy 30-Day Returns" },
+  { icon: Lock, label: "Secure Checkout" },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function ProductImageCard({ src, alt, label }: { src: string; alt: string; label: string }) {
+function ProductCollectionCard({
+  src,
+  alt,
+  label,
+  tag,
+  index,
+}: {
+  src: string;
+  alt: string;
+  label: string;
+  tag: string;
+  index: number;
+}) {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
-    <div className="relative aspect-square overflow-hidden rounded-[1.5rem] bg-[#F5EDE0] shadow-md">
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        className="object-cover"
-        sizes="(max-width: 1024px) 50vw, 300px"
-        onError={() => setVisible(false)}
-      />
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-3">
-        <span className="text-xs font-semibold uppercase tracking-widest text-white/90">{label}</span>
+    <motion.div
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative overflow-hidden rounded-2xl bg-[#EDE6DD]"
+      style={{ aspectRatio: index === 0 ? "3/4" : "3/4" }}
+    >
+      {visible && (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          sizes="(max-width: 768px) 50vw, 25vw"
+          onError={() => setVisible(false)}
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-4">
+        <p className="font-serif text-xl font-bold text-white">{label}</p>
+        <p className="mt-0.5 text-sm text-white/65">{tag}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -237,16 +249,18 @@ function FeaturedProductCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      whileHover={{ scale: 1.02 }}
-      className="group relative flex flex-col overflow-hidden rounded-[1.75rem] border border-black/8 bg-white/90 shadow-[0_18px_44px_-28px_rgba(0,0,0,0.25)] transition-shadow duration-300 hover:shadow-[0_28px_56px_-24px_rgba(0,0,0,0.32)] backdrop-blur-md"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-charcoal/8 bg-white"
     >
       {/* Bestseller badge */}
-      <div className="absolute left-3 top-3 z-10 rounded-full bg-[#C9A84C] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow-sm">
+      <div
+        className="absolute left-3 top-3 z-10 rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm"
+        style={{ backgroundColor: "var(--color-gold)" }}
+      >
         Bestseller
       </div>
 
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-[#F5EDE0]">
+      <div className="relative overflow-hidden bg-[#F5EDE0]" style={{ aspectRatio: "4/5" }}>
         {imgVisible ? (
           <Image
             src={product.src}
@@ -258,50 +272,35 @@ function FeaturedProductCard({
           />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <ShoppingBag size={40} className="text-[#C4714A]/40" />
+            <ShoppingBag size={40} className="text-terracotta/30" />
           </div>
         )}
       </div>
 
       {/* Info */}
       <div className="flex flex-1 flex-col p-4">
-        <p className="font-serif text-base font-semibold leading-tight text-charcoal sm:text-lg">
+        <p className="font-serif text-base font-bold leading-tight text-charcoal sm:text-lg">
           {product.name}
         </p>
         <div className="mt-1.5 flex items-center gap-1.5">
-          <span className="text-sm text-[#C9A84C]">{product.rating}</span>
-          <span className="text-xs text-[#8b7f74]">({product.reviews.toLocaleString()})</span>
+          <span className="text-sm" style={{ color: "var(--color-gold)" }}>{product.rating}</span>
+          <span className="text-xs text-charcoal/45">({product.reviews.toLocaleString()})</span>
         </div>
         <div className="mt-auto flex items-center justify-between pt-3">
-          <span className="text-lg font-bold text-charcoal">{region === "UK" ? product.priceUK : product.priceUS}</span>
+          <span className="text-lg font-bold text-charcoal">
+            {region === "UK" ? product.priceUK : product.priceUS}
+          </span>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-1 rounded-full bg-[#C4714A] px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85"
+            style={{ backgroundColor: "var(--color-terracotta)" }}
           >
             Shop Now
-            <ArrowRight size={14} />
+            <ArrowRight size={13} />
           </Link>
         </div>
       </div>
     </motion.div>
-  );
-}
-
-function ReviewCard({ review }: { review: (typeof REVIEWS)[0] }) {
-  return (
-    <div className="w-[280px] flex-shrink-0 snap-start rounded-[1.5rem] border border-black/8 bg-white/90 p-5 shadow-[0_16px_38px_-24px_rgba(0,0,0,0.22)] backdrop-blur-md">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-[#C9A84C]">★★★★★</span>
-        <span className="rounded-full border border-[#d8cdc0] bg-[#FDF6EE] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#8b7468]">
-          Verified Purchase
-        </span>
-      </div>
-      <p className="mt-3 text-[14px] leading-6 text-[#47413c]">&quot;{review.quote}&quot;</p>
-      <p className="mt-3 text-sm font-semibold text-[#2D2926]">
-        — {review.name}, {review.state}
-      </p>
-      <p className="mt-0.5 text-xs text-[#8b7f74]">{review.occasion}</p>
-    </div>
   );
 }
 
@@ -312,7 +311,6 @@ type LandingPageProps = {
 };
 
 export default function LandingPage({ initialRegion = null }: LandingPageProps) {
-  const router = useRouter();
   const [region, setCurrentRegion] = useState<Region | null>(() => initialRegion ?? getRegion());
   const [showGateway, setShowGateway] = useState<boolean>(() => {
     const resolvedRegion = initialRegion ?? getRegion();
@@ -322,13 +320,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   const [emailValue, setEmailValue] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
 
-  // Mouse-move parallax glow
-  const glowX = useMotionValue(50);
-  const glowY = useMotionValue(28);
-  const heroGlow = useMotionTemplate`radial-gradient(560px circle at ${glowX}% ${glowY}%, rgba(196, 113, 74, 0.18), transparent 60%)`;
-
   const activeRegion = region ?? "US";
-  const showcase = CREATE_EXAMPLES[activeRegion];
 
   useEffect(() => {
     if (showGateway) {
@@ -355,7 +347,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     setShowGateway(false);
   };
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (emailValue.trim()) {
       setEmailSubmitted(true);
@@ -364,29 +356,31 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
   return (
     <div
-      className={`relative min-h-screen overflow-hidden bg-transparent text-charcoal ${
+      className={`relative min-h-screen overflow-hidden text-charcoal ${
         showGateway ? "fixed inset-0 h-screen" : ""
       }`}
+      style={{ backgroundColor: "var(--color-cream)" }}
     >
       {showGateway ? (
         <PremiumGateway onComplete={handleGatewayComplete} />
       ) : (
         <>
           {/* ── Header ── */}
-          <header className="relative z-30">
-            <div className={`${CONTAINER} flex items-center justify-between py-5`}>
-              <DynamicLogo href="/" width={148} className="text-charcoal" />
+          <header className="relative z-30 border-b border-charcoal/8">
+            <div className={`${CONTAINER} flex items-center justify-between py-4`}>
+              <DynamicLogo href="/" width={140} className="text-charcoal" />
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setIsRegionSelectorOpen(true)}
-                  className="rounded-full border border-black/10 bg-white/80 px-4 py-2 text-sm font-medium text-[#4f4944] shadow-[0_12px_30px_-24px_rgba(0,0,0,0.35)] backdrop-blur-md"
+                  className="hidden rounded-full border border-charcoal/15 bg-transparent px-4 py-2 text-sm font-medium text-charcoal/70 transition hover:border-charcoal/30 sm:inline-flex"
                 >
                   {activeRegion} shipping
                 </button>
                 <Link
                   href="/shop"
-                  className="hidden rounded-full bg-[#C4714A] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_-18px_rgba(196,113,74,0.55)] sm:inline-flex"
+                  className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
                   Shop Now
                 </Link>
@@ -394,184 +388,192 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             </div>
           </header>
 
-          <main className="relative z-20">
-            {/* ── 1. Hero ── */}
-            <section className="pb-10 pt-4 sm:pb-14 sm:pt-6">
+          <main>
+            {/* ── 1. HERO — editorial split layout ── */}
+            <section className="overflow-hidden">
               <div className={CONTAINER}>
-                <motion.div
-                  className="relative overflow-hidden rounded-[2.5rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,243,236,0.78))] p-4 shadow-[0_40px_110px_-56px_rgba(31,24,18,0.50)] backdrop-blur-xl sm:p-8"
-                  onMouseMove={(event) => {
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    glowX.set(((event.clientX - rect.left) / rect.width) * 100);
-                    glowY.set(((event.clientY - rect.top) / rect.height) * 100);
-                  }}
-                  onMouseLeave={() => {
-                    glowX.set(50);
-                    glowY.set(28);
-                  }}
-                >
-                  {/* Glow layer */}
+                <div className="grid min-h-[90vh] items-center gap-10 py-16 lg:grid-cols-[3fr_2fr] lg:gap-16 lg:py-24">
+                  {/* Left: Editorial headline */}
                   <motion.div
-                    className="pointer-events-none absolute inset-0"
-                    style={{ backgroundImage: heroGlow }}
-                  />
-                  {/* Shimmer */}
-                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.34),transparent_40%,rgba(255,255,255,0.18)_75%,transparent)]" />
-
-                  <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_1fr] lg:gap-10">
-                    {/* Left */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.55, ease: "easeOut" }}
-                      className="flex flex-col justify-center"
-                    >
-                      {/* Star badge */}
-                      <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#d8cdc0] bg-white/78 px-3 py-1.5 text-sm font-medium text-[#62584e]">
-                        <span className="text-[#C9A84C]">★★★★★</span>
-                        2,847 Happy Customers
-                      </div>
-
-                      <h1
-                        className="mt-5 font-serif leading-[1.0] tracking-[-0.04em] text-charcoal"
-                        style={{ fontSize: "clamp(2.8rem, 5.5vw, 5rem)" }}
+                    initial={{ opacity: 0, x: -28 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex flex-col"
+                  >
+                    {/* Eyebrow */}
+                    <div className="inline-flex items-center gap-2">
+                      <div className="h-px w-8" style={{ backgroundColor: "var(--color-terracotta)" }} />
+                      <span
+                        className="text-[11px] font-bold uppercase tracking-[0.22em]"
+                        style={{ color: "var(--color-terracotta)" }}
                       >
-                        Gifts They&apos;ll Never Forget
-                      </h1>
+                        Keepsy
+                      </span>
+                    </div>
 
-                      <p className="mt-4 max-w-lg text-[17px] leading-8 text-[#5e5852]">
-                        Turn your favourite photos and memories into beautiful, personalised
-                        keepsakes. Mugs, cards, tees, hoodies — all custom made.
-                      </p>
-
-                      {/* CTAs */}
-                      <div className="mt-7 flex flex-wrap gap-3">
-                        <Link
-                          href="/shop"
-                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#C4714A] px-6 text-base font-semibold text-white shadow-[0_18px_34px_-18px_rgba(196,113,74,0.6)] transition-transform duration-200 ease-out hover:-translate-y-0.5"
-                        >
-                          Shop Our Collection
-                          <ShoppingBag size={17} />
-                        </Link>
-                        <Link
-                          href="/create"
-                          className="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-charcoal bg-transparent px-6 text-base font-semibold text-charcoal transition-transform duration-200 ease-out hover:-translate-y-0.5"
-                        >
-                          Create Your Own
-                        </Link>
-                      </div>
-
-                      {/* Trust bullets */}
-                      <ul className="mt-7 space-y-2.5">
-                        {HERO_BULLETS.map((item) => (
-                          <li
-                            key={item}
-                            className="flex items-center gap-3 text-[15px] text-[#514b46]"
-                          >
-                            <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#C4714A]/15 text-[#C4714A]">
-                              <Check size={13} strokeWidth={3} />
-                            </span>
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </motion.div>
-
-                    {/* Right: 2x2 product image grid */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 28 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.65, delay: 0.1, ease: "easeOut" }}
-                      className="grid grid-cols-2 gap-3"
+                    {/* Main headline */}
+                    <h1
+                      className="mt-5 font-serif font-bold leading-[0.95] tracking-[-0.05em] text-charcoal"
+                      style={{ fontSize: "clamp(3.2rem, 7vw, 6.5rem)" }}
                     >
-                      {PRODUCT_IMAGES.map((img) => (
-                        <ProductImageCard key={img.label} {...img} />
+                      Gifts<br />They&apos;ll<br />Never<br />Forget.
+                    </h1>
+
+                    {/* Social proof under headline */}
+                    <div className="mt-6 flex items-center gap-2">
+                      <span className="text-sm" style={{ color: "var(--color-gold)" }}>★★★★★</span>
+                      <span className="text-sm text-charcoal/55">2,847 happy customers</span>
+                    </div>
+
+                    <p className="mt-6 max-w-sm text-base leading-8 text-charcoal/65">
+                      Turn your favourite photos and memories into beautiful, personalised keepsakes — mugs, cards, tees, hoodies.
+                    </p>
+
+                    {/* Trust bullets */}
+                    <ul className="mt-6 space-y-2">
+                      {HERO_BULLETS.map((item) => (
+                        <li key={item} className="flex items-center gap-3 text-sm text-charcoal/65">
+                          <span
+                            className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+                            style={{ backgroundColor: "rgba(196,113,74,0.14)" }}
+                          >
+                            <Check size={11} strokeWidth={3} style={{ color: "var(--color-terracotta)" }} />
+                          </span>
+                          {item}
+                        </li>
                       ))}
-                    </motion.div>
-                  </div>
-                </motion.div>
+                    </ul>
+
+                    {/* CTAs */}
+                    <div className="mt-8 flex flex-wrap gap-3">
+                      <Link
+                        href="/shop"
+                        className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl px-8 text-base font-semibold text-white shadow-[0_12px_28px_-12px_rgba(196,113,74,0.55)] transition-all hover:shadow-[0_16px_36px_-14px_rgba(196,113,74,0.65)] hover:-translate-y-0.5"
+                        style={{ backgroundColor: "var(--color-terracotta)" }}
+                      >
+                        Shop the Collection
+                        <ShoppingBag size={17} />
+                      </Link>
+                      <Link
+                        href="/create"
+                        className="inline-flex min-h-[52px] items-center justify-center rounded-xl border-2 px-8 text-base font-semibold text-charcoal transition-all hover:-translate-y-0.5"
+                        style={{ borderColor: "var(--color-charcoal)" }}
+                      >
+                        Create Your Own
+                      </Link>
+                    </div>
+                  </motion.div>
+
+                  {/* Right: Product gallery */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 28 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                    className="grid grid-cols-2 gap-3"
+                  >
+                    {PRODUCT_IMAGES.map((img, i) => (
+                      <ProductCollectionCard key={img.label} {...img} index={i} />
+                    ))}
+                  </motion.div>
+                </div>
               </div>
             </section>
 
-            {/* ── 2. Social proof bar ── */}
-            <section className="overflow-hidden bg-[#F5EDE0] py-4">
-              {/* Desktop: flex row */}
-              <div className="hidden sm:block">
-                <div className={`${CONTAINER} flex items-center justify-center gap-6`}>
-                  {SOCIAL_PROOF_ITEMS.map((item, i) => (
-                    <div key={item} className="flex items-center gap-6">
-                      <span className="text-sm font-semibold text-[#5e4a3a]">{item}</span>
-                      {i < SOCIAL_PROOF_ITEMS.length - 1 && (
-                        <span className="text-[#c4a882]">·</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {/* Mobile: scrolling marquee */}
-              <div className="sm:hidden">
-                <style>{`
-                  @keyframes marquee-scroll {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                  }
-                  .marquee-track {
-                    display: flex;
-                    width: max-content;
-                    animation: marquee-scroll 18s linear infinite;
-                  }
-                  .marquee-track:hover {
-                    animation-play-state: paused;
-                  }
-                `}</style>
-                <div className="marquee-track">
-                  {[...SOCIAL_PROOF_ITEMS, ...SOCIAL_PROOF_ITEMS].map((item, i) => (
-                    <span key={i} className="px-6 text-sm font-semibold text-[#5e4a3a]">
-                      {item}
-                      <span className="ml-6 text-[#c4a882]">·</span>
-                    </span>
-                  ))}
-                </div>
+            {/* ── 2. Social proof marquee — TERRACOTTA background ── */}
+            <section
+              className="overflow-hidden py-4"
+              style={{ backgroundColor: "var(--color-terracotta)" }}
+            >
+              <style>{`
+                @keyframes marquee-run {
+                  0% { transform: translateX(0); }
+                  100% { transform: translateX(-50%); }
+                }
+                .marquee-run {
+                  display: flex;
+                  width: max-content;
+                  animation: marquee-run 22s linear infinite;
+                }
+                .marquee-run:hover { animation-play-state: paused; }
+              `}</style>
+              <div className="marquee-run">
+                {[...SOCIAL_PROOF_ITEMS, ...SOCIAL_PROOF_ITEMS].map((item, i) => (
+                  <span
+                    key={i}
+                    className="px-8 text-sm font-semibold text-white/85"
+                  >
+                    {item}
+                    <span className="mx-8 text-white/30">·</span>
+                  </span>
+                ))}
               </div>
             </section>
 
             {/* ── 3. Featured Products ── */}
-            <section className="py-16 sm:py-24">
+            <section className="py-20 sm:py-28">
               <div className={CONTAINER}>
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="text-center"
-                >
-                  <h2 className="font-serif text-4xl tracking-[-0.03em] text-charcoal sm:text-5xl">
-                    Most Loved This Month
-                  </h2>
-                  <p className="mt-3 text-[17px] text-[#5e5852]">
-                    Bestsellers our customers keep coming back for
-                  </p>
-                </motion.div>
+                <div className="flex items-end justify-between">
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  >
+                    <p
+                      className="text-[11px] font-bold uppercase tracking-[0.22em]"
+                      style={{ color: "var(--color-terracotta)" }}
+                    >
+                      The Collection
+                    </p>
+                    <h2 className="mt-2 font-serif text-4xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
+                      Most Loved This Month
+                    </h2>
+                  </motion.div>
+                  <Link
+                    href="/shop"
+                    className="hidden items-center gap-1.5 text-sm font-semibold text-charcoal/60 transition hover:text-charcoal sm:flex"
+                  >
+                    View all <ArrowRight size={14} />
+                  </Link>
+                </div>
 
-                <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <div className="mt-10 grid grid-cols-2 gap-5 lg:grid-cols-4">
                   {FEATURED_PRODUCTS.map((product, i) => (
-                    <FeaturedProductCard key={product.name} product={product} index={i} region={activeRegion} />
+                    <FeaturedProductCard
+                      key={product.name}
+                      product={product}
+                      index={i}
+                      region={activeRegion}
+                    />
                   ))}
+                </div>
+
+                <div className="mt-6 sm:hidden">
+                  <Link
+                    href="/shop"
+                    className="flex items-center justify-center gap-2 py-2 text-sm font-semibold text-charcoal/60"
+                  >
+                    View all products <ArrowRight size={14} />
+                  </Link>
                 </div>
               </div>
             </section>
 
-            {/* ── 4. Emotional Storytelling ── */}
-            <section className="py-16 sm:py-24">
+            {/* ── 4. Emotional storytelling — editorial split ── */}
+            <section
+              className="py-20 sm:py-28"
+              style={{ backgroundColor: "#F5EDE0" }}
+            >
               <div className={CONTAINER}>
-                <div className="grid gap-10 lg:grid-cols-2 lg:gap-14 lg:items-center">
-                  {/* Image */}
+                <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+                  {/* Image first on desktop */}
                   <motion.div
-                    initial={{ opacity: 0, x: -24 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.3 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-[#F5EDE0] shadow-[0_32px_72px_-40px_rgba(0,0,0,0.28)]"
+                    className="relative overflow-hidden rounded-2xl bg-[#E8DDD0] lg:order-2"
+                    style={{ aspectRatio: "4/5" }}
                   >
                     <Image
                       src="https://images.unsplash.com/photo-1536010305525-f7aa0834e2c7?w=800"
@@ -580,8 +582,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
                     />
-                    {/* Warm terracotta overlay at bottom */}
-                    <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#C4714A]/60 to-transparent" />
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t"
+                      style={{ backgroundImage: "linear-gradient(to top, rgba(45,41,38,0.4), transparent)" }}
+                    />
                   </motion.div>
 
                   {/* Text */}
@@ -589,24 +593,29 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     initial={{ opacity: 0, y: 24 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.55, delay: 0.12, ease: "easeOut" }}
+                    transition={{ duration: 0.55, delay: 0.1, ease: "easeOut" }}
+                    className="lg:order-1"
                   >
-                    <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#C4714A]">
+                    <p
+                      className="text-[11px] font-bold uppercase tracking-[0.22em]"
+                      style={{ color: "var(--color-terracotta)" }}
+                    >
                       Our Story
                     </p>
-                    <h2 className="mt-4 font-serif text-4xl leading-[1.1] tracking-[-0.03em] text-charcoal sm:text-5xl">
-                      Every Keepsake Tells a Story
+                    <h2 className="mt-4 font-serif text-4xl font-bold leading-[1.05] tracking-[-0.04em] text-charcoal sm:text-5xl lg:text-6xl">
+                      Every Keepsake<br />Tells a Story
                     </h2>
-                    <p className="mt-5 text-[17px] leading-8 text-[#5e5852]">
+                    <div className="mt-6 h-px w-12" style={{ backgroundColor: "var(--color-terracotta)" }} />
+                    <p className="mt-6 text-base leading-8 text-charcoal/65">
                       We built Keepsy because the most meaningful gifts aren&apos;t expensive —
                       they&apos;re personal. A photo turned into art. A memory preserved on
-                      something beautiful. Something she&apos;ll look at every day and think of
-                      you.
+                      something beautiful. Something she&apos;ll look at every day and think of you.
                     </p>
                     <div className="mt-8">
                       <Link
                         href="/create"
-                        className="inline-flex items-center gap-2 rounded-full bg-[#C4714A] px-7 py-3.5 text-base font-semibold text-white shadow-[0_18px_34px_-18px_rgba(196,113,74,0.55)] transition-transform duration-200 hover:-translate-y-0.5"
+                        className="inline-flex items-center gap-2 rounded-xl px-7 py-3.5 text-base font-semibold text-white shadow-[0_12px_28px_-14px_rgba(196,113,74,0.55)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-14px_rgba(196,113,74,0.65)]"
+                        style={{ backgroundColor: "var(--color-terracotta)" }}
                       >
                         Create Your First Keepsake
                         <ArrowRight size={17} />
@@ -617,47 +626,63 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               </div>
             </section>
 
-            {/* ── 5. How It Works ── */}
-            <section className="py-16 sm:py-24">
+            {/* ── 5. How It Works — editorial numbered list ── */}
+            <section className="py-20 sm:py-28">
               <div className={CONTAINER}>
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="text-center"
                 >
-                  <h2 className="font-serif text-4xl tracking-[-0.03em] text-charcoal sm:text-5xl">
+                  <p
+                    className="text-[11px] font-bold uppercase tracking-[0.22em]"
+                    style={{ color: "var(--color-terracotta)" }}
+                  >
+                    The Process
+                  </p>
+                  <h2 className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
                     Three Simple Steps
                   </h2>
                 </motion.div>
 
-                <div className="mt-10 grid gap-5 sm:grid-cols-3">
+                <div className="mt-14 space-y-0">
                   {HOW_IT_WORKS_STEPS.map((step, index) => {
                     const Icon = step.icon;
                     return (
                       <motion.div
                         key={step.title}
-                        initial={{ opacity: 0, y: 28 }}
-                        whileInView={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, amount: 0.2 }}
-                        transition={{
-                          duration: 0.5,
-                          delay: index * 0.15,
-                          ease: "easeOut",
-                        }}
-                        className="rounded-[1.75rem] border border-black/8 bg-white/90 p-6 shadow-[0_20px_46px_-32px_rgba(0,0,0,0.28)] backdrop-blur-md"
+                        transition={{ duration: 0.5, delay: index * 0.12, ease: "easeOut" }}
+                        className="grid grid-cols-[auto_1fr] gap-8 border-b border-charcoal/10 py-8 lg:grid-cols-[120px_1fr_auto] lg:items-center last:border-0"
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#C4714A]/15 text-[#C4714A]">
-                            <Icon size={22} />
-                          </div>
-                          <span className="font-serif text-2xl font-bold text-[#C9A84C]">
-                            {step.step}
-                          </span>
+                        {/* Step number */}
+                        <span
+                          className="font-serif text-5xl font-bold leading-none"
+                          style={{ color: "rgba(196,113,74,0.25)", minWidth: "3.5rem" }}
+                        >
+                          {step.step}
+                        </span>
+
+                        {/* Content */}
+                        <div>
+                          <h3 className="font-serif text-2xl font-bold text-charcoal sm:text-3xl">
+                            {step.title}
+                          </h3>
+                          <p className="mt-2 max-w-md text-base leading-7 text-charcoal/60">
+                            {step.body}
+                          </p>
                         </div>
-                        <h3 className="mt-5 text-xl font-bold text-charcoal">{step.title}</h3>
-                        <p className="mt-2.5 text-[15px] leading-7 text-[#5e5852]">{step.body}</p>
+
+                        {/* Icon */}
+                        <div
+                          className="hidden h-14 w-14 items-center justify-center rounded-xl lg:flex"
+                          style={{ backgroundColor: "rgba(196,113,74,0.10)" }}
+                        >
+                          <Icon size={24} style={{ color: "var(--color-terracotta)" }} />
+                        </div>
                       </motion.div>
                     );
                   })}
@@ -665,8 +690,11 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               </div>
             </section>
 
-            {/* ── 6. Reviews Carousel ── */}
-            <section className="py-16 sm:py-24">
+            {/* ── 6. Reviews — large editorial pull-quotes ── */}
+            <section
+              className="py-20 sm:py-28"
+              style={{ backgroundColor: "var(--color-charcoal)" }}
+            >
               <div className={CONTAINER}>
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
@@ -674,39 +702,78 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
                 >
-                  <h2 className="font-serif text-4xl tracking-[-0.03em] text-charcoal sm:text-5xl">
-                    What Our Customers Are Saying
+                  <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
+                    Customer Love
+                  </p>
+                  <h2 className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
+                    What Our Customers Say
                   </h2>
                 </motion.div>
 
-                {/* Auto-scroll marquee */}
-                <div className="mt-8 overflow-hidden">
-                  <style>{`
-                    @keyframes review-scroll {
-                      0% { transform: translateX(0); }
-                      100% { transform: translateX(-50%); }
-                    }
-                    .review-track {
-                      display: flex;
-                      gap: 1rem;
-                      width: max-content;
-                      animation: review-scroll 38s linear infinite;
-                    }
-                    .review-track:hover {
-                      animation-play-state: paused;
-                    }
-                  `}</style>
-                  <div className="review-track">
-                    {[...REVIEWS, ...REVIEWS].map((review, i) => (
-                      <ReviewCard key={i} review={review} />
-                    ))}
-                  </div>
+                <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                  {REVIEWS.map((review, index) => (
+                    <motion.div
+                      key={review.name}
+                      initial={{ opacity: 0, y: 24 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.2 }}
+                      transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
+                      className="flex flex-col rounded-2xl border border-white/8 bg-white/5 p-6"
+                    >
+                      {/* Stars */}
+                      <span className="text-sm" style={{ color: "var(--color-gold)" }}>★★★★★</span>
+
+                      {/* Big quotation mark */}
+                      <div
+                        className="mt-2 font-serif text-6xl font-bold leading-none"
+                        style={{ color: "rgba(196,113,74,0.35)" }}
+                      >
+                        &ldquo;
+                      </div>
+
+                      {/* Quote */}
+                      <p className="mt-1 flex-1 text-[15px] leading-7 text-white/75">
+                        {review.quote}
+                      </p>
+
+                      {/* Attribution */}
+                      <div className="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
+                        <div
+                          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                          style={{ backgroundColor: "rgba(196,113,74,0.2)", color: "var(--color-terra-light)" }}
+                        >
+                          {review.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-white">
+                            {review.name}, {review.state}
+                          </p>
+                          <p className="text-xs text-white/40">{review.occasion}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="mt-10 text-center"
+                >
+                  <Link
+                    href="/community"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold text-white/80 transition hover:border-white/40 hover:text-white"
+                  >
+                    Read all stories <ArrowRight size={14} />
+                  </Link>
+                </motion.div>
               </div>
             </section>
 
-            {/* ── 7. Trust & Quality grid ── */}
-            <section className="bg-[#F5EDE0] py-16 sm:py-24">
+            {/* ── 7. Trust Grid — on cream background ── */}
+            <section className="py-20 sm:py-28" style={{ backgroundColor: "var(--color-cream)" }}>
               <div className={CONTAINER}>
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
@@ -715,7 +782,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   transition={{ duration: 0.5, ease: "easeOut" }}
                   className="text-center"
                 >
-                  <h2 className="font-serif text-3xl tracking-[-0.03em] text-charcoal sm:text-4xl">
+                  <h2 className="font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-4xl">
                     Why Thousands Choose Keepsy
                   </h2>
                 </motion.div>
@@ -730,10 +797,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.2 }}
                         transition={{ duration: 0.4, delay: index * 0.07, ease: "easeOut" }}
-                        className="flex flex-col items-center gap-3 rounded-[1.5rem] border border-black/8 bg-white/80 px-4 py-5 text-center shadow-sm backdrop-blur-md"
+                        className="flex flex-col items-center gap-3 rounded-xl border border-charcoal/8 bg-white px-4 py-6 text-center"
                       >
-                        <Icon size={28} className={badge.color} />
-                        <p className="text-sm font-semibold leading-snug text-charcoal">
+                        <Icon size={26} style={{ color: "var(--color-terracotta)" }} />
+                        <p className="text-xs font-semibold leading-snug text-charcoal">
                           {badge.label}
                         </p>
                       </motion.div>
@@ -743,107 +810,159 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               </div>
             </section>
 
-            {/* ── 8. Email capture ── */}
-            <section className="bg-[#2C4A3E] py-16 sm:py-24">
-              <div className={`${CONTAINER} text-center`}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.55, ease: "easeOut" }}
-                >
-                  <h2 className="font-serif text-4xl tracking-[-0.03em] text-white sm:text-5xl">
-                    Join the Keepsy Family
-                  </h2>
-                  <p className="mx-auto mt-4 max-w-md text-[17px] leading-7 text-[#FDF6EE]/80">
-                    Get 10% off your first order — plus gifting ideas, new designs & seasonal
-                    inspiration.
-                  </p>
+            {/* ── 8. Email capture — forest green ── */}
+            <section
+              className="py-20 sm:py-28"
+              style={{ backgroundColor: "var(--color-forest)" }}
+            >
+              <div className={CONTAINER}>
+                <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.55, ease: "easeOut" }}
+                  >
+                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
+                      Join the Keepsy Family
+                    </p>
+                    <h2 className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
+                      Get 10% Off<br />Your First Order
+                    </h2>
+                    <p className="mt-4 max-w-sm text-base leading-7 text-white/65">
+                      Plus gifting ideas, new designs &amp; seasonal inspiration — delivered to your inbox.
+                    </p>
+                  </motion.div>
 
-                  <AnimatePresence mode="wait">
-                    {emailSubmitted ? (
-                      <motion.div
-                        key="success"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.35 }}
-                        className="mt-8 inline-block rounded-2xl bg-white/15 px-8 py-5 text-lg font-semibold text-white"
-                      >
-                        🎉 You&apos;re in! Check your inbox for your code.
-                      </motion.div>
-                    ) : (
-                      <motion.form
-                        key="form"
-                        onSubmit={handleEmailSubmit}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
-                      >
-                        <input
-                          type="email"
-                          required
-                          value={emailValue}
-                          onChange={(e) => setEmailValue(e.target.value)}
-                          placeholder="Your email address"
-                          className="w-full max-w-sm rounded-full border-0 bg-[#FDF6EE] px-5 py-3.5 text-charcoal placeholder-[#9c8b7e] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C9A84C] sm:w-72"
-                        />
-                        <button
-                          type="submit"
-                          className="w-full rounded-full bg-[#C9A84C] px-7 py-3.5 font-semibold text-charcoal shadow-[0_14px_28px_-16px_rgba(201,168,76,0.6)] transition-opacity hover:opacity-90 sm:w-auto"
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.55, delay: 0.1, ease: "easeOut" }}
+                    className="w-full lg:w-[400px]"
+                  >
+                    <AnimatePresence mode="wait">
+                      {emailSubmitted ? (
+                        <motion.div
+                          key="success"
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.35 }}
+                          className="rounded-xl border border-white/15 bg-white/10 px-8 py-6 text-center text-lg font-semibold text-white"
                         >
-                          Claim My 10% Off
-                        </button>
-                      </motion.form>
-                    )}
-                  </AnimatePresence>
-
-                  <p className="mt-5 text-sm text-[#FDF6EE]/55">
-                    Join 15,000+ women who love thoughtful gifting · Unsubscribe anytime
-                  </p>
-                </motion.div>
+                          🎉 You&apos;re in! Check your inbox for your code.
+                        </motion.div>
+                      ) : (
+                        <motion.form
+                          key="form"
+                          onSubmit={handleEmailSubmit}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="flex flex-col gap-3 sm:flex-row"
+                        >
+                          <input
+                            type="email"
+                            required
+                            value={emailValue}
+                            onChange={(e) => setEmailValue(e.target.value)}
+                            placeholder="Your email address"
+                            className="flex-1 rounded-xl border-0 bg-white/10 px-5 py-3.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                          />
+                          <button
+                            type="submit"
+                            className="whitespace-nowrap rounded-xl px-6 py-3.5 font-semibold text-charcoal shadow-[0_10px_24px_-12px_rgba(201,168,76,0.6)] transition-opacity hover:opacity-90"
+                            style={{ backgroundColor: "var(--color-gold)" }}
+                          >
+                            Claim 10% Off
+                          </button>
+                        </motion.form>
+                      )}
+                    </AnimatePresence>
+                    <p className="mt-3 text-xs text-white/40">
+                      Join 15,000+ women who love thoughtful gifting · Unsubscribe anytime
+                    </p>
+                  </motion.div>
+                </div>
               </div>
             </section>
           </main>
 
           {/* ── Footer ── */}
-          <footer className="relative z-20 py-12" style={{ backgroundColor: "var(--color-forest)" }}>
-            <div className={`${CONTAINER} flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between`}>
-              <div>
-                <p className="font-serif text-2xl font-bold text-white">Keepsy</p>
-                <p className="mt-2 text-sm" style={{ color: "rgba(253,246,238,0.70)" }}>
-                  Beautiful personalised gifts, made simple.
+          <footer className="py-14" style={{ backgroundColor: "var(--color-charcoal)" }}>
+            <div className={CONTAINER}>
+              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="sm:col-span-2 lg:col-span-1">
+                  <p className="font-serif text-2xl font-bold text-white">Keepsy</p>
+                  <p className="mt-2 text-sm text-white/50">
+                    Beautiful personalised gifts, made simple.
+                  </p>
+                  <p className="mt-3 text-xs text-white/35">
+                    🇬🇧 UK &amp; 🇺🇸 US shipping · Powered by AI
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-4">Shop</p>
+                  <div className="flex flex-col gap-2.5">
+                    {[
+                      { href: "/shop", label: "All Products" },
+                      { href: "/gift-ideas", label: "Gift Ideas" },
+                      { href: "/create", label: "Create Your Own" },
+                    ].map(({ href, label }) => (
+                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
+                        {label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-4">Company</p>
+                  <div className="flex flex-col gap-2.5">
+                    {[
+                      { href: "/community", label: "Customer Stories" },
+                      { href: "/terms", label: "Terms" },
+                      { href: "/privacy", label: "Privacy" },
+                    ].map(({ href, label }) => (
+                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
+                        {label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-4">Help</p>
+                  <div className="flex flex-col gap-2.5">
+                    {[
+                      { href: "/shipping", label: "Shipping" },
+                      { href: "/refunds", label: "Refunds" },
+                    ].map(({ href, label }) => (
+                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
+                        {label}
+                      </Link>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setIsRegionSelectorOpen(true)}
+                      className="text-left text-sm text-white/55 transition hover:text-white"
+                    >
+                      {activeRegion} shipping ↗
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t pt-8"
+                style={{ borderColor: "rgba(255,255,255,0.08)" }}
+              >
+                <p className="text-xs text-white/30">
+                  © {new Date().getFullYear()} Keepsy Ltd. All rights reserved.
                 </p>
-                <p className="mt-3 text-xs font-semibold" style={{ color: "rgba(253,246,238,0.50)" }}>
-                  🇬🇧 UK & 🇺🇸 US shipping · Powered by AI · Payments by Stripe
+                <p className="text-xs text-white/25">
+                  Payments by Stripe · Printing by Printful
                 </p>
               </div>
-              <div className="flex flex-wrap gap-x-8 gap-y-3">
-                {[
-                  { href: "/shop", label: "Shop" },
-                  { href: "/gift-ideas", label: "Gift Ideas" },
-                  { href: "/create", label: "Create" },
-                  { href: "/terms", label: "Terms" },
-                  { href: "/privacy", label: "Privacy" },
-                  { href: "/shipping", label: "Shipping" },
-                  { href: "/refunds", label: "Refunds" },
-                ].map(({ href, label }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="text-sm transition hover:text-white"
-                    style={{ color: "rgba(253,246,238,0.65)" }}
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <div className={`${CONTAINER} mt-8 border-t pt-6`} style={{ borderColor: "rgba(253,246,238,0.12)" }}>
-              <p className="text-xs" style={{ color: "rgba(253,246,238,0.40)" }}>
-                © {new Date().getFullYear()} Keepsy Ltd. All rights reserved.
-              </p>
             </div>
           </footer>
 

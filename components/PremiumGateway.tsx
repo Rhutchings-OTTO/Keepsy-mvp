@@ -17,13 +17,12 @@ import {
 import * as THREE from "three";
 import type { Region } from "@/lib/region";
 import { setRegion } from "@/lib/region";
+import { DynamicLogo } from "@/components/DynamicLogo";
 
 const Canvas = dynamic(
   () => import("@react-three/fiber").then((mod) => mod.Canvas),
   { ssr: false }
 );
-
-const IVORY = "#F9F8F6";
 
 type PremiumGatewayProps = {
   onComplete: (region: Region) => void;
@@ -48,42 +47,126 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
   return (
     <div
       className="fixed inset-0 z-[100] h-screen w-screen overflow-hidden"
-      style={{ backgroundColor: IVORY }}
+      style={{ backgroundColor: "var(--color-cream)" }}
     >
-      {/* ACT 1: Regional Selection */}
+      {/* ACT 1: Regional Selection — editorial boutique design */}
       {phase === "idle" && (
-        <div className="relative flex h-full w-full items-center justify-center overflow-hidden px-4">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(219,232,241,0.48),transparent_28%),radial-gradient(circle_at_82%_16%,rgba(250,223,205,0.46),transparent_30%),linear-gradient(180deg,#faf7f2_0%,#f6f1eb_100%)]" />
-          <div className="absolute left-[8%] top-[18%] h-44 w-44 rounded-full bg-[#dbe8f2]/60 blur-3xl" />
-          <div className="absolute bottom-[14%] right-[10%] h-52 w-52 rounded-full bg-[#f8ddcb]/60 blur-3xl" />
+        <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-5">
+          {/* Subtle warm background texture */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(ellipse 80% 60% at 20% 15%, rgba(196,113,74,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 85% 85%, rgba(44,74,62,0.06) 0%, transparent 55%),
+                radial-gradient(ellipse 40% 40% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 50%)
+              `,
+            }}
+          />
+
+          {/* Decorative thin horizontal rule top */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="relative z-10 w-full max-w-5xl rounded-[2.25rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(248,244,238,0.74))] p-5 shadow-[0_40px_110px_-52px_rgba(0,0,0,0.42)] backdrop-blur-2xl sm:p-8"
-          >
-            <div className="max-w-2xl">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-black/40">Choose experience</p>
-              <h1 className="mt-3 font-serif text-4xl font-semibold tracking-[-0.05em] text-[#201d1b] sm:text-5xl">
-                Enter the Keepsy studio.
-              </h1>
-              <p className="mt-4 text-base leading-8 text-black/58">
-                Select your region for local shipping, occasion timing, and product availability. Then continue into the studio.
-              </p>
-            </div>
-            <div className="mt-8 grid gap-4 md:grid-cols-2">
-              <RegionSide
-                name="UK"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute top-0 left-0 right-0 h-px origin-left"
+            style={{ backgroundColor: "var(--color-terracotta)", opacity: 0.3 }}
+          />
+
+          <div className="relative z-10 w-full max-w-3xl">
+            {/* Logo — centered, prominent */}
+            <motion.div
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+              className="mb-10 flex justify-center"
+            >
+              <DynamicLogo href={null} width={160} className="text-charcoal" />
+            </motion.div>
+
+            {/* Eyebrow */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
+              className="text-center text-[11px] font-bold uppercase tracking-[0.26em]"
+              style={{ color: "var(--color-terracotta)" }}
+            >
+              Personalised keepsakes, made with love
+            </motion.p>
+
+            {/* Main heading */}
+            <motion.h1
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-4 text-center font-serif font-bold tracking-[-0.05em] text-charcoal"
+              style={{ fontSize: "clamp(2.4rem, 5.5vw, 4rem)" }}
+            >
+              Where Are We Shipping To?
+            </motion.h1>
+
+            {/* Subline */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.32 }}
+              className="mx-auto mt-4 max-w-sm text-center text-base leading-7 text-charcoal/55"
+            >
+              Choose your region for local pricing, shipping, and gifting occasions.
+            </motion.p>
+
+            {/* Thin divider */}
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ duration: 0.5, delay: 0.38 }}
+              className="mx-auto mt-8 h-px w-12 origin-center"
+              style={{ backgroundColor: "var(--color-terracotta)", opacity: 0.4 }}
+            />
+
+            {/* Region cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-10 grid gap-4 sm:grid-cols-2"
+            >
+              <RegionCard
                 region="UK"
+                countryName="United Kingdom"
+                currency="Shop in GBP · £"
+                flag="🇬🇧"
                 onSelect={(e) => startTransition("UK", e)}
               />
-              <RegionSide
-                name="US"
+              <RegionCard
                 region="US"
+                countryName="United States"
+                currency="Shop in USD · $"
+                flag="🇺🇸"
                 onSelect={(e) => startTransition("US", e)}
               />
-            </div>
-          </motion.div>
+            </motion.div>
+
+            {/* Trust line */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.65 }}
+              className="mt-8 text-center text-xs text-charcoal/35"
+            >
+              Free gift wrapping on every order · 30-day returns · Secure checkout
+            </motion.p>
+          </div>
+
+          {/* Decorative bottom rule */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute bottom-0 left-0 right-0 h-px origin-right"
+            style={{ backgroundColor: "var(--color-forest)", opacity: 0.2 }}
+          />
         </div>
       )}
 
@@ -112,15 +195,15 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-50"
-            style={{ backgroundColor: IVORY }}
+            style={{ backgroundColor: "var(--color-cream)" }}
           >
             <ErrorBoundary
               fallback={
                 <div
                   className="flex h-full items-center justify-center"
-                  style={{ backgroundColor: IVORY }}
+                  style={{ backgroundColor: "var(--color-cream)" }}
                 >
-                  <span className="font-serif text-obsidian/40">3D unavailable — continuing…</span>
+                  <span className="font-serif text-charcoal/40">Continuing…</span>
                 </div>
               }
             >
@@ -128,32 +211,32 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
                 fallback={
                   <div
                     className="flex h-full items-center justify-center"
-                    style={{ backgroundColor: IVORY }}
+                    style={{ backgroundColor: "var(--color-cream)" }}
                   >
-                    <span className="font-serif text-obsidian/40">Calibrating studio…</span>
+                    <span className="font-serif text-charcoal/40">One moment…</span>
                   </div>
                 }
               >
                 <Canvas
-                camera={{ position: [0, 0, 5], fov: 75 }}
-                gl={{ alpha: false }}
-                dpr={[1, 2]}
-                performance={{ min: 0.5, max: 1 }}
-                className="h-full w-full"
-              >
-                <color attach="background" args={[IVORY]} />
-                <PerformanceMonitor>
-                  <AdaptiveDpr pixelated />
-                  <AdaptiveEvents />
-                  <CloudSceneWithPerf isAccelerating />
-                </PerformanceMonitor>
-              </Canvas>
+                  camera={{ position: [0, 0, 5], fov: 75 }}
+                  gl={{ alpha: false }}
+                  dpr={[1, 2]}
+                  performance={{ min: 0.5, max: 1 }}
+                  className="h-full w-full"
+                >
+                  <color attach="background" args={["#FDF6EE"]} />
+                  <PerformanceMonitor>
+                    <AdaptiveDpr pixelated />
+                    <AdaptiveEvents />
+                    <CloudSceneWithPerf isAccelerating />
+                  </PerformanceMonitor>
+                </Canvas>
               </Suspense>
             </ErrorBoundary>
             {/* ACT 4: White Flash - arrival at 2.5s */}
             <motion.div
               className="pointer-events-none absolute inset-0 z-[51]"
-              style={{ backgroundColor: IVORY }}
+              style={{ backgroundColor: "var(--color-cream)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 0, 1] }}
               transition={{ duration: 2.5, times: [0, 0.72, 1] }}
@@ -165,7 +248,64 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
   );
 }
 
-const CLOUD_SEGMENT_COUNT = 60; // 40 + 20 from the two Cloud components
+// ─── Region Selection Card ────────────────────────────────────────────────────
+
+type RegionCardProps = {
+  region: Region;
+  countryName: string;
+  currency: string;
+  flag: string;
+  onSelect: (e: React.MouseEvent) => void;
+};
+
+function RegionCard({ region, countryName, currency, flag, onSelect }: RegionCardProps) {
+  return (
+    <motion.button
+      type="button"
+      whileHover={{ y: -4, boxShadow: "0 20px 48px -20px rgba(196,113,74,0.22)" }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      onClick={onSelect}
+      aria-label={`Shop ${countryName}`}
+      className="group relative flex w-full cursor-pointer flex-col items-start gap-5 overflow-hidden rounded-2xl border-2 bg-white p-6 text-left transition-colors"
+      style={{ borderColor: "rgba(45,41,38,0.08)" }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-terracotta)";
+        (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#FFFAF6";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(45,41,38,0.08)";
+        (e.currentTarget as HTMLButtonElement).style.backgroundColor = "white";
+      }}
+    >
+      {/* Flag circle */}
+      <div
+        className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
+        style={{ backgroundColor: region === "UK" ? "rgba(1,33,105,0.08)" : "rgba(60,59,110,0.08)" }}
+      >
+        {flag}
+      </div>
+
+      {/* Text */}
+      <div className="flex-1">
+        <h2 className="font-serif text-2xl font-bold tracking-[-0.03em] text-charcoal">
+          {countryName}
+        </h2>
+        <p className="mt-1.5 text-sm text-charcoal/50">{currency}</p>
+      </div>
+
+      {/* Arrow indicator */}
+      <div className="ml-auto flex items-center gap-1.5 text-sm font-semibold text-charcoal/30 group-hover:text-terracotta transition-colors">
+        <span>Continue</span>
+        <span>→</span>
+      </div>
+    </motion.button>
+  );
+}
+
+// ─── 3D Cloud Scene (unchanged) ──────────────────────────────────────────────
+
+const CLOUD_SEGMENT_COUNT = 60;
 
 function CloudSceneWithPerf({ isAccelerating }: { isAccelerating: boolean }) {
   const groupRef = useRef<THREE.Group>(null!);
@@ -188,74 +328,17 @@ function CloudSceneWithPerf({ isAccelerating }: { isAccelerating: boolean }) {
     <>
       <ambientLight intensity={1.5} />
       <pointLight position={[10, 10, 10]} />
-      <fog attach="fog" args={["#F9F8F6", 0, 15]} />
+      <fog attach="fog" args={["#FDF6EE", 0, 15]} />
       <group ref={groupRef}>
         <Clouds
           material={THREE.MeshLambertMaterial}
           range={cloudRange}
           limit={CLOUD_SEGMENT_COUNT}
         >
-          <Cloud segments={40} bounds={[10, 2, 2]} volume={10} color="#F9F8F6" opacity={0.8} />
+          <Cloud segments={40} bounds={[10, 2, 2]} volume={10} color="#FDF6EE" opacity={0.8} />
           <Cloud seed={1} scale={2} volume={5} color="#E2E8FF" fade={100} />
         </Clouds>
       </group>
     </>
-  );
-}
-
-type RegionSideProps = {
-  name: string;
-  region: Region;
-  onSelect: (e: React.MouseEvent) => void;
-};
-
-function RegionSide({ name, region, onSelect }: RegionSideProps) {
-  return (
-    <motion.button
-      type="button"
-      whileHover={{ y: -3, scale: 1.006 }}
-      whileTap={{ scale: 0.992 }}
-      transition={{ duration: 0.22, ease: "easeOut" }}
-      className="relative flex min-h-[22rem] w-full cursor-pointer items-end overflow-hidden rounded-[1.8rem] border border-white/70 text-left shadow-[0_28px_64px_-34px_rgba(0,0,0,0.42)]"
-      onClick={onSelect}
-      aria-label={`Shop ${name}`}
-    >
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(255,255,255,0.98),rgba(255,255,255,0.45)_24%,transparent_54%),linear-gradient(180deg,#f8fbff_0%,#edf2f7_42%,#d9e1ea_100%)]" />
-        <WatercolorCity region={region} />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(241,246,251,0.06)_36%,rgba(71,91,117,0.18)_100%)]" />
-      </div>
-      <div className="relative z-10 w-full p-6 sm:p-7">
-        <div className="max-w-[14rem] rounded-[1.5rem] border border-white/80 bg-[rgba(255,255,255,0.52)] p-4 backdrop-blur-xl">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#2e4055]/58">Regional studio</p>
-          <h2 className="mt-2 font-serif text-4xl text-[#1b2a3d] tracking-[-0.04em] sm:text-5xl">
-          {name}
-          </h2>
-          <p className="mt-2 text-sm text-[#243548]/72">
-            Enter with local gifting context and shipping.
-          </p>
-        </div>
-      </div>
-    </motion.button>
-  );
-}
-
-function WatercolorCity({ region }: { region: Region }) {
-  const isUK = region === "UK";
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="absolute inset-x-[-10%] top-[8%] h-32 rounded-full blur-3xl" style={{ background: isUK ? "rgba(198,212,226,0.55)" : "rgba(206,216,229,0.54)" }} />
-      <div className="absolute right-[8%] top-[18%] h-28 w-28 rounded-full blur-2xl" style={{ background: isUK ? "rgba(223,205,187,0.34)" : "rgba(213,201,186,0.34)" }} />
-      <Image
-        src={isUK ? "/generated-gateway/london-watercolor.png" : "/generated-gateway/new-york-watercolor.png"}
-        alt=""
-        fill
-        priority
-        sizes="(max-width: 768px) 100vw, 50vw"
-        className={`object-cover ${isUK ? "object-[46%_44%]" : "object-[50%_48%]"} opacity-[0.94]`}
-      />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(255,255,255,0.48),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0)_34%,rgba(90,106,122,0.12)_100%)]" />
-      <div className="absolute inset-0 opacity-[0.12] mix-blend-multiply [background-image:radial-gradient(rgba(125,137,149,0.55)_0.55px,transparent_0.55px)] [background-size:7px_7px]" />
-    </div>
   );
 }

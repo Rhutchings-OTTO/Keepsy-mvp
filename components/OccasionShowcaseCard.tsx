@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { MockupStage } from "@/components/mockups/MockupStage";
 import type { OccasionId } from "@/lib/siteConfig";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/placements";
 
@@ -21,6 +20,23 @@ type OccasionShowcaseCardProps = {
   className?: string;
 };
 
+// Map occasion IDs to warm lifestyle images
+const OCCASION_IMAGES: Record<string, string> = {
+  "mothers-day": "https://images.unsplash.com/photo-1559181567-c3190ca9d222?w=600",
+  "birthday": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600",
+  "anniversary": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600",
+  "christmas": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=600",
+  "sympathy": "https://images.unsplash.com/photo-1490750967868-88df5691cc2c?w=600",
+  "friendship": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600",
+  "just-because": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600",
+  "graduation": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600",
+  "fathers-day": "https://images.unsplash.com/photo-1604948501466-4e9c339b9c24?w=600",
+  "valentines": "https://images.unsplash.com/photo-1518893883800-45cd0954574b?w=600",
+};
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600";
+
 export function OccasionShowcaseCard({
   href,
   title,
@@ -29,52 +45,56 @@ export function OccasionShowcaseCard({
   visual,
   className = "",
 }: OccasionShowcaseCardProps) {
+  const imgSrc = OCCASION_IMAGES[visual.id] ?? FALLBACK_IMAGE;
+
   return (
     <a
       href={href}
-      className={`group block rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(247,243,238,0.96))] p-3 shadow-[0_24px_52px_-34px_rgba(23,18,12,0.34)] transition-transform duration-300 hover:-translate-y-1 ${className}`}
+      className={`group relative block overflow-hidden rounded-2xl ${className}`}
+      style={{ aspectRatio: "3/4" }}
     >
-      <div
-        className="relative overflow-hidden rounded-[1.5rem] border border-black/8 p-3"
-        style={{ background: visual.accent }}
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.95),transparent_34%),radial-gradient(circle_at_82%_20%,rgba(255,255,255,0.55),transparent_28%)]" />
-        <div className="relative z-10 flex items-start justify-between gap-3">
-          <div className="max-w-[8rem]">
-            <p className="inline-flex rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
-              {visual.chip}
-            </p>
-            <p className="mt-3 text-xs leading-5 text-black/60">
-              Real artwork preview on the final product.
-            </p>
-          </div>
-          <div className="relative h-14 w-14 overflow-hidden rounded-2xl border border-white/70 bg-white/70 shadow-sm">
-            <Image
-              src={visual.artworkImage}
-              alt={`${title} artwork`}
-              fill
-              className="object-cover"
-              sizes="56px"
-            />
-          </div>
-        </div>
-        <div className="relative z-10 mt-4">
-          <MockupStage
-            productType={visual.productType}
-            color={visual.color}
-            generatedImage={visual.artworkImage}
-            className="!rounded-[1.5rem] !border-white/60 !bg-white/55"
-          />
-        </div>
+      {/* Background lifestyle image */}
+      <Image
+        src={imgSrc}
+        alt={title}
+        fill
+        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+      />
+
+      {/* Dark gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent transition-all duration-500 group-hover:from-black/70" />
+
+      {/* Chip — top left */}
+      <div className="absolute left-4 top-4 z-10">
+        <span className="rounded-sm bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-charcoal backdrop-blur-sm">
+          {visual.chip}
+        </span>
       </div>
-      <div className="px-1 pb-1 pt-4">
-        <h3 className="text-lg font-bold text-charcoal">{title}</h3>
-        <p className="mt-1 text-sm leading-6 text-black/60">{description}</p>
-        {urgency ? (
-          <p className="mt-3 rounded-xl px-3 py-2 text-xs font-semibold text-terracotta" style={{ backgroundColor: "rgba(196,113,74,0.10)" }}>
-            {urgency}
-          </p>
-        ) : null}
+
+      {/* Content — bottom of card */}
+      <div className="absolute inset-x-0 bottom-0 z-10 p-5">
+        {urgency && (
+          <div className="mb-2">
+            <span
+              className="inline-block rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+              style={{ backgroundColor: "var(--color-terracotta)" }}
+            >
+              {urgency}
+            </span>
+          </div>
+        )}
+
+        <h3 className="font-serif text-2xl font-bold leading-tight text-white">{title}</h3>
+
+        <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-white/65">
+          {description}
+        </p>
+
+        <div className="mt-4 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white/70 transition-colors group-hover:text-white">
+          <span>Shop Now</span>
+          <span className="transition-transform group-hover:translate-x-1">→</span>
+        </div>
       </div>
     </a>
   );

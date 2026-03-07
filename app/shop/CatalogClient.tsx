@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { getRegion, type Region } from "@/lib/region";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -185,14 +185,14 @@ function productHref(category: CatalogProduct["category"]) {
   return `/create?product=${category === "card" ? "card" : category === "tee" ? "tee" : category}`;
 }
 
-// ─── Product Card ─────────────────────────────────────────────────────────────
-
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 const USD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 function fmtPrice(price: number, region: Region | null): string {
   return region === "UK" ? GBP.format(price) : USD.format(price);
 }
+
+// ─── Product Card ─────────────────────────────────────────────────────────────
 
 function ProductCard({ product, index, region }: { product: CatalogProduct; index: number; region: Region | null }) {
   return (
@@ -201,20 +201,26 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -4 }}
-      className="group relative rounded-[1.75rem] bg-white/90 shadow-warm-md backdrop-blur-sm
-                 border border-white/70 flex flex-col overflow-hidden
-                 transition-shadow hover:shadow-warm-lg"
+      whileHover={{ y: -6 }}
+      className="group relative flex flex-col overflow-hidden rounded-xl border border-charcoal/8 bg-white transition-shadow hover:shadow-[0_20px_40px_-20px_rgba(196,113,74,0.18)]"
     >
       {/* Badge */}
       {product.badge && (
-        <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-gold text-white text-[11px] font-bold tracking-wide shadow-sm">
+        <div
+          className="absolute left-3 top-3 z-10 rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm"
+          style={{
+            backgroundColor:
+              product.badge === "Bestseller"
+                ? "var(--color-gold)"
+                : "var(--color-terracotta)",
+          }}
+        >
           {product.badge}
         </div>
       )}
 
-      {/* Image */}
-      <div className="relative aspect-square rounded-[1.25rem] overflow-hidden m-3">
+      {/* Image — edge to edge, portrait aspect */}
+      <div className="relative overflow-hidden" style={{ aspectRatio: "4/5" }}>
         <Image
           src={product.image}
           alt={product.name}
@@ -225,33 +231,35 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
       </div>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 px-4 pb-4 gap-2">
+      <div className="flex flex-col flex-1 gap-1.5 border-t border-charcoal/8 px-4 py-4">
         {/* Stars */}
         <div className="flex items-center gap-1.5">
-          <span className="text-gold text-sm leading-none">{renderStars(product.rating)}</span>
-          <span className="text-[11px] text-charcoal/50 font-medium">
-            {product.reviewCount.toLocaleString()} reviews
+          <span className="text-sm leading-none" style={{ color: "var(--color-gold)" }}>
+            {renderStars(product.rating)}
+          </span>
+          <span className="text-[11px] text-charcoal/45 font-medium">
+            {product.reviewCount.toLocaleString()}
           </span>
         </div>
 
         {/* Name */}
-        <p className="font-semibold text-charcoal text-sm leading-snug">{product.name}</p>
+        <p className="font-sans font-semibold text-charcoal text-sm leading-snug">{product.name}</p>
 
         {/* Price */}
-        <p className="font-bold text-charcoal text-base">{fmtPrice(product.price, region)}</p>
+        <p className="font-bold text-charcoal text-lg">{fmtPrice(product.price, region)}</p>
 
         {/* Sold this week */}
-        <p className="text-terracotta font-medium" style={{ fontSize: "11px" }}>
+        <p className="font-medium" style={{ fontSize: "11px", color: "var(--color-terracotta)" }}>
           {product.soldThisWeek} sold this week
         </p>
 
         {/* CTA */}
         <Link
           href={productHref(product.category)}
-          className="mt-auto block w-full rounded-full py-2.5 text-center text-sm font-semibold
-                     text-white btn-primary-sheen transition-opacity hover:opacity-90"
+          className="mt-auto block w-full rounded-lg py-3 text-center text-sm font-semibold text-white transition-opacity hover:opacity-85"
+          style={{ backgroundColor: "var(--color-terracotta)" }}
         >
-          Shop Now
+          Personalise Now
         </Link>
       </div>
     </motion.div>
@@ -274,13 +282,11 @@ function PurchaseToast() {
 
       timerRef.current = setTimeout(() => {
         setVisible(false);
-        // schedule next toast 15-20s after dismiss
         const delay = 15000 + Math.random() * 5000;
         timerRef.current = setTimeout(showNext, delay);
       }, 4000);
     }
 
-    // first toast after 8-12s
     const initial = 8000 + Math.random() * 4000;
     timerRef.current = setTimeout(showNext, initial);
 
@@ -298,17 +304,16 @@ function PurchaseToast() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 20, opacity: 0 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-6 left-4 z-50 max-w-[280px] rounded-2xl bg-white/95
-                     shadow-warm-lg border border-white/70 backdrop-blur-sm px-4 py-3"
-          style={{ animation: "toast-slide-in 0.35s ease-out" }}
+          className="fixed bottom-6 left-4 z-50 max-w-[280px] rounded-xl bg-white shadow-[0_8px_32px_-8px_rgba(45,41,38,0.22)] border-l-4 border-charcoal/10 pl-1 pr-4 py-3"
+          style={{ borderLeftColor: "var(--color-gold)" }}
         >
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2 pl-3">
             <span className="text-xl leading-none mt-0.5">🛍️</span>
             <div>
               <p className="text-[12px] font-semibold text-charcoal leading-snug">
                 {combo.name} from {combo.location} just ordered
               </p>
-              <p className="text-[11px] text-terracotta font-medium mt-0.5">
+              <p className="text-[11px] font-medium mt-0.5" style={{ color: "var(--color-terracotta)" }}>
                 {combo.product} · {combo.time}
               </p>
             </div>
@@ -356,91 +361,134 @@ export function CatalogClient() {
   const sorted = [...filtered].sort((a, b) => {
     if (sortKey === "price-asc") return a.price - b.price;
     if (sortKey === "price-desc") return b.price - a.price;
-    // popular: sort by soldThisWeek desc
     return b.soldThisWeek - a.soldThisWeek;
   });
 
   return (
-    <div className="min-h-screen">
-      {/* Page header */}
-      <section className="pt-14 pb-8 text-center px-4">
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="font-serif text-5xl md:text-6xl text-charcoal font-bold"
-        >
-          Our Collection
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-3 text-charcoal/60 text-lg font-sans"
-        >
-          Personalised gifts she&apos;ll treasure forever
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="mt-1 text-sm text-charcoal/40 font-sans"
-        >
-          {PRODUCTS.length} products
-        </motion.p>
+    <div className="min-h-screen" style={{ backgroundColor: "var(--color-cream)" }}>
+      {/* ── Hero banner — terracotta ── */}
+      <section
+        className="py-16 sm:py-20"
+        style={{ backgroundColor: "var(--color-terracotta)" }}
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/60">
+                Keepsy
+              </p>
+              <h1 className="mt-3 font-serif text-5xl font-bold tracking-[-0.04em] text-white sm:text-6xl">
+                Our Collection
+              </h1>
+              <p className="mt-3 text-base text-white/70">
+                Personalised gifts she&apos;ll treasure forever
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="flex gap-6 sm:text-right"
+            >
+              <div>
+                <p className="font-serif text-2xl font-bold text-white">{PRODUCTS.length}</p>
+                <p className="text-sm text-white/55">Products</p>
+              </div>
+              <div>
+                <p className="font-serif text-2xl font-bold text-white">4,800+</p>
+                <p className="text-sm text-white/55">Reviews</p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </section>
 
-      {/* Filters bar */}
-      <div className="sticky top-16 z-30 bg-cream/90 backdrop-blur-md border-b border-charcoal/8 px-4 py-3">
-        <div className="mx-auto max-w-6xl flex flex-wrap items-center gap-3 justify-between">
-          {/* Category pills */}
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map(({ key, label }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setActiveCategory(key)}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
-                  activeCategory === key
-                    ? "bg-terracotta text-white shadow-warm-sm"
-                    : "bg-white/70 text-charcoal border border-charcoal/15 hover:border-terracotta/40"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Sort dropdown */}
-          <div className="relative">
-            <select
-              value={sortKey}
-              onChange={(e) => setSortKey(e.target.value as SortKey)}
-              className="appearance-none pl-3 pr-8 py-1.5 rounded-full text-sm font-medium
-                         text-charcoal border border-charcoal/20 bg-white/80 cursor-pointer
-                         focus:outline-none focus:border-terracotta/50"
-            >
-              {SORT_OPTIONS.map(({ key, label }) => (
-                <option key={key} value={key}>
+      {/* ── Filters bar ── */}
+      <div
+        className="sticky top-16 z-30 border-b border-charcoal/8"
+        style={{ backgroundColor: "var(--color-cream)" }}
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="flex items-center justify-between gap-4 py-4 overflow-x-auto scrollbar-hide">
+            {/* Category pills */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {CATEGORIES.map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setActiveCategory(key)}
+                  className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+                    activeCategory === key
+                      ? "text-white"
+                      : "border border-charcoal/20 bg-transparent text-charcoal/65 hover:border-terracotta hover:text-terracotta"
+                  }`}
+                  style={
+                    activeCategory === key
+                      ? { backgroundColor: "var(--color-charcoal)" }
+                      : {}
+                  }
+                >
                   {label}
-                </option>
+                </button>
               ))}
-            </select>
-            <ChevronDown
-              size={14}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-charcoal/50 pointer-events-none"
-            />
+            </div>
+
+            {/* Sort dropdown */}
+            <div className="relative flex-shrink-0 flex items-center gap-1.5">
+              <SlidersHorizontal size={14} className="text-charcoal/40" />
+              <select
+                value={sortKey}
+                onChange={(e) => setSortKey(e.target.value as SortKey)}
+                className="appearance-none bg-transparent pr-4 text-sm font-medium text-charcoal/65 cursor-pointer focus:outline-none"
+              >
+                {SORT_OPTIONS.map(({ key, label }) => (
+                  <option key={key} value={key}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={12} className="text-charcoal/40 pointer-events-none" />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Product grid */}
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {sorted.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} region={region} />
-          ))}
-        </div>
+      {/* ── Product grid ── */}
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCategory + sortKey}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4"
+          >
+            {sorted.map((product, i) => (
+              <ProductCard key={product.id} product={product} index={i} region={region} />
+            ))}
+          </motion.div>
+        </AnimatePresence>
+
+        {sorted.length === 0 && (
+          <div className="py-20 text-center">
+            <p className="font-serif text-2xl font-bold text-charcoal">No products found</p>
+            <p className="mt-2 text-charcoal/55">Try a different filter.</p>
+            <button
+              type="button"
+              onClick={() => setActiveCategory("all")}
+              className="mt-5 inline-flex rounded-lg px-6 py-3 text-sm font-semibold text-white"
+              style={{ backgroundColor: "var(--color-terracotta)" }}
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Purchase activity toast */}

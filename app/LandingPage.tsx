@@ -911,7 +911,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/gift-ideas", label: "Gift Ideas" },
                       { href: "/create", label: "Create Your Own" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white" style={{ color: "rgba(255,255,255,0.55)" }}>
                         {label}
                       </Link>
                     ))}
@@ -925,7 +925,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/terms", label: "Terms" },
                       { href: "/privacy", label: "Privacy" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white" style={{ color: "rgba(255,255,255,0.55)" }}>
                         {label}
                       </Link>
                     ))}
@@ -938,7 +938,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/shipping", label: "Shipping" },
                       { href: "/refunds", label: "Refunds" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white" style={{ color: "rgba(255,255,255,0.55)" }}>
                         {label}
                       </Link>
                     ))}

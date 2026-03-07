@@ -6,7 +6,6 @@ import { flushSync } from "react-dom";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { DynamicLogo } from "@/components/DynamicLogo";
 import { MagneticCard } from "@/components/ui/MagneticCard";
 import { MockupRenderer } from "@/components/MockupRenderer";
 import dynamic from "next/dynamic";
@@ -882,87 +881,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
   return (
     <div
-      className={`min-h-screen flex flex-col text-charcoal selection:bg-terracotta/20 overflow-x-hidden ${
-        isMagicpathSkin ? "bg-[#FDFCFB]" : "bg-[#FDF6EE]"
-      }`}
+      className="text-charcoal selection:bg-terracotta/20 overflow-x-hidden"
       aria-busy={isGenerating}
     >
       <MagicpathBackground enabled={isMagicpathSkin} />
-      {!isMagicpathSkin ? (
-        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-          <div className="absolute inset-0" style={{ backgroundColor: "var(--color-cream)" }} />
-        </div>
-      ) : null}
 
-      {/* NAV */}
-      <nav className={`fixed z-40 w-full px-4 sm:px-6 ${isMagicpathSkin ? "top-5" : "top-0"}`}>
-        <MagicpathFrame enabled={isMagicpathSkin} className={isMagicpathSkin ? "mx-auto flex w-full max-w-5xl items-center justify-between px-7 py-5" : ""}>
-          <div className={`flex w-full items-center justify-between px-4 py-3 ${isMagicpathSkin ? "" : "border-b border-charcoal/8 bg-[#FDF6EE]"}`}>
-            <DynamicLogo
-          onClick={() => {
-            setView("home");
-            setStep(1);
-          }}
-              width={148}
-              className="h-12 w-auto text-charcoal sm:h-14"
-            />
-
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-charcoal/60">
-            <button
-              onClick={() => setView("home")}
-              className={`px-4 py-2 text-sm font-semibold transition-colors border-b-2 ${
-                view === "home"
-                  ? "border-terracotta text-terracotta"
-                  : "border-transparent text-charcoal/55 hover:text-charcoal"
-              }`}
-            >
-              How it works
-            </button>
-            <button
-              onClick={() => setView("catalog")}
-              className={`px-4 py-2 text-sm font-semibold transition-colors border-b-2 ${
-                view === "catalog"
-                  ? "border-terracotta text-terracotta"
-                  : "border-transparent text-charcoal/55 hover:text-charcoal"
-              }`}
-            >
-              Catalog
-            </button>
-            <button
-              onClick={() => setView("community")}
-              className={`px-4 py-2 text-sm font-semibold transition-colors border-b-2 ${
-                view === "community"
-                  ? "border-terracotta text-terracotta"
-                  : "border-transparent text-charcoal/55 hover:text-charcoal"
-              }`}
-            >
-                  Community
-                </button>
-          </div>
-
-              <button
-                onClick={() => setIsCartOpen(true)}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 transition-all ${
-                  isMagicpathSkin ? "bg-terracotta !text-white shadow-xl" : "bg-terracotta !text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)]"
-                }`}
-              >
-                <ShoppingCart size={18} className="text-white" />
-            <motion.span
-              key={cartCount}
-              initial={{ scale: 1.35 }}
-              animate={{ scale: 1 }}
-              className="font-extrabold text-sm"
-            >
-              {cartCount}
-            </motion.span>
-              </button>
-          </div>
-        </div>
-        </MagicpathFrame>
-      </nav>
-
-      <main className={`flex-1 pb-16 px-4 sm:px-6 max-w-7xl mx-auto w-full ${isMagicpathSkin ? "pt-40" : "pt-28 sm:pt-32"}`}>
+      <div className={`pb-16 px-4 sm:px-6 max-w-7xl mx-auto w-full pt-6`}>
         <AnimatePresence mode="wait">
           {view === "home" && (
             <div className="space-y-20">
@@ -1479,7 +1403,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
+      </div>
 
       <AnimatePresence>
         {isCartOpen && (
@@ -1588,24 +1512,16 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         />
       ) : null}
 
-      <footer className={`px-6 ${isMagicpathSkin ? "pb-20 pt-16" : "py-10 border-t border-charcoal/10"}`}>
-        <MagicpathFrame enabled={isMagicpathSkin} className={isMagicpathSkin ? "mx-auto max-w-7xl px-8 py-8" : ""}>
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm">
-            <div className="font-semibold text-charcoal/55">
-              © 2026 Keepsy Ltd. All designs generated are owned by the creator. Powered by OpenAI & Stripe
-            </div>
-            <div className="flex items-center gap-5 text-charcoal/60">
-              <button onClick={() => setView("catalog")} className="hover:text-charcoal">Catalog</button>
-              <button onClick={() => setView("community")} className="hover:text-charcoal">Community</button>
-              <button onClick={() => setView("legal")} className="hover:text-charcoal">Terms of Service</button>
-              <button onClick={() => setView("legal")} className="hover:text-charcoal">Privacy Policy</button>
-              <button className="hover:text-charcoal" onClick={handleDeleteMyData}>
-                Delete My Data
-              </button>
-            </div>
-          </div>
-        </MagicpathFrame>
-      </footer>
+      {/* Delete My Data — accessible per privacy policy */}
+      <div className="px-6 py-4 text-center">
+        <button
+          type="button"
+          onClick={handleDeleteMyData}
+          className="text-xs text-charcoal/40 underline underline-offset-2 hover:text-charcoal/70 transition"
+        >
+          Delete My Data
+        </button>
+      </div>
       <GenerationLoadingOverlay
         isOpen={isGenerating}
         startedAt={generationStartedAt}

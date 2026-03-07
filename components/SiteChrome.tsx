@@ -16,14 +16,13 @@ type SiteChromeProps = {
 export function SiteChrome({ children }: SiteChromeProps) {
   const pathname = usePathname();
   const isEntryLanding = pathname === "/";
-  const isCreateRoute = pathname.startsWith("/create");
 
   return (
     <>
       <div className="fixed inset-0 z-0" aria-hidden>
         <MeshGradientBackground />
       </div>
-      {isEntryLanding || isCreateRoute ? (
+      {isEntryLanding ? (
         <EasterEggProvider>
           <div className="relative z-10">{children}</div>
           <PremiumEffects />

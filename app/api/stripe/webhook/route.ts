@@ -302,10 +302,10 @@ async function handleCheckoutCompleted(
         orderRef,
       });
       console.log("[email] send result:", emailResult);
-      debugLog.push(`Email result: ${emailResult}`);
-      if (!emailResult) {
+      debugLog.push(`Email result: ${emailResult.ok}`);
+      if (!emailResult.ok) {
         console.error("[email] sendAtelierCreationEmail returned false for", customerEmail);
-        debugLog.push(`Email error: sendAtelierCreationEmail returned false`);
+        debugLog.push(`Email error: ${emailResult.error ?? "unknown"}`);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

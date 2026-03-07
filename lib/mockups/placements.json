@@ -56,7 +56,7 @@
     "white": {
       "baseMockupSrc": "/product-tiles/hoodie-white.png",
       "aspectRatio": 1.4993,
-      "opacity": 0.89,
+      "opacity": 1.0,
       "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
       "placement": {
         "kind": "rect",
@@ -73,7 +73,7 @@
     "blue": {
       "baseMockupSrc": "/product-tiles/hoodie-blue.png",
       "aspectRatio": 1.5059,
-      "opacity": 0.89,
+      "opacity": 1.0,
       "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
       "placement": {
         "kind": "rect",
@@ -90,7 +90,7 @@
     "black": {
       "baseMockupSrc": "/mockups/hoodie-black.png",
       "aspectRatio": 1.5015,
-      "opacity": 0.89,
+      "opacity": 1.0,
       "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
       "placement": {
         "kind": "rect",
@@ -116,8 +116,8 @@
         "rect": {
           "xPct": 46.9,
           "yPct": 50,
-          "wPct": 36,
-          "hPct": 52,
+          "wPct": 28,
+          "hPct": 50,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         }

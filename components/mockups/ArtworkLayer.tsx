@@ -37,7 +37,8 @@ function getArtworkTransform(
   isQuad: boolean
 ): string {
   if (productType === "mug" && !isQuad) {
-    return `perspective(900px) rotateY(-14deg) scaleX(0.92) skewY(-1deg) ${baseTransform}`.trim();
+    // Gentle cylindrical curve only — no skewY which causes visible tilt at larger print sizes
+    return `perspective(1200px) rotateY(-8deg) scaleX(0.96) ${baseTransform}`.trim();
   }
   return baseTransform;
 }

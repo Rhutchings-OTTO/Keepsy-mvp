@@ -46,12 +46,12 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] h-screen w-screen overflow-hidden"
+      className="fixed inset-0 z-[100] h-screen w-screen overflow-y-auto"
       style={{ backgroundColor: "var(--color-cream)" }}
     >
       {/* ACT 1: Regional Selection — editorial boutique design */}
       {phase === "idle" && (
-        <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-5">
+        <div className="relative flex min-h-full w-full flex-col items-center justify-center overflow-x-hidden px-5 py-12 sm:py-16">
           {/* Subtle warm background texture */}
           <div
             className="pointer-events-none absolute inset-0"
@@ -101,7 +101,7 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="mt-4 text-center font-serif font-bold tracking-[-0.05em] text-charcoal"
-              style={{ fontSize: "clamp(2.4rem, 5.5vw, 4rem)" }}
+              style={{ fontSize: "clamp(1.75rem, 8vw, 4rem)" }}
             >
               Where Are We Shipping To?
             </motion.h1>

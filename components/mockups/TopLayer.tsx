@@ -47,7 +47,7 @@ function getHighlightOpacity(productType: MockupProductType, color: MockupColor)
 function getHoodieStructureOpacity(color: MockupColor): number {
   // White hoodie: structural overlay washes out the design slightly — keep low
   // Dark hoodies: same opacity; at 0.16-0.18 it darkens the design minimally but shows structure
-  return color === "white" ? 0.14 : 0.18;
+  return color === "white" ? 0.07 : 0.08;
 }
 
 type TopLayerProps = {

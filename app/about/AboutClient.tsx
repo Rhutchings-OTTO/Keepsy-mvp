@@ -63,7 +63,7 @@ function Hero() {
             Our Story
           </p>
           <h1 className="font-serif text-4xl font-bold leading-tight text-white md:text-6xl md:leading-[1.1]">
-            Made by a Son,<br className="hidden sm:block" /> for the People You Love
+            Two Sons, One Mission:<br className="hidden sm:block" /> Make Her Smile
           </h1>
         </motion.div>
       </div>

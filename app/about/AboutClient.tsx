@@ -36,10 +36,10 @@ function FadeIn({
 function Hero() {
   return (
     <section className="relative h-[480px] md:h-[600px] overflow-hidden">
-      {/* Background image */}
+      {/* Background image — high resolution, warm friendship energy */}
       <img
-        src="https://images.unsplash.com/photo-1536010305525-f7aa0834e2c7?w=1200"
-        alt="Woman smiling, holding a gift"
+        src="https://images.unsplash.com/photo-1536010305525-f7aa0834e2c7?w=1600&q=90"
+        alt="Women laughing together, warm friendship"
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
       {/* Warm dark gradient overlay */}
@@ -63,7 +63,7 @@ function Hero() {
             Our Story
           </p>
           <h1 className="font-serif text-4xl font-bold leading-tight text-white md:text-6xl md:leading-[1.1]">
-            Made by a Mom,<br className="hidden sm:block" /> for the People You Love
+            Made by a Son,<br className="hidden sm:block" /> for the People You Love
           </h1>
         </motion.div>
       </div>
@@ -87,18 +87,21 @@ function OriginStory() {
           </h2>
           <div className="space-y-5 text-charcoal/70 leading-relaxed">
             <p>
-              Keepsy was born out of a very ordinary moment. Our founder, Emma,
-              was looking for a birthday gift for her mom — something personal,
-              something that said "I really see you." Everything she found was
-              either too generic or too complicated. The custom options required
-              design software she didn't have. The nice things were too
-              expensive. The affordable things looked cheap.
+              Keepsy was born out of a very ordinary moment. Rory was looking
+              for a birthday gift for his mum — something personal, something
+              that said "I really see you." Everything he found was either too
+              generic or too complicated. The custom options required design
+              software he didn't have. The nice things were too expensive. The
+              affordable things looked cheap.
             </p>
             <p>
-              So she built the thing she wished existed. A place where you could
-              describe a memory in plain English — or just upload a photo — and
-              see it transformed into something genuinely beautiful. Something
-              you'd be proud to give. Something she'd actually love.
+              He told his mate Dan about it. Dan had the exact same problem —
+              he'd been trying to find something meaningful for his mum for
+              Mother's Day. So together, they built the thing they both wished
+              existed. A place where you could describe a memory in plain
+              English — or just upload a photo — and see it transformed into
+              something genuinely beautiful. Something you'd be proud to give.
+              Something she'd actually love.
             </p>
             <p>
               Today, Keepsy has helped thousands of families turn their most
@@ -107,6 +110,24 @@ function OriginStory() {
               kept.
             </p>
           </div>
+
+          {/* Dan's quote */}
+          <blockquote
+            className="mt-8 border-l-2 pl-5"
+            style={{ borderColor: "var(--color-terracotta)" }}
+          >
+            <p className="font-serif text-base italic leading-relaxed text-charcoal/80">
+              "We just wanted to make our mums smile. Turns out, a lot of
+              people feel the same way."
+            </p>
+            <footer
+              className="mt-2 text-sm font-medium"
+              style={{ color: "var(--color-terracotta)" }}
+            >
+              — Dan, Co-Founder of Keepsy
+            </footer>
+          </blockquote>
+
           <Link
             href="/create"
             className="mt-8 inline-flex min-h-[52px] items-center justify-center rounded-full px-8 text-sm font-semibold text-white shadow-[0_16px_32px_-16px_rgba(196,113,74,0.45)] transition hover:opacity-90"
@@ -116,13 +137,16 @@ function OriginStory() {
           </Link>
         </FadeIn>
 
-        {/* Image */}
+        {/* Founder illustration */}
         <FadeIn delay={0.15}>
-          <div className="overflow-hidden rounded-[2rem] shadow-xl">
+          <div
+            className="overflow-hidden rounded-[2rem] shadow-xl"
+            style={{ backgroundColor: "#FDF6EE" }}
+          >
             <img
-              src="https://images.unsplash.com/photo-1609220136736-443140cffec6?w=600"
-              alt="Mother and daughter sharing a warm moment"
-              className="aspect-[4/5] w-full object-cover"
+              src="/images/about/founders-illustration.png"
+              alt="Rory and Dan, co-founders of Keepsy"
+              className="aspect-square w-full object-contain"
             />
           </div>
         </FadeIn>
@@ -165,7 +189,7 @@ function MissionStatement() {
             className="mt-6 text-sm font-medium"
             style={{ color: "rgba(253,246,238,0.55)" }}
           >
-            — Emma, Founder of Keepsy
+            — Rory &amp; Dan, Co-Founders of Keepsy
           </p>
         </FadeIn>
       </div>

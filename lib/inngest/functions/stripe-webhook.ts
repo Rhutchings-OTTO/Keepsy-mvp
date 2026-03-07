@@ -230,6 +230,7 @@ export const stripeWebhookProcess = inngest.createFunction(
             variantId,
             printImageId: printifyImageId,
             printPosition: config.printPosition,
+            productType: productId,
           });
 
           await supabase

@@ -66,6 +66,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
           <OrderSuccess
             productName={primaryProductName}
             designUrl={generatedImageUrl}
+            orderRef={orderRef}
           />
         </Reveal>
       </main>

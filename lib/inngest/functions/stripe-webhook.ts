@@ -116,6 +116,17 @@ export const stripeWebhookProcess = inngest.createFunction(
       const prompt = session.metadata?.prompt || "";
       const designUrl = session.metadata?.design_url || null;
 
+      const customerEmail =
+        (session.customer_details?.email as string) || (session.customer_email as string) || null;
+      const customerName =
+        session.collected_information?.shipping_details?.name ??
+        session.customer_details?.name ??
+        null;
+      const shippingAddr =
+        session.collected_information?.shipping_details?.address ??
+        session.customer_details?.address ??
+        null;
+
       await step.run("upsert-order", async () => {
         const { error: orderErr } = await supabase.from("orders").upsert(
           {
@@ -126,6 +137,9 @@ export const stripeWebhookProcess = inngest.createFunction(
             total_gbp: amountTotal,
             prompt,
             generated_image_url: designUrl,
+            customer_email: customerEmail,
+            customer_name: customerName,
+            shipping_address: shippingAddr ? JSON.stringify(shippingAddr) : null,
           },
           { onConflict: "order_ref" }
         );
@@ -147,9 +161,6 @@ export const stripeWebhookProcess = inngest.createFunction(
           if (itemsErr) throw new Error("Failed to insert order items: " + itemsErr.message);
         }
       });
-
-      const customerEmail =
-        (session.customer_details?.email as string) || (session.customer_email as string) || null;
 
       await step.run("send-atelier-email", async () => {
         if (customerEmail) {
@@ -220,7 +231,14 @@ export const stripeWebhookProcess = inngest.createFunction(
 
           await supabase
             .from("orders")
-            .update({ printify_product_id: pid, printify_status: "product_created" })
+            .update({
+              printify_product_id: pid,
+              printify_status: "product_created",
+              product_type: productId,
+              variant_size: size ?? null,
+              variant_color: color ?? null,
+              region,
+            })
             .eq("order_ref", orderRef);
 
           return { productId: pid, variantId };

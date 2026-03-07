@@ -13,6 +13,11 @@
 
 import { createHmac } from "crypto";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import {
+  sendInProductionEmail,
+  sendShippedEmail,
+  sendDeliveredEmail,
+} from "@/lib/emails/orderEmails";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -119,6 +124,21 @@ export async function POST(req: Request): Promise<Response> {
         .update({ printify_status: "in_production", status: "in_production" })
         .eq("printify_order_id", printifyOrderId);
 
+      // Send in-production email
+      const { data: order } = await supabase
+        .from("orders")
+        .select("customer_email, customer_name, order_ref, product_type")
+        .eq("printify_order_id", printifyOrderId)
+        .maybeSingle();
+      if (order?.customer_email && order?.order_ref) {
+        await sendInProductionEmail({
+          to: order.customer_email,
+          orderRef: order.order_ref,
+          customerName: order.customer_name ?? undefined,
+          productName: order.product_type ?? undefined,
+        });
+      }
+
     } else if (eventType === "order:shipment:created") {
       const shipments = resource.shipments as Array<{
         carrier?: string;
@@ -137,11 +157,43 @@ export async function POST(req: Request): Promise<Response> {
         })
         .eq("printify_order_id", printifyOrderId);
 
+      // Send shipped email
+      const { data: order } = await supabase
+        .from("orders")
+        .select("customer_email, customer_name, order_ref, product_type")
+        .eq("printify_order_id", printifyOrderId)
+        .maybeSingle();
+      if (order?.customer_email && order?.order_ref) {
+        await sendShippedEmail({
+          to: order.customer_email,
+          orderRef: order.order_ref,
+          customerName: order.customer_name ?? undefined,
+          productName: order.product_type ?? undefined,
+          trackingNumber: tracking?.number ?? null,
+          trackingUrl: tracking?.url ?? null,
+        });
+      }
+
     } else if (eventType === "order:shipment:delivered") {
       await supabase
         .from("orders")
         .update({ printify_status: "delivered", status: "delivered" })
         .eq("printify_order_id", printifyOrderId);
+
+      // Send delivered email
+      const { data: order } = await supabase
+        .from("orders")
+        .select("customer_email, customer_name, order_ref, product_type")
+        .eq("printify_order_id", printifyOrderId)
+        .maybeSingle();
+      if (order?.customer_email && order?.order_ref) {
+        await sendDeliveredEmail({
+          to: order.customer_email,
+          orderRef: order.order_ref,
+          customerName: order.customer_name ?? undefined,
+          productName: order.product_type ?? undefined,
+        });
+      }
     }
   } catch (err) {
     console.error("[printify-webhook] Supabase update failed:", err instanceof Error ? err.message : err);

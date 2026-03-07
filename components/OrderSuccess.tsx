@@ -8,6 +8,7 @@ import confetti from "canvas-confetti";
 type OrderSuccessProps = {
   productName: string;
   designUrl?: string | null;
+  orderRef?: string | null;
 };
 
 const NEXT_STEPS = [
@@ -28,7 +29,7 @@ const NEXT_STEPS = [
   },
 ];
 
-export function OrderSuccess({ productName, designUrl }: OrderSuccessProps) {
+export function OrderSuccess({ productName, designUrl, orderRef }: OrderSuccessProps) {
   useEffect(() => {
     const duration = 3 * 1000;
     const end = Date.now() + duration;
@@ -125,6 +126,42 @@ export function OrderSuccess({ productName, designUrl }: OrderSuccessProps) {
           >
             Your {productName} has been confirmed and sent to production. We&apos;ll keep you updated every step of the way.
           </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.85 }}
+            className="mt-3 text-sm text-white/40"
+          >
+            Estimated delivery: 5–10 business days
+          </motion.p>
+
+          {orderRef && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.95 }}
+              className="mt-8 flex flex-wrap justify-center gap-3"
+            >
+              <MagneticLink
+                href={`/track?ref=${orderRef}`}
+                className="inline-flex min-h-[48px] items-center justify-center rounded-xl border border-white/30 px-7 text-sm font-semibold text-white/80 transition hover:border-white/60 hover:text-white"
+              >
+                Track Your Order
+              </MagneticLink>
+            </motion.div>
+          )}
+
+          {orderRef && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.05 }}
+              className="mt-4 text-xs text-white/30"
+            >
+              Order ref: {orderRef}
+            </motion.p>
+          )}
         </div>
       </section>
 

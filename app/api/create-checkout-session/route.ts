@@ -195,6 +195,9 @@ export async function POST(req: Request) {
       {
         mode: "payment",
         payment_method_types: ["card"],
+        shipping_address_collection: {
+          allowed_countries: ["US", "GB"],
+        },
         line_items: safeCartSummary.map((item) => {
           const meta: Record<string, string> = {
             productId: item.id,
@@ -223,6 +226,8 @@ export async function POST(req: Request) {
           has_image: imageDataUrl ? "1" : "0",
           design_url: designUrl || "",
           product_type: productType,
+          variant_size: safeCartSummary[0]?.size ?? "",
+          variant_color: safeCartSummary[0]?.color ?? "",
         },
         client_reference_id: orderRef,
       },

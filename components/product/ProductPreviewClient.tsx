@@ -275,7 +275,7 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
             {/* Stars */}
             <div className="flex items-center gap-1.5">
               <span className="text-gold text-base leading-none">{renderStars(4.9)}</span>
-              <span className="text-sm text-charcoal/55 font-medium">847 reviews</span>
+              <span className="text-sm text-charcoal/55 font-medium">Highly rated</span>
             </div>
             {/* Badge */}
             <div className="px-3 py-1.5 rounded-full bg-white/70 border border-charcoal/10 text-xs font-bold flex items-center gap-1.5 text-charcoal">

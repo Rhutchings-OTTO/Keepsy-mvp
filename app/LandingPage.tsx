@@ -66,7 +66,7 @@ const PRODUCT_IMAGES = [
 ];
 
 const SOCIAL_PROOF_ITEMS = [
-  "★★★★★  2,847 Happy Customers",
+  "★★★★★  Thousands of Happy Customers",
   "🎁  Free Gift Wrapping",
   "🇺🇸  Made & Shipped with Love",
   "↩️  30-Day Returns",
@@ -284,7 +284,7 @@ function FeaturedProductCard({
         </p>
         <div className="mt-1.5 flex items-center gap-1.5">
           <span className="text-sm" style={{ color: "var(--color-gold)" }}>{product.rating}</span>
-          <span className="text-xs text-charcoal/45">({product.reviews.toLocaleString()})</span>
+          <span className="text-xs text-charcoal/45">(100+)</span>
         </div>
         <div className="mt-auto flex items-center justify-between pt-3">
           <span className="text-lg font-bold text-charcoal">
@@ -422,7 +422,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     {/* Social proof under headline */}
                     <div className="mt-6 flex items-center gap-2">
                       <span className="text-sm" style={{ color: "var(--color-gold)" }}>★★★★★</span>
-                      <span className="text-sm text-charcoal/55">2,847 happy customers</span>
+                      <span className="text-sm text-charcoal/55">Thousands of happy customers</span>
                     </div>
 
                     <p className="mt-6 max-w-sm text-base leading-8 text-charcoal/65">
@@ -881,7 +881,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       )}
                     </AnimatePresence>
                     <p className="mt-3 text-xs text-white/40">
-                      Join 15,000+ women who love thoughtful gifting · Unsubscribe anytime
+                      Join women who love thoughtful gifting · Unsubscribe anytime
                     </p>
                   </motion.div>
                 </div>

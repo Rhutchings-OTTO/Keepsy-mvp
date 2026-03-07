@@ -101,7 +101,7 @@ function OriginStory() {
               you'd be proud to give. Something she'd actually love.
             </p>
             <p>
-              Today, Keepsy has helped over 15,000 families turn their most
+              Today, Keepsy has helped thousands of families turn their most
               cherished moments into keepsakes. Every mug, every card, every
               hoodie starts the same way: with a memory that deserved to be
               kept.
@@ -242,8 +242,8 @@ function ValuesSection() {
 /* ─── 5. By the Numbers ────────────────────────────────────────────────── */
 
 const STATS = [
-  { value: "15,000+", label: "Happy Customers" },
-  { value: "98%", label: "5-Star Reviews" },
+  { value: "Thousands", label: "Happy Customers" },
+  { value: "98%", label: "Satisfaction Rate" },
   { value: "2 Countries", label: "US & UK Delivery" },
   { value: "0 Waste", label: "Print on Demand" },
 ];
@@ -283,7 +283,7 @@ function ByTheNumbers() {
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn className="mb-12 text-center">
           <h2 className="font-serif text-3xl font-bold text-charcoal md:text-4xl">
-            Keepsy by the Numbers
+            The Keepsy Promise
           </h2>
         </FadeIn>
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
@@ -390,7 +390,7 @@ function CTASection() {
             Ready to Create Something Beautiful?
           </h2>
           <p className="mb-10 text-base" style={{ color: "rgba(253,246,238,0.8)" }}>
-            Join 15,000+ families who've turned their favourite memories into
+            Join thousands of families who've turned their favourite memories into
             keepsakes.
           </p>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

@@ -63,7 +63,7 @@ export function TestimonialGrid() {
         <h2 className="mt-2 font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-4xl">
           Loved by Gift-Givers
         </h2>
-        <p className="mt-2 text-sm text-charcoal/55">Rated 4.8/5 by 2,400+ customers across the UK and US</p>
+        <p className="mt-2 text-sm text-charcoal/55">Loved by customers across the UK and US</p>
       </Reveal>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

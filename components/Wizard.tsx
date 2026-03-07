@@ -275,7 +275,7 @@ export function Wizard({ initialStyle, initialProduct }: WizardProps) {
               </div>
               <PriceSummary unitPrice={productMeta.price} quantity={quantity} productLabel={productMeta.name} />
               <div className="rounded-2xl border border-black/10 bg-white p-4 text-sm">
-                <p className="font-bold">4.8/5 rating · 120,000+ gifts created</p>
+                <p className="font-bold">Top rated · Thousands of gifts created</p>
                 <p className="mt-1 text-black/65">Secure checkout · Fast delivery · Satisfaction guarantee · US/UK support</p>
                 <p className="mt-2 text-black/65">
                   Need details? <Link href="/shipping" className="underline">Shipping</Link> ·{" "}

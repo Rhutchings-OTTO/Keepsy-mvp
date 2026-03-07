@@ -126,7 +126,7 @@ export function SiteFooter() {
                   className="font-serif text-xl font-semibold sm:text-2xl"
                   style={{ color: "var(--color-charcoal)" }}
                 >
-                  Join 15,000+ women who love thoughtful gifting
+                  Join women who love thoughtful gifting
                 </p>
                 <p
                   className="mt-1 text-sm"

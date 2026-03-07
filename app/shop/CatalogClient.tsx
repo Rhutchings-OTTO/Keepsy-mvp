@@ -204,7 +204,7 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
             {renderStars(product.rating)}
           </span>
           <span className="text-[11px] text-charcoal/45 font-medium">
-            {product.reviewCount.toLocaleString()}
+            (100+)
           </span>
         </div>
 
@@ -216,7 +216,7 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
 
         {/* Sold this week */}
         <p className="font-medium" style={{ fontSize: "11px", color: "var(--color-terracotta)" }}>
-          {product.soldThisWeek} sold this week
+          Popular this week
         </p>
 
         {/* CTA */}
@@ -366,8 +366,8 @@ export function CatalogClient() {
                 <p className="text-sm text-white/55">Products</p>
               </div>
               <div>
-                <p className="font-serif text-2xl font-bold text-white">4,800+</p>
-                <p className="text-sm text-white/55">Reviews</p>
+                <p className="font-serif text-2xl font-bold text-white">Thousands</p>
+                <p className="text-sm text-white/55">of Reviews</p>
               </div>
             </motion.div>
           </div>

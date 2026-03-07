@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Reviews | Keepsy",
-  description: "See what customers are saying about Keepsy personalised gifts. 4.8/5 from over 2,400 real reviews.",
+  description: "See what customers are saying about Keepsy personalised gifts. Loved by customers across the UK and US.",
 };
 
 const PULL_QUOTES = [
@@ -53,8 +53,8 @@ export default function CommunityPage() {
             <Reveal variant="fadeUp" delay={0.15}>
               <div className="flex gap-8 lg:flex-col lg:text-right">
                 {[
-                  { value: "4.8★", label: "Average rating" },
-                  { value: "2,400+", label: "Verified reviews" },
+                  { value: "★★★★★", label: "Top rated" },
+                  { value: "Hundreds", label: "Verified reviews" },
                 ].map((stat) => (
                   <div key={stat.label}>
                     <p className="font-serif text-3xl font-bold text-white">{stat.value}</p>

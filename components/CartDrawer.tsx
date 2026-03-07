@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, Gift, ShoppingBag, ChevronDown, ChevronUp } from "lucide-react";
@@ -54,12 +54,9 @@ function productEmoji(productId: string): string {
   return "🎁";
 }
 
-function formatPrice(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
-}
-
 /* price might be in dollars or cents — normalise to dollars for display */
 function priceDollars(unitPrice: number): number {
+
   // If value looks like cents (>= 100 for a reasonable product), treat as cents
   return unitPrice >= 100 ? unitPrice / 100 : unitPrice;
 }
@@ -71,25 +68,25 @@ function FreeShippingBar({ subtotal }: { subtotal: number }) {
   const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
   return (
-    <div className="px-5 py-4 border-b border-black/5">
-      <p className="mb-2 text-xs text-charcoal/60">
+    <div className="px-6 py-4 border-b border-charcoal/8">
+      <p className="mb-2.5 text-xs text-charcoal/55">
         {remaining > 0 ? (
           <>
-            You're{" "}
+            Add{" "}
             <span className="font-semibold text-charcoal/80">
               ${remaining.toFixed(2)}
             </span>{" "}
-            away from free shipping!
+            more for free shipping
           </>
         ) : (
-          <span className="font-semibold text-forest">
-            You've unlocked free shipping!
+          <span className="font-semibold" style={{ color: "var(--color-forest)" }}>
+            Free shipping unlocked!
           </span>
         )}
       </p>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/8">
+      <div className="h-1 w-full overflow-hidden rounded-sm bg-charcoal/8">
         <motion.div
-          className="h-full rounded-full"
+          className="h-full rounded-sm"
           style={{ backgroundColor: "var(--color-terracotta)" }}
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -113,11 +110,14 @@ function CartItemRow({
   const thumb = item.imageUrl || item.designUrl;
 
   return (
-    <div className="flex gap-4 py-5 border-b border-black/5 last:border-b-0">
+    <div
+      className="flex gap-4 py-5 border-b border-charcoal/8 last:border-b-0"
+      style={{ borderLeftWidth: 0 }}
+    >
       {/* Thumbnail */}
       <div
-        className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-cream flex items-center justify-center text-2xl"
-        style={{ backgroundColor: "var(--color-cream)" }}
+        className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl flex items-center justify-center text-2xl"
+        style={{ backgroundColor: "#F5EDE0" }}
       >
         {thumb ? (
           <img
@@ -131,27 +131,30 @@ function CartItemRow({
       </div>
 
       {/* Details */}
-      <div className="flex flex-1 flex-col gap-1.5 min-w-0">
+      <div className="flex flex-1 flex-col gap-1 min-w-0">
         <p className="font-serif text-sm font-bold text-charcoal leading-snug truncate">
           {item.name}
         </p>
         {(item.color || item.size) && (
-          <p className="text-xs text-charcoal/50">
+          <p className="text-xs text-charcoal/45">
             {[item.color, item.size].filter(Boolean).join(" · ")}
           </p>
         )}
-        <p className="text-xs font-medium text-charcoal/70">
+        <p className="text-xs text-charcoal/55">
           ${price.toFixed(2)} each
         </p>
 
         {/* Qty + remove */}
-        <div className="mt-1 flex items-center justify-between">
-          <div className="flex items-center gap-1 rounded-full border border-black/10" style={{ backgroundColor: "var(--color-cream)" }}>
+        <div className="mt-1.5 flex items-center justify-between">
+          <div
+            className="flex items-center gap-0.5 rounded-lg border border-charcoal/12"
+            style={{ backgroundColor: "var(--color-cream)" }}
+          >
             <button
               type="button"
               aria-label="Decrease quantity"
               onClick={() => onQuantityChange(item.id, item.quantity - 1)}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-charcoal transition hover:bg-black/5 text-sm font-bold"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-charcoal transition hover:bg-black/5 text-sm font-bold"
             >
               −
             </button>
@@ -162,7 +165,7 @@ function CartItemRow({
               type="button"
               aria-label="Increase quantity"
               onClick={() => onQuantityChange(item.id, item.quantity + 1)}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-charcoal transition hover:bg-black/5 text-sm font-bold"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-charcoal transition hover:bg-black/5 text-sm font-bold"
             >
               +
             </button>
@@ -176,9 +179,9 @@ function CartItemRow({
               type="button"
               aria-label="Remove item"
               onClick={() => onRemove(item.id)}
-              className="flex h-7 w-7 items-center justify-center rounded-full transition hover:bg-black/5"
+              className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-black/5"
             >
-              <Trash2 size={14} className="text-charcoal/40" />
+              <Trash2 size={13} className="text-charcoal/35" />
             </button>
           </div>
         </div>
@@ -189,25 +192,25 @@ function CartItemRow({
 
 function EmptyState({ onClose }: { onClose: () => void }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-5 px-8 py-16 text-center">
+    <div className="flex flex-1 flex-col items-center justify-center gap-6 px-8 py-16 text-center">
       <div
-        className="flex h-20 w-20 items-center justify-center rounded-full text-4xl"
-        style={{ backgroundColor: "rgba(196,113,74,0.1)" }}
+        className="flex h-20 w-20 items-center justify-center rounded-2xl"
+        style={{ backgroundColor: "#F5EDE0" }}
       >
-        <Gift size={36} style={{ color: "var(--color-terracotta)" }} />
+        <Gift size={32} style={{ color: "var(--color-terracotta)" }} />
       </div>
       <div>
         <p className="font-serif text-xl font-bold text-charcoal">
           Your bag is empty
         </p>
-        <p className="mt-1 text-sm text-charcoal/55">
+        <p className="mt-1 text-sm leading-6 text-charcoal/50">
           Start creating something beautiful for the people you love.
         </p>
       </div>
       <Link
         href="/shop"
         onClick={onClose}
-        className="inline-flex min-h-[48px] items-center justify-center rounded-full px-8 text-sm font-semibold text-white transition hover:opacity-90"
+        className="inline-flex min-h-[48px] items-center justify-center rounded-xl px-8 text-sm font-semibold text-white transition hover:opacity-90"
         style={{ backgroundColor: "var(--color-terracotta)" }}
       >
         Start Shopping
@@ -293,7 +296,7 @@ export function CartDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[300] bg-black/40 backdrop-blur-[2px]"
+            className="fixed inset-0 z-[300] bg-black/40"
             onClick={close}
             aria-hidden
           />
@@ -305,19 +308,15 @@ export function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-y-0 right-0 z-[301] flex w-full flex-col shadow-2xl md:w-[420px]"
-            style={{ backgroundColor: "var(--color-cream)" }}
+            className="fixed inset-y-0 right-0 z-[301] flex w-full flex-col bg-white shadow-[−24px_0_60px_-20px_rgba(45,41,38,0.18)] md:w-[420px]"
             aria-label="Shopping cart"
             role="dialog"
             aria-modal="true"
           >
             {/* ── Header ── */}
-            <div
-              className="flex items-center justify-between border-b border-black/8 px-5 py-5"
-              style={{ backgroundColor: "var(--color-cream)" }}
-            >
-              <div className="flex items-center gap-2">
-                <ShoppingBag size={18} style={{ color: "var(--color-terracotta)" }} />
+            <div className="flex items-center justify-between border-b border-charcoal/8 px-6 py-5">
+              <div className="flex items-center gap-2.5">
+                <ShoppingBag size={18} style={{ color: "var(--color-forest)" }} />
                 <h2 className="font-serif text-xl font-bold text-charcoal">
                   Your Bag
                 </h2>
@@ -334,7 +333,7 @@ export function CartDrawer() {
                 type="button"
                 onClick={close}
                 aria-label="Close cart"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 transition hover:bg-black/5"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-charcoal/10 transition hover:bg-charcoal/5"
               >
                 <X size={16} className="text-charcoal" />
               </button>
@@ -348,7 +347,7 @@ export function CartDrawer() {
                 <FreeShippingBar subtotal={subtotal} />
 
                 {/* ── Items list ── */}
-                <div className="flex-1 overflow-y-auto px-5">
+                <div className="flex-1 overflow-y-auto px-6">
                   {items.map((item) => (
                     <CartItemRow
                       key={item.id}
@@ -360,11 +359,11 @@ export function CartDrawer() {
                 </div>
 
                 {/* ── Gift note ── */}
-                <div className="border-t border-black/8 px-5 py-3">
+                <div className="border-t border-charcoal/8 px-6 py-3">
                   <button
                     type="button"
                     onClick={() => setNoteExpanded((v) => !v)}
-                    className="flex w-full items-center justify-between py-1 text-xs font-semibold text-charcoal/70 transition hover:text-charcoal"
+                    className="flex w-full items-center justify-between py-1 text-xs font-semibold text-charcoal/60 transition hover:text-charcoal"
                   >
                     <span className="flex items-center gap-1.5">
                       <Gift size={13} />
@@ -390,7 +389,7 @@ export function CartDrawer() {
                           onChange={(e) => setGiftNote(e.target.value)}
                           placeholder="Write a personal message for the recipient…"
                           rows={3}
-                          className="mt-2 w-full resize-none rounded-xl border border-black/10 bg-cream p-3 text-xs text-charcoal placeholder:text-charcoal/35 focus:outline-none focus:ring-2 focus:ring-terracotta/30"
+                          className="mt-2 w-full resize-none rounded-xl border border-charcoal/10 p-3 text-xs text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:ring-2 focus:ring-terracotta/20"
                           style={{ backgroundColor: "var(--color-cream)" }}
                         />
                       </motion.div>
@@ -399,34 +398,34 @@ export function CartDrawer() {
                 </div>
 
                 {/* ── Totals ── */}
-                <div className="border-t border-black/8 px-5 pb-2 pt-4 space-y-2">
-                  <div className="flex items-center justify-between text-sm text-charcoal/70">
+                <div className="border-t border-charcoal/8 px-6 pb-2 pt-4 space-y-2">
+                  <div className="flex items-center justify-between text-sm text-charcoal/60">
                     <span>Subtotal</span>
                     <span className="font-semibold text-charcoal">
                       ${subtotal.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-charcoal/70">
+                  <div className="flex items-center justify-between text-sm text-charcoal/60">
                     <span>Shipping</span>
                     <span className="font-medium">
                       {shippingFree ? (
-                        <span className="text-forest font-semibold">Free</span>
+                        <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free</span>
                       ) : (
                         "Calculated at checkout"
                       )}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between border-t border-black/8 pt-3 text-base font-bold text-charcoal">
+                  <div className="flex items-center justify-between border-t border-charcoal/8 pt-3 text-base font-bold text-charcoal">
                     <span>Total</span>
                     <span>${subtotal.toFixed(2)}</span>
                   </div>
                 </div>
 
                 {/* ── Checkout CTA ── */}
-                <div className="px-5 pb-4 pt-2">
+                <div className="px-6 pb-6 pt-3">
                   <button
                     type="button"
-                    className="flex w-full min-h-[52px] items-center justify-center rounded-full text-base font-semibold text-white shadow-[0_16px_32px_-16px_rgba(196,113,74,0.5)] transition hover:opacity-90"
+                    className="flex w-full min-h-[52px] items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90"
                     style={{ backgroundColor: "var(--color-terracotta)" }}
                     onClick={() => {
                       // TODO: wire up Stripe checkout
@@ -437,7 +436,7 @@ export function CartDrawer() {
                   </button>
 
                   {/* Trust badges */}
-                  <p className="mt-4 text-center text-[11px] text-charcoal/45 leading-relaxed">
+                  <p className="mt-3 text-center text-[11px] text-charcoal/40 leading-relaxed">
                     Secure Checkout · Gift Wrapped Free · 30-Day Returns
                   </p>
                 </div>

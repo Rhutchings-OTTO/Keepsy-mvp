@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
-import { MagneticLink } from "@/components/ui/MagneticLink";
 import { Reveal } from "@/components/motion/Reveal";
 import { OrderSuccess } from "@/components/OrderSuccess";
 
@@ -73,72 +72,134 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
     );
   }
 
+  const isFailed = status === "failed";
+
   return (
-    <main className="mx-auto max-w-3xl px-4 py-16">
-      <Reveal variant="fadeUp">
-        <div className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(253,246,238,0.92),rgba(247,236,224,0.95))] p-8 shadow-warm-md backdrop-blur-xl sm:p-10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: status === "failed" ? "#C0392B" : "var(--color-terracotta)" }}>
-            {status === "failed" ? "Payment Issue" : "Order Received"}
+    <main
+      className="min-h-screen py-16"
+      style={{ backgroundColor: "var(--color-cream)" }}
+    >
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <Reveal variant="fadeUp">
+          {/* Status label */}
+          <p
+            className="text-[11px] font-bold uppercase tracking-[0.22em]"
+            style={{ color: isFailed ? "#C0392B" : "var(--color-terracotta)" }}
+          >
+            {isFailed ? "Payment Issue" : "Order Received"}
           </p>
-          <h1 className="mt-3 font-serif text-3xl font-semibold tracking-[-0.03em] sm:text-4xl" style={{ color: "var(--color-charcoal)" }}>
-            {status === "failed" ? "Payment issue detected" : "Thank you for your order!"}
+
+          {/* Headline */}
+          <h1
+            className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] sm:text-5xl"
+            style={{ color: "var(--color-charcoal)" }}
+          >
+            {isFailed ? "Payment issue detected" : "Thank you for your order!"}
           </h1>
-          <p className="mt-4 text-base leading-8" style={{ color: "rgba(45,41,38,0.65)" }}>
-            {status === "failed"
+
+          <p
+            className="mt-4 text-base leading-8"
+            style={{ color: "rgba(45,41,38,0.65)" }}
+          >
+            {isFailed
               ? "Something went wrong with your payment. Please try again or contact support."
               : "We\u2019re finalising your order and preparing your design for print."}
           </p>
 
-          <div className="mt-6 rounded-xl border border-white/60 bg-white/60 p-4 space-y-2 text-sm" style={{ color: "rgba(45,41,38,0.65)" }}>
-            {orderRef && <p>Order reference: <span className="font-semibold" style={{ color: "var(--color-charcoal)" }}>{orderRef}</span></p>}
-            {sessionId && <p>Session: <span className="font-mono text-xs">{sessionId}</span></p>}
-            <p>Status: <span className="font-bold uppercase" style={{ color: "var(--color-terracotta)" }}>{status}</span></p>
+          {/* Order details panel */}
+          <div className="mt-8 rounded-2xl border border-charcoal/8 bg-white p-6 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.10)] space-y-2 text-sm" style={{ color: "rgba(45,41,38,0.65)" }}>
+            {orderRef && (
+              <p>
+                Order reference:{" "}
+                <span className="font-semibold" style={{ color: "var(--color-charcoal)" }}>
+                  {orderRef}
+                </span>
+              </p>
+            )}
+            {sessionId && (
+              <p>
+                Session: <span className="font-mono text-xs">{sessionId}</span>
+              </p>
+            )}
+            <p>
+              Status:{" "}
+              <span
+                className="font-bold uppercase"
+                style={{ color: "var(--color-terracotta)" }}
+              >
+                {status}
+              </span>
+            </p>
           </div>
 
+          {/* Total */}
           {typeof totalGBP === "number" && (
-            <p className="mt-5 text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>
-              Total: <span style={{ color: "var(--color-terracotta)" }}>£{totalGBP.toFixed(2)}</span>
+            <p className="mt-6 text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>
+              Total:{" "}
+              <span style={{ color: "var(--color-terracotta)" }}>
+                £{totalGBP.toFixed(2)}
+              </span>
             </p>
           )}
 
+          {/* Line items */}
           {items.length > 0 && (
-            <div className="mt-4 rounded-xl border border-white/60 bg-white/60 p-5">
-              <h2 className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "rgba(45,41,38,0.45)" }}>Items</h2>
-              <ul className="mt-3 space-y-2 text-sm">
+            <div className="mt-5 rounded-2xl border border-charcoal/8 bg-white p-6">
+              <h2
+                className="text-[11px] font-bold uppercase tracking-[0.18em]"
+                style={{ color: "rgba(45,41,38,0.40)" }}
+              >
+                Items
+              </h2>
+              <ul className="mt-4 divide-y divide-charcoal/6 text-sm">
                 {items.map((item, index) => (
-                  <li key={`${item.product_name}-${index}`} className="flex justify-between gap-2" style={{ color: "var(--color-charcoal)" }}>
-                    <span>{item.product_name} × {item.quantity}</span>
-                    <span style={{ color: "var(--color-terracotta)" }}>£{Number(item.line_total_gbp).toFixed(2)}</span>
+                  <li
+                    key={`${item.product_name}-${index}`}
+                    className="flex items-center justify-between gap-2 py-3 first:pt-0 last:pb-0"
+                    style={{ color: "var(--color-charcoal)" }}
+                  >
+                    <span>
+                      {item.product_name}{" "}
+                      <span className="text-charcoal/50">× {item.quantity}</span>
+                    </span>
+                    <span
+                      className="font-semibold"
+                      style={{ color: "var(--color-terracotta)" }}
+                    >
+                      £{Number(item.line_total_gbp).toFixed(2)}
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
           )}
 
+          {/* Error notice */}
           {errorMessage && (
-            <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+            <p className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
               {errorMessage}
             </p>
           )}
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          {/* CTAs */}
+          <div className="mt-10 flex flex-wrap gap-3">
             <Link
               href="/create"
-              className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white shadow-terra-glow transition hover:opacity-90"
+              className="inline-flex min-h-[52px] items-center gap-2 rounded-xl px-8 text-sm font-semibold text-white transition hover:opacity-90"
               style={{ backgroundColor: "var(--color-terracotta)" }}
             >
               Create another design
             </Link>
             <Link
               href="/gift-ideas"
-              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold transition hover:-translate-y-0.5"
-              style={{ borderColor: "rgba(45,41,38,0.15)", color: "var(--color-charcoal)", backgroundColor: "rgba(255,255,255,0.80)" }}
+              className="inline-flex min-h-[52px] items-center gap-2 rounded-xl border border-charcoal/15 px-8 text-sm font-semibold transition hover:bg-charcoal/5"
+              style={{ color: "var(--color-charcoal)" }}
             >
               Browse gift ideas
             </Link>
           </div>
-        </div>
-      </Reveal>
+        </Reveal>
+      </div>
     </main>
   );
 }

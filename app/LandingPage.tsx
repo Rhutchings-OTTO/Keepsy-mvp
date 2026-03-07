@@ -196,12 +196,14 @@ function ProductCollectionCard({
   label,
   tag,
   index,
+  priority,
 }: {
   src: string;
   alt: string;
   label: string;
   tag: string;
   index: number;
+  priority?: boolean;
 }) {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
@@ -219,6 +221,7 @@ function ProductCollectionCard({
           src={src}
           alt={alt}
           fill
+          priority={priority}
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           sizes="(max-width: 768px) 50vw, 25vw"
           onError={() => setVisible(false)}
@@ -472,7 +475,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     className="grid grid-cols-2 gap-3"
                   >
                     {PRODUCT_IMAGES.map((img, i) => (
-                      <ProductCollectionCard key={img.label} {...img} index={i} />
+                      <ProductCollectionCard key={img.label} {...img} index={i} priority={i < 2} />
                     ))}
                   </motion.div>
                 </div>

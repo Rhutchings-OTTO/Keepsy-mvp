@@ -30,6 +30,49 @@ import type { Region } from "@/lib/region";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+// ─── In-memory LRU cache for shipping rates ───────────────────────────────────
+// TTL: 10 minutes. Max size: 50 entries (oldest evicted first).
+const CACHE_TTL_MS = 10 * 60 * 1000;
+const CACHE_MAX_SIZE = 50;
+
+type CacheEntry = { rates: unknown; expiresAt: number };
+// Map preserves insertion order, making LRU eviction straightforward.
+const shippingCache = new Map<string, CacheEntry>();
+
+function makeCacheKey(
+  productId: string,
+  country: string,
+  zip: string,
+  quantity: number,
+  color: string | undefined,
+  size: string | undefined
+): string {
+  return `${productId}|${country}|${zip}|${quantity}|${color ?? ""}|${size ?? ""}`;
+}
+
+function cacheGet(key: string): unknown | null {
+  const entry = shippingCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    shippingCache.delete(key);
+    return null;
+  }
+  // Refresh LRU position by re-inserting.
+  shippingCache.delete(key);
+  shippingCache.set(key, entry);
+  return entry.rates;
+}
+
+function cacheSet(key: string, rates: unknown): void {
+  // Evict oldest entry if at capacity.
+  if (shippingCache.size >= CACHE_MAX_SIZE) {
+    const oldestKey = shippingCache.keys().next().value;
+    if (oldestKey !== undefined) shippingCache.delete(oldestKey);
+  }
+  shippingCache.set(key, { rates, expiresAt: Date.now() + CACHE_TTL_MS });
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
 const bodySchema = z.object({
@@ -83,7 +126,11 @@ export async function POST(req: Request): Promise<Response> {
       body.size
     );
 
-    const rates = await calculatePrintifyShipping({
+    // Check cache before calling external API.
+    const cacheKey = makeCacheKey(body.productId, body.country, body.zip, body.quantity, body.color, body.size);
+    const cached = cacheGet(cacheKey);
+
+    const rates = cached ?? await calculatePrintifyShipping({
       blueprintId: config.blueprintId,
       printProviderId: config.printProviderId,
       variantId,
@@ -99,6 +146,10 @@ export async function POST(req: Request): Promise<Response> {
         zip: body.zip,
       },
     });
+
+    if (!cached) {
+      cacheSet(cacheKey, rates);
+    }
 
     const headers: Record<string, string> = {
       ...JSON_HEADERS,

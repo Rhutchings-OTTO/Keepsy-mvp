@@ -18,9 +18,11 @@ export async function POST(req: Request) {
   }
 
   const adminKey = process.env.MOCKUP_CALIBRATION_KEY;
+  if (!adminKey) {
+    return NextResponse.json({ error: "Admin key not configured." }, { status: 403 });
+  }
   const incoming = req.headers.get("x-admin-key");
-
-  if (adminKey && incoming !== adminKey) {
+  if (incoming !== adminKey) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import Image from "next/image";
 
 const PREVIEW_FILES = [
@@ -12,6 +13,11 @@ const PREVIEW_FILES = [
 ];
 
 export default function MockupPreviewsPage() {
+  // This page is a design QA tool — not for public use in production.
+  if (process.env.NODE_ENV === "production") {
+    notFound();
+  }
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-8">
       <h1 className="text-3xl font-black">Generated design on every mockup</h1>

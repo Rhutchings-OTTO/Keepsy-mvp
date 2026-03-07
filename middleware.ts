@@ -23,8 +23,8 @@ export function middleware(req: NextRequest) {
   const csp = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
-    "connect-src 'self' https://api.stripe.com https://*.supabase.co https://*.supabase.in",
-    "img-src 'self' data: blob: https:",
+    "connect-src 'self' https://api.stripe.com https://*.supabase.co https://*.supabase.in https://inn.gs https://*.inngest.com",
+    "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://picsum.photos",
     "style-src 'self' 'unsafe-inline'",
     "frame-src https://js.stripe.com https://hooks.stripe.com",
   ].join("; ");

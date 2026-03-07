@@ -47,6 +47,11 @@ export default function PerfDashboardPage() {
   }, []);
 
   useEffect(() => {
+    // In production, require a key before polling — avoids unauthenticated
+    // continuous requests to the perf endpoint on every page load.
+    const isProd = process.env.NODE_ENV === "production";
+    if (isProd && !perfKey) return;
+
     let active = true;
 
     const load = async () => {

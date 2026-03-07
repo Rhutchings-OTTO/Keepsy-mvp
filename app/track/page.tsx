@@ -96,9 +96,13 @@ export default async function TrackPage({ searchParams }: TrackPageProps) {
                 const isActive = i === activeStep;
                 const isPending = i > activeStep;
                 return (
-                  <li key={step.key} className="flex gap-4">
+                  <li
+                    key={step.key}
+                    className="flex gap-4"
+                    aria-label={`Step ${i + 1}: ${step.label} — ${isDone ? "completed" : isActive ? "current" : "upcoming"}`}
+                  >
                     {/* Line + dot */}
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center" aria-hidden="true">
                       <div
                         className="h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold"
                         style={{
@@ -111,7 +115,7 @@ export default async function TrackPage({ searchParams }: TrackPageProps) {
                         }}
                       >
                         {isDone ? (
-                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                             <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         ) : (

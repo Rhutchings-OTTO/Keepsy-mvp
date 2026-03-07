@@ -1,4 +1,4 @@
-import MerchGeneratorPlatform from "../MerchGeneratorPlatform";
+import { MerchGeneratorPlatformLoader as MerchGeneratorPlatform } from "./MerchGeneratorPlatformLoader";
 import { ConversionFlowProvider } from "@/context/ConversionFlowContext";
 import { GenerationProvider, SonicBoomEffect } from "@/context/GenerationContext";
 import { LenisProvider } from "@/components/LenisProvider";

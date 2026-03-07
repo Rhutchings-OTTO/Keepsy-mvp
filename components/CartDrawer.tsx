@@ -389,8 +389,8 @@ export function CartDrawer() {
                           onChange={(e) => setGiftNote(e.target.value)}
                           placeholder="Write a personal message for the recipient…"
                           rows={3}
-                          className="mt-2 w-full resize-none rounded-xl border border-charcoal/10 p-3 text-xs text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:ring-2 focus:ring-terracotta/20"
-                          style={{ backgroundColor: "var(--color-cream)" }}
+                          className="mt-2 w-full resize-none rounded-xl border border-charcoal/10 p-3 text-sm text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:ring-2 focus:ring-terracotta/20"
+                          style={{ backgroundColor: "var(--color-cream)", fontSize: "16px" }}
                         />
                       </motion.div>
                     )}

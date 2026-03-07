@@ -158,7 +158,9 @@ export function MockupStage({
     };
     const artworkBoundary =
       productType === "card"
-        ? insetRect(boundary, boundary.w * 0.1, boundary.h * 0.1)
+        // Use boundary.h for both axes so the pixel border is equal on all 4 sides
+        // regardless of the card container's landscape aspect ratio
+        ? insetRect(boundary, boundary.h * 0.08, boundary.h * 0.08)
         : boundary;
     const artworkRect = fitArtworkToBoundary({
       boundary: artworkBoundary,

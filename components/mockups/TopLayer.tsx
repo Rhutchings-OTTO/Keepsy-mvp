@@ -32,10 +32,22 @@ function getRelightOpacity(productType: MockupProductType, color: MockupColor): 
  */
 function getHighlightOpacity(productType: MockupProductType, color: MockupColor): number {
   const dark = isDarkGarment(productType, color);
-  if (productType === "hoodie") return dark ? 0.46 : 0.22;
+  if (productType === "hoodie") return dark ? 0.58 : 0.32;
   if (productType === "tshirt") return dark ? 0.36 : 0.18;
   if (productType === "card") return 0.16;
   return 0.2; // mug
+}
+
+/**
+ * For hoodies: a thin "normal" blend pass renders the full garment image at low opacity
+ * directly over the design. This ensures structural elements — drawstrings, pockets, seams —
+ * are visible regardless of their colour (screen can't recover dark drawstrings on dark fabric,
+ * but normal blend at low opacity shows them as the subtle structure they are in reality).
+ */
+function getHoodieStructureOpacity(color: MockupColor): number {
+  // White hoodie: structural overlay washes out the design slightly — keep low
+  // Dark hoodies: same opacity; at 0.16-0.18 it darkens the design minimally but shows structure
+  return color === "white" ? 0.14 : 0.18;
 }
 
 type TopLayerProps = {
@@ -87,6 +99,25 @@ export function TopLayer({ productType, color, baseMockupSrc }: TopLayerProps) {
         }}
         aria-hidden
       />
+      {/* Hoodie-only: garment structure layer — normal blend at low opacity makes drawstrings,
+          pocket seams, and cord hardware visible over the design on all hoodie colours.
+          Screen/multiply alone can't recover dark-coloured drawstrings on dark fabric.
+          At 0.14-0.18 opacity, the design colours remain vibrant but the garment wins
+          wherever structural elements are prominent (cord holes, hem seam, drawstrings). */}
+      {productType === "hoodie" && (
+        <Image
+          src={baseMockupSrc}
+          alt=""
+          fill
+          className="pointer-events-none absolute inset-0 z-[33] object-contain"
+          aria-hidden
+          sizes="(max-width: 1024px) 100vw, 700px"
+          style={{
+            opacity: getHoodieStructureOpacity(color),
+            mixBlendMode: "normal",
+          }}
+        />
+      )}
     </>
   );
 }

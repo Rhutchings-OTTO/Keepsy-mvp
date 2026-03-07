@@ -126,7 +126,7 @@ export default function CommunityPage() {
               </Link>
               <Link
                 href="/shop"
-                className="inline-flex min-h-[52px] items-center justify-center rounded-xl border-2 border-white px-10 text-base font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex min-h-[52px] items-center justify-center rounded-xl border-2 border-white bg-white/10 px-10 text-base font-semibold text-white transition hover:bg-white/20"
               >
                 Browse Shop
               </Link>

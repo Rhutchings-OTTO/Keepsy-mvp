@@ -764,7 +764,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                 >
                   <Link
                     href="/community"
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold text-white/80 transition hover:border-white/40 hover:text-white"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/65 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20 hover:border-white"
                   >
                     Read all stories <ArrowRight size={14} />
                   </Link>

@@ -115,9 +115,9 @@
         "kind": "rect",
         "rect": {
           "xPct": 46.9,
-          "yPct": 53,
-          "wPct": 18.6,
-          "hPct": 48.6,
+          "yPct": 50,
+          "wPct": 36,
+          "hPct": 52,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         }
@@ -135,8 +135,8 @@
         "rect": {
           "xPct": 50,
           "yPct": 50,
-          "wPct": 57.4,
-          "hPct": 62.1,
+          "wPct": 78,
+          "hPct": 64,
           "rotateDeg": 0,
           "borderRadiusPct": 1.8
         }

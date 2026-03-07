@@ -1,6 +1,17 @@
 /**
- * Transactional order lifecycle email templates.
- * Used with Resend for in-production, shipped, and delivered notifications.
+ * Keepsy Order Email Lifecycle
+ * ─────────────────────────────
+ * 1. Order Confirmed  → Stripe checkout.session.completed webhook
+ *                       (app/api/stripe/webhook/route.ts)
+ * 2. In Production    → Printify webhook: order status → in_production
+ *                       (app/api/webhooks/printify/route.ts)
+ * 3. Shipped          → Printify webhook: shipping update with tracking
+ *                       (app/api/webhooks/printify/route.ts)
+ * 4. Delivered        → Printify webhook: order completed / tracking webhook
+ *                       (app/api/webhooks/printify/route.ts + app/api/webhooks/tracking/route.ts)
+ *
+ * Brand voice: The Keepsy Atelier — premium-craft, warm, slightly theatrical.
+ * All emails use reply-to: hello@keepsy.store for the delivered email.
  */
 
 import * as React from "react";
@@ -78,6 +89,45 @@ const sig = {
   marginTop: 24,
 } as const;
 
+// ─── Order Confirmation email ─────────────────────────────────────────────────
+
+export type OrderConfirmationEmailProps = {
+  customerName?: string;
+  orderRef: string;
+  productName?: string;
+  designPrompt?: string;
+};
+
+export function OrderConfirmationEmail({ customerName, orderRef, productName, designPrompt }: OrderConfirmationEmailProps) {
+  const trackUrl = `${SITE_URL}/track?ref=${orderRef}`;
+  return (
+    <html>
+      <body style={base}>
+        <div style={container}>
+          <p style={eyebrow}>Order Confirmed</p>
+          <h1 style={heading}>Your vision is taking form.</h1>
+          <p style={body}>
+            {customerName ? `Hi ${customerName}, ` : ""}
+            Thank you for your order. We&apos;ve received your {designPrompt ? `&apos;${designPrompt}&apos; ` : ""}design and our studio is preparing to bring it to life. Our machines are currently calibrating the pigment density — every detail will be carefully rendered on premium materials before it reaches you.
+          </p>
+          <a href={trackUrl} style={badge}>Track Your Order</a>
+          <hr style={divider} />
+          <p style={meta}>
+            <strong>Order reference:</strong> {orderRef}
+            {productName && (
+              <>
+                <br />
+                <strong>Product:</strong> {productName}
+              </>
+            )}
+          </p>
+          <p style={sig}>— The Keepsy Atelier</p>
+        </div>
+      </body>
+    </html>
+  );
+}
+
 // ─── In-production email ──────────────────────────────────────────────────────
 
 export type InProductionEmailProps = {
@@ -106,7 +156,7 @@ export function InProductionEmail({ customerName, orderRef, productName }: InPro
             <br />
             <strong>Estimated delivery:</strong> 5–10 business days
           </p>
-          <p style={sig}>— The Keepsy team</p>
+          <p style={sig}>— The Keepsy Atelier</p>
         </div>
       </body>
     </html>
@@ -130,7 +180,7 @@ export function ShippedEmail({ customerName, orderRef, productName, trackingNumb
       <body style={base}>
         <div style={container}>
           <p style={eyebrow}>On Its Way</p>
-          <h1 style={heading}>Your order has shipped! 🎉</h1>
+          <h1 style={heading}>Your order has shipped.</h1>
           <p style={body}>
             {customerName ? `Hi ${customerName}, ` : ""}
             Your {productName ?? "Keepsy order"} has left the studio and is heading to you.
@@ -151,7 +201,7 @@ export function ShippedEmail({ customerName, orderRef, productName, trackingNumb
               </>
             )}
           </p>
-          <p style={sig}>— The Keepsy team</p>
+          <p style={sig}>— The Keepsy Atelier</p>
         </div>
       </body>
     </html>
@@ -173,18 +223,20 @@ export function DeliveredEmail({ customerName, orderRef, productName }: Delivere
       <body style={base}>
         <div style={container}>
           <p style={eyebrow}>Delivered</p>
-          <h1 style={heading}>Your order has arrived.</h1>
+          <h1 style={heading}>Your piece has arrived.</h1>
           <p style={body}>
             {customerName ? `Hi ${customerName}, ` : ""}
-            Your {productName ?? "Keepsy order"} has been delivered. We hope it makes a wonderful memory.
-            If you&apos;d like to create another keepsake, we&apos;d love to help.
+            Your {productName ?? "Keepsy order"} has been delivered. We hope it carries the meaning you intended and brings joy to whoever receives it.
           </p>
-          <a href={createUrl} style={badge}>Create Another Design</a>
+          <p style={body}>
+            We&apos;d love to hear how it turned out — simply reply to this email and let us know. Your words help us refine our craft and help others find their perfect keepsake.
+          </p>
+          <a href={createUrl} style={badge}>Create Another Keepsake</a>
           <hr style={divider} />
           <p style={meta}>
             <strong>Order reference:</strong> {orderRef}
           </p>
-          <p style={sig}>— The Keepsy team</p>
+          <p style={sig}>— The Keepsy Atelier</p>
         </div>
       </body>
     </html>
@@ -193,10 +245,40 @@ export function DeliveredEmail({ customerName, orderRef, productName }: Delivere
 
 // ─── Send functions ────────────────────────────────────────────────────────────
 
+export type EmailResult = { ok: boolean; error?: string };
+
 function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY;
   if (!key) return null;
   return new Resend(key);
+}
+
+export async function sendOrderConfirmationEmail(
+  params: OrderConfirmationEmailProps & { to: string }
+): Promise<EmailResult> {
+  const resend = getResend();
+  if (!resend) {
+    console.error("[email] RESEND_API_KEY not set, skipping order confirmation email to", params.to);
+    return { ok: false, error: "RESEND_API_KEY not set" };
+  }
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM,
+      to: params.to,
+      subject: `Thank you for your Keepsy order — ${params.orderRef}`,
+      react: OrderConfirmationEmail(params),
+      text: `Thank you for your Keepsy order. Your ${params.designPrompt ? `'${params.designPrompt}' ` : ""}design is being prepared. Track your order: ${SITE_URL}/track?ref=${params.orderRef}`,
+    });
+    if (error) {
+      console.error("[email] order-confirmation send failed:", error);
+      return { ok: false, error: JSON.stringify(error) };
+    }
+    return { ok: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : JSON.stringify(e);
+    console.error("[email] order-confirmation send error:", e);
+    return { ok: false, error: msg };
+  }
 }
 
 export async function sendInProductionEmail(params: InProductionEmailProps & { to: string }): Promise<boolean> {
@@ -206,7 +288,7 @@ export async function sendInProductionEmail(params: InProductionEmailProps & { t
     const { error } = await resend.emails.send({
       from: FROM,
       to: params.to,
-      subject: `Your Keepsy order is in production — ${params.orderRef}`,
+      subject: `Your Keepsy order is being crafted — ${params.orderRef}`,
       react: InProductionEmail(params),
       text: `Your ${params.productName ?? "order"} is now in production. Track it at ${SITE_URL}/track?ref=${params.orderRef}`,
     });
@@ -244,9 +326,10 @@ export async function sendDeliveredEmail(params: DeliveredEmailProps & { to: str
     const { error } = await resend.emails.send({
       from: FROM,
       to: params.to,
-      subject: `Your Keepsy order has been delivered — ${params.orderRef}`,
+      replyTo: "hello@keepsy.store",
+      subject: "Your Keepsy order has arrived — we'd love your thoughts",
       react: DeliveredEmail(params),
-      text: `Your ${params.productName ?? "order"} has been delivered. Create another: ${SITE_URL}/create`,
+      text: `Your ${params.productName ?? "order"} has been delivered. We'd love to hear how it turned out — simply reply to this email. Create another keepsake: ${SITE_URL}/create`,
     });
     if (error) { console.error("[email] delivered send failed:", error); return false; }
     return true;

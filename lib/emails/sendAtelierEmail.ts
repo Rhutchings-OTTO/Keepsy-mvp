@@ -8,6 +8,10 @@ import { getAtelierEmailPlain, type AtelierEmailParams } from "@/content/atelier
 
 export type EmailResult = { ok: boolean; error?: string };
 
+/**
+ * @deprecated No longer called from the Stripe webhook — replaced by sendOrderConfirmationEmail
+ * in lib/emails/orderEmails.tsx. Can be safely removed once confirmed no other callers exist.
+ */
 export async function sendAtelierCreationEmail(
   params: AtelierEmailParams & { to: string }
 ): Promise<EmailResult> {

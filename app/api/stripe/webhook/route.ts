@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import { schemas } from "@/lib/http/validate";
 import { logSecurityEvent } from "@/lib/security/auditLog";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
-import { sendAtelierCreationEmail } from "@/lib/emails/sendAtelierEmail";
+import { sendOrderConfirmationEmail } from "@/lib/emails/orderEmails";
 import { clearDesignCacheForOrder } from "@/lib/cache/designCache";
 import {
   uploadImageToPrintify,
@@ -279,14 +279,16 @@ async function handleCheckoutCompleted(
 
   // Send confirmation email
   if (customerEmail) {
-    const emailResult = await sendAtelierCreationEmail({
+    const emailResult = await sendOrderConfirmationEmail({
       to: customerEmail,
-      designPrompt: prompt || undefined,
       orderRef,
+      customerName: customerName ?? undefined,
+      productName: lineItems.data[0]?.description ?? undefined,
+      designPrompt: prompt || undefined,
     });
     console.log("[email] send result:", emailResult);
     if (!emailResult.ok) {
-      console.error("[email] sendAtelierCreationEmail returned false for", customerEmail, "error:", emailResult.error);
+      console.error("[email] order confirmation email failed for", customerEmail, "error:", emailResult.error);
     }
   }
 

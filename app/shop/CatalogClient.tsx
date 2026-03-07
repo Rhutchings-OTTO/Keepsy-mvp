@@ -16,6 +16,7 @@ interface CatalogProduct {
   id: string;
   name: string;
   category: "mug" | "tee" | "hoodie" | "card";
+  color?: "white" | "black" | "blue";
   price: number;
   rating: number;
   reviewCount: number;
@@ -28,150 +29,114 @@ interface CatalogProduct {
 
 const PRODUCTS: CatalogProduct[] = [
   {
-    id: "mug-1",
-    name: "The 'Best Mom Ever' Mug",
-    category: "mug",
-    price: 24.99,
-    rating: 4.9,
-    reviewCount: 847,
-    soldThisWeek: 34,
-    badge: "Bestseller",
-    image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
-  },
-  {
-    id: "mug-2",
-    name: "Custom Photo Memory Mug",
-    category: "mug",
-    price: 27.99,
-    rating: 4.9,
-    reviewCount: 1203,
-    soldThisWeek: 58,
-    badge: "Bestseller",
-    image: "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=400",
-  },
-  {
-    id: "mug-3",
-    name: "Personalised Kids' Artwork Mug",
-    category: "mug",
-    price: 26.99,
-    rating: 4.8,
-    reviewCount: 634,
-    soldThisWeek: 21,
-    badge: null,
-    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400",
-  },
-  {
-    id: "mug-4",
-    name: "The Friendship Quote Mug",
-    category: "mug",
-    price: 24.99,
-    rating: 4.8,
-    reviewCount: 412,
-    soldThisWeek: 17,
-    badge: null,
-    image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400",
-  },
-  {
-    id: "tee-1",
-    name: "Custom Family Portrait Tee",
-    category: "tee",
-    price: 32.99,
-    rating: 4.9,
-    reviewCount: 328,
-    soldThisWeek: 12,
-    badge: "Bestseller",
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
-  },
-  {
-    id: "tee-2",
-    name: "The 'Mama Bear' Tee",
-    category: "tee",
-    price: 29.99,
-    rating: 4.9,
-    reviewCount: 567,
-    soldThisWeek: 28,
-    badge: "Bestseller",
-    image: "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=400",
-  },
-  {
-    id: "tee-3",
-    name: "Personalised Date & Initials Tee",
-    category: "tee",
-    price: 31.99,
-    rating: 4.7,
-    reviewCount: 189,
-    soldThisWeek: 8,
-    badge: "New",
-    image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400",
-  },
-  {
-    id: "hoodie-1",
-    name: "The Cozy Custom Photo Hoodie",
+    id: "hoodie-white",
+    name: "Personalised Hoodie — White",
     category: "hoodie",
+    color: "white",
     price: 54.99,
     rating: 4.9,
-    reviewCount: 276,
-    soldThisWeek: 11,
+    reviewCount: 412,
+    soldThisWeek: 18,
     badge: "Bestseller",
     image: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400",
   },
   {
-    id: "hoodie-2",
-    name: "Personalised 'Est.' Family Hoodie",
+    id: "hoodie-black",
+    name: "Personalised Hoodie — Black",
     category: "hoodie",
-    price: 52.99,
+    color: "black",
+    price: 54.99,
+    rating: 4.9,
+    reviewCount: 347,
+    soldThisWeek: 14,
+    badge: null,
+    image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400",
+  },
+  {
+    id: "hoodie-blue",
+    name: "Personalised Hoodie — Blue",
+    category: "hoodie",
+    color: "blue",
+    price: 54.99,
     rating: 4.8,
     reviewCount: 198,
-    soldThisWeek: 7,
-    badge: null,
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400",
-  },
-  {
-    id: "hoodie-3",
-    name: "The Memory Collage Hoodie",
-    category: "hoodie",
-    price: 56.99,
-    rating: 4.8,
-    reviewCount: 143,
-    soldThisWeek: 5,
+    soldThisWeek: 9,
     badge: "New",
-    image: "https://images.unsplash.com/photo-1614495152581-2ccea408b0a8?w=400",
+    image: "https://images.unsplash.com/photo-1563330232-57114bb0823c?w=400",
   },
   {
-    id: "card-1",
-    name: "Custom Photo Greeting Card (Pack of 5)",
-    category: "card",
-    price: 18.99,
+    id: "tee-white",
+    name: "Personalised T-Shirt — White",
+    category: "tee",
+    color: "white",
+    price: 29.99,
     rating: 4.9,
-    reviewCount: 892,
-    soldThisWeek: 47,
+    reviewCount: 856,
+    soldThisWeek: 34,
+    badge: "Bestseller",
+    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
+  },
+  {
+    id: "tee-black",
+    name: "Personalised T-Shirt — Black",
+    category: "tee",
+    color: "black",
+    price: 29.99,
+    rating: 4.9,
+    reviewCount: 621,
+    soldThisWeek: 27,
+    badge: null,
+    image: "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=400",
+  },
+  {
+    id: "tee-blue",
+    name: "Personalised T-Shirt — Blue",
+    category: "tee",
+    color: "blue",
+    price: 29.99,
+    rating: 4.8,
+    reviewCount: 289,
+    soldThisWeek: 11,
+    badge: "New",
+    image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400",
+  },
+  {
+    id: "mug-white",
+    name: "Personalised Mug",
+    category: "mug",
+    color: "white",
+    price: 24.99,
+    rating: 4.9,
+    reviewCount: 1847,
+    soldThisWeek: 72,
+    badge: "Bestseller",
+    image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
+  },
+  {
+    id: "card-white",
+    name: "Personalised Greeting Card",
+    category: "card",
+    color: "white",
+    price: 8.99,
+    rating: 4.9,
+    reviewCount: 2341,
+    soldThisWeek: 98,
     badge: "Bestseller",
     image: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400",
-  },
-  {
-    id: "card-2",
-    name: "Personalised Birthday Card",
-    category: "card",
-    price: 4.99,
-    rating: 4.9,
-    reviewCount: 1456,
-    soldThisWeek: 92,
-    badge: "Bestseller",
-    image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400",
   },
 ];
 
 // ─── Toast data ───────────────────────────────────────────────────────────────
 
 const TOAST_COMBOS = [
-  { name: "Sarah", location: "Texas", product: "Best Mom Ever Mug", time: "3 min ago" },
-  { name: "Jennifer", location: "Ohio", product: "Custom Photo Hoodie", time: "7 min ago" },
-  { name: "Lisa", location: "California", product: "Mama Bear Tee", time: "2 min ago" },
-  { name: "Michelle", location: "Florida", product: "Personalised Birthday Card", time: "5 min ago" },
-  { name: "Karen", location: "Georgia", product: "Custom Family Portrait Tee", time: "9 min ago" },
-  { name: "Deborah", location: "Tennessee", product: "Photo Memory Mug", time: "1 min ago" },
-  { name: "Patricia", location: "Virginia", product: "Est. Family Hoodie", time: "4 min ago" },
-  { name: "Nancy", location: "Illinois", product: "Greeting Card Pack", time: "6 min ago" },
+  { name: "Sarah", location: "Texas", product: "Personalised Mug", time: "3 min ago" },
+  { name: "Jennifer", location: "Ohio", product: "Black Hoodie", time: "7 min ago" },
+  { name: "Lisa", location: "California", product: "White T-Shirt", time: "2 min ago" },
+  { name: "Michelle", location: "Florida", product: "Personalised Greeting Card", time: "5 min ago" },
+  { name: "Karen", location: "Georgia", product: "Blue Hoodie", time: "9 min ago" },
+  { name: "Deborah", location: "Tennessee", product: "Personalised Mug", time: "1 min ago" },
+  { name: "Patricia", location: "Virginia", product: "Black T-Shirt", time: "4 min ago" },
+  { name: "Nancy", location: "Illinois", product: "White Hoodie", time: "6 min ago" },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -181,8 +146,9 @@ function renderStars(rating: number) {
   return "★".repeat(full) + (rating % 1 >= 0.5 ? "½" : "");
 }
 
-function productHref(category: CatalogProduct["category"]) {
-  return `/create?product=${category === "card" ? "card" : category === "tee" ? "tee" : category}`;
+function productHref(product: CatalogProduct) {
+  const base = `/create?product=${product.category === "tee" ? "tee" : product.category}`;
+  return product.color ? `${base}&color=${product.color}` : base;
 }
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
@@ -255,7 +221,7 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
 
         {/* CTA */}
         <Link
-          href={productHref(product.category)}
+          href={productHref(product)}
           className="mt-auto block w-full rounded-lg py-3 text-center text-sm font-semibold text-white transition-opacity hover:opacity-85"
           style={{ backgroundColor: "var(--color-terracotta)" }}
         >

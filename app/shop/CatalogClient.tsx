@@ -38,7 +38,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 412,
     soldThisWeek: 18,
     badge: "Bestseller",
-    image: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400",
+    image: "/images/products/hoodie-white.jpg",
   },
   {
     id: "hoodie-black",
@@ -50,7 +50,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 347,
     soldThisWeek: 14,
     badge: null,
-    image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400",
+    image: "/images/products/hoodie-black.jpg",
   },
   {
     id: "hoodie-blue",
@@ -62,7 +62,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 198,
     soldThisWeek: 9,
     badge: "New",
-    image: "https://images.unsplash.com/photo-1563330232-57114bb0823c?w=400",
+    image: "/images/products/hoodie-blue.jpg",
   },
   {
     id: "tee-white",
@@ -74,7 +74,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 856,
     soldThisWeek: 34,
     badge: "Bestseller",
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400",
+    image: "/images/products/tshirt-white.jpg",
   },
   {
     id: "tee-black",
@@ -86,7 +86,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 621,
     soldThisWeek: 27,
     badge: null,
-    image: "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=400",
+    image: "/images/products/tshirt-black.jpg",
   },
   {
     id: "tee-blue",
@@ -98,7 +98,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 289,
     soldThisWeek: 11,
     badge: "New",
-    image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400",
+    image: "/images/products/tshirt-blue.jpg",
   },
   {
     id: "mug-white",
@@ -110,7 +110,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 1847,
     soldThisWeek: 72,
     badge: "Bestseller",
-    image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400",
+    image: "/images/products/mug.jpg",
   },
   {
     id: "card-white",
@@ -122,7 +122,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 2341,
     soldThisWeek: 98,
     badge: "Bestseller",
-    image: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400",
+    image: "/images/products/greeting-card.jpg",
   },
 ];
 

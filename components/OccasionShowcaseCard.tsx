@@ -22,10 +22,15 @@ type OccasionShowcaseCardProps = {
 
 // Map occasion IDs to warm lifestyle images
 const OCCASION_IMAGES: Record<string, string> = {
-  "mothers-day": "https://images.unsplash.com/photo-1559181567-c3190ca9d222?w=600",
-  "birthday": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600",
-  "anniversary": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600",
-  "christmas": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=600",
+  "mothers-day": "/images/occasions/mothers-day.jpg",
+  "birthday": "/images/occasions/birthday.jpg",
+  "birthdays": "/images/occasions/birthday.jpg",
+  "anniversary": "/images/occasions/anniversary.jpg",
+  "anniversaries": "/images/occasions/anniversary.jpg",
+  "christmas": "/images/occasions/christmas.jpg",
+  "thanksgiving": "/images/occasions/thanksgiving.jpg",
+  "fourth-of-july": "/images/occasions/fourth-of-july.jpg",
+  "pet-gifts": "/images/occasions/pet-gifts.jpg",
   "sympathy": "https://images.unsplash.com/photo-1490750967868-88df5691cc2c?w=600",
   "friendship": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600",
   "just-because": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600",
@@ -34,8 +39,7 @@ const OCCASION_IMAGES: Record<string, string> = {
   "valentines": "https://images.unsplash.com/photo-1518893883800-45cd0954574b?w=600",
 };
 
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600";
+const FALLBACK_IMAGE = "/images/occasions/birthday.jpg";
 
 export function OccasionShowcaseCard({
   href,

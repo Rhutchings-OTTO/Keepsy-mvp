@@ -40,25 +40,25 @@ const HERO_BULLETS = [
 
 const PRODUCT_IMAGES = [
   {
-    src: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600",
+    src: "/images/hero/mug-hero.jpg",
     alt: "Custom personalised mug",
     label: "Mugs",
     tag: "From $24",
   },
   {
-    src: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=600",
+    src: "/images/hero/cards-hero.jpg",
     alt: "Personalised greeting card",
     label: "Cards",
     tag: "From $4",
   },
   {
-    src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600",
+    src: "/images/hero/tee-hero.jpg",
     alt: "Custom printed tee",
     label: "Tees",
     tag: "From $32",
   },
   {
-    src: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600",
+    src: "/images/featured/grandma-hoodie.jpg",
     alt: "Custom hoodie",
     label: "Hoodies",
     tag: "From $54",
@@ -81,7 +81,7 @@ const FEATURED_PRODUCTS = [
     priceUK: "£19.99",
     rating: "★★★★★",
     reviews: 847,
-    src: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=500",
+    src: "/images/featured/mom-mug.jpg",
     alt: "Best Mom Ever custom mug",
   },
   {
@@ -90,7 +90,7 @@ const FEATURED_PRODUCTS = [
     priceUK: "£14.99",
     rating: "★★★★★",
     reviews: 1203,
-    src: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=500",
+    src: "/images/featured/card-pack.jpg",
     alt: "Custom photo greeting card",
   },
   {
@@ -99,7 +99,7 @@ const FEATURED_PRODUCTS = [
     priceUK: "£44.99",
     rating: "★★★★★",
     reviews: 276,
-    src: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=500",
+    src: "/images/featured/grandma-hoodie.jpg",
     alt: "Custom personalised hoodie",
   },
   {
@@ -108,7 +108,7 @@ const FEATURED_PRODUCTS = [
     priceUK: "£26.99",
     rating: "★★★★★",
     reviews: 328,
-    src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500",
+    src: "/images/featured/family-tee.jpg",
     alt: "Personalised family t-shirt",
   },
 ];

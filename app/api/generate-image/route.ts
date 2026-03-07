@@ -139,7 +139,7 @@ export async function POST(req: Request) {
         {
           ok: true,
           imageDataUrl: cached.imageDataUrl,
-          designUrl: cached.designUrl ?? cached.imageDataUrl,
+          designUrl: cached.designUrl || cached.imageDataUrl,
           cached: true,
           latencyMs: Date.now() - startedAt,
         },
@@ -170,7 +170,7 @@ export async function POST(req: Request) {
         {
           ok: true,
           imageDataUrl: dedupResult.imageDataUrl,
-          designUrl: dedupResult.designUrl ?? dedupResult.imageDataUrl,
+          designUrl: dedupResult.designUrl || dedupResult.imageDataUrl,
           deduped: true,
           latencyMs: Date.now() - startedAt,
         },
@@ -246,11 +246,15 @@ export async function POST(req: Request) {
 
     recordGenerationMetric("totalSuccess", 1);
     recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
+    if (!genResult.designUrl) {
+      console.error("[generate] Cloudinary upload failed — designUrl is empty. Printify fulfillment will be skipped for this order.");
+    }
     return NextResponse.json(
       {
         ok: true,
         imageDataUrl: genResult.imageDataUrl,
-        designUrl: genResult.designUrl ?? genResult.imageDataUrl,
+        designUrl: genResult.designUrl || genResult.imageDataUrl,
+        designUploadFailed: !genResult.designUrl,
         edited: mode === "upload",
         cached: false,
         latencyMs: Date.now() - startedAt,

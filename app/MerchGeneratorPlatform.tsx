@@ -304,6 +304,9 @@ async function checkoutViaKeepsyAPI(args: {
 
   // Only pass designUrl if it's a real HTTPS URL — strip base64 fallbacks to prevent 413
   const safeDesignUrl = primaryDesignUrl && !primaryDesignUrl.startsWith("data:") ? primaryDesignUrl : undefined;
+  if (process.env.NODE_ENV !== "production" && !safeDesignUrl) {
+    console.warn("[checkout] WARNING: no valid designUrl — Printify fulfillment will be skipped for this order");
+  }
 
   const payload = {
     currency: "gbp" as const,

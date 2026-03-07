@@ -13,7 +13,7 @@ const NAV_ITEMS = [
   { href: "/shop", label: "Shop" },
   { href: "/gift-ideas", label: "Gift Ideas" },
   { href: "/create", label: "Create" },
-  { href: "/#reviews", label: "Reviews" },
+  { href: "/community", label: "Reviews" },
 ];
 
 function useCartCount() {
@@ -132,10 +132,7 @@ function MobileOverlay({
             className="flex flex-1 flex-col justify-center px-8 gap-2"
           >
             {NAV_ITEMS.map(({ href, label }, i) => {
-              const active =
-                href !== "/#reviews" &&
-                href.startsWith("/") &&
-                pathname === href;
+              const active = href.startsWith("/") && pathname === href;
               return (
                 <motion.div
                   key={href}
@@ -221,10 +218,7 @@ export function SiteHeader() {
             className="hidden items-center gap-1 rounded-full border border-white/60 bg-white/70 px-2 py-1.5 shadow-[0_18px_38px_-30px_rgba(0,0,0,0.28)] backdrop-blur-md md:flex"
           >
             {NAV_ITEMS.map(({ href, label }) => {
-              const active =
-                href !== "/#reviews" &&
-                href.startsWith("/") &&
-                pathname === href;
+              const active = href.startsWith("/") && pathname === href;
               return (
                 <Link
                   key={href}

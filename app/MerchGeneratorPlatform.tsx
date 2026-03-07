@@ -366,6 +366,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     setPromptState(s);
   };
   const [isBusy, setIsBusy] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStartedAt, setGenerationStartedAt] = useState<number | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -765,6 +766,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const handleCheckout = async () => {
     const cart = buildSingleCheckoutCart();
     if (!cart) return;
+    setCheckoutError(null);
     setIsSecuring(true);
     setIsBusy(true);
     try {
@@ -777,7 +779,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       window.location.href = url;
     } catch (e) {
       console.error(e);
-      alert(e instanceof Error ? e.message : "Checkout failed");
+      setCheckoutError(e instanceof Error ? e.message : "Checkout failed. Please try again.");
       setIsSecuring(false);
       setIsBusy(false);
     }
@@ -786,11 +788,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const handleCartCheckout = async () => {
     if (cartItems.length === 0) return;
     if (cartItems.some((item) => !item.imageUrl)) {
-      alert("Please remove items missing generated designs before checking out.");
+      setCheckoutError("Please remove items missing generated designs before checking out.");
       return;
     }
     const checkoutImage = cartItems[0]?.imageUrl;
     if (!checkoutImage) return;
+    setCheckoutError(null);
     setIsSecuring(true);
     setIsBusy(true);
     try {
@@ -803,7 +806,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       window.location.href = url;
     } catch (e) {
       console.error(e);
-      alert(e instanceof Error ? e.message : "Checkout failed");
+      setCheckoutError(e instanceof Error ? e.message : "Checkout failed. Please try again.");
       setIsSecuring(false);
       setIsBusy(false);
     }
@@ -1242,6 +1245,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <button onClick={() => setStep(3)} className="mt-4 text-sm font-extrabold inline-flex items-center gap-2 hover:opacity-100" style={{ color: "rgba(45,41,38,0.55)" }}>
                       <ChevronLeft size={16} /> Back
                     </button>
+                    {checkoutError && (
+                      <p className="mt-3 rounded-xl px-4 py-3 text-sm font-semibold" style={{ backgroundColor: "rgba(196,113,74,0.10)", color: "var(--color-terracotta)" }}>
+                        {checkoutError}
+                      </p>
+                    )}
                     {FF.trustLayer ? (
                       <div className="mt-4">
                         <TrustBar />

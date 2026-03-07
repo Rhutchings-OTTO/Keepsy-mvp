@@ -244,16 +244,12 @@ export async function POST(req: Request) {
     });
   } catch (err: unknown) {
     const errMsg = err instanceof Error ? err.message : String(err);
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[checkout] Error:", errMsg);
-    }
-    const isStripeError = errMsg.toLowerCase().includes("stripe") || errMsg.includes("api_key");
+    // Always log — visible in Vercel function logs for diagnostics
+    console.error("[checkout] Stripe session creation failed:", errMsg);
     return new Response(
       JSON.stringify({
         error: "CHECKOUT_FAILED",
-        message: isStripeError && process.env.NODE_ENV !== "production"
-          ? `Stripe error: ${errMsg}`
-          : "Checkout couldn't start. Please try again.",
+        message: "Checkout couldn't start. Please try again.",
       }),
       { status: 500, headers: JSON_HEADERS }
     );

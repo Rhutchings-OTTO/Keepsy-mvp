@@ -140,27 +140,22 @@ export async function POST(req: Request) {
         { onConflict: "order_ref" }
       );
       if (orderErr) {
-        return new Response(JSON.stringify({ error: "Failed to create pending order." }), {
-          status: 500,
-          headers: JSON_HEADERS,
-        });
-      }
-
-      await supabase.from("order_items").delete().eq("order_ref", orderRef);
-      const { error: itemsErr } = await supabase.from("order_items").insert(
-        lines.map((item) => ({
-          order_ref: orderRef,
-          product_name: [item.name, item.size, item.color].filter(Boolean).join(" · ") || item.name,
-          quantity: item.quantity,
-          unit_price_gbp: item.priceGBP,
-          line_total_gbp: Number((item.priceGBP * item.quantity).toFixed(2)),
-        }))
-      );
-      if (itemsErr) {
-        return new Response(JSON.stringify({ error: "Failed to persist order items." }), {
-          status: 500,
-          headers: JSON_HEADERS,
-        });
+        // Non-fatal: log and continue to Stripe — order can be recovered from webhook
+        console.error("[checkout] Supabase order pre-insert failed (continuing):", orderErr.message);
+      } else {
+        await supabase.from("order_items").delete().eq("order_ref", orderRef);
+        const { error: itemsErr } = await supabase.from("order_items").insert(
+          lines.map((item) => ({
+            order_ref: orderRef,
+            product_name: [item.name, item.size, item.color].filter(Boolean).join(" · ") || item.name,
+            quantity: item.quantity,
+            unit_price_gbp: item.priceGBP,
+            line_total_gbp: Number((item.priceGBP * item.quantity).toFixed(2)),
+          }))
+        );
+        if (itemsErr) {
+          console.error("[checkout] Supabase order_items insert failed (continuing):", itemsErr.message);
+        }
       }
     }
 
@@ -206,9 +201,8 @@ export async function POST(req: Request) {
       { status: 200, headers: { ...JSON_HEADERS, ...rateLimitResult.headers } }
     );
   } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[checkout] Error:", err instanceof Error ? err.message : err);
-    }
+    // Always log — visible in Vercel function logs for diagnostics
+    console.error("[checkout] Stripe session creation failed:", err instanceof Error ? err.message : err);
     return new Response(
       JSON.stringify({
         error: "CHECKOUT_FAILED",

@@ -883,21 +883,21 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   return (
     <div
       className={`min-h-screen flex flex-col text-charcoal selection:bg-terracotta/20 overflow-x-hidden ${
-        isMagicpathSkin ? "bg-[#FDFCFB]" : "bg-[#F7F1EB]"
+        isMagicpathSkin ? "bg-[#FDFCFB]" : "bg-[#FDF6EE]"
       }`}
       aria-busy={isGenerating}
     >
       <MagicpathBackground enabled={isMagicpathSkin} />
       {!isMagicpathSkin ? (
         <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_12%,rgba(246,221,210,0.56),transparent_30%),radial-gradient(circle_at_85%_14%,rgba(219,232,241,0.42),transparent_28%),linear-gradient(180deg,#f8f4ee_0%,#f5efe8_100%)]" />
+          <div className="absolute inset-0" style={{ backgroundColor: "var(--color-cream)" }} />
         </div>
       ) : null}
 
       {/* NAV */}
-      <nav className={`fixed z-40 w-full px-4 sm:px-6 ${isMagicpathSkin ? "top-5" : "top-0 py-4"}`}>
+      <nav className={`fixed z-40 w-full px-4 sm:px-6 ${isMagicpathSkin ? "top-5" : "top-0"}`}>
         <MagicpathFrame enabled={isMagicpathSkin} className={isMagicpathSkin ? "mx-auto flex w-full max-w-5xl items-center justify-between px-7 py-5" : ""}>
-          <div className={`flex w-full items-center justify-between rounded-full px-4 py-3 ${isMagicpathSkin ? "" : "border border-black/8 bg-white/82 shadow-[0_16px_34px_-28px_rgba(0,0,0,0.26)] backdrop-blur-md"}`}>
+          <div className={`flex w-full items-center justify-between px-4 py-3 ${isMagicpathSkin ? "" : "border-b border-charcoal/8 bg-[#FDF6EE]"}`}>
             <DynamicLogo
           onClick={() => {
             setView("home");
@@ -911,40 +911,40 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-black/60">
             <button
               onClick={() => setView("home")}
-              className={`rounded-full px-3 py-1.5 transition-colors ${
+              className={`px-4 py-2 text-sm font-semibold transition-colors border-b-2 ${
                 view === "home"
-                  ? "bg-terracotta !text-white shadow-[0_12px_24px_-18px_rgba(196,113,74,0.45)]"
-                  : "text-black/65 hover:bg-black/[0.04] hover:text-black"
+                  ? "border-terracotta text-terracotta"
+                  : "border-transparent text-charcoal/55 hover:text-charcoal"
               }`}
             >
-                  How it works
+              How it works
             </button>
             <button
               onClick={() => setView("catalog")}
-              className={`rounded-full px-3 py-1.5 transition-colors ${
+              className={`px-4 py-2 text-sm font-semibold transition-colors border-b-2 ${
                 view === "catalog"
-                  ? "bg-terracotta !text-white shadow-[0_12px_24px_-18px_rgba(196,113,74,0.45)]"
-                  : "text-black/65 hover:bg-black/[0.04] hover:text-black"
+                  ? "border-terracotta text-terracotta"
+                  : "border-transparent text-charcoal/55 hover:text-charcoal"
               }`}
             >
               Catalog
             </button>
-                <button
-                  onClick={() => setView("community")}
-                  className={`rounded-full px-3 py-1.5 transition-colors ${
-                    view === "community"
-? "bg-terracotta !text-white shadow-[0_12px_24px_-18px_rgba(196,113,74,0.45)]"
-                  : "text-black/65 hover:bg-black/[0.04] hover:text-black"
+            <button
+              onClick={() => setView("community")}
+              className={`px-4 py-2 text-sm font-semibold transition-colors border-b-2 ${
+                view === "community"
+                  ? "border-terracotta text-terracotta"
+                  : "border-transparent text-charcoal/55 hover:text-charcoal"
               }`}
-                >
+            >
                   Community
                 </button>
           </div>
 
               <button
                 onClick={() => setIsCartOpen(true)}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all ${
-                  isMagicpathSkin ? "bg-terracotta !text-white shadow-xl" : "bg-terracotta !text-white shadow-[0_14px_28px_-20px_rgba(196,113,74,0.55)]"
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 transition-all ${
+                  isMagicpathSkin ? "bg-terracotta !text-white shadow-xl" : "bg-terracotta !text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)]"
                 }`}
               >
                 <ShoppingCart size={18} className="text-white" />
@@ -969,19 +969,19 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               <div className="flex gap-2 md:hidden">
                 <button
                   onClick={() => setView("home")}
-                  className="rounded-full border border-terracotta bg-terracotta px-3 py-1.5 text-xs font-semibold text-white"
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${view === "home" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
                 >
                   How it works
                 </button>
                 <button
                   onClick={() => setView("catalog")}
-                  className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#2b2521]"
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${view === "catalog" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
                 >
                   Catalog
                 </button>
                 <button
                   onClick={() => setView("community")}
-                  className="rounded-full border border-black/10 bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#2b2521]"
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${view === "community" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
                 >
                   Community
                             </button>
@@ -1083,7 +1083,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       className="self-start shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,242,236,0.84))] p-4 shadow-[0_34px_84px_-46px_rgba(0,0,0,0.36)] backdrop-blur-xl">
+                      <div className="rounded-2xl bg-white border border-charcoal/8 p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                         <motion.div
                           key={generatedImage ?? "empty-reveal"}
                           initial={FF.dynamicReveal ? "initial" : false}
@@ -1099,7 +1099,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           />
                         </motion.div>
                         <div className="mt-5 flex flex-wrap items-center gap-3">
-                          <div className="inline-flex rounded-full border border-black/10 bg-white/76 px-3 py-2 text-xs font-extrabold">
+                          <div className="inline-flex rounded-lg border border-charcoal/10 bg-[#F5EDE0] px-3 py-2 text-xs font-extrabold">
                             <span className="inline-flex items-center gap-2 text-black/70"><Sparkles size={14} /> Real product preview</span>
                           </div>
                           <button
@@ -1120,7 +1120,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   </div>
 
                   <div className="space-y-6">
-                    <div className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(247,242,236,0.88))] p-6 shadow-[0_28px_70px_-46px_rgba(0,0,0,0.3)] backdrop-blur-xl">
+                    <div className="rounded-2xl bg-white border border-charcoal/8 p-6 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-black/40">Configure your gift</p>
                       <KineticHeading as="h2" className="mb-2 mt-3 text-4xl font-black">{selectedProduct.name}</KineticHeading>
                       <p className="font-semibold text-black/55">{selectedProduct.description}</p>
@@ -1129,7 +1129,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       <PersonalisedStoryCopy region={region} productType={selectedProduct.id} />
                     ) : null}
 
-                    <div className="space-y-5 rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,242,236,0.92))] p-5 shadow-[0_28px_70px_-46px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+                    <div className="space-y-5 rounded-2xl bg-white border border-charcoal/8 p-5 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
                       <section>
                         <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">
                         Select Product
@@ -1281,7 +1281,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   exit={{ opacity: 0, scale: 0.98 }}
                   className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2"
                 >
-                  <div className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,242,236,0.88))] p-7 shadow-[0_30px_72px_-44px_rgba(0,0,0,0.32)] backdrop-blur-xl">
+                  <div className="rounded-2xl bg-white border border-charcoal/8 p-7 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                     <KineticHeading as="h2" className="text-3xl font-black mb-4">Checkout</KineticHeading>
                     <p className="text-black/55 font-semibold mb-6">
                       You&apos;re about to buy: <span className="text-black">{checkoutItemDescription}</span>

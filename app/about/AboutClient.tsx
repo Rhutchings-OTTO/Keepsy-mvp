@@ -403,7 +403,8 @@ function CTASection() {
             </Link>
             <Link
               href="/create"
-              className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border-2 border-white/70 px-8 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10 sm:w-auto"
+              className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border-2 border-white bg-white px-8 text-sm font-semibold transition hover:bg-cream sm:w-auto"
+              style={{ color: "var(--color-terracotta)" }}
             >
               Start Creating for Free
             </Link>

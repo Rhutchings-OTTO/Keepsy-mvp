@@ -116,15 +116,15 @@ export function Wizard({ initialStyle, initialProduct }: WizardProps) {
     setIsCheckingOut(true);
     trackEvent("CheckoutStart", { product: productMeta.type });
     try {
-      const cartBase = [{ id: productMeta.type, name: productMeta.name, priceGBP: productMeta.price * quantity }];
-      const cart = includeUpsell ? [...cartBase, { id: "upsell", name: "Matching add-on", priceGBP: 12 }] : cartBase;
+      const cartBase = [{ productId: productMeta.type, name: productMeta.name, unitPrice: productMeta.price, quantity }];
+      const cart = includeUpsell
+        ? [...cartBase, { productId: "upsell", name: "Matching add-on", unitPrice: 12, quantity: 1 }]
+        : cartBase;
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          product: { id: productMeta.type, name: productMeta.name, priceGBP: productMeta.price * quantity },
-          prompt: `${style ?? ""} ${advancedPrompt}`.trim(),
-          imageDataUrl: generatedImage,
+          imageDataUrl: generatedImage ? "1" : undefined,
           cart,
         }),
       });

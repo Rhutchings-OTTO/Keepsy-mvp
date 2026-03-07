@@ -302,10 +302,13 @@ async function checkoutViaKeepsyAPI(args: {
   const primaryDesignUrl = args.designUrl ?? args.cart[0]?.designUrl ?? "";
   const primaryProduct = args.cart[0]?.name ?? args.productType ?? "";
 
+  // Only pass designUrl if it's a real HTTPS URL — strip base64 fallbacks to prevent 413
+  const safeDesignUrl = primaryDesignUrl && !primaryDesignUrl.startsWith("data:") ? primaryDesignUrl : undefined;
+
   const payload = {
     currency: "gbp" as const,
     imageDataUrl: args.imageDataUrl ? "1" : undefined,
-    designUrl: primaryDesignUrl || undefined,
+    designUrl: safeDesignUrl,
     productType: primaryProduct,
     cart: args.cart.map((item) => ({
       productId: item.productId,
@@ -317,6 +320,11 @@ async function checkoutViaKeepsyAPI(args: {
       quantity: item.quantity,
     })),
   };
+
+  if (process.env.NODE_ENV !== "production") {
+    const size = JSON.stringify(payload).length;
+    console.log(`[checkout] payload size: ${size} bytes (${(size / 1024).toFixed(1)} KB)`);
+  }
 
   const res = await fetch("/api/create-checkout-session", {
     method: "POST",

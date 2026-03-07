@@ -1,8 +1,14 @@
 /**
- * Printful API v1 client.
+ * PRINTFUL INTEGRATION — DISABLED
+ *
+ * Replaced by Printify. See lib/printify.ts and lib/printify-blueprints.ts.
+ * Kept for rollback safety. Do not import from this file.
+ *
+ * Original Printful API v1 client.
  * Docs: https://developers.printful.com/docs/
  */
 
+/*
 const PRINTFUL_BASE = "https://api.printful.com";
 
 function getToken(): string {
@@ -48,12 +54,10 @@ export type PrintfulRecipient = {
 };
 
 export type PrintfulOrderItem = {
-  /** Printful catalog variant ID */
   variant_id: number;
   quantity: number;
   files: Array<{
     url: string;
-    /** 'default' for front, 'back' for back, etc. */
     type?: string;
   }>;
 };
@@ -61,7 +65,6 @@ export type PrintfulOrderItem = {
 export type PrintfulCreateOrderRequest = {
   recipient: PrintfulRecipient;
   items: PrintfulOrderItem[];
-  /** Set to false to place a real order, true for draft */
   confirm?: boolean;
   retail_costs?: {
     currency: string;
@@ -100,3 +103,6 @@ export async function confirmPrintfulOrder(orderId: number): Promise<PrintfulOrd
     method: "POST",
   });
 }
+*/
+
+export {};

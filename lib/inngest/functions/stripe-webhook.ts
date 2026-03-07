@@ -3,7 +3,53 @@ import { inngest } from "../client";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { sendAtelierCreationEmail } from "@/lib/emails/sendAtelierEmail";
 import { clearDesignCacheForOrder } from "@/lib/cache/designCache";
-import { submitPrintfulOrder } from "@/lib/printful/createOrder";
+import {
+  uploadImageToPrintify,
+  createPrintifyProduct,
+  submitPrintifyOrder,
+  splitName,
+  type PrintifyAddress,
+} from "@/lib/printify";
+import { getPrintifyVariantId } from "@/lib/printify-blueprints";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
+
+/** Derive UK vs US from Stripe shipping/billing country. */
+function regionFromCountry(country: string | null | undefined): "US" | "UK" {
+  return country === "GB" ? "UK" : "US";
+}
+
+/** Build a Printify-shaped address from a Stripe session. */
+function buildPrintifyAddress(session: Stripe.Checkout.Session): PrintifyAddress {
+  const shipping = session.collected_information?.shipping_details;
+  const billing = session.customer_details;
+  const addr = shipping?.address ?? billing?.address;
+  const name = shipping?.name ?? billing?.name ?? "Keepsy Customer";
+  const email = billing?.email ?? "";
+
+  if (!addr?.line1 || !addr?.city || !addr?.country || !addr?.postal_code) {
+    throw new Error(
+      "No complete shipping/billing address on Stripe session — cannot fulfil order."
+    );
+  }
+
+  const { first_name, last_name } = splitName(name);
+
+  return {
+    first_name,
+    last_name,
+    email,
+    phone: billing?.phone ?? undefined,
+    country: addr.country,
+    region: addr.state ?? undefined,
+    address1: addr.line1,
+    address2: addr.line2 ?? undefined,
+    city: addr.city,
+    zip: addr.postal_code,
+  };
+}
+
+// ─── Main Inngest function ─────────────────────────────────────────────────
 
 export const stripeWebhookProcess = inngest.createFunction(
   {
@@ -46,6 +92,7 @@ export const stripeWebhookProcess = inngest.createFunction(
 
     if (alreadyProcessed) return { skipped: "duplicate" };
 
+    // ── checkout.session.completed ─────────────────────────────────────────
     if (eventType === "checkout.session.completed") {
       const session = payload.data.object as Stripe.Checkout.Session;
       const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -53,9 +100,13 @@ export const stripeWebhookProcess = inngest.createFunction(
 
       const stripe = new Stripe(secretKey, { apiVersion: "2026-02-25.clover" });
 
+      // Expand price.product so we can access per-item metadata (productId, size, color)
       const [lineItems] = await Promise.all([
         step.run("fetch-line-items", () =>
-          stripe.checkout.sessions.listLineItems(session.id, { limit: 100 })
+          stripe.checkout.sessions.listLineItems(session.id, {
+            limit: 100,
+            expand: ["data.price.product"],
+          })
         ),
       ]);
 
@@ -110,28 +161,113 @@ export const stripeWebhookProcess = inngest.createFunction(
         }
       });
 
-      await step.run("submit-printful-order", async () => {
-        try {
-          const { printfulOrderId } = await submitPrintfulOrder(
-            session,
-            lineItems,
-            { confirm: process.env.NODE_ENV === "production" }
+      // ── Printify fulfilment — 4 retryable steps ──────────────────────────
+
+      // Skip Printify if no design URL or API token not configured
+      if (!designUrl || !process.env.PRINTIFY_API_TOKEN) {
+        console.warn(
+          "[printify] Skipping fulfilment — missing designUrl or PRINTIFY_API_TOKEN"
+        );
+      } else {
+        // Extract product details from first line item metadata
+        const firstItem = lineItems.data[0];
+        const productMeta =
+          typeof firstItem?.price?.product === "object" && firstItem.price.product !== null
+            ? ((firstItem.price.product as Stripe.Product).metadata ?? {})
+            : {};
+
+        const productId = (productMeta.productId ?? session.metadata?.product_type ?? "card")
+          .toLowerCase()
+          .replace(/\s+/g, "");
+        const size = productMeta.size || undefined;
+        const color = productMeta.color || undefined;
+        const quantity = firstItem?.quantity ?? 1;
+
+        // Determine region from shipping address country
+        const shippingCountry =
+          session.collected_information?.shipping_details?.address?.country ??
+          session.customer_details?.address?.country;
+        const region = regionFromCountry(shippingCountry);
+
+        // Step: Upload design image to Printify
+        const printifyImageId = await step.run("printify-upload-image", async () => {
+          const imageId = await uploadImageToPrintify(
+            designUrl,
+            `keepsy-${orderRef}.png`
           );
-          if (supabase) {
+
+          await supabase
+            .from("orders")
+            .update({ printify_image_id: imageId, printify_status: "image_uploaded" })
+            .eq("order_ref", orderRef);
+
+          return imageId;
+        });
+
+        // Step: Create Printify product
+        const printifyProductId = await step.run("printify-create-product", async () => {
+          const { config, variantId } = getPrintifyVariantId(productId, region, color, size);
+
+          const productTitle = `Keepsy ${productId} — ${orderRef}`;
+          const pid = await createPrintifyProduct({
+            title: productTitle,
+            blueprintId: config.blueprintId,
+            printProviderId: config.printProviderId,
+            variantId,
+            printImageId: printifyImageId,
+            printPosition: config.printPosition,
+          });
+
+          await supabase
+            .from("orders")
+            .update({ printify_product_id: pid, printify_status: "product_created" })
+            .eq("order_ref", orderRef);
+
+          return { productId: pid, variantId };
+        });
+
+        // Step: Submit Printify order
+        await step.run("printify-submit-order", async () => {
+          try {
+            const { variantId } = printifyProductId;
+            const address = buildPrintifyAddress(session);
+
+            const printifyOrderId = await submitPrintifyOrder({
+              externalId: orderRef,
+              productId: printifyProductId.productId,
+              variantId,
+              quantity,
+              shippingAddress: address,
+            });
+
             await supabase
               .from("orders")
-              .update({ printful_order_id: printfulOrderId })
+              .update({
+                printify_order_id: printifyOrderId,
+                printify_status: "sent_to_printify",
+                status: "in_production",
+              })
               .eq("order_ref", orderRef);
+          } catch (err) {
+            // Mark for manual review — do NOT auto-refund
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error("[printify] Failed to submit order:", msg);
+
+            await supabase
+              .from("orders")
+              .update({ printify_status: "needs_manual_review" })
+              .eq("order_ref", orderRef);
+
+            // Re-throw so Inngest retries this step
+            throw err;
           }
-        } catch (err) {
-          // Log but don't fail the whole webhook — manual retry possible
-          console.error("[printful] Failed to create order:", err instanceof Error ? err.message : err);
-        }
-      });
+        });
+      }
 
       await step.run("clear-design-cache", () => clearDesignCacheForOrder(designUrl));
     }
 
+    // ── checkout.session.async_payment_failed ──────────────────────────────
     if (eventType === "checkout.session.async_payment_failed") {
       const session = payload.data.object as Stripe.Checkout.Session;
       const orderRef = session.metadata?.order_ref || session.client_reference_id;
@@ -146,6 +282,7 @@ export const stripeWebhookProcess = inngest.createFunction(
       });
     }
 
+    // ── checkout.session.expired ───────────────────────────────────────────
     if (eventType === "checkout.session.expired") {
       const session = payload.data.object as Stripe.Checkout.Session;
       const orderRef = session.metadata?.order_ref || session.client_reference_id;

@@ -1,6 +1,11 @@
 /**
- * Builds and submits a Printful order from a completed Stripe checkout session.
+ * PRINTFUL INTEGRATION — DISABLED
+ *
+ * Replaced by Printify. See lib/inngest/functions/stripe-webhook.ts.
+ * Kept for rollback safety. Do not import from this file.
  */
+
+/*
 import Stripe from "stripe";
 import {
   createPrintfulOrder,
@@ -47,7 +52,6 @@ function buildItems(
   designUrl: string
 ): PrintfulOrderItem[] {
   return lineItems.data.map((item) => {
-    // Metadata is on the Stripe price's product metadata
     const productMeta =
       typeof item.price?.product === "object" && item.price.product !== null
         ? (item.price.product as Stripe.Product).metadata ?? {}
@@ -68,10 +72,6 @@ function buildItems(
   });
 }
 
-/**
- * Creates a Printful order (draft by default — set confirm=true to go live).
- * Call this after a verified `checkout.session.completed` webhook.
- */
 export async function submitPrintfulOrder(
   session: Stripe.Checkout.Session,
   lineItems: Stripe.ApiList<Stripe.LineItem>,
@@ -92,3 +92,6 @@ export async function submitPrintfulOrder(
 
   return { printfulOrderId: printfulOrder.id };
 }
+*/
+
+export {};

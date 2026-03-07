@@ -6,23 +6,21 @@ import { Resend } from "resend";
 import { AtelierCreationEmail } from "@/lib/emails/atelierTemplates";
 import { getAtelierEmailPlain, type AtelierEmailParams } from "@/content/atelierEmails";
 
-const FROM = process.env.EMAIL_FROM || "Keepsy <hello@keepsy.store>";
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-
 export async function sendAtelierCreationEmail(params: AtelierEmailParams & { to: string }): Promise<boolean> {
-  if (!RESEND_API_KEY) {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[email] RESEND_API_KEY not set, skipping Atelier creation email to", params.to);
-    }
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM || "Keepsy <hello@keepsy.store>";
+
+  if (!resendApiKey) {
+    console.error("[email] RESEND_API_KEY not set, skipping Atelier creation email to", params.to);
     return false;
   }
 
-  const resend = new Resend(RESEND_API_KEY);
+  const resend = new Resend(resendApiKey);
   const { subject, body } = getAtelierEmailPlain("creation", params);
 
   try {
     const { error } = await resend.emails.send({
-      from: FROM,
+      from,
       to: params.to,
       subject,
       react: AtelierCreationEmail(params),

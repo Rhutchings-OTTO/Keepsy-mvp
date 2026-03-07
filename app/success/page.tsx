@@ -84,7 +84,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
           {/* Status label */}
           <p
             className="text-[11px] font-bold uppercase tracking-[0.22em]"
-            style={{ color: isFailed ? "#C0392B" : "var(--color-terracotta)" }}
+            style={{ color: "var(--color-terracotta)" }}
           >
             {isFailed ? "Payment Issue" : "Order Received"}
           </p>
@@ -176,7 +176,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
 
           {/* Error notice */}
           {errorMessage && (
-            <p className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+            <p className="mt-6 rounded-xl border border-charcoal/10 bg-[#F5EDE0] px-4 py-3 text-sm font-semibold text-terracotta">
               {errorMessage}
             </p>
           )}

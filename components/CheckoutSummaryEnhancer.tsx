@@ -29,7 +29,7 @@ export default function CheckoutSummaryEnhancer({ productName, priceText, thumbn
 
   return (
     <section className="space-y-3">
-      <article className="rounded-[1.5rem] border border-white/65 bg-white/78 p-4 shadow-[0_14px_30px_-24px_rgba(0,0,0,0.22)]">
+      <article className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
         <div className="flex items-center gap-3">
           <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-cream/80">
             {thumbnailSrc ? (
@@ -45,7 +45,7 @@ export default function CheckoutSummaryEnhancer({ productName, priceText, thumbn
         </div>
       </article>
 
-      <article className="rounded-[1.5rem] border border-white/65 bg-white/74 p-4 shadow-[0_14px_30px_-24px_rgba(0,0,0,0.18)]">
+      <article className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
         <p className="mb-2 text-sm font-semibold text-charcoal">Need help?</p>
         <div className="space-y-2">
           {FAQS.map((item, index) => (

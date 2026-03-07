@@ -215,7 +215,7 @@ export function SiteHeader() {
           {/* ── Desktop center pill nav ── */}
           <nav
             aria-label="Primary"
-            className="hidden items-center gap-1 rounded-full border border-white/60 bg-white/70 px-2 py-1.5 shadow-[0_18px_38px_-30px_rgba(0,0,0,0.28)] backdrop-blur-md md:flex"
+            className="hidden items-center gap-1 rounded-full border border-charcoal/10 bg-white px-2 py-1.5 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] md:flex"
           >
             {NAV_ITEMS.map(({ href, label }) => {
               const active = href.startsWith("/") && pathname === href;

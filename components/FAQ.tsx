@@ -30,7 +30,7 @@ export function FAQ() {
       <div className="mt-6 space-y-3">
         {FAQS.map((faq, i) => (
           <Reveal key={faq.q} variant="fadeUp" delay={i * 0.06}>
-            <div className="overflow-hidden rounded-[1.5rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] shadow-warm-sm backdrop-blur-sm">
+            <div className="overflow-hidden rounded-2xl border border-charcoal/8 bg-white shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
               <button
                 type="button"
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}

@@ -93,7 +93,7 @@ export default function RegionSelector({ open, onSelect, onClose, currentRegion 
             role="dialog"
             aria-modal="true"
             aria-label="Choose your region"
-            className="fixed left-1/2 top-1/2 z-[81] w-[min(92vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(253,246,238,0.96),rgba(247,236,224,0.98))] p-7 shadow-warm-xl backdrop-blur-xl"
+            className="fixed left-1/2 top-1/2 z-[81] w-[min(92vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-charcoal/8 bg-white p-7 shadow-[0_24px_60px_-30px_rgba(45,41,38,0.15)]"
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
@@ -110,7 +110,7 @@ export default function RegionSelector({ open, onSelect, onClose, currentRegion 
                   type="button"
                   ref={index === 0 ? firstButtonRef : null}
                   onClick={() => handleRegionClick(option.region)}
-                  className="rounded-[1.5rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,244,238,0.92))] px-5 py-5 text-left shadow-warm-sm backdrop-blur-sm transition hover:shadow-warm-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-terracotta/30"
+                  className="rounded-2xl border border-charcoal/8 bg-white px-5 py-5 text-left shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] transition hover:shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)] hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-terracotta/30"
                 >
                   <p className="text-lg font-bold text-charcoal">{option.title}</p>
                   <p className="mt-0.5 text-xs text-charcoal/55">See local gift ideas & holidays</p>

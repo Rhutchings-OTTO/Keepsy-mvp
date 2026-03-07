@@ -81,7 +81,7 @@ export function RealisticHoodie({
           <div className="absolute bottom-6 right-6 z-40">
             <button
               type="button"
-              className="rounded-full bg-white/80 px-4 py-2 font-sans text-xs uppercase tracking-widest text-obsidian shadow-lg backdrop-blur-md"
+              className="rounded-full bg-white/80 px-4 py-2 font-sans text-xs uppercase tracking-widest text-charcoal shadow-lg"
             >
               Inspect Texture
             </button>

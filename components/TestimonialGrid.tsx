@@ -32,7 +32,7 @@ function StarRating({ count = 5 }: { count?: number }) {
         >
           <path
             d="M7 1L8.54 5.19H13L9.47 7.81L10.9 12L7 9.44L3.1 12L4.53 7.81L1 5.19H5.46L7 1Z"
-            fill="#C9A84C"
+            fill="var(--color-gold)"
           />
         </svg>
       ))}

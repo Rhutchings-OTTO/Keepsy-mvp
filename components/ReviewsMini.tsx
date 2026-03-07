@@ -15,7 +15,7 @@ export default function ReviewsMini() {
   return (
     <section
       aria-label="Example customer reviews"
-      className="rounded-[1.5rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,244,238,0.88))] p-4 shadow-warm-sm backdrop-blur-sm"
+      className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]"
     >
       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Example reviews</p>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">

@@ -36,7 +36,7 @@ export function GenerationLoadingOverlay({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: prefersReducedMotion ? 0.15 : 0.3 }}
-          className="fixed inset-0 z-[120] flex items-center justify-center bg-cream/94 px-6 backdrop-blur-sm"
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-cream/94 px-6"
           role="status"
           aria-live="polite"
           aria-label="Synthesizing your design"
@@ -61,7 +61,7 @@ export function GenerationLoadingOverlay({
             </motion.div>
           )}
 
-          <div className="frosted-glass relative w-full max-w-md rounded-3xl p-8 text-center">
+          <div className="relative w-full max-w-md rounded-2xl border border-charcoal/8 bg-white p-8 text-center shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
             <GenerativeLoader useInternalMessages={true} region={region} startedAt={startedAt} prompt={prompt} />
 
             <p className="mt-4 text-sm font-medium text-charcoal/60">Calibrating pigments — this usually takes a moment.</p>

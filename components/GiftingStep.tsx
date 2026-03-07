@@ -21,8 +21,7 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
   if (hidden) {
     return (
       <section
-        className="rounded-[1.5rem] border border-white/65 p-4 shadow-warm-sm backdrop-blur-sm"
-        style={{ backgroundColor: "rgba(253,246,238,0.88)" }}
+        className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]"
       >
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm text-charcoal/65">Personalised gifting is skipped.</p>
@@ -40,8 +39,7 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
 
   return (
     <section
-      className="rounded-[1.5rem] border border-white/65 p-5 shadow-warm-sm backdrop-blur-sm"
-      style={{ backgroundColor: "rgba(253,246,238,0.88)" }}
+      className="rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]"
     >
       <div className="mb-4 flex items-center justify-between gap-2">
         <p className="text-sm font-semibold text-charcoal">Optional gifting details</p>

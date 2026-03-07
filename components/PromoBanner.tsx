@@ -8,8 +8,8 @@ export function PromoBanner() {
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4">
       <div
-        className="rounded-2xl border border-white/65 px-5 py-4 shadow-warm-sm backdrop-blur-sm"
-        style={{ backgroundColor: "rgba(196,113,74,0.08)", borderColor: "rgba(196,113,74,0.20)" }}
+        className="rounded-2xl px-5 py-4"
+        style={{ backgroundColor: "rgba(196,113,74,0.08)", borderColor: "rgba(196,113,74,0.20)", border: "1px solid" }}
       >
         <p className="text-sm font-bold" style={{ color: "var(--color-terracotta)" }}>
           {promo.title} — {promo.discountLabel}

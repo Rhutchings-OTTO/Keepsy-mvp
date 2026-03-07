@@ -46,7 +46,7 @@ export default function GuidedPromptPanel({ currentPrompt, onApplyPrompt }: Guid
   };
 
   return (
-    <section className="rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] p-4 shadow-warm-sm backdrop-blur-sm sm:p-5">
+    <section className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)] sm:p-5">
       <div className="mb-3 flex items-center gap-2 text-charcoal">
         <Wand2 className="h-4 w-4" />
         <p className="text-sm font-semibold">Guided prompt builder</p>

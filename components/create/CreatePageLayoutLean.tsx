@@ -145,15 +145,17 @@ export function CreatePageLayoutLean({
     >
       <div className="grid gap-6 lg:grid-cols-[1.06fr_0.94fr] lg:gap-8">
         <motion.section variants={fadeInUp} className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#d7cabc] bg-white/80 px-3 py-1.5 text-sm font-medium text-[#665f58]">
-            <Heart size={14} className="text-[#a06b55]" />
+          <div
+            className="inline-flex items-center gap-2 rounded-xl border border-charcoal/15 bg-white px-3 py-1.5 text-sm font-medium text-charcoal/65"
+          >
+            <Heart size={14} style={{ color: "var(--color-terracotta)" }} />
             Make a thoughtful personalised gift
           </div>
-          <h1 className="mt-5 font-serif text-[clamp(2.2rem,4.6vw,4.4rem)] leading-[1.02] tracking-[-0.04em] text-[#1f1b18]">
+          <h1 className="mt-5 font-serif text-[clamp(2.2rem,4.6vw,4.4rem)] leading-[1.02] tracking-[-0.04em] text-charcoal">
             Create something personal in a way that feels easy.
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-8 text-[#5c5650]">
-            Tell us what you want to make, or upload a photo. We’ll turn it into a polished design and show you how it will look before you buy.
+          <p className="mt-5 max-w-xl text-lg leading-8 text-charcoal/60">
+            Tell us what you want to make, or upload a photo. We&apos;ll turn it into a polished design and show you how it will look before you buy.
           </p>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
@@ -162,8 +164,14 @@ export function CreatePageLayoutLean({
               "Preview your design on a product",
               "Only order if it looks right",
             ].map((item) => (
-              <div key={item} className="rounded-[22px] border border-black/8 bg-white/76 p-4 text-sm leading-6 text-[#564f49] shadow-[0_18px_40px_-32px_rgba(0,0,0,0.3)]">
-                <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#efe4d7] text-[#8b6f47]">
+              <div
+                key={item}
+                className="rounded-xl border border-charcoal/8 bg-white p-4 text-sm leading-6 text-charcoal/65 shadow-[0_8px_20px_-12px_rgba(45,41,38,0.12)]"
+              >
+                <div
+                  className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: "rgba(196,113,74,0.12)", color: "var(--color-terracotta)" }}
+                >
                   <Check size={16} />
                 </div>
                 {item}
@@ -174,19 +182,19 @@ export function CreatePageLayoutLean({
 
         <motion.section variants={fadeInUp} className="w-full">
           <MagicpathFrame enabled={isMagicpathSkin}>
-            <div className="rounded-[28px] border border-white/65 bg-[linear-gradient(165deg,rgba(255,255,255,0.9),rgba(255,255,255,0.72))] p-4 shadow-[0_30px_70px_-44px_rgba(0,0,0,0.42)] backdrop-blur-xl sm:p-5">
-              <div className="inline-flex rounded-full border border-black/10 bg-[#f4ede6] p-1">
+            <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)] sm:p-5">
+              <div className="inline-flex rounded-lg border border-charcoal/10 bg-[#F5EDE0] p-1">
                 <button
                   type="button"
                   onClick={() => setCreateMode("describe")}
-                  className={`rounded-full px-4 py-2 text-sm font-medium ${createMode === "describe" ? "bg-white text-[#1f1b18] shadow-sm" : "text-[#69615a]"}`}
+                  className={`rounded-md px-4 py-2 text-sm font-medium ${createMode === "describe" ? "bg-white text-charcoal shadow-sm" : "text-charcoal/55"}`}
                 >
                   Describe a gift
                 </button>
                 <button
                   type="button"
                   onClick={() => setCreateMode("upload")}
-                  className={`rounded-full px-4 py-2 text-sm font-medium ${createMode === "upload" ? "bg-white text-[#1f1b18] shadow-sm" : "text-[#69615a]"}`}
+                  className={`rounded-md px-4 py-2 text-sm font-medium ${createMode === "upload" ? "bg-white text-charcoal shadow-sm" : "text-charcoal/55"}`}
                 >
                   Use a photo
                 </button>
@@ -194,7 +202,7 @@ export function CreatePageLayoutLean({
 
               <div className="mt-4 space-y-4">
                 <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-[#5e5650]">
+                  <span className="mb-2 block text-sm font-medium text-charcoal/60">
                     {createMode === "upload" ? "Describe how you want the photo changed" : "Describe the gift you want to make"}
                   </span>
                   <textarea
@@ -206,15 +214,18 @@ export function CreatePageLayoutLean({
                     placeholder={
                       createMode === "upload"
                         ? "Example: Turn this family photo into a soft watercolor birthday card"
-                        : "Example: A warm floral mug design for Mum’s birthday"
+                        : "Example: A warm floral mug design for Mum's birthday"
                     }
                     rows={5}
-                    className="min-h-[144px] w-full resize-none rounded-[22px] border border-black/10 bg-white px-4 py-4 text-base leading-7 text-[#282320] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] outline-none placeholder:text-[#9b938c] focus:border-[#c8b6a2]"
+                    className="min-h-[144px] w-full resize-none rounded-xl border border-charcoal/10 bg-white px-4 py-4 text-base leading-7 text-charcoal outline-none placeholder:text-charcoal/35 focus:border-terracotta/40 focus:ring-2 focus:ring-terracotta/15"
                   />
                 </label>
 
                 {createMode === "upload" ? (
-                  <div className="rounded-[22px] border border-dashed border-[#d8c9b8] bg-[#fcf8f4] p-4">
+                  <div
+                    className="rounded-xl border border-dashed border-charcoal/20 p-4"
+                    style={{ backgroundColor: "#F5EDE0" }}
+                  >
                     <input
                       ref={fileInputRef}
                       id="create-upload-input"
@@ -225,25 +236,28 @@ export function CreatePageLayoutLean({
                     />
                     {!uploadedImage ? (
                       <label htmlFor="create-upload-input" className="flex cursor-pointer flex-col items-center gap-2 py-5 text-center">
-                        <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-[#8b6f47] shadow-sm">
+                        <div
+                          className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm"
+                          style={{ color: "var(--color-terracotta)" }}
+                        >
                           <Upload size={18} />
                         </div>
-                        <span className="text-base font-medium text-[#302a26]">Choose a photo</span>
-                        <span className="text-sm text-[#726960]">PNG or JPG, up to 5MB</span>
+                        <span className="text-base font-medium text-charcoal">Choose a photo</span>
+                        <span className="text-sm text-charcoal/55">PNG or JPG, up to 5MB</span>
                       </label>
                     ) : (
-                      <div className="flex items-center gap-3 rounded-[18px] bg-white p-3">
-                        <div className="relative h-16 w-16 overflow-hidden rounded-2xl">
+                      <div className="flex items-center gap-3 rounded-xl bg-white p-3">
+                        <div className="relative h-16 w-16 overflow-hidden rounded-xl">
                           <Image src={uploadedImage} alt="Uploaded" fill className="object-cover" unoptimized sizes="64px" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-[#2d2724]">{uploadedFileName || "Photo selected"}</p>
-                          <p className="mt-1 text-xs text-[#716960]">Ready to transform</p>
+                          <p className="truncate text-sm font-medium text-charcoal">{uploadedFileName || "Photo selected"}</p>
+                          <p className="mt-1 text-xs text-charcoal/55">Ready to transform</p>
                         </div>
                         <button
                           type="button"
                           onClick={onClearUploadedImage}
-                          className="rounded-full p-2 text-[#6a635c] hover:bg-black/5"
+                          className="rounded-lg p-2 text-charcoal/55 hover:bg-charcoal/5"
                           aria-label="Remove photo"
                         >
                           <X size={16} />
@@ -256,7 +270,7 @@ export function CreatePageLayoutLean({
                 <MagneticButton
                   onClick={() => onGenerate()}
                   disabled={(!(typeof prompt === "string" ? prompt : "").trim() && !uploadedImage) || isBusy}
-                  className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-full bg-terracotta px-6 text-base font-semibold !text-white shadow-[0_20px_36px_-22px_rgba(196,113,74,0.55)] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-terracotta px-6 text-base font-semibold !text-white shadow-[0_16px_32px_-20px_rgba(196,113,74,0.45)] disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   {isBusy ? (
                     <>
@@ -271,7 +285,7 @@ export function CreatePageLayoutLean({
                   )}
                 </MagneticButton>
 
-                <p className="text-sm text-[#736b64]">
+                <p className="text-sm text-charcoal/55">
                   Most designs are ready in 10 to 20 seconds. You can refine the result afterwards.
                 </p>
 
@@ -289,7 +303,8 @@ export function CreatePageLayoutLean({
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
-                      className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700"
+                      className="rounded-xl border border-charcoal/10 px-4 py-3 text-sm font-medium text-charcoal"
+                      style={{ backgroundColor: "#F5EDE0" }}
                     >
                       Payment complete. Your order is confirmed.
                     </motion.p>
@@ -299,7 +314,8 @@ export function CreatePageLayoutLean({
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
-                      className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700"
+                      className="rounded-xl border border-charcoal/10 px-4 py-3 text-sm font-medium"
+                      style={{ backgroundColor: "#FDF6EE", color: "var(--color-terracotta)" }}
                     >
                       Checkout canceled. Your design is still here whenever you want to continue.
                     </motion.p>
@@ -312,11 +328,11 @@ export function CreatePageLayoutLean({
       </div>
 
       <motion.section variants={fadeInUp} className="grid gap-4 lg:grid-cols-[1fr_1fr]">
-        <div className="rounded-[26px] border border-black/8 bg-white/82 p-4 shadow-[0_20px_44px_-34px_rgba(0,0,0,0.3)] sm:p-5">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#8b7f74]">Need ideas?</p>
+        <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Need ideas?</p>
           <PromptHelperCollapsible onUsePrompt={handleUsePrompt} />
         </div>
-        <div className="rounded-[26px] border border-black/8 bg-white/82 p-4 shadow-[0_20px_44px_-34px_rgba(0,0,0,0.3)] sm:p-5">
+        <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
           <IdeasForYou
             region={region}
             onUsePrompt={handleChipPrompt}
@@ -332,8 +348,8 @@ export function CreatePageLayoutLean({
       </motion.section>
 
       <motion.section variants={fadeInUp}>
-        <div className="rounded-[26px] border border-black/8 bg-white/82 p-5 shadow-[0_20px_44px_-34px_rgba(0,0,0,0.3)] sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#8b7f74]">Choose your product</p>
+        <div className="rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Choose your product</p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {PRODUCTS.map(({ type, Icon, label }) => (
               <motion.button
@@ -342,13 +358,13 @@ export function CreatePageLayoutLean({
                 onClick={() => onProductSelect(type)}
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.985 }}
-                className={`rounded-[22px] border p-4 text-left transition sm:p-5 ${
+                className={`rounded-xl border p-4 text-left transition sm:p-5 ${
                   selectedProductType === type
                     ? "border-terracotta bg-terracotta text-white shadow-[0_16px_34px_-22px_rgba(196,113,74,0.5)]"
-                    : "border-black/10 bg-[#fbf8f4] text-[#2b2521]"
+                    : "border-charcoal/10 bg-[#F5EDE0] text-charcoal"
                 }`}
               >
-                <div className="relative mb-4 overflow-hidden rounded-[1rem] border border-black/8 bg-white/80">
+                <div className="relative mb-4 overflow-hidden rounded-xl border border-charcoal/8 bg-white">
                   <Image
                     src={PRODUCT_PREVIEW_IMAGES[type]}
                     alt={`${label} preview`}
@@ -357,13 +373,16 @@ export function CreatePageLayoutLean({
                     className="h-24 w-full object-contain p-2"
                   />
                 </div>
-                <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl ${selectedProductType === type ? "bg-white/12 text-white" : "bg-white/80 text-[#8b6f47]"}`}>
+                <div
+                  className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${selectedProductType === type ? "bg-white/20 text-white" : ""}`}
+                  style={selectedProductType !== type ? { backgroundColor: "rgba(196,113,74,0.12)", color: "var(--color-terracotta)" } : {}}
+                >
                   <Icon size={20} />
                 </div>
-                <p className={`mt-4 text-lg font-semibold ${selectedProductType === type ? "text-white" : "text-[#241f1c]"}`}>
+                <p className={`mt-4 text-lg font-semibold ${selectedProductType === type ? "text-white" : "text-charcoal"}`}>
                   {label}
                 </p>
-                <p className={`mt-1 text-sm ${selectedProductType === type ? "text-white/75" : "text-[#70675f]"}`}>
+                <p className={`mt-1 text-sm ${selectedProductType === type ? "text-white/75" : "text-charcoal/55"}`}>
                   {selectedProductType === type ? "Selected for your preview" : "Choose this product for your preview"}
                 </p>
               </motion.button>
@@ -374,20 +393,22 @@ export function CreatePageLayoutLean({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="mt-5 grid gap-4 rounded-[24px] border border-black/8 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(247,242,235,0.92))] p-4 shadow-[0_18px_38px_-28px_rgba(0,0,0,0.28)] sm:p-5 md:grid-cols-[0.8fr_1.2fr]"
+            className="mt-5 grid gap-4 rounded-2xl border border-charcoal/8 bg-[#F5EDE0] p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5 md:grid-cols-[0.8fr_1.2fr]"
           >
             <div className="flex flex-col justify-center">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#efe4d7] text-[#8b6f47]">
+              <div
+                className="inline-flex h-12 w-12 items-center justify-center rounded-xl"
+                style={{ backgroundColor: "rgba(196,113,74,0.12)", color: "var(--color-terracotta)" }}
+              >
                 <ActiveProductIcon size={20} />
               </div>
-              <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-[#8b7f74]">Selected preview</p>
-              <h3 className="mt-2 text-2xl font-semibold text-[#241f1c]">{activeProduct.label}</h3>
-              <p className="mt-3 max-w-md text-sm leading-7 text-[#645c55]">
+              <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-charcoal/45">Selected preview</p>
+              <h3 className="mt-2 text-2xl font-semibold text-charcoal">{activeProduct.label}</h3>
+              <p className="mt-3 max-w-md text-sm leading-7 text-charcoal/60">
                 Pick a different item above and the preview surface updates straight away.
               </p>
             </div>
-            <div className="relative overflow-hidden rounded-[22px] border border-black/8 bg-white/90 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] sm:p-4">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.9),transparent_42%),linear-gradient(180deg,rgba(249,244,238,0.1),rgba(232,226,219,0.28))]" />
+            <div className="relative overflow-hidden rounded-xl border border-charcoal/8 bg-white p-3 sm:p-4">
               <Image
                 src={PRODUCT_PREVIEW_IMAGES[activeProduct.type]}
                 alt={`${activeProduct.label} large preview`}
@@ -400,20 +421,23 @@ export function CreatePageLayoutLean({
         </div>
       </motion.section>
 
-      <motion.section variants={fadeInUp} className="rounded-[26px] border border-black/8 bg-white/82 p-5 shadow-[0_20px_44px_-34px_rgba(0,0,0,0.3)] sm:p-6">
+      <motion.section variants={fadeInUp} className="rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-6">
         <div className="flex flex-col gap-2 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#8b7f74]">Customer feedback</p>
-          <h2 className="font-serif text-3xl tracking-[-0.03em] text-[#1f1b18]">Designed to feel reassuring, not confusing.</h2>
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Customer feedback</p>
+          <h2 className="font-serif text-3xl tracking-[-0.03em] text-charcoal">Designed to feel reassuring, not confusing.</h2>
         </div>
         <div className="mt-6">
           <Carousel showArrows showDots>
             {REVIEWS.map((review) => (
-              <article key={review.name} className="rounded-[26px] bg-[#fbf7f2] p-6 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#efe4d7] text-sm font-semibold text-[#7d6148]">
+              <article key={review.name} className="rounded-2xl bg-[#F5EDE0] p-6 text-center">
+                <div
+                  className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl text-sm font-semibold text-white"
+                  style={{ backgroundColor: "var(--color-terracotta)" }}
+                >
                   {review.initials}
                 </div>
-                <p className="mt-4 text-base leading-7 text-[#4d4742]">&quot;{review.quote}&quot;</p>
-                <p className="mt-4 text-sm font-semibold text-[#7a7066]">{review.name}</p>
+                <p className="mt-4 text-base leading-7 text-charcoal/70">&quot;{review.quote}&quot;</p>
+                <p className="mt-4 text-sm font-semibold text-charcoal/55">{review.name}</p>
               </article>
             ))}
           </Carousel>

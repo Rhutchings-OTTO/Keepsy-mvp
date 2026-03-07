@@ -33,7 +33,7 @@ export function GenerationErrorDisplay({
         initial={{ opacity: 0, y: -4 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -4 }}
-        className="rounded-xl border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-4 py-3 shadow-warm-sm backdrop-blur-sm"
+        className="rounded-xl border border-charcoal/8 bg-white px-4 py-3 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)]"
       >
         {isContentBlock ? (
           <>

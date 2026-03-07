@@ -103,7 +103,7 @@ export function DesignConfirmation({
       {/* Back link */}
       <button
         onClick={onBackToPrompt}
-        className="text-sm font-semibold text-black/55 hover:text-black inline-flex items-center gap-1 mb-8 transition-colors"
+        className="text-sm font-semibold text-charcoal/55 hover:text-charcoal inline-flex items-center gap-1 mb-8 transition-colors"
         type="button"
       >
         <ChevronLeft size={16} aria-hidden />
@@ -112,19 +112,19 @@ export function DesignConfirmation({
 
       {/* Section 1 — Title + reassurance */}
       <div className="mb-10 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-black/40">Review your artwork</p>
-        <KineticHeading className="mb-2 mt-3 text-3xl font-black text-black sm:text-4xl">How does this look?</KineticHeading>
-        <p className="text-sm font-semibold text-black/60 sm:text-base">You can still refine it before moving into product preview.</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Review your artwork</p>
+        <KineticHeading className="mb-2 mt-3 text-3xl font-black text-charcoal sm:text-4xl">How does this look?</KineticHeading>
+        <p className="text-sm font-semibold text-charcoal/60 sm:text-base">You can still refine it before moving into product preview.</p>
       </div>
 
       {/* Section 2 — Large image preview */}
       <div className="mb-10 flex justify-center">
-        <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(247,242,236,0.82))] p-3 shadow-[0_30px_72px_-40px_rgba(0,0,0,0.34)] backdrop-blur-xl">
-          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[1.5rem] border border-black/8 bg-white/80">
+        <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-charcoal/8 bg-white p-3 shadow-[0_30px_72px_-40px_rgba(45,41,38,0.20)]">
+          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-charcoal/8 bg-white">
           {isRefining ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[1.5rem] bg-black/5">
-              <div className="w-8 h-8 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-              <span className="text-sm font-semibold text-black/60">Updating your design…</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-xl bg-[#F5EDE0]">
+              <div className="w-8 h-8 border-2 border-charcoal/20 border-t-charcoal rounded-full animate-spin" />
+              <span className="text-sm font-semibold text-charcoal/60">Updating your design…</span>
             </div>
           ) : (
             <Image
@@ -149,7 +149,8 @@ export function DesignConfirmation({
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="text-center text-sm font-semibold text-emerald-700 mb-4"
+            className="text-center text-sm font-semibold mb-4"
+            style={{ color: "var(--color-forest)" }}
           >
             Updated. Want to see it on your gift?
           </motion.p>
@@ -163,12 +164,12 @@ export function DesignConfirmation({
           type="button"
           onClick={() => setRefinementExpanded((x) => !x)}
           disabled={isRefining || !canRefine}
-          className="min-h-[72px] rounded-[1.5rem] border border-black/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-6 py-4 text-left transition-all hover:border-black/20 hover:bg-white focus:outline-none focus:ring-2 focus:ring-black/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px]"
+          className="min-h-[72px] rounded-2xl border border-charcoal/10 bg-[#F5EDE0] px-6 py-4 text-left transition-all hover:border-charcoal/20 hover:bg-white focus:outline-none focus:ring-2 focus:ring-charcoal/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px]"
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
         >
-          <div className="font-bold text-base sm:text-lg text-black">I&apos;d like to make a few changes</div>
-          <div className="text-sm text-black/55 mt-1">
+          <div className="font-bold text-base sm:text-lg text-charcoal">I&apos;d like to make a few changes</div>
+          <div className="text-sm text-charcoal/55 mt-1">
             {canRefine ? `Tweak colours, style, or details. Tweaks left: ${refinementsLeft}` : "Maximum tweaks reached."}
           </div>
         </motion.button>
@@ -178,7 +179,7 @@ export function DesignConfirmation({
           type="button"
           onClick={onContinue}
           disabled={isRefining}
-          className="min-h-[72px] rounded-[1.5rem] bg-terracotta px-6 py-4 text-left text-base font-bold !text-white shadow-[0_18px_34px_-20px_rgba(196,113,74,0.5)] transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-terracotta focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px] sm:text-lg"
+          className="min-h-[72px] rounded-2xl bg-terracotta px-6 py-4 text-left text-base font-bold !text-white shadow-[0_18px_34px_-20px_rgba(196,113,74,0.5)] transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-terracotta focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-[80px] sm:text-lg"
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
         >
@@ -197,12 +198,12 @@ export function DesignConfirmation({
             transition={motionTransition("base")}
             className="overflow-hidden"
           >
-            <div className="rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,242,236,0.9))] p-6 shadow-[0_24px_54px_-38px_rgba(0,0,0,0.32)] backdrop-blur-xl">
-              <h3 className="text-lg font-bold text-black mb-3">Tell us what you&apos;d like to change</h3>
+            <div className="rounded-2xl border border-charcoal/8 bg-white p-6 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
+              <h3 className="text-lg font-bold text-charcoal mb-3">Tell us what you&apos;d like to change</h3>
 
               {!canRefine ? (
-                <div className="rounded-xl border border-black/10 bg-black/5 px-4 py-3 mb-4">
-                  <p className="text-sm text-black/70 mb-3">
+                <div className="rounded-xl border border-charcoal/10 bg-[#F5EDE0] px-4 py-3 mb-4">
+                  <p className="text-sm text-charcoal/70 mb-3">
                     You&apos;ve reached the maximum of 3 tweaks for this design. If you&apos;d like, start a fresh design from the prompt.
                   </p>
                   {onStartFresh && (
@@ -217,7 +218,7 @@ export function DesignConfirmation({
                 </div>
               ) : (
                 <>
-                  <p className="text-xs font-semibold text-black/55 mb-2">Tweaks left: {refinementsLeft}</p>
+                  <p className="text-xs font-semibold text-charcoal/55 mb-2">Tweaks left: {refinementsLeft}</p>
                   {/* Helper chips */}
                   <div className="flex flex-wrap gap-2 mb-3">
                     {REFINEMENT_CHIPS.map((chip) => (
@@ -226,7 +227,7 @@ export function DesignConfirmation({
                         type="button"
                         onClick={() => insertChip(chip)}
                         disabled={!canRefine}
-                        className="px-3 py-1.5 rounded-full text-sm font-semibold bg-black/5 hover:bg-black/10 text-black/80 transition-colors disabled:opacity-50"
+                        className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-[#F5EDE0] hover:bg-charcoal/5 text-charcoal/80 transition-colors disabled:opacity-50"
                       >
                         {chip}
                       </button>
@@ -242,12 +243,12 @@ export function DesignConfirmation({
                     onChange={(e) => setRefinementText(e.target.value)}
                     placeholder={PLACEHOLDERS[placeholderIndex]}
                     rows={3}
-                    className="w-full px-4 py-3 rounded-xl border border-black/15 bg-white focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-transparent resize-none text-black placeholder:text-black/40"
+                    className="w-full px-4 py-3 rounded-xl border border-charcoal/15 bg-white focus:outline-none focus:ring-2 focus:ring-charcoal/20 focus:border-transparent resize-none text-charcoal placeholder:text-charcoal/40"
                     disabled={isRefining}
                   />
 
                   {inlineError && (
-                    <p className="text-sm text-amber-700 font-medium">{inlineError}</p>
+                    <p className="text-sm font-medium text-terracotta">{inlineError}</p>
                   )}
 
                   <GenerationSafetyNotice
@@ -274,7 +275,7 @@ export function DesignConfirmation({
                         setRefinementText("");
                         setInlineError(null);
                       }}
-                      className="text-sm font-semibold text-black/55 hover:text-black"
+                      className="text-sm font-semibold text-charcoal/55 hover:text-charcoal"
                     >
                       Cancel
                     </button>

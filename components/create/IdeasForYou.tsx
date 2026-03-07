@@ -35,7 +35,7 @@ export function IdeasForYou({
   };
 
   return (
-    <section className="mt-6 w-full rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] p-4 shadow-warm-sm backdrop-blur-sm">
+    <section className="mt-6 w-full rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
       <KineticHeading as="h2" className="text-sm font-black uppercase tracking-wider text-charcoal/60">Ideas for you</KineticHeading>
 
       <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-charcoal/45">Holidays & occasions</p>

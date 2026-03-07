@@ -12,7 +12,7 @@ export function PriceSummary({ unitPrice, quantity, productLabel }: PriceSummary
   const total = subtotal - totalSavings;
 
   return (
-    <section className="rounded-[1.75rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] p-4 shadow-warm-sm backdrop-blur-sm">
+    <section className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
       <h3 className="text-lg font-black text-charcoal">Price summary</h3>
       <div className="mt-3 space-y-2 text-sm text-charcoal">
         <div className="flex justify-between"><span>Unit price</span><span>£{unitPrice}</span></div>

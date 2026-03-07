@@ -12,8 +12,7 @@ export default function OccasionBanner({ onUseTemplate }: OccasionBannerProps) {
 
   return (
     <section
-      className="rounded-[1.5rem] border border-white/65 p-4 shadow-warm-sm backdrop-blur-sm"
-      style={{ backgroundColor: "rgba(253,246,238,0.88)" }}
+      className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]"
     >
       <div className="flex items-start gap-3">
         <div

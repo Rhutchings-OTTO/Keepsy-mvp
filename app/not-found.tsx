@@ -39,7 +39,7 @@ export default function NotFound() {
           </Link>
           <Link
             href="/shop"
-            className="inline-flex h-12 items-center gap-2 rounded-full border border-charcoal/15 bg-white/80 px-6 text-sm font-semibold text-charcoal shadow-warm-sm backdrop-blur-md transition-transform duration-200 hover:-translate-y-0.5"
+            className="inline-flex h-12 items-center gap-2 rounded-xl border border-charcoal/15 bg-white px-6 text-sm font-semibold text-charcoal shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] transition-transform duration-200 hover:-translate-y-0.5"
           >
             <ShoppingBag size={16} />
             Shop Collection

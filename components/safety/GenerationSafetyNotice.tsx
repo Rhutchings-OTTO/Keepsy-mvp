@@ -50,7 +50,7 @@ export function GenerationSafetyNotice({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
-          className="rounded-xl border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-4 py-3 shadow-warm-sm backdrop-blur-sm"
+          className="rounded-xl border border-charcoal/8 bg-white px-4 py-3 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)]"
         >
           <h4 className="text-sm font-bold text-charcoal mb-1">{hardBlock.title}</h4>
           <p className="text-sm text-charcoal/70 mb-3">{hardBlock.message}</p>
@@ -112,7 +112,7 @@ export function GenerationSafetyNotice({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
-          className="rounded-xl border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-4 py-3 shadow-warm-sm backdrop-blur-sm"
+          className="rounded-xl border border-charcoal/8 bg-white px-4 py-3 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)]"
         >
           <p className="text-sm text-charcoal/70">{typeof error === "string" ? error : String(error)}</p>
         </motion.div>
@@ -124,7 +124,7 @@ export function GenerationSafetyNotice({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
-          className="rounded-xl border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] px-4 py-3 text-left shadow-warm-sm backdrop-blur-sm"
+          className="rounded-xl border border-charcoal/8 bg-white px-4 py-3 text-left shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)]"
         >
           <p className="text-sm text-charcoal/70">
             We adjusted a couple of words to keep this original.

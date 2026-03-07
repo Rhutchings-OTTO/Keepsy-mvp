@@ -49,8 +49,7 @@ export default function UpsellDrawer({
             role="dialog"
             aria-modal="true"
             aria-label="Optional add-ons"
-            className="fixed inset-x-0 bottom-0 z-[71] rounded-t-[2rem] border border-black/10 p-5 shadow-[0_-24px_60px_-34px_rgba(0,0,0,0.42)] backdrop-blur-xl"
-            style={{ backgroundColor: "var(--color-cream)" }}
+            className="fixed inset-x-0 bottom-0 z-[71] rounded-t-2xl border border-charcoal/10 bg-white p-5 shadow-[0_-16px_40px_-20px_rgba(45,41,38,0.15)]"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -62,7 +61,7 @@ export default function UpsellDrawer({
               {OPTIONS.map((option) => (
                 <label
                   key={option.id}
-                  className="flex cursor-pointer items-center justify-between rounded-[1.15rem] border border-black/10 bg-white/70 px-3 py-2 shadow-[0_10px_24px_-22px_rgba(0,0,0,0.18)]"
+                  className="flex cursor-pointer items-center justify-between rounded-[1.15rem] border border-charcoal/10 bg-white/70 px-3 py-2 shadow-[0_10px_24px_-22px_rgba(45,41,38,0.18)]"
                 >
                   <div>
                     <p className="text-sm text-charcoal">{option.label}</p>
@@ -70,7 +69,7 @@ export default function UpsellDrawer({
                   </div>
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded border-black/20"
+                    className="h-4 w-4 rounded border-charcoal/20"
                     checked={selectedUpsells.includes(option.id)}
                     onChange={() => toggleUpsell(option.id)}
                   />
@@ -78,7 +77,7 @@ export default function UpsellDrawer({
               ))}
             </div>
 
-            <div className="mt-3 rounded-[1.15rem] border border-black/10 p-3" style={{ backgroundColor: "rgba(253,246,238,0.8)" }}>
+            <div className="mt-3 rounded-[1.15rem] border border-charcoal/10 p-3" style={{ backgroundColor: "rgba(253,246,238,0.8)" }}>
               <p className="text-xs font-semibold text-charcoal">Bundle option</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {["none", "gift-bundle", "premium-bundle"].map((choice) => (
@@ -89,7 +88,7 @@ export default function UpsellDrawer({
                     className={`rounded-full px-3 py-1 text-xs font-semibold transition hover:opacity-90 ${
                       bundleChoice === choice
                         ? "text-white"
-                        : "border border-black/15 bg-white/60 text-charcoal/80"
+                        : "border border-charcoal/15 bg-white/60 text-charcoal/80"
                     }`}
                     style={bundleChoice === choice ? { backgroundColor: "var(--color-terracotta)" } : undefined}
                   >
@@ -103,7 +102,7 @@ export default function UpsellDrawer({
               <button
                 type="button"
                 onClick={onNoThanks}
-                className="rounded-full border border-black/15 px-4 py-2 text-sm font-semibold text-charcoal/80"
+                className="rounded-full border border-charcoal/15 px-4 py-2 text-sm font-semibold text-charcoal/80"
               >
                 No thanks
               </button>

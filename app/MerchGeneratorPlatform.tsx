@@ -904,11 +904,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
             setStep(1);
           }}
               width={148}
-              className="h-12 w-auto text-obsidian sm:h-14"
+              className="h-12 w-auto text-charcoal sm:h-14"
             />
 
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-black/60">
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-charcoal/60">
             <button
               onClick={() => setView("home")}
               className={`px-4 py-2 text-sm font-semibold transition-colors border-b-2 ${
@@ -1105,11 +1105,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         </motion.div>
                         <div className="mt-5 flex flex-wrap items-center gap-3">
                           <div className="inline-flex rounded-lg border border-charcoal/10 bg-[#F5EDE0] px-3 py-2 text-xs font-extrabold">
-                            <span className="inline-flex items-center gap-2 text-black/70"><Sparkles size={14} /> Real product preview</span>
+                            <span className="inline-flex items-center gap-2 text-charcoal/70"><Sparkles size={14} /> Real product preview</span>
                           </div>
                           <button
                             onClick={() => setStep(2)}
-                            className="inline-flex items-center gap-2 text-xs font-extrabold text-black/55 hover:text-black"
+                            className="inline-flex items-center gap-2 text-xs font-extrabold text-charcoal/55 hover:text-charcoal"
                           >
                             <ChevronLeft size={16} />
                             Back
@@ -1126,9 +1126,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
                   <div className="space-y-6">
                     <div className="rounded-2xl bg-white border border-charcoal/8 p-6 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-black/40">Configure your gift</p>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Configure your gift</p>
                       <KineticHeading as="h2" className="mb-2 mt-3 text-4xl font-black">{selectedProduct.name}</KineticHeading>
-                      <p className="font-semibold text-black/55">{selectedProduct.description}</p>
+                      <p className="font-semibold text-charcoal/55">{selectedProduct.description}</p>
                     </div>
                     {FF.personalisedStory ? (
                       <PersonalisedStoryCopy region={region} productType={selectedProduct.id} />
@@ -1136,7 +1136,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
                     <div className="space-y-5 rounded-2xl bg-white border border-charcoal/8 p-5 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
                       <section>
-                        <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">
+                        <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">
                         Select Product
                       </h3>
                       <div className="grid grid-cols-2 gap-3">
@@ -1149,14 +1149,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               setSelectedProduct(prod);
                                 setSelectedColor(prod.colors?.[0]?.hex ?? "#FFFFFF");
                             }}
-                            className={`rounded-[1.35rem] border p-4 text-left transition-all ${
+                            className={`rounded-xl border p-4 text-left transition-all ${
                               selectedProduct.id === prod.id
                                 ? "border-terracotta bg-terracotta text-white shadow-[0_16px_34px_-24px_rgba(196,113,74,0.5)]"
-                                : "border-black/10 bg-white/84"
+                                : "border-charcoal/10 bg-[#F5EDE0]"
                             }`}
                           >
                             <div className="text-sm font-extrabold">{prod.name}</div>
-                            <div className={`text-xs mt-1 ${selectedProduct.id === prod.id ? "text-white/70" : "text-black/55"}`}>
+                            <div className={`text-xs mt-1 ${selectedProduct.id === prod.id ? "text-white/70" : "text-charcoal/55"}`}>
                                 {fmt(prod.basePrice)}
                             </div>
                           </motion.button>
@@ -1166,7 +1166,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
                       {selectedProduct.colors && selectedProduct.colors.length > 1 && (
                         <section>
-                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">Color</h3>
+                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">Color</h3>
                           <div className="flex gap-3 flex-wrap">
                             {selectedProduct.colors.map((c) => (
                               <button
@@ -1174,7 +1174,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                 type="button"
                                 onClick={() => setSelectedColor(c.hex)}
                                 className={`w-10 h-10 rounded-full border-2 transition ${
-                                  selectedColor === c.hex ? "border-terracotta ring-4 ring-terracotta/20" : "border-black/10 hover:border-black/30"
+                                  selectedColor === c.hex ? "border-terracotta ring-4 ring-terracotta/20" : "border-charcoal/10 hover:border-charcoal/30"
                                 }`}
                                 style={{ backgroundColor: c.hex }}
                                 aria-pressed={selectedColor === c.hex}
@@ -1187,7 +1187,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
                       {selectedProduct.hasSize && selectedProduct.sizes && (
                         <section>
-                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">Size</h3>
+                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">Size</h3>
                           <div className="flex flex-wrap gap-2" role="group" aria-label="Select size">
                             {selectedProduct.sizes.map((size) => (
                               <button
@@ -1197,7 +1197,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                 className={`min-h-[44px] min-w-[44px] px-3 py-2 rounded-xl text-sm font-bold transition ${
                                   selectedSize === size
                                     ? "bg-terracotta text-white"
-                                    : "bg-black/5 text-black/80 hover:bg-black/10"
+                                    : "bg-[#F5EDE0] text-charcoal/80 hover:bg-charcoal/5"
                                 }`}
                                 aria-pressed={selectedSize === size}
                               >
@@ -1208,24 +1208,24 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           <button
                             type="button"
                             onClick={() => setIsSizeGuideOpen(true)}
-                            className="mt-2 text-sm font-semibold text-black/60 hover:text-black underline underline-offset-2"
+                            className="mt-2 text-sm font-semibold text-charcoal/60 hover:text-charcoal underline underline-offset-2"
                           >
                             View size guide
                           </button>
                           {selectedProduct.hasSize && !selectedSize && (
-                            <p className="mt-1 text-xs text-amber-700 font-medium">Please select a size</p>
+                            <p className="mt-1 text-xs font-medium text-terracotta">Please select a size</p>
                           )}
                         </section>
                       )}
 
-                      <section className="border-t border-black/10 pt-4">
+                      <section className="border-t border-charcoal/10 pt-4">
                         <div className="flex justify-between items-center mb-4">
-                          <span className="text-black/55 font-semibold">Subtotal</span>
+                          <span className="text-charcoal/55 font-semibold">Subtotal</span>
                           <span className="text-2xl font-black">{fmt(selectedProduct.basePrice)}</span>
                         </div>
                         {FF.giftingFlow && generatedImage ? (
                           <div className="mb-4">
-                            <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">
+                            <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">
                               Optional Gifting Details
                             </h3>
                             <GiftingStep
@@ -1238,11 +1238,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </div>
                         ) : null}
                         <section>
-                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-black/45 mb-3">
+                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">
                             Add to Cart
                           </h3>
                           {addToCartConfirmation && (
-                            <p className="mb-3 text-sm font-semibold text-green-700">{addToCartConfirmation}</p>
+                            <p className="mb-3 text-sm font-semibold" style={{ color: "var(--color-forest)" }}>{addToCartConfirmation}</p>
                           )}
                         <div className="grid grid-cols-2 gap-3">
                           <motion.button
@@ -1250,16 +1250,16 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             whileTap={{ scale: 0.98 }}
                             onClick={handleAddToCart}
                               disabled={!generatedImage || (selectedProduct.hasSize && !selectedSize)}
-                              className="flex w-full items-center justify-center gap-2 rounded-[1.35rem] bg-terracotta py-4 font-black !text-white disabled:cursor-not-allowed disabled:opacity-40"
+                              className="flex w-full items-center justify-center gap-2 rounded-xl bg-terracotta py-4 font-black !text-white disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             Add <Plus size={18} />
                           </motion.button>
                           <motion.button
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.98 }}
-                            className="flex w-full items-center justify-center gap-2 rounded-[1.35rem] border border-black/10 bg-white py-4 font-black text-black"
+                            className="flex w-full items-center justify-center gap-2 rounded-xl border border-charcoal/10 bg-white py-4 font-black text-charcoal"
                           >
-                            Save <Heart size={18} className="text-pink-400" />
+                            Save <Heart size={18} className="text-terracotta/70" />
                           </motion.button>
                         </div>
                         </section>
@@ -1288,14 +1288,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 >
                   <div className="rounded-2xl bg-white border border-charcoal/8 p-7 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                     <KineticHeading as="h2" className="text-3xl font-black mb-4">Checkout</KineticHeading>
-                    <p className="text-black/55 font-semibold mb-6">
-                      You&apos;re about to buy: <span className="text-black">{checkoutItemDescription}</span>
+                    <p className="text-charcoal/55 font-semibold mb-6">
+                      You&apos;re about to buy: <span className="text-charcoal">{checkoutItemDescription}</span>
                     </p>
 
                     <MagneticButton
                       onClick={() => requestCheckout(hasCartItems ? "cart" : "single")}
                       disabled={isBusy || !canProceedToCheckout}
-                      className="relative w-full overflow-hidden rounded-[1.5rem] bg-terracotta py-5 text-lg font-black text-white shadow-terra-glow disabled:cursor-not-allowed disabled:opacity-40"
+                      className="relative w-full overflow-hidden rounded-2xl bg-terracotta py-5 text-lg font-black text-white shadow-terra-glow disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <AnimatePresence mode="wait">
                         {checkoutSuccess ? (
@@ -1310,7 +1310,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       </AnimatePresence>
                     </MagneticButton>
 
-                    <button onClick={() => setStep(3)} className="mt-4 text-sm font-extrabold text-black/55 hover:text-black inline-flex items-center gap-2">
+                    <button onClick={() => setStep(3)} className="mt-4 text-sm font-extrabold text-charcoal/55 hover:text-charcoal inline-flex items-center gap-2">
                       <ChevronLeft size={16} /> Back
                     </button>
                     {FF.trustLayer ? (
@@ -1318,39 +1318,39 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         <TrustBar />
                       </div>
                     ) : null}
-                    <p className="mt-4 text-xs text-black/45">
+                    <p className="mt-4 text-xs text-charcoal/45">
                       By placing your order, you agree to our{" "}
-                      <button className="underline hover:text-black" onClick={() => setView("legal")}>
+                      <button className="underline hover:text-charcoal" onClick={() => setView("legal")}>
                         Terms of Service
                       </button>
                       .
                     </p>
                   </div>
 
-                  <Reveal variant="fadeUp" className="rounded-[2rem] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,242,236,0.88))] p-7 shadow-[0_30px_72px_-44px_rgba(0,0,0,0.32)] backdrop-blur-xl">
+                  <Reveal variant="fadeUp" className="rounded-2xl border border-charcoal/8 bg-white p-7 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
                     <h3 className="text-xl font-black mb-4">Order Summary</h3>
                     <div className="flex items-center gap-4">
-                      <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-black/10 bg-white">
+                      <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-charcoal/10 bg-white">
                         {checkoutPreviewImage ? (
                           <Image src={checkoutPreviewImage} className="h-full w-full object-contain p-1.5" alt="thumb" fill />
                         ) : null}
                       </div>
                       <div>
                         <div className="font-extrabold">{checkoutItemDescription}</div>
-                        <div className="text-sm text-black/55 font-semibold">
+                        <div className="text-sm text-charcoal/55 font-semibold">
                           {hasCartItems ? "Mixed cart with custom AI-generated designs" : "Custom AI-generated design"}
                       </div>
                       </div>
                       <div className="ml-auto font-black">{fmt(checkoutTotal)}</div>
                     </div>
 
-                    <div className="mt-6 pt-5 border-t border-black/10 space-y-2 text-sm font-semibold text-black/60">
+                    <div className="mt-6 pt-5 border-t border-charcoal/10 space-y-2 text-sm font-semibold text-charcoal/60">
                       <div className="flex justify-between"><span>Shipping</span><span>Free</span></div>
-                      <div className="flex justify-between text-black font-black text-base pt-2"><span>Total</span><span>{fmt(checkoutTotal)}</span></div>
+                      <div className="flex justify-between text-charcoal font-black text-base pt-2"><span>Total</span><span>{fmt(checkoutTotal)}</span></div>
                     </div>
 
-                    <div className="mt-6 flex items-center gap-2 text-xs text-black/45 font-semibold">
-                      <Star size={14} className="text-yellow-500" /> Gift-ready print & packaging
+                    <div className="mt-6 flex items-center gap-2 text-xs text-charcoal/45 font-semibold">
+                      <Star size={14} className="text-gold" /> Gift-ready print & packaging
                     </div>
                     {FF.checkoutUX ? (
                       <div className="mt-4">
@@ -1376,15 +1376,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="fixed inset-0 z-[60] flex items-center justify-center bg-[#F9F8F6]/95 backdrop-blur-sm"
+                className="fixed inset-0 z-[60] flex items-center justify-center bg-[#FDF6EE]/95"
               >
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center"
                 >
-                  <p className="text-lg font-black text-[#1A1A1A]">Securing your Masterpiece</p>
-                  <p className="mt-2 text-sm font-semibold text-[#1A1A1A]/60">Redirecting to checkout…</p>
+                  <p className="text-lg font-black text-charcoal">Securing your Masterpiece</p>
+                  <p className="mt-2 text-sm font-semibold text-charcoal/60">Redirecting to checkout…</p>
                   <motion.div
                     className="mt-4 mx-auto h-1 w-32 rounded-full bg-terracotta/10 overflow-hidden"
                     animate={{ opacity: [0.6, 1, 0.6] }}
@@ -1406,7 +1406,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
             <motion.div key="catalog" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
               <div className="text-center max-w-2xl mx-auto">
                 <KineticHeading className="text-5xl font-black mb-3">Catalog</KineticHeading>
-                <p className="text-black/55 font-semibold">Pick your base product, then generate a design.</p>
+                <p className="text-charcoal/55 font-semibold">Pick your base product, then generate a design.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1414,10 +1414,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   <Link
                     key={p.id}
                     href={getProductPreviewHref(p.id)}
-                    className="block text-left bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] border border-white/65 rounded-3xl p-5 shadow-warm-md backdrop-blur-sm transition hover:shadow-warm-lg hover:-translate-y-1"
+                    className="block text-left rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)] transition hover:shadow-[0_20px_48px_-20px_rgba(45,41,38,0.18)] hover:-translate-y-1"
                   >
                     <div className="text-lg font-black">{p.name}</div>
-                    <div className="text-sm text-black/55 font-semibold mt-1">{p.description}</div>
+                    <div className="text-sm text-charcoal/55 font-semibold mt-1">{p.description}</div>
                     <div className="text-sm font-black mt-3">{fmt(p.basePrice)}</div>
                   </Link>
                 ))}
@@ -1429,7 +1429,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
             <motion.div key="community" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
               <div className="text-center max-w-2xl mx-auto">
                 <KineticHeading className="text-5xl font-black mb-3">Community Showcase</KineticHeading>
-                <p className="text-black/55 font-semibold">
+                <p className="text-charcoal/55 font-semibold">
                   See what other creators are making and get inspiration for your next keepsake.
                 </p>
               </div>
@@ -1439,10 +1439,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     key={`${img}-${idx}`}
                     maxTilt={8}
                     hoverScale={1.02}
-                    className="break-inside-avoid rounded-2xl overflow-hidden bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,238,0.92))] border border-white/65 shadow-warm-md backdrop-blur-sm"
+                    className="break-inside-avoid rounded-2xl overflow-hidden border border-charcoal/8 bg-white shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]"
                   >
                     <Image src={img} alt="Community design" width={400} height={500} className="w-full h-auto" />
-                    <div className="p-3 text-sm font-semibold text-black/55">@creator_{idx + 1}</div>
+                    <div className="p-3 text-sm font-semibold text-charcoal/55">@creator_{idx + 1}</div>
                   </MagneticCard>
                 ))}
               </div>
@@ -1452,28 +1452,28 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           {view === "legal" && (
             <motion.div key="legal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto space-y-6">
               <KineticHeading className="text-4xl font-black">Terms & Conditions</KineticHeading>
-              <section className="space-y-2 text-black/70">
-                <KineticHeading as="h2" className="text-xl font-bold text-black">1. Intellectual Property</KineticHeading>
+              <section className="space-y-2 text-charcoal/70">
+                <KineticHeading as="h2" className="text-xl font-bold text-charcoal">1. Intellectual Property</KineticHeading>
                 <p>
                   AI-generated designs created on Keepsy remain the property of the creator. By placing an order, you grant Keepsy
                   permission to produce and ship products featuring that design.
                 </p>
               </section>
-              <section className="space-y-2 text-black/70">
-                <KineticHeading as="h2" className="text-xl font-bold text-black">2. Usage Policy</KineticHeading>
+              <section className="space-y-2 text-charcoal/70">
+                <KineticHeading as="h2" className="text-xl font-bold text-charcoal">2. Usage Policy</KineticHeading>
                 <p>
                   Users are responsible for uploaded and generated content. Content must not violate copyright, trademark, or contain
                   illegal or harmful material.
                 </p>
               </section>
-              <section className="space-y-2 text-black/70">
-                <KineticHeading as="h2" className="text-xl font-bold text-black">3. Payments & Refunds</KineticHeading>
+              <section className="space-y-2 text-charcoal/70">
+                <KineticHeading as="h2" className="text-xl font-bold text-charcoal">3. Payments & Refunds</KineticHeading>
                 <p>
                   Payments are processed securely by Stripe. Because products are custom-made, refunds are only offered for damaged or
                   defective items.
                 </p>
               </section>
-              <button onClick={() => setView("home")} className="inline-flex items-center gap-2 font-bold text-black/70 hover:text-black">
+              <button onClick={() => setView("home")} className="inline-flex items-center gap-2 font-bold text-charcoal/70 hover:text-charcoal">
                 <ChevronLeft size={16} /> Back to creation
               </button>
             </motion.div>
@@ -1496,25 +1496,25 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               animate={{ x: 0 }}
               exit={{ x: 420 }}
               transition={{ type: "spring", stiffness: 260, damping: 28 }}
-              className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-l border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,242,236,0.94))] p-6 shadow-[0_0_80px_-26px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+              className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-l border-charcoal/8 bg-white p-6 shadow-[0_0_80px_-26px_rgba(45,41,38,0.25)]"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-2xl font-black">Your Cart</h3>
-                <button onClick={() => setIsCartOpen(false)} className="text-black/50 hover:text-black">
+                <button onClick={() => setIsCartOpen(false)} className="text-charcoal/50 hover:text-charcoal">
                   <X size={20} />
                 </button>
               </div>
               <div className="flex-1 overflow-auto space-y-4 pr-1">
                 {cartItems.length === 0 ? (
-                  <div className="frosted-glass rounded-2xl border border-white/20 p-6 text-center">
-                    <p className="font-semibold text-obsidian">Your cart is empty</p>
-                    <p className="mt-1 text-sm text-black/60">Curating your first design? Add one to get started.</p>
+                  <div className="rounded-2xl border border-charcoal/8 bg-[#F5EDE0] p-6 text-center">
+                    <p className="font-semibold text-charcoal">Your cart is empty</p>
+                    <p className="mt-1 text-sm text-charcoal/60">Curating your first design? Add one to get started.</p>
                   </div>
                 ) : (
                   cartItems.map((item) => (
-                    <div key={item.id} className="rounded-[1.35rem] border border-white/60 bg-white/74 p-3 shadow-[0_14px_28px_-24px_rgba(0,0,0,0.24)]">
+                    <div key={item.id} className="rounded-2xl border border-charcoal/8 bg-white p-3 shadow-[0_8px_20px_-12px_rgba(45,41,38,0.12)]">
                       <div className="flex items-center gap-3">
-                        <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-black/5 border border-black/10">
+                        <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-[#F5EDE0] border border-charcoal/10">
                           {item.imageUrl ? (
                             <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1.5" />
                           ) : (
@@ -1524,23 +1524,23 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         <div className="flex-1 min-w-0">
                           <div className="font-bold text-sm">{item.name}</div>
                           {(item.size || item.color) && (
-                            <div className="text-black/55 text-xs mt-0.5">
+                            <div className="text-charcoal/55 text-xs mt-0.5">
                               {[item.size, item.color].filter(Boolean).join(" · ")}
                             </div>
                           )}
-                          <div className="text-black/55 text-sm">{fmt(item.unitPrice)}</div>
+                          <div className="text-charcoal/55 text-sm">{fmt(item.unitPrice)}</div>
                         </div>
-                        <button onClick={() => handleRemoveCartItem(item.id)} className="text-black/40 hover:text-red-600 shrink-0">
+                        <button onClick={() => handleRemoveCartItem(item.id)} className="text-charcoal/40 hover:text-terracotta shrink-0">
                           <X size={16} />
                         </button>
                       </div>
                       <div className="mt-3 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <button onClick={() => handleAdjustQuantity(item.id, -1)} className="px-2 py-1 border border-black/10 rounded-md">
+                          <button onClick={() => handleAdjustQuantity(item.id, -1)} className="px-2 py-1 border border-charcoal/10 rounded-md">
                             -
                           </button>
                           <span className="font-semibold text-sm w-6 text-center">{item.quantity}</span>
-                          <button onClick={() => handleAdjustQuantity(item.id, 1)} className="px-2 py-1 border border-black/10 rounded-md">
+                          <button onClick={() => handleAdjustQuantity(item.id, 1)} className="px-2 py-1 border border-charcoal/10 rounded-md">
                             +
                           </button>
                         </div>
@@ -1550,9 +1550,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   ))
                 )}
               </div>
-              <div className="pt-4 border-t border-black/10">
+              <div className="pt-4 border-t border-charcoal/10">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-black/55 font-semibold">Subtotal</span>
+                  <span className="text-charcoal/55 font-semibold">Subtotal</span>
                   <span className="text-xl font-black">{fmt(cartSubtotal)}</span>
                 </div>
                 <MagneticButton
@@ -1588,18 +1588,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         />
       ) : null}
 
-      <footer className={`px-6 ${isMagicpathSkin ? "pb-20 pt-16" : "py-10 border-t border-black/10 bg-white/60"}`}>
+      <footer className={`px-6 ${isMagicpathSkin ? "pb-20 pt-16" : "py-10 border-t border-charcoal/10"}`}>
         <MagicpathFrame enabled={isMagicpathSkin} className={isMagicpathSkin ? "mx-auto max-w-7xl px-8 py-8" : ""}>
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm">
-            <div className="font-semibold text-black/55">
+            <div className="font-semibold text-charcoal/55">
               © 2026 Keepsy Ltd. All designs generated are owned by the creator. Powered by OpenAI & Stripe
             </div>
-            <div className="flex items-center gap-5 text-black/60">
-              <button onClick={() => setView("catalog")} className="hover:text-black">Catalog</button>
-              <button onClick={() => setView("community")} className="hover:text-black">Community</button>
-              <button onClick={() => setView("legal")} className="hover:text-black">Terms of Service</button>
-              <button onClick={() => setView("legal")} className="hover:text-black">Privacy Policy</button>
-              <button className="hover:text-black" onClick={handleDeleteMyData}>
+            <div className="flex items-center gap-5 text-charcoal/60">
+              <button onClick={() => setView("catalog")} className="hover:text-charcoal">Catalog</button>
+              <button onClick={() => setView("community")} className="hover:text-charcoal">Community</button>
+              <button onClick={() => setView("legal")} className="hover:text-charcoal">Terms of Service</button>
+              <button onClick={() => setView("legal")} className="hover:text-charcoal">Privacy Policy</button>
+              <button className="hover:text-charcoal" onClick={handleDeleteMyData}>
                 Delete My Data
               </button>
             </div>

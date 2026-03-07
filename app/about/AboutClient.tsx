@@ -220,7 +220,7 @@ function ValuesSection() {
               delay: i * 0.1,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="rounded-[1.75rem] border border-white/60 bg-white/90 p-8 shadow-sm backdrop-blur-sm"
+            className="rounded-2xl border border-charcoal/8 bg-white p-8 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]"
           >
             <div
               className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full"

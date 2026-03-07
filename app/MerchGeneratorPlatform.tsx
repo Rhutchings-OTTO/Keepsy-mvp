@@ -1213,15 +1213,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2"
                 >
                   <div className="rounded-2xl bg-white border border-charcoal/8 p-7 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
-                    <KineticHeading as="h2" className="text-3xl font-black mb-4">Checkout</KineticHeading>
-                    <p className="text-charcoal/55 font-semibold mb-6">
-                      You&apos;re about to buy: <span className="text-charcoal">{checkoutItemDescription}</span>
+                    <div style={{ color: "var(--color-charcoal)" }}>
+                      <KineticHeading as="h2" className="text-3xl font-black mb-4">Checkout</KineticHeading>
+                    </div>
+                    <p className="font-semibold mb-6" style={{ color: "rgba(45,41,38,0.55)" }}>
+                      You&apos;re about to buy: <span style={{ color: "var(--color-charcoal)" }}>{checkoutItemDescription}</span>
                     </p>
 
                     <MagneticButton
                       onClick={() => requestCheckout(hasCartItems ? "cart" : "single")}
                       disabled={isBusy || !canProceedToCheckout}
-                      className="relative w-full overflow-hidden rounded-2xl bg-terracotta py-5 text-lg font-black text-white shadow-terra-glow disabled:cursor-not-allowed disabled:opacity-40"
+                      className="relative w-full overflow-hidden rounded-2xl py-5 text-lg font-black shadow-terra-glow disabled:cursor-not-allowed disabled:opacity-40"
+                      style={{ backgroundColor: "var(--color-terracotta)", color: "white" }}
                     >
                       <AnimatePresence mode="wait">
                         {checkoutSuccess ? (
@@ -1236,7 +1239,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       </AnimatePresence>
                     </MagneticButton>
 
-                    <button onClick={() => setStep(3)} className="mt-4 text-sm font-extrabold text-charcoal/55 hover:text-charcoal inline-flex items-center gap-2">
+                    <button onClick={() => setStep(3)} className="mt-4 text-sm font-extrabold inline-flex items-center gap-2 hover:opacity-100" style={{ color: "rgba(45,41,38,0.55)" }}>
                       <ChevronLeft size={16} /> Back
                     </button>
                     {FF.trustLayer ? (

@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Prevent 308 redirects on API routes (e.g. Stripe webhook delivery)
+  trailingSlash: false,
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [375, 640, 750, 828, 1080, 1200, 1920],

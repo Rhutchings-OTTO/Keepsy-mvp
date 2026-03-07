@@ -8,6 +8,7 @@ import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNoti
 import { motionTransition } from "@/lib/motion";
 import { KineticHeading } from "@/components/motion/KineticHeading";
 import { MagneticButton } from "@/components/ui/MagneticButton";
+import { WatermarkOverlay } from "@/components/WatermarkOverlay";
 
 const REFINEMENT_CHIPS = [
   "Softer colours",
@@ -127,16 +128,19 @@ export function DesignConfirmation({
               <span className="text-sm font-semibold text-charcoal/60">Updating your design…</span>
             </div>
           ) : (
-            <Image
-              key={generatedImage}
-              src={generatedImage}
-              alt="Your generated design"
-              fill
-              className="object-contain"
-              sizes="(max-width: 640px) 100vw, 672px"
-              priority
-              unoptimized={generatedImage.startsWith("data:")}
-            />
+            <>
+              <Image
+                key={generatedImage}
+                src={generatedImage}
+                alt="Your generated design"
+                fill
+                className="object-contain"
+                sizes="(max-width: 640px) 100vw, 672px"
+                priority
+                unoptimized={generatedImage.startsWith("data:")}
+              />
+              <WatermarkOverlay />
+            </>
           )}
           </div>
         </div>

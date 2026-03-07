@@ -4,6 +4,7 @@ import React, { useState, useRef, useCallback, useEffect } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { MockupStage } from "./MockupStage";
 import type { MockupStageProps } from "./MockupStage";
+import { WatermarkOverlay } from "@/components/WatermarkOverlay";
 
 const LOUPE_SIZE = 192;
 const ZOOM_SCALE = 3;
@@ -78,13 +79,15 @@ export function MockupWithLoupe({
         onMouseEnter={() => loupeActive && setShowLoupe(true)}
         onMouseLeave={() => setShowLoupe(false)}
         onMouseMove={loupeActive ? handleMouseMove : undefined}
-        className=""
+        className="relative"
       >
         <MockupStage
           {...mockupProps}
           generatedImage={generatedImage}
           hasArtwork={hasArtwork}
         />
+        {/* Watermark — only shown pre-purchase while design is on display */}
+        {generatedImage ? <WatermarkOverlay /> : null}
 
         {showLoupe && loupeActive && rect.width > 0 && (
           <motion.div

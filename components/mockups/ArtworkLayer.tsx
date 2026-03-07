@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import type { CSSProperties } from "react";
 import type { PixelRect } from "@/lib/placement/fitArtworkToBoundary";
-import type { MockupProductType } from "@/lib/mockups/placements";
+import type { MockupColor, MockupProductType } from "@/lib/mockups/placements";
 
 type RectPlacement = {
   boundary: PixelRect;
@@ -11,9 +11,23 @@ type RectPlacement = {
   rotateDeg: number;
 };
 
-/** multiply for hoodie/tee (fabric texture shows through), normal for mug/card */
-function getMixBlendMode(productType: MockupProductType): "multiply" | "normal" {
-  return productType === "tshirt" || productType === "hoodie" ? "multiply" : "normal";
+const DARK_GARMENT_COLORS: MockupColor[] = ["black", "blue"];
+
+function isDarkGarment(productType: MockupProductType, color?: MockupColor): boolean {
+  if (productType !== "tshirt" && productType !== "hoodie") return false;
+  return !!color && DARK_GARMENT_COLORS.includes(color);
+}
+
+/**
+ * White apparel: multiply lets fabric shadows/texture show through the design (great for white shirts).
+ * Dark apparel: normal keeps design colours vibrant — multiply on black/blue tints the design dark.
+ * Mug/Card: normal (no fabric to blend through).
+ */
+function getMixBlendMode(productType: MockupProductType, color?: MockupColor): CSSProperties["mixBlendMode"] {
+  if (productType === "tshirt" || productType === "hoodie") {
+    return isDarkGarment(productType, color) ? "normal" : "multiply";
+  }
+  return "normal";
 }
 
 /** Subtle perspective to match product angle. Mug gets rotateY for cylindrical curve. */
@@ -32,6 +46,7 @@ type ArtworkLayerProps =
   | {
       kind: "rect";
       productType: MockupProductType;
+      color?: MockupColor;
       generatedImage: string;
       rectPlacementPx: RectPlacement;
       onLoad: (width: number, height: number) => void;
@@ -41,6 +56,7 @@ type ArtworkLayerProps =
   | {
       kind: "quad";
       productType: MockupProductType;
+      color?: MockupColor;
       generatedImage: string;
       quadMatrix: string;
       onLoad: (width: number, height: number) => void;
@@ -48,13 +64,18 @@ type ArtworkLayerProps =
       dropShadow?: string;
     };
 
-function getArtworkFilter(productType: MockupProductType, dropShadow?: string): string {
+function getArtworkFilter(productType: MockupProductType, color?: MockupColor, dropShadow?: string): string {
+  const darkApparel = isDarkGarment(productType, color);
   const tonal =
     productType === "mug"
       ? "saturate(0.95) contrast(1.02) brightness(0.98)"
       : productType === "card"
         ? "saturate(0.94) contrast(1.01) brightness(0.99)"
-        : "saturate(0.9) contrast(1.06) brightness(0.96)";
+        : darkApparel
+          // Dark garment: full saturation + slight brightness boost so DTG design stays vivid
+          ? "saturate(1.0) contrast(1.02) brightness(1.01)"
+          // White garment: gentle desaturation mimics real DTG ink absorption into fabric
+          : "saturate(0.9) contrast(1.06) brightness(0.96)";
   return dropShadow ? `${tonal} drop-shadow(${dropShadow})` : tonal;
 }
 
@@ -68,18 +89,20 @@ function getTextureVeil(productType: MockupProductType): CSSProperties | null {
     };
   }
   if (productType === "card") {
+    // Paper grain: denser diagonal pattern at slightly higher opacity for premium card stock feel
     return {
       backgroundImage:
-        "repeating-linear-gradient(45deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px)",
-      opacity: 0.16,
+        "repeating-linear-gradient(47deg, rgba(255,255,255,0.09) 0px, rgba(255,255,255,0.09) 2px, rgba(0,0,0,0.045) 2px, rgba(0,0,0,0.045) 4px)",
+      opacity: 0.28,
       mixBlendMode: "multiply",
     };
   }
   if (productType === "mug") {
+    // Ceramic specular: strong diagonal highlight streak simulating glossy glaze sheen
     return {
       background:
-        "linear-gradient(96deg, rgba(255,255,255,0.22) 8%, rgba(255,255,255,0) 28%, rgba(255,255,255,0.12) 76%, rgba(0,0,0,0.04) 100%)",
-      opacity: 0.24,
+        "linear-gradient(108deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.52) 24%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0.0) 52%, rgba(255,255,255,0.06) 80%, rgba(0,0,0,0.06) 100%)",
+      opacity: 0.42,
       mixBlendMode: "screen",
     };
   }
@@ -98,7 +121,8 @@ function getSurfaceShape(productType: MockupProductType): CSSProperties {
 
 export function ArtworkLayer(props: ArtworkLayerProps) {
   const productType = props.productType;
-  const mixBlendMode = getMixBlendMode(productType);
+  const color = props.color;
+  const mixBlendMode = getMixBlendMode(productType, color);
   const textureVeil = getTextureVeil(productType);
   const surfaceShape = getSurfaceShape(productType);
 
@@ -129,7 +153,7 @@ export function ArtworkLayer(props: ArtworkLayerProps) {
             transformOrigin: "center center",
             transform,
             opacity: opacity ?? 0.96,
-            filter: getArtworkFilter(productType, dropShadow),
+            filter: getArtworkFilter(productType, color, dropShadow),
             mixBlendMode,
             ...surfaceShape,
           }}
@@ -179,7 +203,7 @@ export function ArtworkLayer(props: ArtworkLayerProps) {
           transformOrigin: "0 0",
           transform,
           opacity: opacity ?? 0.96,
-          filter: getArtworkFilter(productType, dropShadow),
+          filter: getArtworkFilter(productType, color, dropShadow),
           mixBlendMode,
           ...surfaceShape,
         }}

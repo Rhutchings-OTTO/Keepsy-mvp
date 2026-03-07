@@ -201,6 +201,7 @@ export function MockupStage({
               <ArtworkLayer
                 kind="rect"
                 productType={productType}
+                color={color}
                 generatedImage={generatedImage}
                 rectPlacementPx={rectPlacementPx}
                 onLoad={(w, h) => setArtNaturalSize({ width: w, height: h })}
@@ -212,6 +213,7 @@ export function MockupStage({
               <ArtworkLayer
                 kind="quad"
                 productType={productType}
+                color={color}
                 generatedImage={generatedImage}
                 quadMatrix={quadMatrix}
                 onLoad={(w, h) => setArtNaturalSize({ width: w, height: h })}
@@ -268,6 +270,18 @@ export function MockupStage({
           }}
           aria-hidden
         />
+        {/* Mug: side-edge darkening — simulates design wrapping around the cylinder away from viewer */}
+        {productType === "mug" && (
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(0,0,0,0.09) 0%, rgba(0,0,0,0) 18%, rgba(0,0,0,0) 72%, rgba(0,0,0,0.13) 100%)",
+              mixBlendMode: "multiply",
+            }}
+            aria-hidden
+          />
+        )}
       </div>
     </div>
   );

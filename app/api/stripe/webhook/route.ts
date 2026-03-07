@@ -14,7 +14,7 @@ import {
 import { getPrintifyVariantId } from "@/lib/printify-blueprints";
 import { notifyFounders } from "@/lib/notifications";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 const MAX_WEBHOOK_BODY = schemas.webhookMaxBytes;
 

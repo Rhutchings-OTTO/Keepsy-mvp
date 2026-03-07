@@ -263,7 +263,8 @@ export function DesignConfirmation({
                     <MagneticButton
                       type="submit"
                       disabled={!trimmedText || isRefining || !canRefine}
-                      className="px-6 py-3 rounded-xl bg-terracotta text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-6 py-3 rounded-xl text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ backgroundColor: "var(--color-terracotta)" }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >

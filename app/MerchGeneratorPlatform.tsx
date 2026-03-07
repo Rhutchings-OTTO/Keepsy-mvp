@@ -1073,14 +1073,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               setSelectedProduct(prod);
                                 setSelectedColor(prod.colors?.[0]?.hex ?? "#FFFFFF");
                             }}
-                            className={`rounded-xl border p-4 text-left transition-all ${
+                            className={`rounded-xl border-2 p-4 text-left transition-all ${
                               selectedProduct.id === prod.id
-                                ? "border-terracotta bg-terracotta text-white shadow-[0_16px_34px_-24px_rgba(196,113,74,0.5)]"
+                                ? "bg-white shadow-[0_16px_34px_-24px_rgba(196,113,74,0.5)]"
                                 : "border-charcoal/10 bg-[#F5EDE0]"
                             }`}
+                            style={selectedProduct.id === prod.id ? { borderColor: "var(--color-terracotta)" } : undefined}
                           >
-                            <div className="text-sm font-extrabold">{prod.name}</div>
-                            <div className={`text-xs mt-1 ${selectedProduct.id === prod.id ? "text-white/70" : "text-charcoal/55"}`}>
+                            <div className="text-sm font-extrabold text-charcoal">{prod.name}</div>
+                            <div className="text-xs mt-1 text-charcoal/55">
                                 {fmt(prod.basePrice)}
                             </div>
                           </motion.button>

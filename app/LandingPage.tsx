@@ -43,25 +43,25 @@ const PRODUCT_IMAGES = [
     src: "/images/hero/mug-hero.jpg",
     alt: "Custom personalised mug",
     label: "Mugs",
-    tag: "From $24",
+    tag: "From $23",
   },
   {
     src: "/images/hero/cards-hero.jpg",
     alt: "Personalised greeting card",
     label: "Cards",
-    tag: "From $4",
+    tag: "From $12",
   },
   {
     src: "/images/hero/tee-hero.jpg",
     alt: "Custom printed tee",
     label: "Tees",
-    tag: "From $32",
+    tag: "From $37",
   },
   {
     src: "/images/featured/grandma-hoodie.jpg",
     alt: "Custom hoodie",
     label: "Hoodies",
-    tag: "From $54",
+    tag: "From $56",
   },
 ];
 
@@ -77,8 +77,8 @@ const SOCIAL_PROOF_ITEMS = [
 const FEATURED_PRODUCTS = [
   {
     name: "Best Mom Ever Mug",
-    priceUS: "$24.99",
-    priceUK: "£19.99",
+    priceUS: "$23.99",
+    priceUK: "£18.99",
     rating: "★★★★★",
     reviews: 847,
     src: "/images/featured/mom-mug.jpg",
@@ -86,8 +86,8 @@ const FEATURED_PRODUCTS = [
   },
   {
     name: "Custom Photo Card Pack",
-    priceUS: "$18.99",
-    priceUK: "£14.99",
+    priceUS: "$12.99",
+    priceUK: "£9.99",
     rating: "★★★★★",
     reviews: 1203,
     src: "/images/featured/card-pack.jpg",
@@ -95,7 +95,7 @@ const FEATURED_PRODUCTS = [
   },
   {
     name: "The Cozy Custom Hoodie",
-    priceUS: "$54.99",
+    priceUS: "$56.99",
     priceUK: "£44.99",
     rating: "★★★★★",
     reviews: 276,
@@ -104,8 +104,8 @@ const FEATURED_PRODUCTS = [
   },
   {
     name: "Personalised Family Tee",
-    priceUS: "$32.99",
-    priceUK: "£26.99",
+    priceUS: "$37.99",
+    priceUK: "£29.99",
     rating: "★★★★★",
     reviews: 328,
     src: "/images/featured/family-tee.jpg",

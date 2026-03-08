@@ -168,24 +168,24 @@ const RELATED_META: Record<
   Array<{ type: ProductType; label: string; price: number }>
 > = {
   mug: [
-    { type: "tshirt", label: "Premium Tee", price: 29 },
-    { type: "hoodie", label: "Hoodie", price: 40 },
-    { type: "card", label: "Greeting Card", price: 8 },
+    { type: "tshirt", label: "Premium Tee", price: 29.99 },
+    { type: "hoodie", label: "Hoodie", price: 44.99 },
+    { type: "card", label: "Greeting Card", price: 9.99 },
   ],
   tshirt: [
-    { type: "mug", label: "Mug", price: 14 },
-    { type: "hoodie", label: "Hoodie", price: 40 },
-    { type: "card", label: "Greeting Card", price: 8 },
+    { type: "mug", label: "Mug", price: 18.99 },
+    { type: "hoodie", label: "Hoodie", price: 44.99 },
+    { type: "card", label: "Greeting Card", price: 9.99 },
   ],
   hoodie: [
-    { type: "mug", label: "Mug", price: 14 },
-    { type: "tshirt", label: "Premium Tee", price: 29 },
-    { type: "card", label: "Greeting Card", price: 8 },
+    { type: "mug", label: "Mug", price: 18.99 },
+    { type: "tshirt", label: "Premium Tee", price: 29.99 },
+    { type: "card", label: "Greeting Card", price: 9.99 },
   ],
   card: [
-    { type: "mug", label: "Mug", price: 14 },
-    { type: "tshirt", label: "Premium Tee", price: 29 },
-    { type: "hoodie", label: "Hoodie", price: 40 },
+    { type: "mug", label: "Mug", price: 18.99 },
+    { type: "tshirt", label: "Premium Tee", price: 29.99 },
+    { type: "hoodie", label: "Hoodie", price: 44.99 },
   ],
 };
 

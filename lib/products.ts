@@ -24,7 +24,7 @@ export const PRODUCTS: Record<ProductType, Product> = {
     id: "tshirt",
     name: "Premium Tee",
     description: "Soft, heavyweight premium tee.",
-    basePrice: 29,
+    basePrice: 29.99,
     hasSize: true,
     sizes: TSHIRT_SIZES,
     colors: [
@@ -37,7 +37,7 @@ export const PRODUCTS: Record<ProductType, Product> = {
     id: "hoodie",
     name: "Hoodie",
     description: "Soft fleece hoodie, gift-ready print.",
-    basePrice: 40,
+    basePrice: 44.99,
     hasSize: true,
     sizes: HOODIE_SIZES,
     colors: [
@@ -50,14 +50,14 @@ export const PRODUCTS: Record<ProductType, Product> = {
     id: "mug",
     name: "Mug",
     description: "11oz ceramic mug with glossy finish.",
-    basePrice: 14,
+    basePrice: 18.99,
     hasSize: false,
   },
   card: {
     id: "card",
     name: "Greeting Card",
     description: "Premium cardstock + envelope.",
-    basePrice: 8,
+    basePrice: 9.99,
     hasSize: false,
   },
 };

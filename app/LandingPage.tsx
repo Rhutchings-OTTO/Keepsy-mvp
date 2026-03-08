@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
   Check,
@@ -12,13 +12,8 @@ import {
   ImageIcon,
   Sparkles,
   ShoppingBag,
-  Package,
-  Printer,
-  BadgeCheck,
-  Truck,
-  RotateCcw,
-  Lock,
 } from "lucide-react";
+// Package, Printer, BadgeCheck, Truck, RotateCcw, Lock moved to TrustSection
 import { DynamicLogo } from "@/components/DynamicLogo";
 const RegionSelector = dynamic(
   () => import("@/components/RegionSelector"),
@@ -28,6 +23,18 @@ import { getRegion, setRegion, type Region } from "@/lib/region";
 
 const PremiumGateway = dynamic(
   () => import("@/components/PremiumGateway").then((mod) => mod.PremiumGateway),
+  { ssr: false }
+);
+
+// Phase 3 fix 3.7 — lazy-load the two largest below-the-fold sections so their
+// Framer Motion animations and icon bundles don't block the initial paint.
+// These sections have no dependency on region or shared state.
+const ReviewsSection = dynamic(
+  () => import("@/components/landing/ReviewsSection").then((mod) => mod.ReviewsSection),
+  { ssr: false }
+);
+const TrustSection = dynamic(
+  () => import("@/components/landing/TrustSection").then((mod) => mod.TrustSection),
   { ssr: false }
 );
 
@@ -137,59 +144,9 @@ const HOW_IT_WORKS_STEPS = [
   },
 ];
 
-const REVIEWS = [
-  {
-    quote:
-      "I ordered the custom mug with my daughter's artwork on it for my mom's 70th birthday. She cried. Literally cried. The quality is incredible — it feels expensive and the print is crystal clear.",
-    name: "Sarah M.",
-    state: "Ohio",
-    occasion: "Birthday Gift",
-  },
-  {
-    quote:
-      "Got the personalised hoodie for my best friend for Mother's Day and she texted me at 7am when she opened it. She said it was the most thoughtful gift she'd ever received. I'll definitely be ordering again.",
-    name: "Jennifer K.",
-    state: "Texas",
-    occasion: "Mother's Day",
-  },
-  {
-    quote:
-      "My husband passed away last year and I had a photo card made of our favourite family memory for Christmas. Every one of my kids got one. It was the most meaningful thing I've ever given.",
-    name: "Diane R.",
-    state: "Colorado",
-    occasion: "Memorial Gift",
-  },
-  {
-    quote:
-      "Ordered the custom tee for my sister's anniversary trip. The colours are so vibrant and the quality is incredible. Felt like I'd spent twice what I did. Absolute steal.",
-    name: "Michelle T.",
-    state: "Florida",
-    occasion: "Anniversary",
-  },
-  {
-    quote:
-      "I am NOT a tech person but this was so easy. I uploaded a photo of my granddaughter and had a mug ordered in literally ten minutes. My daughter loved it for Christmas.",
-    name: "Carol B.",
-    state: "Virginia",
-    occasion: "Christmas Gift",
-  },
-  {
-    quote:
-      "Bought the photo card pack just because I wanted to do something special, no occasion. My best friend called me sobbing. The photo quality is gorgeous — not like a drugstore print at all.",
-    name: "Lisa H.",
-    state: "California",
-    occasion: "Just Because",
-  },
-];
-
-const TRUST_BADGES = [
-  { icon: Package, label: "Premium Materials" },
-  { icon: Printer, label: "Vivid Lasting Prints" },
-  { icon: BadgeCheck, label: "Gift-Ready Packaging" },
-  { icon: Truck, label: "Fast US & UK Shipping" },
-  { icon: RotateCcw, label: "Easy 30-Day Returns" },
-  { icon: Lock, label: "Secure Checkout" },
-];
+// REVIEWS and TRUST_BADGES constants moved to their extracted components:
+// - components/landing/ReviewsSection.tsx
+// - components/landing/TrustSection.tsx
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -317,6 +274,7 @@ type LandingPageProps = {
 };
 
 export default function LandingPage({ initialRegion = null }: LandingPageProps) {
+  const shouldReduceMotion = useReducedMotion();
   const [region, setCurrentRegion] = useState<Region | null>(() => initialRegion ?? getRegion());
   const [showGateway, setShowGateway] = useState<boolean>(() => {
     const resolvedRegion = initialRegion ?? getRegion();
@@ -325,6 +283,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   const [isRegionSelectorOpen, setIsRegionSelectorOpen] = useState(false);
   const [emailValue, setEmailValue] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const activeRegion = region ?? "US";
 
@@ -353,10 +313,27 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
     setShowGateway(false);
   };
 
-  const handleEmailSubmit = (e: React.SyntheticEvent) => {
+  const handleEmailSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (emailValue.trim()) {
-      setEmailSubmitted(true);
+    if (!emailValue.trim() || emailLoading) return;
+    setEmailLoading(true);
+    setEmailError(null);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailValue.trim() }),
+      });
+      const data = await res.json() as { success?: boolean; error?: string };
+      if (!res.ok || !data.success) {
+        setEmailError(data.error ?? "Something went wrong. Please try again.");
+      } else {
+        setEmailSubmitted(true);
+      }
+    } catch {
+      setEmailError("Something went wrong. Please try again.");
+    } finally {
+      setEmailLoading(false);
     }
   };
 
@@ -401,8 +378,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                 <div className="grid min-h-[90vh] items-center gap-10 py-16 lg:grid-cols-[3fr_2fr] lg:gap-16 lg:py-24">
                   {/* Left: Editorial headline */}
                   <motion.div
-                    initial={{ opacity: 0, x: -28 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={shouldReduceMotion ? {} : { opacity: 0, x: -28 }}
+                    animate={shouldReduceMotion ? {} : { opacity: 1, x: 0 }}
                     transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                     className="flex flex-col"
                   >
@@ -472,8 +449,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
                   {/* Right: Product gallery */}
                   <motion.div
-                    initial={{ opacity: 0, x: 28 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={shouldReduceMotion ? {} : { opacity: 0, x: 28 }}
+                    animate={shouldReduceMotion ? {} : { opacity: 1, x: 0 }}
                     transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                     className="grid grid-cols-2 gap-3"
                   >
@@ -699,126 +676,11 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               </div>
             </section>
 
-            {/* ── 6. Reviews — large editorial pull-quotes ── */}
-            <section
-              className="py-20 sm:py-28"
-              style={{ backgroundColor: "var(--color-charcoal)" }}
-            >
-              <div className={CONTAINER}>
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                >
-                  <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
-                    Customer Love
-                  </p>
-                  <h2 className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
-                    What Our Customers Say
-                  </h2>
-                </motion.div>
+            {/* ── 6. Reviews — lazy-loaded (Phase 3 fix 3.7) ── */}
+            <ReviewsSection />
 
-                <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                  {REVIEWS.map((review, index) => (
-                    <motion.div
-                      key={review.name}
-                      initial={{ opacity: 0, y: 24 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.2 }}
-                      transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
-                      className="flex flex-col rounded-2xl border border-white/8 bg-white/5 p-6"
-                    >
-                      {/* Stars */}
-                      <span className="text-sm" style={{ color: "var(--color-gold)" }}>★★★★★</span>
-
-                      {/* Big quotation mark */}
-                      <div
-                        className="mt-2 font-serif text-6xl font-bold leading-none"
-                        style={{ color: "rgba(196,113,74,0.35)" }}
-                      >
-                        &ldquo;
-                      </div>
-
-                      {/* Quote */}
-                      <p className="mt-1 flex-1 text-[15px] leading-7 text-white/75">
-                        {review.quote}
-                      </p>
-
-                      {/* Attribution */}
-                      <div className="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
-                        <div
-                          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold"
-                          style={{ backgroundColor: "rgba(196,113,74,0.2)", color: "var(--color-terra-light)" }}
-                        >
-                          {review.name.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-white">
-                            {review.name}, {review.state}
-                          </p>
-                          <p className="text-xs text-white/40">{review.occasion}</p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="mt-10 text-center"
-                >
-                  <Link
-                    href="/community"
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/65 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20 hover:border-white"
-                    style={{ color: "white" }}
-                  >
-                    Read all stories <ArrowRight size={14} />
-                  </Link>
-                </motion.div>
-              </div>
-            </section>
-
-            {/* ── 7. Trust Grid — on cream background ── */}
-            <section className="py-20 sm:py-28" style={{ backgroundColor: "var(--color-cream)" }}>
-              <div className={CONTAINER}>
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="text-center"
-                >
-                  <h2 className="font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-4xl">
-                    Why Thousands Choose Keepsy
-                  </h2>
-                </motion.div>
-
-                <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                  {TRUST_BADGES.map((badge, index) => {
-                    const Icon = badge.icon;
-                    return (
-                      <motion.div
-                        key={badge.label}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.2 }}
-                        transition={{ duration: 0.4, delay: index * 0.07, ease: "easeOut" }}
-                        className="flex flex-col items-center gap-3 rounded-xl border border-charcoal/8 bg-white px-4 py-6 text-center"
-                      >
-                        <Icon size={26} style={{ color: "var(--color-terracotta)" }} />
-                        <p className="text-xs font-semibold leading-snug text-charcoal">
-                          {badge.label}
-                        </p>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
+            {/* ── 7. Trust Grid — lazy-loaded (Phase 3 fix 3.7) ── */}
+            <TrustSection />
 
             {/* ── 8. Email capture — forest green ── */}
             <section
@@ -866,28 +728,36 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       ) : (
                         <motion.form
                           key="form"
-                          onSubmit={handleEmailSubmit}
+                          onSubmit={(e) => { void handleEmailSubmit(e); }}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="flex flex-col gap-3 sm:flex-row"
+                          className="flex flex-col gap-3"
                         >
-                          <input
-                            type="email"
-                            required
-                            value={emailValue}
-                            onChange={(e) => setEmailValue(e.target.value)}
-                            placeholder="Your email address"
-                            aria-label="Email address for 10% discount"
-                            className="flex-1 rounded-xl border-0 bg-white/10 px-5 py-3.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
-                          />
-                          <button
-                            type="submit"
-                            className="whitespace-nowrap rounded-xl px-6 py-3.5 font-semibold text-charcoal shadow-[0_10px_24px_-12px_rgba(201,168,76,0.6)] transition-opacity hover:opacity-90"
-                            style={{ backgroundColor: "var(--color-gold)" }}
-                          >
-                            Claim 10% Off
-                          </button>
+                          <div className="flex flex-col gap-3 sm:flex-row">
+                            <input
+                              type="email"
+                              required
+                              value={emailValue}
+                              onChange={(e) => setEmailValue(e.target.value)}
+                              placeholder="Your email address"
+                              aria-label="Email address for 10% discount"
+                              className="flex-1 rounded-xl border-0 bg-white/10 px-5 py-3.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                            />
+                            <button
+                              type="submit"
+                              disabled={emailLoading}
+                              className="whitespace-nowrap rounded-xl px-6 py-3.5 font-semibold text-charcoal shadow-[0_10px_24px_-12px_rgba(201,168,76,0.6)] transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                              style={{ backgroundColor: "var(--color-gold)" }}
+                            >
+                              {emailLoading ? "Sending…" : "Claim 10% Off"}
+                            </button>
+                          </div>
+                          {emailError && (
+                            <p className="rounded-lg border border-red-300/40 bg-red-900/20 px-4 py-2 text-sm text-red-200">
+                              {emailError}
+                            </p>
+                          )}
                         </motion.form>
                       )}
                     </AnimatePresence>

@@ -204,7 +204,11 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create(
       {
         mode: "payment",
-        payment_method_types: ["card"],
+        // NOTE: Klarna and Clearpay must be enabled in the Stripe Dashboard under
+        // Settings > Payment methods before they will appear at checkout.
+        // Klarna requires billing_address_collection: "required" and price_data on line items.
+        payment_method_types: ["card", "klarna", "afterpay_clearpay"],
+        billing_address_collection: "required",
         shipping_address_collection: {
           allowed_countries: ["US", "GB"],
         },

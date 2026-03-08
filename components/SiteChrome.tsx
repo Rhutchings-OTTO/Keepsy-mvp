@@ -1,11 +1,18 @@
-"use client";
+// SiteChrome — Server Component (Phase 3 fix 3.14)
+//
+// Previously this was "use client" solely because of usePathname(). That hook
+// has been extracted into SiteChromeLayout (a small "use client" island) which
+// handles the landing vs. standard layout switch. All interactive children
+// (SiteHeader, SiteFooter, BottomSheetNav, CartDrawer, CookieBanner,
+// MeshGradientBackground, EasterEggProvider) already carry their own
+// "use client" declarations and are unaffected by this change.
+//
+// The static shell — skip-to-content link, fixed background wrapper, CartDrawer
+// portal mount point, CookieBanner — now renders as pure HTML on the server,
+// reducing the client JavaScript that must be downloaded and hydrated before the
+// page is interactive.
 
-import { usePathname } from "next/navigation";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
-import { BottomSheetNav } from "@/components/BottomSheetNav";
-import { PremiumEffects } from "@/components/PremiumEffects";
-import { EasterEggProvider } from "@/components/EasterEggProvider";
+import { SiteChromeLayout } from "@/components/SiteChromeLayout";
 import { MeshGradientBackground } from "@/components/MeshGradientBackground";
 import { CartDrawer } from "@/components/CartDrawer";
 import { CookieBanner } from "@/components/CookieBanner";
@@ -15,9 +22,6 @@ type SiteChromeProps = {
 };
 
 export function SiteChrome({ children }: SiteChromeProps) {
-  const pathname = usePathname();
-  const isEntryLanding = pathname === "/";
-
   return (
     <>
       {/* Skip to main content — hidden until focused (WCAG 2.4.1) */}
@@ -31,20 +35,10 @@ export function SiteChrome({ children }: SiteChromeProps) {
       <div className="fixed inset-0 z-0" aria-hidden>
         <MeshGradientBackground />
       </div>
-      {isEntryLanding ? (
-        <EasterEggProvider>
-          <div className="relative z-10" id="main-content">{children}</div>
-          <PremiumEffects />
-          <BottomSheetNav />
-        </EasterEggProvider>
-      ) : (
-        <div className="relative z-10 min-h-screen flex flex-col">
-          <SiteHeader />
-          <main className="flex-1 pb-16 md:pb-0" id="main-content">{children}</main>
-          <SiteFooter />
-          <BottomSheetNav />
-        </div>
-      )}
+
+      {/* Client island: handles pathname-dependent layout switching */}
+      <SiteChromeLayout>{children}</SiteChromeLayout>
+
       {/* CartDrawer is always mounted; it opens via "open-cart-drawer" event */}
       <CartDrawer />
       {/* Cookie notice banner — shown once until dismissed */}

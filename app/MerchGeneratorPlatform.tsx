@@ -298,6 +298,7 @@ async function checkoutViaKeepsyAPI(args: {
   imageDataUrl: string;
   designUrl?: string | null;
   productType?: string;
+  currency?: "gbp" | "usd";
 }): Promise<string> {
   const primaryDesignUrl = args.designUrl ?? args.cart[0]?.designUrl ?? "";
   const primaryProduct = args.cart[0]?.name ?? args.productType ?? "";
@@ -309,7 +310,7 @@ async function checkoutViaKeepsyAPI(args: {
   }
 
   const payload = {
-    currency: "gbp" as const,
+    currency: args.currency ?? "gbp",
     imageDataUrl: args.imageDataUrl ? "1" : undefined,
     designUrl: safeDesignUrl,
     productType: primaryProduct,
@@ -787,6 +788,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         imageDataUrl: generatedImage!,
         designUrl: createSession.currentDesignUrl,
         productType: selectedProduct.name,
+        currency: region === "US" ? "usd" : "gbp",
       });
       window.location.href = url;
     } catch (e) {
@@ -814,6 +816,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         imageDataUrl: checkoutImage,
         designUrl: cartItems[0]?.designUrl,
         productType: cartItems[0]?.name,
+        currency: region === "US" ? "usd" : "gbp",
       });
       window.location.href = url;
     } catch (e) {

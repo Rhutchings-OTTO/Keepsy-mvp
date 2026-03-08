@@ -1,28 +1,16 @@
 "use client";
 
-import React, { useState, useRef, Suspense } from "react";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
-import dynamic from "next/dynamic";
-import { useFrame } from "@react-three/fiber";
-import {
-  Clouds,
-  Cloud,
-  PerformanceMonitor,
-  AdaptiveDpr,
-  AdaptiveEvents,
-  usePerformanceMonitor,
-} from "@react-three/drei";
-import * as THREE from "three";
 import type { Region } from "@/lib/region";
 import { setRegion } from "@/lib/region";
 import { DynamicLogo } from "@/components/DynamicLogo";
 
-const Canvas = dynamic(
-  () => import("@react-three/fiber").then((mod) => mod.Canvas),
-  { ssr: false }
-);
+// NOTE (Phase 3 perf fix 3.5): The Three.js / @react-three/fiber cloud scene that
+// previously ran here was replaced with a CSS-only animated cloud illusion.
+// The original Canvas + CloudSceneWithPerf components ran a GPU-intensive WebGL
+// render for every first-time visitor before the homepage was visible. The CSS
+// version achieves the same warm atmospheric feel with zero JS animation overhead.
 
 type PremiumGatewayProps = {
   onComplete: (region: Region) => void;
@@ -186,7 +174,7 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
         )}
       </AnimatePresence>
 
-      {/* ACT 3: 3D Cloud Flight - immediate transition after wash */}
+      {/* ACT 3: CSS Cloud Flight - replaces GPU-intensive Three.js canvas */}
       <AnimatePresence>
         {phase === "flying" && (
           <motion.div
@@ -194,46 +182,19 @@ export function PremiumGateway({ onComplete }: PremiumGatewayProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-50 overflow-hidden"
             style={{ backgroundColor: "var(--color-cream)" }}
           >
-            <ErrorBoundary
-              fallback={
-                <div
-                  className="flex h-full items-center justify-center"
-                  style={{ backgroundColor: "var(--color-cream)" }}
-                >
-                  <span className="font-serif text-charcoal/40">Continuing…</span>
-                </div>
-              }
-            >
-              <Suspense
-                fallback={
-                  <div
-                    className="flex h-full items-center justify-center"
-                    style={{ backgroundColor: "var(--color-cream)" }}
-                  >
-                    <span className="font-serif text-charcoal/40">One moment…</span>
-                  </div>
-                }
-              >
-                <Canvas
-                  camera={{ position: [0, 0, 5], fov: 75 }}
-                  gl={{ alpha: false }}
-                  dpr={[1, 2]}
-                  performance={{ min: 0.5, max: 1 }}
-                  className="h-full w-full"
-                >
-                  <color attach="background" args={["#FDF6EE"]} />
-                  <PerformanceMonitor>
-                    <AdaptiveDpr pixelated />
-                    <AdaptiveEvents />
-                    <CloudSceneWithPerf isAccelerating />
-                  </PerformanceMonitor>
-                </Canvas>
-              </Suspense>
-            </ErrorBoundary>
-            {/* ACT 4: White Flash - arrival at 2.5s */}
+            {/* CSS animated cloud blobs — simulates warm atmospheric depth */}
+            <div className="absolute inset-0" aria-hidden>
+              <div className="gateway-cloud-blob gateway-cloud-blob--1" />
+              <div className="gateway-cloud-blob gateway-cloud-blob--2" />
+              <div className="gateway-cloud-blob gateway-cloud-blob--3" />
+              <div className="gateway-cloud-blob gateway-cloud-blob--4" />
+              <div className="gateway-cloud-blob gateway-cloud-blob--5" />
+            </div>
+
+            {/* ACT 4: Cream fade-out — arrival at 2.5s */}
             <motion.div
               className="pointer-events-none absolute inset-0 z-[51]"
               style={{ backgroundColor: "var(--color-cream)" }}
@@ -300,45 +261,5 @@ function RegionCard({ region, countryName, currency, flag, onSelect }: RegionCar
         <span>→</span>
       </div>
     </motion.button>
-  );
-}
-
-// ─── 3D Cloud Scene (unchanged) ──────────────────────────────────────────────
-
-const CLOUD_SEGMENT_COUNT = 60;
-
-function CloudSceneWithPerf({ isAccelerating }: { isAccelerating: boolean }) {
-  const groupRef = useRef<THREE.Group>(null!);
-  const [perfFactor, setPerfFactor] = useState(1);
-
-  usePerformanceMonitor({
-    onChange: ({ factor }) => setPerfFactor(factor),
-  });
-
-  useFrame((_: unknown, delta: number) => {
-    if (!groupRef.current) return;
-    const speed = isAccelerating ? delta * 15 : delta * 0.5;
-    groupRef.current.position.z += speed;
-    if (groupRef.current.position.z > 20) groupRef.current.position.z = 0;
-  });
-
-  const cloudRange = Math.max(10, Math.floor(CLOUD_SEGMENT_COUNT * perfFactor));
-
-  return (
-    <>
-      <ambientLight intensity={1.5} />
-      <pointLight position={[10, 10, 10]} />
-      <fog attach="fog" args={["#FDF6EE", 0, 15]} />
-      <group ref={groupRef}>
-        <Clouds
-          material={THREE.MeshLambertMaterial}
-          range={cloudRange}
-          limit={CLOUD_SEGMENT_COUNT}
-        >
-          <Cloud segments={40} bounds={[10, 2, 2]} volume={10} color="#FDF6EE" opacity={0.8} />
-          <Cloud seed={1} scale={2} volume={5} color="#E2E8FF" fade={100} />
-        </Clouds>
-      </group>
-    </>
   );
 }

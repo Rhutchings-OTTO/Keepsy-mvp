@@ -199,7 +199,11 @@ export default function PrivacyPage() {
           <section>
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>8. Your Rights Under UK GDPR</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
-              You have the following rights regarding your personal data. To exercise any of these rights, please email{" "}
+              You have the following rights regarding your personal data. To exercise any of these rights, you can{" "}
+              <Link href="/sar" className="font-semibold underline underline-offset-2" style={{ color: "var(--color-terracotta)" }}>
+                submit a Subject Access Request
+              </Link>{" "}
+              or email{" "}
               <a href="mailto:privacy@keepsy.co" className="font-semibold underline underline-offset-2" style={{ color: "var(--color-terracotta)" }}>
                 privacy@keepsy.co
               </a>. We will respond within one month.

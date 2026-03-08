@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { Star, Sparkles, Heart, Leaf, ShieldCheck, Package, Truck, RefreshCcw, Lock } from "lucide-react";
 
 /* ─── helpers ─────────────────────────────────────────────────────────── */
@@ -18,11 +18,12 @@ function FadeIn({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const shouldReduceMotion = useReducedMotion();
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 28 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
+      initial={shouldReduceMotion ? {} : { opacity: 0, y: 28 }}
+      animate={shouldReduceMotion ? {} : (inView ? { opacity: 1, y: 0 } : {})}
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
@@ -34,6 +35,7 @@ function FadeIn({
 /* ─── 1. Hero ──────────────────────────────────────────────────────────── */
 
 function Hero() {
+  const shouldReduceMotion = useReducedMotion();
   return (
     <section className="relative h-[480px] md:h-[600px] overflow-hidden">
       {/* Background image — high resolution, warm friendship energy */}
@@ -53,8 +55,8 @@ function Hero() {
       {/* Text */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={shouldReduceMotion ? {} : { opacity: 0, y: 24 }}
+          animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
           transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
         >
           <p
@@ -225,6 +227,7 @@ const VALUES = [
 function ValuesSection() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
@@ -237,8 +240,8 @@ function ValuesSection() {
         {VALUES.map(({ icon: Icon, title, body }, i) => (
           <motion.div
             key={title}
-            initial={{ opacity: 0, y: 32 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
+            initial={shouldReduceMotion ? {} : { opacity: 0, y: 32 }}
+            animate={shouldReduceMotion ? {} : (inView ? { opacity: 1, y: 0 } : {})}
             transition={{
               duration: 0.55,
               delay: i * 0.1,
@@ -358,6 +361,7 @@ const PROMISES = [
 function OurPromise() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <section className="bg-white py-20 md:py-28">
@@ -371,8 +375,8 @@ function OurPromise() {
           {PROMISES.map(({ icon: Icon, title, body }, i) => (
             <motion.div
               key={title}
-              initial={{ opacity: 0, y: 24 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
+              initial={shouldReduceMotion ? {} : { opacity: 0, y: 24 }}
+              animate={shouldReduceMotion ? {} : (inView ? { opacity: 1, y: 0 } : {})}
               transition={{
                 duration: 0.5,
                 delay: i * 0.08,

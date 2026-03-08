@@ -243,6 +243,64 @@ export function DeliveredEmail({ customerName, orderRef, productName }: Delivere
   );
 }
 
+// ─── Post-delivery follow-up email (Day 7) ────────────────────────────────────
+
+export type PostDeliveryFollowUpEmailProps = {
+  customerName?: string;
+  orderRef: string;
+  productName?: string;
+};
+
+export function PostDeliveryFollowUpEmail({ customerName, orderRef, productName }: PostDeliveryFollowUpEmailProps) {
+  const createUrl = `${SITE_URL}/create`;
+  const reviewMailto = `mailto:hello@keepsy.store?subject=My%20Keepsy%20Story%20%E2%80%94%20${encodeURIComponent(orderRef)}&body=Hi%2C%20I%20wanted%20to%20share%20how%20my%20Keepsy%20piece%20turned%20out%E2%80%A6`;
+  return (
+    <html>
+      <body style={base}>
+        <div style={container}>
+          <p style={eyebrow}>A Week On</p>
+          <h1 style={heading}>How did your Keepsy piece turn out?</h1>
+          <p style={body}>
+            {customerName ? `Hi ${customerName}, ` : ""}
+            It&apos;s been a week since your {productName ?? "Keepsy piece"} arrived — and we&apos;ve been wondering how it landed.
+            Did it spark a smile? Find its place on a shelf, a wall, or in someone&apos;s hands?
+          </p>
+          <p style={body}>
+            Every piece that leaves our studio carries a little piece of someone&apos;s story. We&apos;d love to hear yours — a photo, a few words, or just a note saying it arrived safely. Your story helps us craft better keepsakes for everyone who comes after you.
+          </p>
+          <a href={reviewMailto} style={badge}>Share Your Story</a>
+          <p style={{ ...body, marginTop: 8, marginBottom: 28 }}>
+            Or, if you&apos;re already thinking about the next one —
+          </p>
+          <a
+            href={createUrl}
+            style={{
+              ...badge,
+              backgroundColor: "transparent",
+              color: "#2D2926",
+              border: "1.5px solid rgba(45,41,38,0.25)",
+              marginBottom: 0,
+            }}
+          >
+            Create Another Keepsake
+          </a>
+          <hr style={divider} />
+          <p style={meta}>
+            <strong>Order reference:</strong> {orderRef}
+            {productName && (
+              <>
+                <br />
+                <strong>Product:</strong> {productName}
+              </>
+            )}
+          </p>
+          <p style={sig}>— The Keepsy Atelier</p>
+        </div>
+      </body>
+    </html>
+  );
+}
+
 // ─── Send functions ────────────────────────────────────────────────────────────
 
 export type EmailResult = { ok: boolean; error?: string };
@@ -339,6 +397,29 @@ export async function sendDeliveredEmail(params: DeliveredEmailProps & { to: str
     return true;
   } catch (e) {
     console.error("[email] delivered send error:", e);
+    return false;
+  }
+}
+
+export async function sendPostDeliveryFollowUpEmail(
+  params: PostDeliveryFollowUpEmailProps & { to: string }
+): Promise<boolean> {
+  const resend = getResend();
+  if (!resend) return false;
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM,
+      to: params.to,
+      replyTo: "hello@keepsy.store",
+      subject: "How did your Keepsy piece turn out?",
+      react: PostDeliveryFollowUpEmail(params),
+      text: `Hi${params.customerName ? ` ${params.customerName}` : ""}, it's been a week since your ${params.productName ?? "Keepsy piece"} arrived. We'd love to hear how it turned out — reply to this email or share a photo. Create another keepsake: ${SITE_URL}/create`,
+      headers: { "List-Unsubscribe": "<mailto:hello@keepsy.store?subject=unsubscribe>" },
+    });
+    if (error) { console.error("[email] post-delivery follow-up send failed:", error); return false; }
+    return true;
+  } catch (e) {
+    console.error("[email] post-delivery follow-up send error:", e);
     return false;
   }
 }

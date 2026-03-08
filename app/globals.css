@@ -175,6 +175,77 @@ a { color: inherit; text-decoration: none; }
 }
 .aurora-container.panic-mode { animation: aurora-panic-flicker 2s ease-in-out infinite; }
 
+/* ===== PremiumGateway CSS cloud blobs (replaces Three.js canvas, Phase 3 fix 3.5) ===== */
+@keyframes gateway-cloud-drift-1 {
+  0%   { transform: translate(0, 0) scale(1);    opacity: 0.55; }
+  40%  { transform: translate(60px, -30px) scale(1.12); opacity: 0.7; }
+  100% { transform: translate(140px, -10px) scale(1.3); opacity: 0.3; }
+}
+@keyframes gateway-cloud-drift-2 {
+  0%   { transform: translate(0, 0) scale(1);     opacity: 0.45; }
+  35%  { transform: translate(-50px, 20px) scale(1.08); opacity: 0.6; }
+  100% { transform: translate(-120px, 50px) scale(1.25); opacity: 0.25; }
+}
+@keyframes gateway-cloud-drift-3 {
+  0%   { transform: translate(0, 0) scale(0.9);  opacity: 0.6; }
+  50%  { transform: translate(30px, -60px) scale(1.05); opacity: 0.75; }
+  100% { transform: translate(80px, -100px) scale(1.2); opacity: 0.2; }
+}
+@keyframes gateway-cloud-drift-4 {
+  0%   { transform: translate(0, 0) scale(1.1);  opacity: 0.5; }
+  45%  { transform: translate(-40px, -20px) scale(1.2); opacity: 0.65; }
+  100% { transform: translate(-100px, -60px) scale(1.4); opacity: 0.15; }
+}
+@keyframes gateway-cloud-drift-5 {
+  0%   { transform: translate(0, 0) scale(0.85); opacity: 0.55; }
+  60%  { transform: translate(50px, 40px) scale(1.0); opacity: 0.7; }
+  100% { transform: translate(110px, 80px) scale(1.18); opacity: 0.2; }
+}
+
+.gateway-cloud-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  will-change: transform, opacity;
+}
+.gateway-cloud-blob--1 {
+  width: 600px; height: 380px;
+  top: 5%; left: -8%;
+  background: radial-gradient(ellipse, rgba(253,246,238,0.95) 0%, rgba(232,215,196,0.6) 55%, transparent 100%);
+  animation: gateway-cloud-drift-1 2s ease-out forwards;
+}
+.gateway-cloud-blob--2 {
+  width: 520px; height: 340px;
+  top: 30%; right: -5%;
+  background: radial-gradient(ellipse, rgba(253,246,238,0.90) 0%, rgba(226,232,255,0.5) 55%, transparent 100%);
+  animation: gateway-cloud-drift-2 2.1s ease-out forwards;
+  animation-delay: 0.05s;
+}
+.gateway-cloud-blob--3 {
+  width: 480px; height: 320px;
+  bottom: 10%; left: 15%;
+  background: radial-gradient(ellipse, rgba(253,246,238,0.95) 0%, rgba(196,113,74,0.12) 55%, transparent 100%);
+  animation: gateway-cloud-drift-3 2.2s ease-out forwards;
+  animation-delay: 0.08s;
+}
+.gateway-cloud-blob--4 {
+  width: 440px; height: 300px;
+  top: 45%; left: 40%;
+  background: radial-gradient(ellipse, rgba(253,246,238,0.88) 0%, rgba(201,168,76,0.10) 50%, transparent 100%);
+  animation: gateway-cloud-drift-4 2.3s ease-out forwards;
+  animation-delay: 0.04s;
+}
+.gateway-cloud-blob--5 {
+  width: 560px; height: 360px;
+  top: -5%; right: 20%;
+  background: radial-gradient(ellipse, rgba(253,246,238,0.92) 0%, rgba(44,74,62,0.08) 55%, transparent 100%);
+  animation: gateway-cloud-drift-5 2.4s ease-out forwards;
+  animation-delay: 0.1s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gateway-cloud-blob { animation: none !important; opacity: 0.5; }
+}
+
 /* ===== Mug gloss ===== */
 .mug-art-overlay {
   background: linear-gradient(90deg,

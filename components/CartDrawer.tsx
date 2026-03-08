@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, Gift, ShoppingBag, ChevronDown, ChevronUp } from "lucide-react";
+import { getRegion } from "@/lib/region";
+import { getEstimatedDelivery, type DeliveryRegion } from "@/lib/deliveryEstimate";
 
 /* ─── Types ────────────────────────────────────────────────────────────── */
 
@@ -229,6 +231,10 @@ export function CartDrawer() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
+  const region = getRegion() ?? "UK";
+  const deliveryRegion: DeliveryRegion = region === "US" ? "us" : "uk";
+  const delivery = getEstimatedDelivery(deliveryRegion);
+
   /* Listen for open-cart-drawer event */
   useEffect(() => {
     function handleOpen() {
@@ -294,11 +300,13 @@ export function CartDrawer() {
         quantity: item.quantity,
       }));
       const primaryItem = items[0];
+      const currency = region === "US" ? "usd" : "gbp";
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           cart,
+          currency,
           designUrl: primaryItem.designUrl ?? primaryItem.imageUrl ?? "",
           imageDataUrl: primaryItem.imageUrl ? "1" : undefined,
           productType: primaryItem.productId,
@@ -462,7 +470,7 @@ export function CartDrawer() {
                 {/* ── Delivery estimate ── */}
                 <div className="px-6 pb-1">
                   <p className="text-center text-[11px] text-charcoal/40 leading-relaxed">
-                    Estimated delivery: 4–7 business days (UK) · 5–10 (US)
+                    Estimated delivery: {delivery.from} – {delivery.to}
                   </p>
                 </div>
 

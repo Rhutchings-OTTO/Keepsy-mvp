@@ -762,7 +762,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       )}
                     </AnimatePresence>
                     <p className="mt-3 text-xs text-white/40">
-                      Join women who love thoughtful gifting · Unsubscribe anytime
+                      Join the people who love thoughtful gifting · Unsubscribe anytime
                     </p>
                   </motion.div>
                 </div>

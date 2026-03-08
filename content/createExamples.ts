@@ -38,12 +38,12 @@ export const CREATE_EXAMPLES: Record<
 > = {
   US: {
     describeChips: [
-      "A cozy Thanksgiving family scene in warm watercolor.",
-      "A Fourth of July backyard memory at golden hour.",
-      "A Mother's Day floral keepsake with elegant brush texture.",
-      "A birthday portrait with soft pastel flowers.",
-      "A premium Christmas house portrait for a greeting card.",
-      "A heartfelt anniversary line drawing on luxe cardstock.",
+      "A golden retriever puppy surrounded by spring flowers",
+      "A dad and daughter fishing by a lake at sunset",
+      "Soft watercolour flowers with 'Happy Mother's Day' in elegant handwriting",
+      "A cosy Christmas scene with a fireplace and stockings",
+      "Two best friends laughing under fairy lights",
+      "A vintage-style portrait of a family home in autumn",
     ],
     uploadTransformChips: [
       "Turn our front door photo into a Christmas card illustration.",
@@ -172,12 +172,12 @@ export const CREATE_EXAMPLES: Record<
   },
   UK: {
     describeChips: [
-      "A Mother's Day floral keepsake in soft neutrals.",
-      "A Christmas house portrait with gentle watercolor detail.",
-      "A birthday keepsake with floral illustration and calm tones.",
-      "A premium anniversary line drawing for a greeting card.",
-      "A painterly pet portrait for a cosy hoodie gift.",
-      "A warm family caricature for an everyday mug keepsake.",
+      "A golden retriever puppy surrounded by spring flowers",
+      "A dad and daughter fishing by a lake at sunset",
+      "Soft watercolour flowers with 'Happy Mother's Day' in elegant handwriting",
+      "A cosy Christmas scene with a fireplace and stockings",
+      "Two best friends laughing under fairy lights",
+      "A vintage-style portrait of a family home",
     ],
     uploadTransformChips: [
       "Turn our front door photo into a Christmas card illustration.",

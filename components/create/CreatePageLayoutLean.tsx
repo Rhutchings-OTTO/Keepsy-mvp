@@ -202,9 +202,19 @@ export function CreatePageLayoutLean({
 
               <div className="mt-4 space-y-4">
                 <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-charcoal/60">
-                    {createMode === "upload" ? "Describe how you want the photo changed" : "Describe the gift you want to make"}
+                  <span className="mb-1 block text-sm font-medium text-charcoal/60">
+                    {createMode === "upload" ? "Describe how you want the photo changed" : "Describe the picture you'd like on your gift"}
                   </span>
+                  {createMode !== "upload" && (
+                    <>
+                      <span className="mb-1 block text-xs text-charcoal/45">
+                        This will be the image printed on your hoodie, mug, t-shirt or card. Describe the picture, not the product.
+                      </span>
+                      <span className="mb-2 block text-xs text-charcoal/45">
+                        Add as much or as little detail as you'd like — even a few words is enough to get started.
+                      </span>
+                    </>
+                  )}
                   <textarea
                     value={typeof prompt === "string" ? prompt : ""}
                     onChange={(e) => {
@@ -214,7 +224,7 @@ export function CreatePageLayoutLean({
                     placeholder={
                       createMode === "upload"
                         ? "Example: Turn this family photo into a soft watercolor birthday card"
-                        : "Example: A warm floral mug design for Mum's birthday"
+                        : "Example: A golden retriever sitting in a field of sunflowers"
                     }
                     rows={5}
                     className="min-h-[144px] w-full resize-none rounded-xl border border-charcoal/10 bg-white px-4 py-4 text-base leading-7 text-charcoal outline-none placeholder:text-charcoal/35 focus:border-terracotta/40 focus:ring-2 focus:ring-terracotta/15"

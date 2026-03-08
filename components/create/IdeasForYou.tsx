@@ -50,7 +50,7 @@ export function IdeasForYou({
         ))}
       </div>
 
-      <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-charcoal/45">Suggested prompts</p>
+      <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-charcoal/45">Picture ideas — click to use</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {visiblePrompts.map((chip) => (
           <button
@@ -75,7 +75,7 @@ export function IdeasForYou({
 
       {pendingReplace ? (
         <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-terracotta/25 bg-terracotta/8 px-3 py-2 text-xs">
-          <span className="font-semibold text-charcoal">Replace current prompt?</span>
+          <span className="font-semibold text-charcoal">Replace your current description?</span>
           {onReplaceConfirm && (
             <button
               type="button"

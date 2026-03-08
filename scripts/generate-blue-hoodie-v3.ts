@@ -1,7 +1,5 @@
 /**
- * Generate a corrected blue hoodie product image using DALL-E 3.
- * Matches the original flat-lay style but with print correctly positioned
- * above the kangaroo pouch pocket.
+ * Generate a replacement blue hoodie product image using DALL-E 3.
  * Overwrites public/images/products/hoodie-blue.jpg
  *
  * Run: NODE_TLS_REJECT_UNAUTHORIZED=0 npx tsx scripts/generate-blue-hoodie-v3.ts
@@ -32,10 +30,10 @@ if (!OPENAI_API_KEY) {
 const OUT_FILE = path.join(ROOT, "public", "images", "products", "hoodie-blue.jpg");
 
 const PROMPT =
-  "A hyperrealistic flat-lay photograph of a light blue hoodie laid flat on a warm wooden surface, shot from directly above. The hoodie has a beautiful sunset over ocean scene printed on the upper chest area — the print is positioned HIGH on the chest, well ABOVE the kangaroo pouch pocket. There is a clear gap of plain blue fabric between the bottom of the print and the top of the pocket. The kangaroo pouch pocket is completely visible and unobstructed. The hoodie has natural soft fabric texture and subtle creases. Warm natural lighting from the side. A straw sun hat is placed next to the hoodie, and flip flops are visible at the bottom edge. Professional e-commerce flat-lay photography, warm wooden background, magazine quality styling.";
+  "A hyperrealistic photograph of a light blue pullover hoodie lying casually on a cream linen sofa. The hoodie is unfolded and relaxed with natural fabric wrinkles and creases. On the upper chest area there is a small cute cartoon illustration of a bride and groom holding hands with the text 'Jay's Wedding Party 2026' printed in a clean white handwritten font beneath the illustration. The print is small and centered on the chest, well above the kangaroo pocket. The print looks like it is part of the fabric — you can see the cotton texture through the ink, not like a digital overlay. The kangaroo pouch pocket is fully visible and unobstructed below. A couple of scatter cushions are visible on the sofa behind the hoodie. Soft warm natural daylight from a nearby window. The scene looks like someone just took the hoodie off and laid it on the sofa. Shot on a 50mm lens, shallow depth of field, professional lifestyle product photography.";
 
 async function main() {
-  console.log("Generating blue hoodie image (v3 — flat-lay, print above pouch) with DALL-E 3…");
+  console.log("Generating blue hoodie image (wedding party lifestyle) with DALL-E 3…");
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",

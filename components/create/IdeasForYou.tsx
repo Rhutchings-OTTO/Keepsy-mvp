@@ -8,9 +8,23 @@ import { REGION_CONTENT } from "@/content/regionContent";
 const MAX_CHIPS = 6;
 const MAX_PROMPTS_VISIBLE = 4;
 
+const STYLE_PILLS = [
+  "Watercolour",
+  "Cartoon",
+  "Caricature",
+  "Oil painting",
+  "Pencil sketch",
+  "Pop art",
+  "Vintage poster",
+  "Minimalist line art",
+  "Stained glass",
+  "Anime",
+];
+
 type IdeasForYouProps = {
   region: Region;
   onUsePrompt: (prompt: string) => void;
+  onAppendStyle: (style: string) => void;
   onReplaceConfirm?: (prompt: string) => void;
   onReplaceCancel?: () => void;
   pendingReplace: string | null;
@@ -19,6 +33,7 @@ type IdeasForYouProps = {
 export function IdeasForYou({
   region,
   onUsePrompt,
+  onAppendStyle,
   onReplaceConfirm,
   onReplaceCancel,
   pendingReplace,
@@ -72,6 +87,20 @@ export function IdeasForYou({
           {showMore ? "Show less" : "Show more"}
         </button>
       )}
+
+      <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-charcoal/45">Styles to try</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {STYLE_PILLS.map((style) => (
+          <button
+            key={style}
+            type="button"
+            onClick={() => onAppendStyle(style)}
+            className="rounded-full border border-charcoal/15 bg-white/80 px-3 py-1.5 text-xs font-semibold text-charcoal/65 transition hover:bg-white hover:text-charcoal/80"
+          >
+            {style}
+          </button>
+        ))}
+      </div>
 
       {pendingReplace ? (
         <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-terracotta/25 bg-terracotta/8 px-3 py-2 text-xs">

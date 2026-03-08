@@ -129,6 +129,12 @@ export function CreatePageLayoutLean({
     setPendingReplace(null);
   };
 
+  const handleAppendStyle = (style: string) => {
+    const current = (typeof prompt === "string" ? prompt : "").trim();
+    setPrompt(current ? `${current}, ${style.toLowerCase()} style` : `${style.toLowerCase()} style`);
+    setHasUserTypedPrompt(true);
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) onUploadFile(file);
@@ -371,6 +377,7 @@ export function CreatePageLayoutLean({
           <IdeasForYou
             region={region}
             onUsePrompt={handleChipPrompt}
+            onAppendStyle={handleAppendStyle}
             onReplaceConfirm={handleReplaceConfirm}
             onReplaceCancel={() => setPendingReplace(null)}
             pendingReplace={pendingReplace}

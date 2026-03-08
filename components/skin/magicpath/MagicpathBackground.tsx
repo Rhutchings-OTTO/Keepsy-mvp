@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 
 type FloatingBlob = {
   className: string;
@@ -38,12 +37,6 @@ const BLOBS: FloatingBlob[] = [
   },
 ];
 
-const FLOATING_CARDS = [
-  { src: "/product-tiles/tee-white.png", className: "hidden xl:block left-[5%] top-[16%] w-28" },
-  { src: "/product-tiles/plain-mug-front.png", className: "hidden xl:block right-[7%] top-[20%] w-28" },
-  { src: "/occasion-tiles/christmas-scene.png", className: "hidden 2xl:block right-[16%] bottom-[18%] w-24" },
-  { src: "/occasion-tiles/anniversary-watercolor.png", className: "hidden 2xl:block left-[14%] bottom-[16%] w-24" },
-];
 
 export default function MagicpathBackground({ enabled }: { enabled: boolean }) {
   if (!enabled) return null;
@@ -59,16 +52,6 @@ export default function MagicpathBackground({ enabled }: { enabled: boolean }) {
         />
       ))}
 
-      {FLOATING_CARDS.map((card, idx) => (
-        <motion.div
-          key={card.src}
-          className={`absolute rounded-2xl border border-white/50 bg-white/45 p-2 shadow-2xl backdrop-blur-xl ${card.className}`}
-          animate={{ y: [0, idx % 2 === 0 ? -10 : 10, 0], rotate: [0, idx % 2 === 0 ? 1.5 : -1.5, 0] }}
-          transition={{ duration: 7 + idx, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Image src={card.src} alt="" width={180} height={120} className="h-24 w-full rounded-xl object-cover opacity-85" />
-        </motion.div>
-      ))}
     </div>
   );
 }

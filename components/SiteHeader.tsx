@@ -62,11 +62,11 @@ function AnnouncementBar() {
 
   return (
     <div
-      className="relative flex items-center justify-center gap-2 px-10 py-2 text-xs font-medium text-white"
+      className="relative flex items-center justify-center gap-2 px-10 py-1.5 text-xs font-medium text-white"
       style={{ backgroundColor: "var(--color-terracotta)" }}
     >
-      <span className="sm:hidden">⚡ Free shipping over £75 / $75</span>
-      <span className="hidden sm:inline">⚡ Fast shipping on every order · Free shipping over £75 (UK) / $75 (US)</span>
+      <span className="truncate sm:hidden">⚡ Free shipping over £75 / $75</span>
+      <span className="hidden truncate sm:inline">⚡ Fast shipping on every order · Free shipping over £75 (UK) / $75 (US)</span>
       <button
         type="button"
         onClick={dismiss}
@@ -168,7 +168,7 @@ function MobileOverlay({
               type="button"
               onClick={onClose}
               aria-label="Close menu"
-              className="rounded-full border p-2 transition hover:bg-black/5"
+              className="flex h-10 w-10 items-center justify-center rounded-full border transition hover:bg-black/5"
               style={{ borderColor: "var(--border)" }}
             >
               <X size={20} style={{ color: "var(--color-charcoal)" }} />
@@ -277,17 +277,11 @@ export function SiteHeader() {
                 <Link
                   key={href}
                   href={href}
-                  className="min-h-9 rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20"
-                  style={
+                  className={`min-h-9 rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 ${
                     active
-                      ? {
-                          backgroundColor: "var(--color-terracotta)",
-                          color: "#fff",
-                        }
-                      : {
-                          color: "rgba(45,41,38,0.70)",
-                        }
-                  }
+                      ? "bg-charcoal text-white"
+                      : "text-charcoal/60 hover:text-charcoal"
+                  }`}
                   data-active-nav={active ? "true" : undefined}
                 >
                   {label}
@@ -311,7 +305,7 @@ export function SiteHeader() {
               />
               {cartCount > 0 && (
                 <span
-                  className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                  className="absolute -right-0.5 -top-0.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full px-0.5 text-[10px] font-bold text-white"
                   style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
                   {cartCount > 99 ? "99+" : cartCount}
@@ -322,7 +316,7 @@ export function SiteHeader() {
             {/* Desktop CTA */}
             <Link
               href="/create"
-              className="hidden min-h-10 items-center justify-center rounded-full px-5 text-sm font-semibold text-white shadow-[0_16px_32px_-20px_rgba(196,113,74,0.5)] transition hover:opacity-90 md:inline-flex"
+              className="hidden items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-[0_16px_32px_-20px_rgba(196,113,74,0.5)] transition-opacity duration-150 hover:opacity-90 md:inline-flex"
               style={{ backgroundColor: "var(--color-terracotta)" }}
             >
               Make a Gift

@@ -36,7 +36,15 @@ export function ProductGrid({ selected, onSelect }: ProductGridProps) {
           <div className={`rounded-xl border ${selected === product.type ? "border-white/10 bg-white/5" : "border-black/6"} p-2`}
             style={selected !== product.type ? { backgroundColor: "rgba(253,246,238,0.6)" } : undefined}
           >
-            <Image src={product.image} alt={product.name} width={360} height={220} className="h-28 w-full object-contain" />
+            {/* Image: verify this mockup looks consistent with other product selector images */}
+            <Image
+              src={product.image}
+              alt={`Personalised ${product.name.toLowerCase()} mockup`}
+              width={360}
+              height={220}
+              sizes="(max-width: 640px) 50vw, 25vw"
+              className="h-28 w-full object-contain"
+            />
           </div>
           <p className="mt-2 font-bold">{product.name}</p>
           <p className={`${selected === product.type ? "text-white/80" : "text-black/65"}`}>from £{product.price}</p>

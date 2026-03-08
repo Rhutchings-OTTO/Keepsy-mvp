@@ -69,12 +69,9 @@ function FacebookIcon() {
 
 function TrustBadge({ icon, label }: { icon: string; label: string }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col items-center gap-1 text-center">
       <span className="text-lg">{icon}</span>
-      <span
-        className="text-xs font-semibold"
-        style={{ color: "var(--color-forest)" }}
-      >
+      <span className="text-xs font-semibold text-charcoal/60">
         {label}
       </span>
     </div>
@@ -190,10 +187,8 @@ export function SiteFooter() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="your@email.com"
                       required
-                      className="flex-1 rounded-full border px-4 py-2.5 text-sm outline-none transition focus:ring-2"
+                      className="flex-1 rounded-lg border border-charcoal/20 bg-white/80 px-4 py-3 text-sm outline-none transition focus:ring-2"
                       style={{
-                        borderColor: "var(--border)",
-                        backgroundColor: "rgba(255,255,255,0.7)",
                         color: "var(--color-charcoal)",
                         // @ts-expect-error CSS custom property
                         "--tw-ring-color": "var(--color-terracotta)",
@@ -203,7 +198,7 @@ export function SiteFooter() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+                      className="shrink-0 rounded-lg px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
                       style={{ backgroundColor: "var(--color-terracotta)" }}
                     >
                       {loading ? "…" : "Get 10% Off"}
@@ -224,8 +219,7 @@ export function SiteFooter() {
           style={{ borderColor: "var(--border)" }}
         >
           <div className={CONTAINER}>
-            {/* Mobile: single scrollable row */}
-            <div className="flex gap-6 overflow-x-auto pb-1 sm:flex-wrap sm:items-center sm:justify-start">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
               <TrustBadge icon="✦" label="Premium Quality" />
               <TrustBadge icon="↩" label="30-Day Returns" />
               <TrustBadge icon="⚡" label="Fast Delivery" />
@@ -271,16 +265,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border transition hover:border-transparent hover:text-white"
-                  style={{ borderColor: "var(--border)", color: "var(--ink-muted)" }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "var(--color-terracotta)";
-                    (e.currentTarget as HTMLAnchorElement).style.color = "#fff";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "";
-                    (e.currentTarget as HTMLAnchorElement).style.color = "var(--ink-muted)";
-                  }}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-charcoal/15 text-charcoal/50 transition-colors duration-150 hover:border-terracotta hover:text-terracotta"
                 >
                   <Icon />
                 </a>
@@ -297,7 +282,7 @@ export function SiteFooter() {
                 onClick={() => setShopOpen(!shopOpen)}
                 className="flex w-full items-center justify-between sm:pointer-events-none"
               >
-                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "var(--ink-faint)" }}>
+                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/40">
                   Shop
                 </p>
                 <span className="text-sm sm:hidden" style={{ color: "var(--ink-faint)" }}>{shopOpen ? "−" : "+"}</span>
@@ -313,7 +298,7 @@ export function SiteFooter() {
                   { href: "/product/hoodie", label: "Hoodies" },
                   { href: "/product/card", label: "Greeting Cards" },
                 ].map(({ href, label }) => (
-                  <Link key={href} href={href} className="text-sm transition hover:underline" style={{ color: "var(--ink-muted)" }}>
+                  <Link key={href} href={href} className="text-sm text-charcoal/60 transition-colors duration-150 hover:text-charcoal">
                     {label}
                   </Link>
                 ))}
@@ -327,7 +312,7 @@ export function SiteFooter() {
                 onClick={() => setCompanyOpen(!companyOpen)}
                 className="flex w-full items-center justify-between sm:pointer-events-none"
               >
-                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "var(--ink-faint)" }}>
+                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/40">
                   Company
                 </p>
                 <span className="text-sm sm:hidden" style={{ color: "var(--ink-faint)" }}>{companyOpen ? "−" : "+"}</span>
@@ -341,7 +326,7 @@ export function SiteFooter() {
                   { href: "/refunds", label: "Refund Policy" },
                   { href: "/shipping", label: "Shipping Info" },
                 ].map(({ href, label }) => (
-                  <Link key={href} href={href} className="text-sm transition hover:underline" style={{ color: "var(--ink-muted)" }}>
+                  <Link key={href} href={href} className="text-sm text-charcoal/60 transition-colors duration-150 hover:text-charcoal">
                     {label}
                   </Link>
                 ))}
@@ -355,7 +340,7 @@ export function SiteFooter() {
                 onClick={() => setHelpOpen(!helpOpen)}
                 className="flex w-full items-center justify-between sm:pointer-events-none"
               >
-                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "var(--ink-faint)" }}>
+                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/40">
                   Help
                 </p>
                 <span className="text-sm sm:hidden" style={{ color: "var(--ink-faint)" }}>{helpOpen ? "−" : "+"}</span>
@@ -364,7 +349,7 @@ export function SiteFooter() {
                 <a href="mailto:support@keepsy.store" className="text-sm transition hover:underline" style={{ color: "var(--color-terracotta)" }}>
                   support@keepsy.store
                 </a>
-                <Link href="/faq" className="text-sm transition hover:underline" style={{ color: "var(--ink-muted)" }}>
+                <Link href="/faq" className="text-sm text-charcoal/60 transition-colors duration-150 hover:text-charcoal">
                   FAQ
                 </Link>
                 <p className="text-sm" style={{ color: "var(--ink-muted)" }}>Made with love, shipped worldwide</p>
@@ -394,10 +379,10 @@ export function SiteFooter() {
           <div
             className={`${CONTAINER} flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left`}
           >
-            <p className="text-xs" style={{ color: "var(--ink-faint)" }}>
+            <p className="text-xs text-charcoal/35">
               © {new Date().getFullYear()} Keepsy. All rights reserved.
             </p>
-            <p className="text-xs" style={{ color: "var(--ink-faint)" }}>
+            <p className="text-xs text-charcoal/35">
               Powered by AI · Fulfilled by Printify · Payments by Stripe
             </p>
           </div>

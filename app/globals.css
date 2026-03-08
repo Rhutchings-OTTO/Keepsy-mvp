@@ -373,3 +373,431 @@ nav a[data-active-nav="true"] { color: white !important; }
   from { transform: translateY(0); opacity: 1; }
   to   { transform: translateY(20px); opacity: 0; }
 }
+
+/* === TYPOGRAPHY POLISH === */
+
+/* Balance text wrapping on all headings to prevent ugly orphans */
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+/* Ensure headings never break at awkward points */
+h1, h2 {
+  word-break: keep-all;
+}
+
+/* Consistent eyebrow/label text treatment */
+.eyebrow {
+  font-size: 0.6875rem; /* 11px */
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(45, 41, 38, 0.5);
+}
+
+/* Tight leading for display headings */
+.display-heading {
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+/* Comfortable reading for body text */
+.body-comfortable {
+  line-height: 1.65;
+  font-size: 0.9375rem; /* 15px */
+}
+
+/* Fraunces italic for decorative text */
+.serif-italic {
+  font-family: var(--font-serif), Fraunces, Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Prevent single-word lines in key marketing copy */
+.text-balance-safe {
+  text-wrap: balance;
+  max-width: 28ch; /* soft constraint for narrow headlines */
+}
+
+/* === SURFACE & SHADOW SYSTEM === */
+
+/* Standardised card shadow — use this class on ALL product cards */
+.card-shadow {
+  box-shadow: 0 1px 3px rgba(45, 41, 38, 0.04), 0 4px 12px rgba(45, 41, 38, 0.05);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card-shadow:hover {
+  box-shadow: 0 2px 8px rgba(45, 41, 38, 0.07), 0 12px 28px rgba(45, 41, 38, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Elevated surface — modals, drawers, dropdowns */
+.surface-elevated {
+  box-shadow: 0 4px 16px rgba(45, 41, 38, 0.08), 0 16px 48px rgba(45, 41, 38, 0.07);
+  border: 1px solid rgba(45, 41, 38, 0.06);
+}
+
+/* Subtle section separator */
+.section-divider {
+  border-top: 1px solid rgba(45, 41, 38, 0.07);
+}
+
+/* Standard focus ring for interactive elements */
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  outline: 2px solid #C4714A;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Standard border for cards and panels */
+.border-subtle {
+  border: 1px solid rgba(45, 41, 38, 0.08);
+}
+
+/* Consistent hover overlay for images */
+.image-hover-lift {
+  transition: transform 0.25s ease;
+}
+.image-hover-lift:hover {
+  transform: scale(1.03);
+}
+
+/* Standard button transition */
+.btn-transition {
+  transition: opacity 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Image fade-in on load */
+@keyframes imageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.image-fade-in {
+  animation: imageFadeIn 0.4s ease forwards;
+}
+
+/* Smooth colour transitions for interactive elements */
+a, button {
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+/* === SPACING & LAYOUT SYSTEM === */
+
+/* Consistent section vertical rhythm */
+.section-padding {
+  padding-top: 6rem;   /* 96px desktop */
+  padding-bottom: 6rem;
+}
+
+@media (max-width: 768px) {
+  .section-padding {
+    padding-top: 3rem;   /* 48px mobile */
+    padding-bottom: 3rem;
+  }
+}
+
+/* Standard page container */
+.page-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;  /* 20px mobile */
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .page-container {
+    padding-left: 2.5rem;  /* 40px tablet */
+    padding-right: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-container {
+    padding-left: 5rem;   /* 80px desktop */
+    padding-right: 5rem;
+  }
+}
+
+/* Card internal spacing */
+.card-padding {
+  padding: 1.5rem;   /* 24px desktop */
+}
+
+@media (max-width: 640px) {
+  .card-padding {
+    padding: 1rem;   /* 16px mobile */
+  }
+}
+
+/* Generous section gap for premium spacing */
+.section-gap {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;   /* 80px between major sections on desktop */
+}
+
+@media (max-width: 768px) {
+  .section-gap {
+    gap: 3rem;   /* 48px on mobile */
+  }
+}
+
+/* Grid gap utilities */
+.grid-gap {
+  gap: 1.5rem;   /* 24px desktop */
+}
+
+@media (max-width: 640px) {
+  .grid-gap {
+    gap: 0.75rem;   /* 12px mobile */
+  }
+}
+
+/* === FORMS & INTERACTIVE SYSTEM === */
+
+/* Standard text input styling */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+textarea,
+select {
+  font-size: 1rem; /* 16px — prevents iOS zoom on focus */
+  font-family: var(--font-sans, Manrope, sans-serif);
+  color: #2D2926;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(45, 41, 38, 0.15);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  min-height: 44px;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #C4714A;
+  box-shadow: 0 0 0 3px rgba(196, 113, 74, 0.15);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(45, 41, 38, 0.38);
+}
+
+/* Disabled state */
+input:disabled,
+textarea:disabled,
+select:disabled,
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary button base (for raw <button> elements not using MagneticButton) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 1.5rem;
+  border-radius: 10px;
+  background-color: #C4714A;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+.btn-primary:hover {
+  opacity: 0.88;
+}
+
+.btn-primary:active {
+  transform: scale(0.985);
+}
+
+/* Secondary button */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 1.5rem;
+  border-radius: 10px;
+  background: transparent;
+  color: #2D2926;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border: 1px solid rgba(45, 41, 38, 0.2);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(45, 41, 38, 0.04);
+  border-color: rgba(45, 41, 38, 0.35);
+}
+
+/* Modal/drawer overlay */
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Drawer/modal content panel */
+.modal-panel {
+  background: white;
+  border-radius: 16px 16px 0 0;
+  padding: 2rem;
+}
+
+@media (min-width: 640px) {
+  .modal-panel {
+    border-radius: 16px;
+    padding: 2.5rem;
+  }
+}
+
+/* === SCROLL REVEAL ANIMATIONS === */
+
+/* Base reveal state — elements start invisible and slightly below */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* State when element enters viewport (added by IntersectionObserver or JS) */
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children in reveal groups */
+.reveal-on-scroll:nth-child(2) { transition-delay: 0.08s; }
+.reveal-on-scroll:nth-child(3) { transition-delay: 0.16s; }
+.reveal-on-scroll:nth-child(4) { transition-delay: 0.24s; }
+.reveal-on-scroll:nth-child(5) { transition-delay: 0.32s; }
+.reveal-on-scroll:nth-child(6) { transition-delay: 0.40s; }
+
+/* Reduced motion: skip transforms, keep instant appearance */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Shimmer loading effect for skeleton placeholders */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(45, 41, 38, 0.04) 25%,
+    rgba(45, 41, 38, 0.09) 50%,
+    rgba(45, 41, 38, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Page-level fade in */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: pageFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Micro-interaction: subtle pulse for new notifications */
+@keyframes subtlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.pulse-once {
+  animation: subtlePulse 0.4s ease-in-out;
+}
+
+/* Smooth number counter animation */
+.count-up {
+  transition: all 0.3s ease;
+}
+
+/* Hover underline animation for text links */
+.hover-underline {
+  position: relative;
+  text-decoration: none;
+}
+
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: width 0.2s ease;
+}
+
+.hover-underline:hover::after {
+  width: 100%;
+}
+
+/* Consistent cart/badge pop */
+@keyframes badgePop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.badge-pop {
+  animation: badgePop 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+    background: rgba(45, 41, 38, 0.06);
+  }
+  .page-enter {
+    animation: none;
+  }
+  .pulse-once {
+    animation: none;
+  }
+}

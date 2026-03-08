@@ -188,40 +188,35 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -6 }}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-charcoal/8 bg-white transition-shadow hover:shadow-[0_20px_40px_-20px_rgba(196,113,74,0.18)]"
+      className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(45,41,38,0.04),_0_4px_12px_rgba(45,41,38,0.05)] transition-all duration-200 ease-out hover:shadow-[0_2px_8px_rgba(45,41,38,0.07),_0_12px_28px_rgba(45,41,38,0.08)] hover:-translate-y-0.5"
     >
       {/* Badge */}
       {product.badge && (
         <div
-          className="absolute left-3 top-3 z-10 rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm"
-          style={{
-            backgroundColor:
-              product.badge === "Bestseller"
-                ? "var(--color-gold)"
-                : "var(--color-terracotta)",
-          }}
+          className={`absolute left-3 top-3 z-10 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white ${
+            product.badge === "Bestseller" ? "bg-[#C9A84C]" : "bg-terracotta"
+          }`}
         >
           {product.badge}
         </div>
       )}
 
       {/* Image — edge to edge, portrait aspect */}
-      <div className="relative overflow-hidden" style={{ aspectRatio: "4/5" }}>
+      <div className="relative overflow-hidden bg-[#F5EDE0] rounded-t-2xl" style={{ aspectRatio: "4/5" }}>
         <Image
           src={product.image}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+          className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
         />
       </div>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 gap-1.5 border-t border-charcoal/8 px-3 py-3 sm:px-4 sm:py-4">
+      <div className="flex flex-col flex-1 p-4">
         {/* Stars — hidden on mobile to keep cards compact */}
         <div className="hidden items-center gap-1.5 sm:flex">
-          <span className="text-sm leading-none" style={{ color: "var(--color-gold)" }}>
+          <span className="text-sm leading-none text-[#C9A84C]">
             {renderStars(product.rating)}
           </span>
           <span className="text-[11px] text-charcoal/45 font-medium">
@@ -230,20 +225,20 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
         </div>
 
         {/* Name */}
-        <p className="font-sans font-semibold text-charcoal text-sm leading-snug">{product.name}</p>
+        <p className="text-sm font-semibold text-charcoal leading-snug mb-1">{product.name}</p>
 
         {/* Price */}
-        <p className="font-bold text-charcoal text-base sm:text-lg">{fmtPrice(product.price, region)}</p>
+        <p className="text-base font-bold text-charcoal">{fmtPrice(product.price, region)}</p>
 
         {/* Sold this week — hidden on mobile */}
-        <p className="hidden font-medium sm:block" style={{ fontSize: "11px", color: "var(--color-terracotta)" }}>
+        <p className="hidden text-xs text-terracotta font-medium mb-2 sm:block">
           Popular this week
         </p>
 
         {/* CTA */}
         <Link
           href={productHref(product)}
-          className="mt-auto block w-full rounded-lg py-2.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-85 sm:py-3"
+          className="mt-auto block w-full min-h-[44px] rounded-xl text-center text-sm font-semibold text-white transition-opacity hover:opacity-90 flex items-center justify-center"
           style={{ backgroundColor: "var(--color-terracotta)" }}
         >
           Personalise Now
@@ -345,15 +340,15 @@ export function CatalogClient() {
         style={{ backgroundColor: "var(--color-cream)" }}
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex items-center justify-between gap-4 py-4 overflow-x-auto scrollbar-hide">
-            {/* Category pills */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center justify-between gap-4 py-4">
+            {/* Category pills — horizontally scrollable on mobile */}
+            <div className="-mx-4 flex flex-1 items-center gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 sm:pb-0">
               {CATEGORIES.map(({ key, label }) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setActiveCategory(key)}
-                  className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+                  className={`flex-shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
                     activeCategory === key
                       ? "text-white"
                       : "border border-charcoal/20 bg-transparent text-charcoal/65 hover:border-terracotta hover:text-terracotta"
@@ -370,13 +365,13 @@ export function CatalogClient() {
             </div>
 
             {/* Sort dropdown */}
-            <div className="relative flex-shrink-0 flex items-center gap-1.5">
+            <div className="relative flex flex-shrink-0 items-center gap-1.5">
               <SlidersHorizontal size={14} className="text-charcoal/40" />
               <select
                 value={sortKey}
                 onChange={(e) => setSortKey(e.target.value as SortKey)}
                 aria-label="Sort products"
-                className="appearance-none bg-transparent pr-4 text-sm font-medium text-charcoal/65 cursor-pointer focus:outline-none"
+                className="min-h-[44px] appearance-none rounded-lg border border-charcoal/20 bg-transparent px-2 pr-6 text-sm font-medium text-charcoal/65 cursor-pointer focus:outline-none"
               >
                 {SORT_OPTIONS.map(({ key, label }) => (
                   <option key={key} value={key}>
@@ -384,7 +379,7 @@ export function CatalogClient() {
                   </option>
                 ))}
               </select>
-              <ChevronDown size={12} className="text-charcoal/40 pointer-events-none" />
+              <ChevronDown size={12} className="pointer-events-none absolute right-1.5 text-charcoal/40" />
             </div>
           </div>
         </div>
@@ -399,7 +394,7 @@ export function CatalogClient() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4"
+            className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
           >
             {sorted.map((product, i) => (
               <ProductCard key={product.id} product={product} index={i} region={region} />

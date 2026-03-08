@@ -371,7 +371,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                 </button>
                 <Link
                   href="/shop"
-                  className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="inline-flex min-h-[44px] items-center rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
                   Shop Now
@@ -405,7 +405,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
                     {/* Main headline */}
                     <h1
-                      className="mt-5 font-serif font-bold leading-[0.95] tracking-[-0.05em] text-charcoal"
+                      className="mt-5 text-balance font-serif font-black leading-[0.95] tracking-[-0.05em] text-charcoal"
                       style={{ fontSize: "clamp(2.4rem, 7vw, 6.5rem)" }}
                     >
                       Gifts<br />They&apos;ll<br />Never<br />Forget.
@@ -515,7 +515,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             </section>
 
             {/* ── 3. Featured Products ── */}
-            <section className="py-12 sm:py-20">
+            <section className="py-16 sm:py-24">
               <div className={CONTAINER}>
                 <div className="flex items-end justify-between">
                   <motion.div
@@ -530,7 +530,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     >
                       The Collection
                     </p>
-                    <h2 className="mt-2 font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
+                    <h2 className="mt-2 text-balance font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
                       Most Loved This Month
                     </h2>
                   </motion.div>
@@ -566,7 +566,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
             {/* ── 4. Emotional storytelling — editorial split ── */}
             <section
-              className="py-12 sm:py-20"
+              className="py-16 sm:py-24"
               style={{ backgroundColor: "#F5EDE0" }}
             >
               <div className={CONTAINER}>
@@ -608,7 +608,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     >
                       Our Story
                     </p>
-                    <h2 className="mt-4 font-serif text-3xl font-bold leading-[1.05] tracking-[-0.04em] text-charcoal sm:text-5xl lg:text-6xl">
+                    <h2 className="mt-4 text-balance font-serif text-3xl font-bold leading-[1.05] tracking-[-0.04em] text-charcoal sm:text-5xl lg:text-6xl">
                       Every Keepsake<br />Tells a Story
                     </h2>
                     <div className="mt-6 h-px w-12" style={{ backgroundColor: "var(--color-terracotta)" }} />
@@ -620,7 +620,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     <div className="mt-8">
                       <Link
                         href="/create"
-                        className="inline-flex items-center gap-2 rounded-xl px-7 py-3.5 text-base font-semibold text-white shadow-[0_12px_28px_-14px_rgba(196,113,74,0.55)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-14px_rgba(196,113,74,0.65)]"
+                        className="inline-flex min-h-[44px] items-center gap-2 rounded-xl px-7 py-3.5 text-base font-semibold text-white shadow-[0_12px_28px_-14px_rgba(196,113,74,0.55)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-14px_rgba(196,113,74,0.65)]"
                         style={{ backgroundColor: "var(--color-terracotta)" }}
                       >
                         Create Your First Keepsake
@@ -633,7 +633,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             </section>
 
             {/* ── 5. How It Works — editorial numbered list ── */}
-            <section className="py-12 sm:py-20">
+            <section className="py-16 sm:py-24">
               <div className={CONTAINER}>
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
@@ -647,7 +647,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   >
                     The Process
                   </p>
-                  <h2 className="mt-3 font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
+                  <h2 className="mt-3 text-balance font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
                     Three Simple Steps
                   </h2>
                 </motion.div>
@@ -704,7 +704,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
             {/* ── 8. Email capture — forest green ── */}
             <section
-              className="py-12 sm:py-20"
+              className="py-16 sm:py-24"
               style={{ backgroundColor: "var(--color-forest)" }}
             >
               <div className={CONTAINER}>
@@ -718,7 +718,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
                       Join the Keepsy Family
                     </p>
-                    <h2 className="mt-3 font-serif text-3xl font-bold tracking-[-0.03em] text-white sm:text-4xl sm:text-5xl">
+                    <h2 className="mt-3 text-balance font-serif text-3xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
                       Get 10% Off<br />Your First Order
                     </h2>
                     <p className="mt-4 hidden max-w-sm text-base leading-7 text-white/65 sm:block">
@@ -767,7 +767,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                             <button
                               type="submit"
                               disabled={emailLoading}
-                              className="whitespace-nowrap rounded-xl px-6 py-3.5 font-semibold text-charcoal shadow-[0_10px_24px_-12px_rgba(201,168,76,0.6)] transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                              className="min-h-[44px] whitespace-nowrap rounded-xl px-6 py-3.5 font-semibold text-charcoal shadow-[0_10px_24px_-12px_rgba(201,168,76,0.6)] transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
                               style={{ backgroundColor: "var(--color-gold)" }}
                             >
                               {emailLoading ? "Sending…" : "Claim 10% Off"}

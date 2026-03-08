@@ -317,7 +317,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </section>
 
           {/* Delivery */}
-          <section className="mb-12 rounded-2xl bg-[#F5EDE0] p-6">
+          <section className="mb-12 rounded-2xl bg-[#F5EDE0] p-4 sm:p-6">
             <h2 className="text-xl font-black text-charcoal mb-3">Delivery Information</h2>
             <ul className="space-y-2 text-sm text-charcoal/70">
               <li>✓ UK standard delivery: 5–8 business days</li>
@@ -330,7 +330,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
           {/* FAQ */}
           <section className="mb-12">
-            <h2 className="text-2xl font-black text-charcoal mb-6">Common Questions</h2>
+            <h2 className="text-xl sm:text-2xl font-black text-charcoal mb-6">Common Questions</h2>
             <div className="space-y-6">
               {content.faqs.map((faq, i) => (
                 <div key={i} className="border-b border-charcoal/10 pb-6">
@@ -344,10 +344,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
           {/* Related links */}
           <section>
             <h2 className="text-xl font-black text-charcoal mb-4">Explore More</h2>
-            <div className="flex flex-wrap gap-3">
-              <a href="/create" className="rounded-xl px-5 py-2.5 text-sm font-bold text-white" style={{backgroundColor: "var(--color-terracotta, #C4714A)"}}>Design yours now</a>
-              <a href="/shop" className="rounded-xl border border-charcoal/15 px-5 py-2.5 text-sm font-bold text-charcoal hover:bg-[#F5EDE0]">Browse all products</a>
-              <a href="/gift-ideas" className="rounded-xl border border-charcoal/15 px-5 py-2.5 text-sm font-bold text-charcoal hover:bg-[#F5EDE0]">Gift ideas by occasion</a>
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <a href="/create" className="w-full rounded-xl px-5 py-2.5 text-center text-sm font-bold text-white sm:w-auto" style={{backgroundColor: "var(--color-terracotta, #C4714A)"}}>Design yours now</a>
+              <a href="/shop" className="w-full rounded-xl border border-charcoal/15 px-5 py-2.5 text-center text-sm font-bold text-charcoal hover:bg-[#F5EDE0] sm:w-auto">Browse all products</a>
+              <a href="/gift-ideas" className="w-full rounded-xl border border-charcoal/15 px-5 py-2.5 text-center text-sm font-bold text-charcoal hover:bg-[#F5EDE0] sm:w-auto">Gift ideas by occasion</a>
             </div>
           </section>
         </div>

@@ -255,13 +255,13 @@ function FeaturedProductCard({
           <span className="text-sm" style={{ color: "var(--color-gold)" }}>{product.rating}</span>
           <span className="text-xs text-charcoal/45">(100+)</span>
         </div>
-        <div className="mt-auto flex items-center justify-between pt-3">
-          <span className="text-lg font-bold text-charcoal">
+        <div className="mt-auto pt-3">
+          <span className="block text-base font-bold text-charcoal sm:text-lg">
             {region === "UK" ? product.priceUK : product.priceUS}
           </span>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85"
+            className="mt-2 flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold text-white transition-opacity hover:opacity-85 sm:inline-flex sm:px-4"
             style={{ backgroundColor: "var(--color-terracotta)" }}
           >
             Shop Now
@@ -530,7 +530,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     >
                       The Collection
                     </p>
-                    <h2 className="mt-2 font-serif text-4xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
+                    <h2 className="mt-2 font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
                       Most Loved This Month
                     </h2>
                   </motion.div>
@@ -542,7 +542,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   </Link>
                 </div>
 
-                <div className="mt-10 grid grid-cols-2 gap-5 lg:grid-cols-4">
+                <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
                   {FEATURED_PRODUCTS.map((product, i) => (
                     <FeaturedProductCard
                       key={product.name}

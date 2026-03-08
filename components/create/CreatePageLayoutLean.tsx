@@ -152,7 +152,7 @@ export function CreatePageLayoutLean({
       animate="animate"
       exit={{ opacity: 0, scale: 0.98 }}
       variants={fadeInUp}
-      className="mx-auto mt-4 flex max-w-6xl flex-col gap-6 px-1 sm:mt-8 sm:gap-10"
+      className="mx-auto mt-4 flex max-w-6xl flex-col gap-6 px-4 sm:mt-8 sm:gap-10 sm:px-1"
     >
       <div className="grid gap-6 lg:grid-cols-[1.06fr_0.94fr] lg:gap-8">
         <motion.section variants={fadeInUp} className="max-w-2xl">
@@ -394,7 +394,7 @@ export function CreatePageLayoutLean({
         </button>
 
         {/* Content: collapsible on mobile, always visible on sm+ */}
-        <div className={`mt-3 grid gap-4 lg:grid-cols-[1fr_1fr] ${ideasOpen ? "block" : "hidden"} sm:mt-0 sm:block`}>
+        <div className={`gap-4 lg:grid-cols-[1fr_1fr] ${ideasOpen ? "mt-3 grid" : "hidden"} sm:mt-4 sm:grid`}>
           <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Need ideas?</p>
             <PromptHelperCollapsible onUsePrompt={handleUsePrompt} />

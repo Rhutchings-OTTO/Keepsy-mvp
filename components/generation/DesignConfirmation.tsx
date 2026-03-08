@@ -112,14 +112,14 @@ export function DesignConfirmation({
       </button>
 
       {/* Section 1 — Title + reassurance */}
-      <div className="mb-10 text-center">
+      <div className="mb-6 text-center sm:mb-10">
         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Review your artwork</p>
         <KineticHeading className="mb-2 mt-3 text-3xl font-black text-charcoal sm:text-4xl">How does this look?</KineticHeading>
         <p className="text-sm font-semibold text-charcoal/60 sm:text-base">You can still refine it before moving into product preview.</p>
       </div>
 
       {/* Section 2 — Large image preview */}
-      <div className="mb-10 flex justify-center">
+      <div className="mb-6 flex justify-center sm:mb-10">
         <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-charcoal/8 bg-white p-3 shadow-[0_30px_72px_-40px_rgba(45,41,38,0.20)]">
           {/* One-of-a-kind badge */}
           <div className="absolute left-5 top-5 z-30 flex items-center gap-1.5 rounded-full border border-white/30 bg-charcoal/80 px-3 py-1.5 backdrop-blur-sm">
@@ -171,7 +171,7 @@ export function DesignConfirmation({
       </p>
 
       {/* Section 3 — Two choice buttons */}
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mb-5 grid grid-cols-1 gap-4 sm:mb-8 sm:grid-cols-2">
         {/* Option A — Refine (secondary) */}
         <motion.button
           type="button"
@@ -241,7 +241,7 @@ export function DesignConfirmation({
                         type="button"
                         onClick={() => insertChip(chip)}
                         disabled={!canRefine}
-                        className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-[#F5EDE0] hover:bg-charcoal/5 text-charcoal/80 transition-colors disabled:opacity-50"
+                        className="min-h-[44px] px-3 py-2 rounded-lg text-sm font-semibold bg-[#F5EDE0] hover:bg-charcoal/5 text-charcoal/80 transition-colors disabled:opacity-50"
                       >
                         {chip}
                       </button>
@@ -257,6 +257,7 @@ export function DesignConfirmation({
                     onChange={(e) => setRefinementText(e.target.value)}
                     placeholder={PLACEHOLDERS[placeholderIndex]}
                     rows={3}
+                    style={{ fontSize: "16px" }}
                     className="w-full px-4 py-3 rounded-xl border border-charcoal/15 bg-white focus:outline-none focus:ring-2 focus:ring-charcoal/20 focus:border-transparent resize-none text-charcoal placeholder:text-charcoal/40"
                     disabled={isRefining}
                   />
@@ -272,11 +273,11 @@ export function DesignConfirmation({
                     onSuggestionClick={onRefinementSuggestionClick}
                   />
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                     <MagneticButton
                       type="submit"
                       disabled={!trimmedText || isRefining || !canRefine}
-                      className="px-6 py-3 rounded-xl text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full rounded-xl px-6 py-3 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
                       style={{ backgroundColor: "var(--color-terracotta)" }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}

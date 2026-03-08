@@ -65,7 +65,8 @@ function AnnouncementBar() {
       className="relative flex items-center justify-center gap-2 px-10 py-2 text-xs font-medium text-white"
       style={{ backgroundColor: "var(--color-terracotta)" }}
     >
-      <span>⚡ Fast shipping on every order · Free shipping over £75 (UK) / $75 (US)</span>
+      <span className="sm:hidden">⚡ Free shipping over £75 / $75</span>
+      <span className="hidden sm:inline">⚡ Fast shipping on every order · Free shipping over £75 (UK) / $75 (US)</span>
       <button
         type="button"
         onClick={dismiss}

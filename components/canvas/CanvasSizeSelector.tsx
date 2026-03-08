@@ -110,6 +110,7 @@ export const CanvasSizeSelector = memo(function CanvasSizeSelector({
             <div
               className="p-3 space-y-3 overflow-y-auto max-h-[260px] sm:max-h-[320px] rounded-b-2xl"
               style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}
+              data-lenis-prevent
             >
               {TIER_ORDER.map((tier) => {
                 const sizes = sizesByTier(activeTab)[tier];

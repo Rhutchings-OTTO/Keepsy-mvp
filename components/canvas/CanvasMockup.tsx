@@ -1,7 +1,6 @@
 "use client";
 
 import { memo } from "react";
-import Image from "next/image";
 
 type CanvasMockupProps = {
   /** Width/height ratio of the canvas (width ÷ height) */
@@ -67,13 +66,12 @@ export const CanvasMockup = memo(function CanvasMockup({
           style={{ borderRadius: `${CORNER_R}px ${CORNER_R}px 0 0` }}
         >
           {imageSrc ? (
-            <Image
+            // Use a plain <img> so data URLs (from the crop tool) work without Next.js domain config
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={imageSrc}
               alt="Canvas print preview"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 90vw, 50vw"
-              priority
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
             /* Placeholder when no image yet */

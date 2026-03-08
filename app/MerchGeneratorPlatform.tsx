@@ -1224,6 +1224,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       {/* Canvas size selector */}
                       {isCanvasProduct && (
                         <section>
+                          {/* Workflow hint */}
+                          <div className="mb-4 flex items-center gap-0 rounded-xl bg-[#F5EDE0] px-3 py-2.5 text-[11px] font-semibold text-charcoal/60">
+                            <span className="font-extrabold text-charcoal/80">1&nbsp;</span><span>Choose size</span>
+                            <span className="mx-1.5 text-charcoal/30">→</span>
+                            <span className="font-extrabold text-charcoal/80">2&nbsp;</span><span>Position image</span>
+                            <span className="mx-1.5 text-charcoal/30">→</span>
+                            <span className="font-extrabold text-charcoal/80">3&nbsp;</span><span>Confirm &amp; preview</span>
+                          </div>
                           <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">Canvas Size</h3>
                           <CanvasSizeSelector
                             selected={selectedCanvasSize}

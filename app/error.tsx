@@ -35,7 +35,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
 
         <div className="relative mx-auto max-w-2xl px-4 sm:px-6">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
-            Something went wrong
+            Unexpected error
           </p>
           <h1
             className="mt-4 font-serif font-bold tracking-[-0.03em] text-white"

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { MerchGeneratorPlatformLoader as MerchGeneratorPlatform } from "./MerchGeneratorPlatformLoader";
 import { ConversionFlowProvider } from "@/context/ConversionFlowContext";
 import { GenerationProvider, SonicBoomEffect } from "@/context/GenerationContext";
@@ -5,6 +6,12 @@ import { LenisProvider } from "@/components/LenisProvider";
 import { ExitGuardian } from "@/components/ExitGuardian";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Create Your Custom Gift",
+  description: "Design a unique personalised gift in seconds. Describe your memory, pick a product, and we'll bring it to life with AI.",
+  alternates: { canonical: "https://keepsy.store/create" },
+};
 
 type CreatePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

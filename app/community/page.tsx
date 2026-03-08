@@ -3,7 +3,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Reviews | Keepsy",
+  title: "Customer Reviews",
   description: "See what customers are saying about Keepsy personalised gifts. Loved by customers across the UK and US.",
 };
 

@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { Reveal } from "@/components/motion/Reveal";
 import { OrderSuccess } from "@/components/OrderSuccess";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 type SuccessPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

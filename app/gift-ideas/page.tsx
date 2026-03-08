@@ -4,7 +4,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Gift Ideas | Keepsy",
+  title: "Gift Ideas by Occasion",
   description: "Browse gift ideas by occasion — birthdays, anniversaries, holidays and more. Find the perfect personalised gift.",
 };
 

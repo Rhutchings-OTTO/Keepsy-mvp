@@ -68,7 +68,7 @@ const PRODUCT_IMAGES = [
 const SOCIAL_PROOF_ITEMS = [
   "★★★★★  Thousands of Happy Customers",
   "🚀  Free Fast Shipping",
-  "🇺🇸  Made & Shipped with Love",
+  "🌍  Made & Shipped with Love",
   "↩️  30-Day Returns",
   "🔒  Secure Checkout",
   "⚡  Fast US & UK Delivery",
@@ -498,12 +498,15 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   animation: marquee-run 22s linear infinite;
                 }
                 .marquee-run:hover { animation-play-state: paused; }
+                @media (prefers-reduced-motion: reduce) {
+                  .marquee-run { animation: none; }
+                }
               `}</style>
               <div className="marquee-run">
                 {[...SOCIAL_PROOF_ITEMS, ...SOCIAL_PROOF_ITEMS].map((item, i) => (
                   <span
                     key={i}
-                    className="px-8 text-sm font-semibold text-white/85"
+                    className="px-8 text-sm font-semibold text-white"
                   >
                     {item}
                     <span className="mx-8 text-white/30">·</span>
@@ -872,6 +875,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                             value={emailValue}
                             onChange={(e) => setEmailValue(e.target.value)}
                             placeholder="Your email address"
+                            aria-label="Email address for 10% discount"
                             className="flex-1 rounded-xl border-0 bg-white/10 px-5 py-3.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
                           />
                           <button

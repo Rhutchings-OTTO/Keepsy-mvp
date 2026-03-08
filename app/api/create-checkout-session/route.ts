@@ -224,7 +224,7 @@ export async function POST(req: Request) {
           order_ref: orderRef,
           primary_product: primaryProductName,
           has_image: imageDataUrl ? "1" : "0",
-          design_url: designUrl || "",
+          design_url: (designUrl || "").slice(0, 490), // Stripe metadata values are limited to 500 chars
           product_type: productType,
           variant_size: safeCartSummary[0]?.size ?? "",
           variant_color: safeCartSummary[0]?.color ?? "",

@@ -80,7 +80,7 @@ export function MockupStage({
     let active = true;
     const load = async () => {
       try {
-        const res = await fetch("/api/mockup-placements", { cache: "no-store" });
+        const res = await fetch("/api/mockup-placements", { next: { revalidate: 60 } });
         if (!res.ok) return;
         const json = (await res.json()) as { placements?: PlacementMap };
         if (active && json.placements) setRuntimePlacements(json.placements);

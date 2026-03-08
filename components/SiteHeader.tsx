@@ -70,7 +70,7 @@ function AnnouncementBar() {
         type="button"
         onClick={dismiss}
         aria-label="Dismiss announcement"
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 hover:bg-white/20 transition"
+        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2.5 hover:bg-white/20 transition"
       >
         <X size={12} />
       </button>

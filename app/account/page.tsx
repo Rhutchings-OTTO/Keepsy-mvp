@@ -2,7 +2,7 @@ import Link from "next/link";
 import { GalleryOfThePossible } from "@/components/GalleryOfThePossible";
 
 export const metadata = {
-  title: "My Account | Keepsy",
+  title: "My Account",
   description: "View your saved designs, order history, and reorder your favourite gifts.",
 };
 

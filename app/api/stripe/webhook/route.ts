@@ -206,9 +206,12 @@ async function handleCheckoutCompleted(
     (session.customer_email as string) ||
     null;
 
+  const logEmail = process.env.NODE_ENV === "production"
+    ? (customerEmail?.replace(/(.{2}).*(@.*)/, "$1***$2") ?? "unknown")
+    : customerEmail;
   console.log(
     "[webhook] Processing checkout.session.completed for order:", orderRef,
-    "email:", customerEmail,
+    "email:", logEmail,
     "designUrl:", designUrl
   );
 

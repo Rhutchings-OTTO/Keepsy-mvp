@@ -307,8 +307,9 @@ export function SiteFooter() {
               <div className="flex flex-col gap-2.5">
                 {[
                   { href: "/about", label: "About Us" },
-                  { href: "/terms", label: "Terms of Service" },
+                  { href: "/terms", label: "Terms & Conditions" },
                   { href: "/privacy", label: "Privacy Policy" },
+                  { href: "/cookies", label: "Cookie Policy" },
                   { href: "/refunds", label: "Refund Policy" },
                   { href: "/shipping", label: "Shipping Info" },
                 ].map(({ href, label }) => (
@@ -341,7 +342,7 @@ export function SiteFooter() {
                   support@keepsy.store
                 </a>
                 <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
-                  🇺🇸 Made with love in the USA
+                  Made with love, shipped worldwide
                 </p>
                 <p
                   className="text-xs"
@@ -381,7 +382,7 @@ export function SiteFooter() {
               © {new Date().getFullYear()} Keepsy. All rights reserved.
             </p>
             <p className="text-xs" style={{ color: "var(--ink-faint)" }}>
-              Powered by AI · Fulfilled by Printful · Payments by Stripe
+              Powered by AI · Fulfilled by Printify · Payments by Stripe
             </p>
           </div>
         </div>

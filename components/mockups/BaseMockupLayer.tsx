@@ -15,7 +15,7 @@ export function BaseMockupLayer({ baseMockupSrc, productType }: BaseMockupLayerP
       alt={`${productType} mockup`}
       fill
       className="object-contain"
-      quality={100}
+      quality={85}
       sizes="(max-width: 1024px) 100vw, 700px"
     />
   );

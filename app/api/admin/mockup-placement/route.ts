@@ -16,7 +16,9 @@ function assertAdminAccess(req: Request) {
     return NextResponse.json({ error: "Mockup calibration is disabled." }, { status: 403 });
   }
   const requiredKey = process.env.MOCKUP_CALIBRATION_KEY;
-  if (!requiredKey) return null;
+  if (!requiredKey) {
+    return NextResponse.json({ error: "Admin key not configured." }, { status: 403 });
+  }
   const provided = req.headers.get("x-calibration-key") || "";
   if (provided !== requiredKey) {
     return NextResponse.json({ error: "Invalid calibration key." }, { status: 401 });

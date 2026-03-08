@@ -410,6 +410,7 @@ export function CatalogClient() {
               <select
                 value={sortKey}
                 onChange={(e) => setSortKey(e.target.value as SortKey)}
+                aria-label="Sort products"
                 className="appearance-none bg-transparent pr-4 text-sm font-medium text-charcoal/65 cursor-pointer focus:outline-none"
               >
                 {SORT_OPTIONS.map(({ key, label }) => (

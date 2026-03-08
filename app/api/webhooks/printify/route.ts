@@ -94,7 +94,11 @@ export async function POST(req: Request): Promise<Response> {
       });
     }
   } else if (process.env.NODE_ENV === "production") {
-    console.warn("[printify-webhook] PRINTIFY_WEBHOOK_SECRET not set — skipping signature check");
+    console.error("[printify-webhook] PRINTIFY_WEBHOOK_SECRET not set — rejecting all requests for security");
+    return new Response(JSON.stringify({ error: "Webhook not configured" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   // ── Parse payload ────────────────────────────────────────────────────────

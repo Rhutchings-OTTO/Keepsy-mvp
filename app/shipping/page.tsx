@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Shipping & Delivery | Keepsy",
+  title: "Shipping & Delivery",
   description: "Shipping times, cutoff dates, and delivery information for UK and US orders.",
 };
 

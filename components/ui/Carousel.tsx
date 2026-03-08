@@ -112,6 +112,7 @@ export function Carousel({ children, className = "", showArrows = true, showDots
               type="button"
               onClick={() => scrollToIndex(i)}
               aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === index ? "true" : undefined}
               className={`h-2 rounded-full transition ${i === index ? "w-6 bg-charcoal/70" : "w-2 bg-charcoal/25 hover:bg-charcoal/40"}`}
             />
           ))}

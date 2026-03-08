@@ -1257,7 +1257,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       <ChevronLeft size={16} /> Back
                     </button>
                     {checkoutError && (
-                      <p className="mt-3 rounded-xl px-4 py-3 text-sm font-semibold" style={{ backgroundColor: "rgba(196,113,74,0.10)", color: "var(--color-terracotta)" }}>
+                      <p role="alert" className="mt-3 rounded-xl px-4 py-3 text-sm font-semibold" style={{ backgroundColor: "rgba(196,113,74,0.10)", color: "var(--color-terracotta)" }}>
                         {checkoutError}
                       </p>
                     )}
@@ -1330,6 +1330,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center"
+                  role="status"
+                  aria-live="polite"
                 >
                   <p className="text-lg font-black text-charcoal">Securing your Masterpiece</p>
                   <p className="mt-2 text-sm font-semibold text-charcoal/60">Redirecting to checkout…</p>

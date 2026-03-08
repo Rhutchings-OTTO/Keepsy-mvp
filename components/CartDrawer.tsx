@@ -308,7 +308,7 @@ export function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-y-0 right-0 z-[301] flex w-full flex-col bg-white shadow-[−24px_0_60px_-20px_rgba(45,41,38,0.18)] md:w-[420px]"
+            className="fixed inset-y-0 right-0 z-[301] flex w-full flex-col bg-white shadow-[-24px_0_60px_-20px_rgba(45,41,38,0.18)] md:w-[420px]"
             aria-label="Shopping cart"
             role="dialog"
             aria-modal="true"

@@ -226,6 +226,8 @@ export function CartDrawer() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [giftNote, setGiftNote] = useState("");
   const [noteExpanded, setNoteExpanded] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   /* Listen for open-cart-drawer event */
   useEffect(() => {
@@ -275,6 +277,42 @@ export function CartDrawer() {
     const next = items.filter((i) => i.id !== id);
     setItems(next);
     writeCart(next);
+  }
+
+  async function handleCheckout() {
+    if (isCheckingOut || items.length === 0) return;
+    setIsCheckingOut(true);
+    setCheckoutError(null);
+    try {
+      const cart = items.map((item) => ({
+        productId: item.productId,
+        name: item.name,
+        color: item.color,
+        size: item.size,
+        imageUrl: item.imageUrl || item.designUrl,
+        unitPrice: priceDollars(item.unitPrice),
+        quantity: item.quantity,
+      }));
+      const primaryItem = items[0];
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cart,
+          designUrl: primaryItem.designUrl ?? primaryItem.imageUrl ?? "",
+          imageDataUrl: primaryItem.imageUrl ? "1" : undefined,
+          productType: primaryItem.productId,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.message || data?.error || "Checkout failed.");
+      }
+      window.location.href = data.url as string;
+    } catch (e) {
+      setCheckoutError(e instanceof Error ? e.message : "Checkout failed. Please try again.");
+      setIsCheckingOut(false);
+    }
   }
 
   /* Derived totals */
@@ -423,16 +461,19 @@ export function CartDrawer() {
 
                 {/* ── Checkout CTA ── */}
                 <div className="px-6 pb-6 pt-3">
+                  {checkoutError && (
+                    <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
+                      {checkoutError}
+                    </p>
+                  )}
                   <button
                     type="button"
-                    className="flex w-full min-h-[52px] items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90"
+                    disabled={isCheckingOut}
+                    className="flex w-full min-h-[52px] items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
                     style={{ backgroundColor: "var(--color-terracotta)" }}
-                    onClick={() => {
-                      // TODO: wire up Stripe checkout
-                      window.location.href = "/create";
-                    }}
+                    onClick={() => void handleCheckout()}
                   >
-                    Checkout
+                    {isCheckingOut ? "Taking you to checkout…" : "Checkout"}
                   </button>
 
                   {/* Trust badges */}

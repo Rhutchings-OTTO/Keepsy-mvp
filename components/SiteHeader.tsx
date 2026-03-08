@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -82,11 +82,16 @@ function MobileOverlay({
   open,
   onClose,
   pathname,
+  triggerRef,
 }: {
   open: boolean;
   onClose: () => void;
   pathname: string;
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
 }) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const lastNavLinkRef = useRef<HTMLAnchorElement>(null);
+
   // Prevent body scroll when open
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
@@ -94,17 +99,59 @@ function MobileOverlay({
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  // Focus first item (close button) when menu opens
+  useEffect(() => {
+    if (open) {
+      // Small delay so AnimatePresence has rendered the element
+      const id = setTimeout(() => closeButtonRef.current?.focus(), 50);
+      return () => clearTimeout(id);
+    } else {
+      // Return focus to hamburger button when menu closes
+      triggerRef.current?.focus();
+    }
+  }, [open, triggerRef]);
+
+  // Close on Escape
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      // Focus trap: Tab from last focusable item wraps to close button;
+      // Shift+Tab from close button wraps to last focusable item.
+      if (e.key === "Tab") {
+        if (e.shiftKey) {
+          if (document.activeElement === closeButtonRef.current) {
+            e.preventDefault();
+            lastNavLinkRef.current?.focus();
+          }
+        } else {
+          if (document.activeElement === lastNavLinkRef.current) {
+            e.preventDefault();
+            closeButtonRef.current?.focus();
+          }
+        }
+      }
+    },
+    [onClose]
+  );
+
   return (
     <AnimatePresence>
       {open && (
         <motion.div
           key="mobile-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.22 }}
           className="fixed inset-0 z-[200] flex flex-col"
           style={{ backgroundColor: "var(--color-cream)" }}
+          onKeyDown={handleKeyDown}
         >
           {/* Top bar */}
           <div className="flex items-center justify-between px-5 py-5">
@@ -116,6 +163,7 @@ function MobileOverlay({
               />
             </Link>
             <button
+              ref={closeButtonRef}
               type="button"
               onClick={onClose}
               aria-label="Close menu"
@@ -157,9 +205,10 @@ function MobileOverlay({
             })}
           </nav>
 
-          {/* CTA */}
+          {/* CTA — last focusable element, used as focus-trap anchor */}
           <div className="px-8 pb-16">
             <Link
+              ref={lastNavLinkRef}
               href="/create"
               onClick={onClose}
               className="flex min-h-[52px] items-center justify-center rounded-full text-base font-semibold text-white transition hover:opacity-90"
@@ -178,6 +227,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const cartCount = useCartCount();
   const [menuOpen, setMenuOpen] = useState(false);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
@@ -194,9 +244,12 @@ export function SiteHeader() {
         <div className={`${CONTAINER} flex items-center justify-between py-3`}>
           {/* ── Mobile: hamburger left ── */}
           <button
+            ref={hamburgerRef}
             type="button"
             className="flex items-center justify-center rounded-full p-2 transition hover:bg-black/5 md:hidden"
             aria-label="Open menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav-overlay"
             onClick={() => setMenuOpen(true)}
           >
             <Menu size={22} style={{ color: "var(--color-charcoal)" }} />
@@ -281,6 +334,7 @@ export function SiteHeader() {
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         pathname={pathname}
+        triggerRef={hamburgerRef}
       />
     </>
   );

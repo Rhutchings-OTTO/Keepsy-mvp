@@ -20,7 +20,10 @@ import {
   Lock,
 } from "lucide-react";
 import { DynamicLogo } from "@/components/DynamicLogo";
-import RegionSelector from "@/components/RegionSelector";
+const RegionSelector = dynamic(
+  () => import("@/components/RegionSelector"),
+  { ssr: false }
+);
 import { getRegion, setRegion, type Region } from "@/lib/region";
 
 const PremiumGateway = dynamic(

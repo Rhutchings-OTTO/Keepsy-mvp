@@ -562,11 +562,12 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     style={{ aspectRatio: "4/5" }}
                   >
                     <Image
-                      src="https://images.unsplash.com/photo-1536010305525-f7aa0834e2c7?w=800"
-                      alt="Woman smiling while receiving a gift"
+                      src="/images/our-story-hero.png"
+                      alt="Two women laughing together outdoors in warm golden light"
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
+                      quality={85}
                     />
                     <div
                       className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t"

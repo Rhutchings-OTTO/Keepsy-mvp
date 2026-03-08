@@ -86,9 +86,9 @@ export const CanvasSizeSelector = memo(function CanvasSizeSelector({
 
       {/* Expanded panel */}
       {isOpen && (
-        <div className="mt-2 rounded-2xl border border-charcoal/10 bg-white shadow-[0_16px_40px_-20px_rgba(45,41,38,0.20)] overflow-hidden">
+        <div className="mt-2 rounded-2xl border border-charcoal/10 bg-white shadow-[0_16px_40px_-20px_rgba(45,41,38,0.20)]">
           {/* Tabs */}
-          <div className="flex border-b border-charcoal/8">
+          <div className="flex border-b border-charcoal/8 rounded-t-2xl overflow-hidden">
             {ORIENTATIONS.map((o) => (
               <button
                 key={o}
@@ -105,42 +105,53 @@ export const CanvasSizeSelector = memo(function CanvasSizeSelector({
             ))}
           </div>
 
-          {/* Size grid */}
-          <div className="max-h-72 overflow-y-auto p-3 space-y-3">
-            {TIER_ORDER.map((tier) => {
-              const sizes = sizesByTier(activeTab)[tier];
-              if (!sizes.length) return null;
-              return (
-                <div key={tier}>
-                  <p className="mb-1.5 px-1 text-[10px] font-extrabold uppercase tracking-widest text-charcoal/35">
-                    {TIER_LABEL[tier]} — {GBP.format(sizes[0].priceGBP)}
-                  </p>
-                  <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-                    {sizes.map((size) => {
-                      const isSelected = size.code === selected.code;
-                      return (
-                        <button
-                          key={size.code}
-                          type="button"
-                          onClick={() => handleSelect(size)}
-                          className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition ${
-                            isSelected
-                              ? "border-terracotta bg-terracotta/5"
-                              : "border-charcoal/10 hover:border-charcoal/25 hover:bg-[#F5EDE0]"
-                          }`}
-                        >
-                          <AspectThumb w={size.width} h={size.height} />
-                          <span className={`text-xs font-bold ${isSelected ? "text-terracotta" : "text-charcoal"}`}>
-                            {size.width}×{size.height}
-                          </span>
-                          {isSelected && <Check size={12} className="ml-auto text-terracotta shrink-0" />}
-                        </button>
-                      );
-                    })}
+          {/* Size grid — scrollable wrapper with bottom-fade scroll indicator */}
+          <div className="relative">
+            <div
+              className="p-3 space-y-3 overflow-y-auto max-h-[260px] sm:max-h-[320px] rounded-b-2xl"
+              style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}
+            >
+              {TIER_ORDER.map((tier) => {
+                const sizes = sizesByTier(activeTab)[tier];
+                if (!sizes.length) return null;
+                return (
+                  <div key={tier}>
+                    <p className="mb-1.5 px-1 text-[10px] font-extrabold uppercase tracking-widest text-charcoal/35">
+                      {TIER_LABEL[tier]} — {GBP.format(sizes[0].priceGBP)}
+                    </p>
+                    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                      {sizes.map((size) => {
+                        const isSelected = size.code === selected.code;
+                        return (
+                          <button
+                            key={size.code}
+                            type="button"
+                            onClick={() => handleSelect(size)}
+                            className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition ${
+                              isSelected
+                                ? "border-terracotta bg-terracotta/5"
+                                : "border-charcoal/10 hover:border-charcoal/25 hover:bg-[#F5EDE0]"
+                            }`}
+                          >
+                            <AspectThumb w={size.width} h={size.height} />
+                            <span className={`text-xs font-bold ${isSelected ? "text-terracotta" : "text-charcoal"}`}>
+                              {size.width}×{size.height}
+                            </span>
+                            {isSelected && <Check size={12} className="ml-auto text-terracotta shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            {/* Bottom fade — signals there is more content to scroll */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 rounded-b-2xl"
+              style={{ background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.92))" }}
+            />
           </div>
         </div>
       )}

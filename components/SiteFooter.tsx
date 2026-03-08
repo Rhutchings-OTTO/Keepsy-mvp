@@ -1,3 +1,17 @@
+/*
+ * GOOGLE BUSINESS PROFILE SETUP (do this manually):
+ * 1. Go to https://business.google.com and sign in with the Keepsy Google account
+ * 2. Search for "Keepsy" — if it appears, claim it; if not, create a new listing
+ * 3. Category: "Gift Shop" (primary) + "Online Gift Store" (secondary)
+ * 4. Business name: Keepsy
+ * 5. Website: https://keepsy.store
+ * 6. Description: "Keepsy is an online personalised gift store where you can design custom hoodies, mugs, t-shirts, greeting cards and canvas prints — and see your design on the product before ordering. Ships to UK and US."
+ * 7. Add product photos: upload 10+ high-quality product mockup images
+ * 8. Enable Google Messaging for customer enquiries
+ * 9. Add all products with photos and prices
+ * 10. Request reviews from customers after orders arrive
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -292,6 +306,7 @@ export function SiteFooter() {
                 {[
                   { href: "/shop", label: "All Products" },
                   { href: "/gift-ideas", label: "Gift Ideas" },
+                  { href: "/community", label: "Community" },
                   { href: "/create", label: "Create a Gift" },
                   { href: "/product/mug", label: "Personalised Mugs" },
                   { href: "/product/tee", label: "Custom Tees" },
@@ -349,6 +364,9 @@ export function SiteFooter() {
                 <a href="mailto:support@keepsy.store" className="text-sm transition hover:underline" style={{ color: "var(--color-terracotta)" }}>
                   support@keepsy.store
                 </a>
+                <Link href="/faq" className="text-sm transition hover:underline" style={{ color: "var(--ink-muted)" }}>
+                  FAQ
+                </Link>
                 <p className="text-sm" style={{ color: "var(--ink-muted)" }}>Made with love, shipped worldwide</p>
                 <p className="text-xs" style={{ color: "var(--ink-faint)" }}>Support available 7 days a week</p>
                 {/* Payment icons */}

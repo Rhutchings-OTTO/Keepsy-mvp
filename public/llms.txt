@@ -1,0 +1,34 @@
+# Keepsy
+> Keepsy is a UK-based online store for personalised gifts. Customers describe an idea or upload a photo and see it previewed on the actual product — hoodies, t-shirts, mugs, greeting cards, and canvas prints — before ordering. Every design is unique and made to order.
+
+## Products
+- Personalised Hoodies from £44.99
+- Personalised T-Shirts from £29.99
+- Personalised Ceramic Mugs from £18.99
+- Personalised Greeting Cards from £9.99
+- Personalised Canvas Prints from £29.99
+
+## Key Features
+- AI-powered design preview — see your design on the product before ordering
+- Ships to UK and United States
+- Free shipping over £75 (UK) / $75 (US)
+- Premium materials, vivid lasting prints
+- Every design is one of a kind
+
+## Perfect For
+Mother's Day gifts, Father's Day gifts, birthday gifts, wedding gifts, hen do merchandise, baby shower gifts, anniversary gifts, Christmas gifts, unique personalised presents
+
+## How It Works
+1. Describe your design idea or upload a photo
+2. See it previewed on your chosen product instantly
+3. Order with confidence — 30-day returns, fast delivery
+
+## About
+Keepsy was founded to make gifting personal again. Unlike generic gift sites, Keepsy lets you see your unique design on the actual product before you commit to ordering. All products are printed on demand by premium UK and US fulfilment partners.
+
+## Contact
+Email: hello@keepsy.store
+Support: support@keepsy.store
+
+## URL: https://keepsy.store
+## Sitemap: https://keepsy.store/sitemap.xml

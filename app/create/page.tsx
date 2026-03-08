@@ -8,9 +8,22 @@ import { ExitGuardian } from "@/components/ExitGuardian";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Create Your Custom Gift",
-  description: "Design a unique personalised gift in seconds. Describe your memory, pick a product, and we'll bring it to life.",
+  title: "Design Your Own Personalised Gift | Create Custom Prints — Keepsy",
+  description: "Design your own personalised gift in seconds. Describe what you'd like or upload a photo — we'll turn it into a beautiful custom print on hoodies, mugs, t-shirts, cards or canvas. Preview before ordering.",
   alternates: { canonical: "https://keepsy.store/create" },
+  openGraph: {
+    title: "Design Your Own Personalised Gift | Create Custom Prints — Keepsy",
+    description: "Design your own personalised gift in seconds. Describe what you'd like or upload a photo — we'll turn it into a beautiful custom print on hoodies, mugs, t-shirts, cards or canvas. Preview before ordering.",
+    type: "website",
+    url: "https://keepsy.store/create",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Keepsy personalised gift creator" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Design Your Own Personalised Gift | Create Custom Prints — Keepsy",
+    description: "Design your own personalised gift in seconds. Describe what you'd like or upload a photo — we'll turn it into a beautiful custom print on hoodies, mugs, t-shirts, cards or canvas. Preview before ordering.",
+    images: ["/twitter-image"],
+  },
 };
 
 type CreatePageProps = {

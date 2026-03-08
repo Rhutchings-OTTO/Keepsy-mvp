@@ -6,30 +6,37 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Gift Ideas for Every Occasion",
+  title: "Personalised Gift Ideas | Gift Guides by Occasion — Keepsy",
   description:
-    "Discover thoughtful gift ideas for every occasion. From unique gifts for her to personalised keepsakes for birthdays, anniversaries and holidays — curated with care at Keepsy.",
+    "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do merchandise and more — all custom printed and previewed before you order.",
   alternates: {
     canonical: "https://keepsy.store/gift-ideas",
   },
   openGraph: {
-    title: "Gift Ideas for Every Occasion — Keepsy",
+    title: "Personalised Gift Ideas | Gift Guides by Occasion — Keepsy",
     description:
-      "Find the perfect unique gift for her — or anyone. Browse personalised gift ideas by occasion: birthdays, anniversaries, Christmas and more.",
+      "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do merchandise and more — all custom printed and previewed before you order.",
     type: "website",
     url: "https://keepsy.store/gift-ideas",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Gift Ideas for Every Occasion — Keepsy",
+    title: "Personalised Gift Ideas | Gift Guides by Occasion — Keepsy",
     description:
-      "Unique gifts for her and everyone you love. Browse personalised gift ideas by occasion at Keepsy.",
+      "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do merchandise and more — all custom printed and previewed before you order.",
   },
 };
 
 export default function GiftIdeasPage() {
   return (
     <>
+      <nav aria-label="Breadcrumb" className="mx-auto max-w-6xl px-4 pt-4 pb-2 text-sm text-charcoal/50 sm:px-6">
+        <ol className="flex items-center gap-1.5">
+          <li><Link href="/" className="hover:text-charcoal">Home</Link></li>
+          <li aria-hidden>/</li>
+          <li className="text-charcoal font-medium">Gift Ideas</li>
+        </ol>
+      </nav>
       <PromoBanner />
 
       {/* Hero — forest green full-bleed */}

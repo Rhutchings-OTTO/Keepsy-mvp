@@ -5,24 +5,24 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Customer Reviews & Stories",
+  title: "Customer Reviews — Keepsy Personalised Gifts",
   description:
-    "Real reviews from real Keepsy customers. See why thousands of gift-givers across the UK and US trust Keepsy for their most heartfelt, personalised presents.",
+    "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from thousands of happy customers.",
   alternates: {
     canonical: "https://keepsy.store/community",
   },
   openGraph: {
-    title: "Customer Reviews & Stories — Keepsy",
+    title: "Customer Reviews — Keepsy Personalised Gifts",
     description:
-      "Honest words from people who found the perfect personalised gift. Browse hundreds of verified Keepsy customer reviews.",
+      "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from thousands of happy customers.",
     type: "website",
     url: "https://keepsy.store/community",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Customer Reviews & Stories — Keepsy",
+    title: "Customer Reviews — Keepsy Personalised Gifts",
     description:
-      "See what real customers say about Keepsy personalised gifts. Loved by gift-givers across the UK and US.",
+      "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from thousands of happy customers.",
   },
 };
 

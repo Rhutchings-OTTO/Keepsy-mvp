@@ -166,6 +166,8 @@ function getImagePlacement(productType: string): { x: number; y: number; scale: 
   if (p.includes("hoodie")) return { x: 0.5, y: 0.38, scale: 0.5  };
   if (p.includes("tee") || p.includes("tshirt") || p.includes("t-shirt"))
                             return { x: 0.5, y: 0.42, scale: 0.55 };
+  // Canvas: full-bleed — the cropped image fills the entire print area
+  if (p.includes("canvas")) return { x: 0.5, y: 0.5,  scale: 1.0  };
   return                           { x: 0.5, y: 0.5,  scale: 0.7  };
 }
 

@@ -159,6 +159,32 @@ const REVIEWS: Record<
       rating: 5,
     },
   ],
+  canvas: [
+    {
+      name: "Jennifer M.",
+      location: "California",
+      text: "Absolutely stunning. The colours are so vibrant and the gallery wrap looks incredibly professional.",
+      rating: 5,
+    },
+    {
+      name: "Patricia L.",
+      location: "Florida",
+      text: "Hung it in our living room and every visitor asks where we got it. Perfect wedding gift.",
+      rating: 5,
+    },
+    {
+      name: "Susan T.",
+      location: "Texas",
+      text: "The 1.25\" depth makes it look like a real gallery piece. Could not be happier.",
+      rating: 5,
+    },
+    {
+      name: "Karen W.",
+      location: "Georgia",
+      text: "Ordered the 20×16 for my mum's birthday — she cried. The quality is unreal for the price.",
+      rating: 5,
+    },
+  ],
 };
 
 // ─── Related products ─────────────────────────────────────────────────────────
@@ -187,6 +213,11 @@ const RELATED_META: Record<
     { type: "tshirt", label: "Premium Tee", price: 29.99 },
     { type: "hoodie", label: "Hoodie", price: 44.99 },
   ],
+  canvas: [
+    { type: "mug", label: "Mug", price: 18.99 },
+    { type: "card", label: "Greeting Card", price: 9.99 },
+    { type: "hoodie", label: "Hoodie", price: 44.99 },
+  ],
 };
 
 const PRODUCT_UNSPLASH: Record<ProductType, string> = {
@@ -194,6 +225,7 @@ const PRODUCT_UNSPLASH: Record<ProductType, string> = {
   tshirt: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300",
   hoodie: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300",
   card: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=300",
+  canvas: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300",
 };
 
 // ─── Trust badges ─────────────────────────────────────────────────────────────

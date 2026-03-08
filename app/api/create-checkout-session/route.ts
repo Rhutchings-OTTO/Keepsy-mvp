@@ -50,6 +50,7 @@ const checkoutSchema = z
     currency: z.enum(["gbp", "usd"]).optional(),
     imageDataUrl: z.string().max(256).optional(),
     designUrl: z.string().max(2048).optional(),
+    croppedImageUrl: z.string().max(2048).optional(),
     productType: z.string().max(64).optional(),
   })
   .strict();
@@ -155,6 +156,7 @@ export async function POST(req: Request) {
     const orderRef = `order_${globalThis.crypto.randomUUID()}`;
     const imageDataUrl = body.imageDataUrl ?? safeCartSummary[0]?.imageUrl ?? "";
     const designUrl = body.designUrl ?? "";
+    const croppedImageUrl = body.croppedImageUrl ?? "";
     const productType = body.productType ?? primaryProductName;
 
     const idempotencySource = JSON.stringify({
@@ -239,6 +241,7 @@ export async function POST(req: Request) {
           primary_product: primaryProductName,
           has_image: imageDataUrl ? "1" : "0",
           design_url: (designUrl || "").slice(0, 490), // Stripe metadata values are limited to 500 chars
+          cropped_image_url: (croppedImageUrl || "").slice(0, 490),
           product_type: productType,
           variant_size: safeCartSummary[0]?.size ?? "",
           variant_color: safeCartSummary[0]?.color ?? "",

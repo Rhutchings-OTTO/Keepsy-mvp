@@ -4,7 +4,7 @@
 
 export type ApparelSize = "S" | "M" | "L" | "XL" | "2XL" | "3XL" | "4XL" | "5XL";
 
-export type ProductType = "hoodie" | "tshirt" | "mug" | "card";
+export type ProductType = "hoodie" | "tshirt" | "mug" | "card" | "canvas";
 
 export interface Product {
   id: ProductType;
@@ -12,6 +12,8 @@ export interface Product {
   description: string;
   basePrice: number;
   hasSize: boolean;
+  /** True for the canvas product — uses CanvasSizeSelector instead of apparel sizes */
+  hasCanvasSize?: boolean;
   sizes?: ApparelSize[];
   colors?: Array<{ hex: string; name: string }>;
 }
@@ -60,14 +62,23 @@ export const PRODUCTS: Record<ProductType, Product> = {
     basePrice: 9.99,
     hasSize: false,
   },
+  canvas: {
+    id: "canvas",
+    name: "Canvas Print",
+    description: "Gallery-wrapped canvas, 1.25\" depth. From £29.99.",
+    basePrice: 29.99, // starting price (small tier)
+    hasSize: false,
+    hasCanvasSize: true,
+  },
 };
 
-/** Ordered list for UI iteration (Premium Tee, Hoodie, Mug, Greeting Card) */
+/** Ordered list for UI iteration */
 export const PRODUCT_LIST: Product[] = [
   PRODUCTS.tshirt,
   PRODUCTS.hoodie,
   PRODUCTS.mug,
   PRODUCTS.card,
+  PRODUCTS.canvas,
 ];
 
 /** Product id used in cart/checkout (legacy: tee, hoodie, mug, card) */
@@ -76,9 +87,13 @@ export const PRODUCT_CATALOG_IDS: Record<ProductType, string> = {
   hoodie: "hoodie",
   mug: "mug",
   card: "card",
+  // Canvas uses size-tier IDs (canvas_small/medium/large/xlarge) — handled specially at cart build time
+  canvas: "canvas",
 };
 
 export function getProductByCatalogId(catalogId: string): Product | null {
+  // Canvas tier IDs (canvas_small / canvas_medium / canvas_large / canvas_xlarge)
+  if (catalogId.startsWith("canvas")) return PRODUCTS.canvas;
   const entry = Object.entries(PRODUCT_CATALOG_IDS).find(([, id]) => id === catalogId);
   return entry ? PRODUCTS[entry[0] as ProductType] : null;
 }

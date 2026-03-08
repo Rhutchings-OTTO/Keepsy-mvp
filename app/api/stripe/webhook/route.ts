@@ -204,6 +204,7 @@ async function handleCheckoutCompleted(
     session.metadata?.order_ref || session.client_reference_id || `order_${session.id}`;
   const prompt = session.metadata?.prompt || "";
   const designUrl = session.metadata?.design_url || null;
+  const croppedImageUrl = session.metadata?.cropped_image_url || null;
   const amountTotal = (session.amount_total ?? 0) / 100;
 
   const customerEmail =
@@ -326,8 +327,11 @@ async function handleCheckoutCompleted(
       session.customer_details?.address?.country;
     const region = regionFromCountry(shippingCountry);
 
+    // For canvas orders a cropped image URL is preferred over the original design.
+    const printifySourceUrl = croppedImageUrl || designUrl;
+
     // Upload design image to Printify
-    const printifyImageId = await uploadImageToPrintify(designUrl, `keepsy-${orderRef}.png`);
+    const printifyImageId = await uploadImageToPrintify(printifySourceUrl, `keepsy-${orderRef}.png`);
     await supabase
       .from("orders")
       .update({ printify_image_id: printifyImageId, printify_status: "image_uploaded" })

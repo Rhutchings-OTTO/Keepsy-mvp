@@ -22,7 +22,8 @@ export type ProductRegionKey =
   | "hoodie_uk"
   | "tee_us"
   | "tee_uk"
-  | "card";
+  | "card"
+  | "canvas";
 
 export type BlueprintConfig = {
   blueprintId: number;
@@ -180,6 +181,81 @@ const TEE: BlueprintConfig = {
   fallbackVariantId: 73200, // Black / M
 };
 
+/* ─── Canvas (BP 1159, provider 105 — Jondo) ─────────────────────────────── */
+// Single global provider; no color variants — key is "WxH" (width × height in inches).
+// All sizes have 1.25" depth. Variant IDs fetched via scripts/fetch-canvas-variants.ts.
+const CANVAS: BlueprintConfig = {
+  blueprintId: 1159,
+  printProviderId: 105,
+  printPosition: "front",
+  variants: {
+    // ── Horizontal ────────────────────────────────────────────────────────
+    "10x8":  101412,
+    "12x9":   91624,
+    "14x11":  91625,
+    "16x12":  91626,
+    "18x12":  91627,
+    "20x10":  91628,
+    "20x16":  91629,
+    "24x16":  91630,
+    "24x18":  91631,
+    "24x20":  91632,
+    "30x15": 112821,
+    "30x20":  91633,
+    "30x24": 101410,
+    "32x24":  91634,
+    "36x12":  91636,
+    "36x24":  91635,
+    "40x20": 112822,
+    "40x30":  91637,
+    "48x16": 101414,
+    "48x24": 112135,
+    "48x32":  91638,
+    "48x36": 112823,
+    "60x20":  91639,
+    "60x30": 112137,
+    "60x40": 112954,
+    // ── Vertical ──────────────────────────────────────────────────────────
+    "8x10":  101413,
+    "9x12":   91640,
+    "10x20":  91642,
+    "11x14":  91641,
+    "12x16":  91643,
+    "12x18":  91644,
+    "12x36":  91645,
+    "15x30": 112824,
+    "16x20":  91646,
+    "16x24":  91647,
+    "16x48": 101415,
+    "18x24":  91648,
+    "20x24":  91649,
+    "20x30":  91650,
+    "20x40": 112825,
+    "20x60":  91651,
+    "24x30": 101411,
+    "24x32":  91652,
+    "24x36":  91653,
+    "24x48": 112136,
+    "30x40":  91654,
+    "30x60": 112138,
+    "32x48":  91655,
+    "36x48": 112826,
+    "40x60": 112955,
+    // ── Square ────────────────────────────────────────────────────────────
+    "6x6":   101418,
+    "10x10":  91656,
+    "12x12":  91657,
+    "14x14":  91658,
+    "16x16":  91659,
+    "20x20":  91660,
+    "24x24":  91661,
+    "30x30":  91662,
+    "32x32":  91663,
+    "36x36": 101419,
+  },
+  fallbackVariantId: 91657, // 12x12 square
+};
+
 /* ─── Master product map ─────────────────────────────────────────────────── */
 
 export const PRINTIFY_BLUEPRINTS: Record<ProductRegionKey, BlueprintConfig> = {
@@ -190,6 +266,7 @@ export const PRINTIFY_BLUEPRINTS: Record<ProductRegionKey, BlueprintConfig> = {
   tee_us: TEE,
   tee_uk: TEE, // same provider serves both regions for Comfort Colors
   card: CARD,
+  canvas: CANVAS,
 };
 
 /* ─── Lookup helpers ─────────────────────────────────────────────────────── */
@@ -207,6 +284,8 @@ export function getProductRegionKey(
   if (p === "mug") return region === "UK" ? "mug_uk" : "mug_us";
   if (p === "hoodie") return region === "UK" ? "hoodie_uk" : "hoodie_us";
   if (p === "tee") return region === "UK" ? "tee_uk" : "tee_us";
+  // canvas_small / canvas_medium / canvas_large / canvas_xlarge all map to one provider
+  if (p.startsWith("canvas")) return "canvas";
   // fallback
   console.error(`[printify] Unknown productId '${productId}' — falling back to card. Add blueprint mapping.`);
   return "card";
@@ -261,6 +340,11 @@ export function getPrintifyVariantId(
   // Color-only (for products with no sizes like mugs/cards)
   if (c && config.variants[c] !== undefined) {
     return { config, variantId: config.variants[c] };
+  }
+
+  // Size-only (for products with no colors like canvas)
+  if (s && config.variants[s] !== undefined) {
+    return { config, variantId: config.variants[s] };
   }
 
   // Fallback

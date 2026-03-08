@@ -124,7 +124,7 @@ export function OrderSuccess({ productName, designUrl, orderRef }: OrderSuccessP
             transition={{ delay: 0.7 }}
             className="mx-auto mt-5 max-w-sm text-base leading-8 text-white/65"
           >
-            Your {productName} has been confirmed and sent to production. We&apos;ll keep you updated every step of the way.
+            Your one-of-a-kind {productName} has been confirmed and sent to production. No one else in the world has this design.
           </motion.p>
 
           <motion.p
@@ -243,6 +243,9 @@ export function OrderSuccess({ productName, designUrl, orderRef }: OrderSuccessP
           <h2 className="mt-3 font-serif text-3xl font-bold text-white sm:text-4xl">
             Make Another Memory?
           </h2>
+          <p className="mt-3 text-sm text-white/60 max-w-sm mx-auto">
+            Got another person to gift? Every design is unique — start a new one now while you&apos;re feeling inspired.
+          </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <MagneticLink
               href="/create"

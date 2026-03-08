@@ -3,9 +3,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 
 const OPTIONS = [
-  { id: "matching-card", label: "Add a matching card", priceHint: "+ small extra" },
-  { id: "second-print", label: "Add a second print", priceHint: "+ small extra" },
-  { id: "priority-print", label: "Priority print handling", priceHint: "optional add-on" },
+  { id: "matching-card", label: "Add a matching card", priceHint: "+ £9.99 · Most popular add-on" },
+  { id: "second-print", label: "Add a second print", priceHint: "+ same price · Perfect as a spare" },
+  { id: "priority-print", label: "Priority print handling", priceHint: "+ £3.99 · Ships 2 days faster" },
 ];
 
 type UpsellDrawerProps = {
@@ -78,7 +78,7 @@ export default function UpsellDrawer({
             </div>
 
             <div className="mt-3 rounded-[1.15rem] border border-charcoal/10 p-3" style={{ backgroundColor: "rgba(253,246,238,0.8)" }}>
-              <p className="text-xs font-semibold text-charcoal">Bundle option</p>
+              <p className="text-xs font-semibold text-charcoal">Bundle &amp; save</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {["none", "gift-bundle", "premium-bundle"].map((choice) => (
                   <button
@@ -92,7 +92,7 @@ export default function UpsellDrawer({
                     }`}
                     style={bundleChoice === choice ? { backgroundColor: "var(--color-terracotta)" } : undefined}
                   >
-                    {choice === "none" ? "No bundle" : choice === "gift-bundle" ? "Gift bundle" : "Premium bundle"}
+                    {choice === "none" ? "No bundle" : choice === "gift-bundle" ? "Gift bundle — save 10%" : "Premium bundle — save 15%"}
                   </button>
                 ))}
               </div>

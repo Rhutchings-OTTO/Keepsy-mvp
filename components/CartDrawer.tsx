@@ -22,7 +22,7 @@ type CartItem = {
 /* ─── Constants ────────────────────────────────────────────────────────── */
 
 const CART_KEY = "keepsy_cart_v2";
-const FREE_SHIPPING_THRESHOLD = 75;
+const FREE_SHIPPING_THRESHOLD = 60;
 
 /* ─── Helpers ──────────────────────────────────────────────────────────── */
 
@@ -74,7 +74,7 @@ function FreeShippingBar({ subtotal }: { subtotal: number }) {
           <>
             Add{" "}
             <span className="font-semibold text-charcoal/80">
-              ${remaining.toFixed(2)}
+              £{remaining.toFixed(2)}
             </span>{" "}
             more for free shipping
           </>
@@ -141,7 +141,7 @@ function CartItemRow({
           </p>
         )}
         <p className="text-xs text-charcoal/55">
-          ${price.toFixed(2)} each
+          £{price.toFixed(2)} each
         </p>
 
         {/* Qty + remove */}
@@ -173,7 +173,7 @@ function CartItemRow({
 
           <div className="flex items-center gap-3">
             <p className="text-sm font-bold text-charcoal">
-              ${(price * item.quantity).toFixed(2)}
+              £{(price * item.quantity).toFixed(2)}
             </p>
             <button
               type="button"
@@ -402,7 +402,7 @@ export function CartDrawer() {
                   <div className="flex items-center justify-between text-sm text-charcoal/60">
                     <span>Subtotal</span>
                     <span className="font-semibold text-charcoal">
-                      ${subtotal.toFixed(2)}
+                      £{subtotal.toFixed(2)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm text-charcoal/60">
@@ -417,7 +417,7 @@ export function CartDrawer() {
                   </div>
                   <div className="flex items-center justify-between border-t border-charcoal/8 pt-3 text-base font-bold text-charcoal">
                     <span>Total</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>£{subtotal.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -438,6 +438,9 @@ export function CartDrawer() {
                   {/* Trust badges */}
                   <p className="mt-3 text-center text-[11px] text-charcoal/40 leading-relaxed">
                     Secure Checkout · Handmade With Care · 30-Day Returns
+                  </p>
+                  <p className="mt-1.5 text-center text-[11px] text-charcoal/35 leading-relaxed">
+                    Every design in your bag is one of a kind — made uniquely for you.
                   </p>
                 </div>
               </>

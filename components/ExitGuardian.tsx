@@ -26,16 +26,20 @@ export function ExitGuardian() {
           style={{ backgroundColor: "rgba(253,246,238,0.4)" }}
         >
           <div className="p-12 rounded-[40px] shadow-2xl text-center max-w-md border border-black/10" style={{ backgroundColor: "var(--color-cream)" }}>
-            <h2 className="font-serif text-4xl text-charcoal mb-4">Wait.</h2>
-            <p className="font-sans text-charcoal/60 mb-8 leading-relaxed">
-              Your masterpiece is still cooling in the kiln. If you leave now, the pigment might fade.
+            <div className="mb-4 text-3xl">⚠️</div>
+            <h2 className="font-serif text-4xl text-charcoal mb-4">Your design will be lost.</h2>
+            <p className="font-sans text-charcoal/60 mb-2 leading-relaxed">
+              This is a one-of-a-kind AI design created just for you. If you leave now, it&apos;s gone forever — we don&apos;t save designs until you order.
+            </p>
+            <p className="font-sans text-sm font-semibold mb-8" style={{ color: "var(--color-terracotta)" }}>
+              Don&apos;t lose your unique creation.
             </p>
             <MagneticButton
               onClick={() => setShowExit(false)}
               className="px-8 py-4 rounded-full font-sans tracking-widest uppercase text-xs text-white transition hover:opacity-90"
               style={{ backgroundColor: "var(--color-charcoal)" }}
             >
-              Continue Creating
+              Keep My Design
             </MagneticButton>
           </div>
         </motion.div>

@@ -6,13 +6,14 @@ export type ProductCard = {
   name: string;
   price: number;
   image: string;
+  valueFrame: string;
 };
 
 export const PRODUCT_CARDS: ProductCard[] = [
-  { type: "card", name: "Greeting Card", price: 9.99, image: "/product-tiles/plain-card.png" },
-  { type: "hoodie", name: "Premium Hoodie", price: 44.99, image: "/product-tiles/hoodie-white.png" },
-  { type: "mug", name: "Ceramic Mug", price: 18.99, image: "/product-tiles/plain-mug-front.png" },
-  { type: "tee", name: "Premium Tee", price: 29.99, image: "/product-tiles/tee-white.png" },
+  { type: "card", name: "Greeting Card", price: 9.99, image: "/product-tiles/plain-card.png", valueFrame: "Less than a bunch of flowers" },
+  { type: "hoodie", name: "Premium Hoodie", price: 44.99, image: "/product-tiles/hoodie-white.png", valueFrame: "A gift they'll wear every day" },
+  { type: "mug", name: "Ceramic Mug", price: 18.99, image: "/product-tiles/plain-mug-front.png", valueFrame: "They'll think of you every morning" },
+  { type: "tee", name: "Premium Tee", price: 29.99, image: "/product-tiles/tee-white.png", valueFrame: "Less than a dinner out" },
 ];
 
 type ProductGridProps = {
@@ -39,6 +40,7 @@ export function ProductGrid({ selected, onSelect }: ProductGridProps) {
           </div>
           <p className="mt-2 font-bold">{product.name}</p>
           <p className={`${selected === product.type ? "text-white/80" : "text-black/65"}`}>from £{product.price}</p>
+          <p className={`mt-0.5 text-[11px] ${selected === product.type ? "text-white/50" : "text-black/40"}`}>{product.valueFrame}</p>
         </button>
       ))}
     </div>

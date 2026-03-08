@@ -38,11 +38,17 @@ export default function CheckoutSummaryEnhancer({ productName, priceText, thumbn
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-charcoal">{productName}</p>
-            <p className="text-sm text-charcoal/70">{priceText}</p>
-            <p className="text-xs text-charcoal/55">You can review before paying.</p>
+            <p className="text-sm font-bold text-charcoal">{priceText}</p>
+            <p className="text-xs text-charcoal/55">One-of-a-kind · Printed just for you</p>
             <p className="text-xs text-charcoal/55">Secure payment via Stripe.</p>
           </div>
         </div>
+      </article>
+
+      <article className="rounded-2xl border border-charcoal/8 bg-white p-3 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
+        <p className="text-[11px] text-charcoal/50 leading-relaxed text-center">
+          Pay in instalments available at checkout via Klarna &amp; Clearpay
+        </p>
       </article>
 
       <article className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">

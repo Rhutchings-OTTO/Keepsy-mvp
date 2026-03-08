@@ -26,6 +26,7 @@ export function PriceSummary({ unitPrice, quantity, productLabel }: PriceSummary
         <span>Total</span><span>£{total}</span>
       </div>
       <p className="mt-2 text-xs text-charcoal/55">Bundles: Buy 3 cards get 1 free. Family pack savings auto-applied.</p>
+      <p className="mt-2 text-xs font-semibold text-charcoal/45">Every design is one-of-a-kind — made uniquely for the person you&apos;re gifting.</p>
     </section>
   );
 }

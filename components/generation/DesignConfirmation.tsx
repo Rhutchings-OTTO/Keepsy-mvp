@@ -121,6 +121,10 @@ export function DesignConfirmation({
       {/* Section 2 — Large image preview */}
       <div className="mb-10 flex justify-center">
         <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-charcoal/8 bg-white p-3 shadow-[0_30px_72px_-40px_rgba(45,41,38,0.20)]">
+          {/* One-of-a-kind badge */}
+          <div className="absolute left-5 top-5 z-30 flex items-center gap-1.5 rounded-full border border-white/30 bg-charcoal/80 px-3 py-1.5 backdrop-blur-sm">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/90">✦ One of a kind</span>
+          </div>
           <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-charcoal/8 bg-white">
           {isRefining ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-xl bg-[#F5EDE0]">
@@ -160,6 +164,11 @@ export function DesignConfirmation({
           </motion.p>
         )}
       </AnimatePresence>
+
+      {/* Design uniqueness nudge */}
+      <p className="mb-4 text-center text-xs font-semibold text-charcoal/45">
+        This design exists nowhere else in the world — it was made uniquely for you.
+      </p>
 
       {/* Section 3 — Two choice buttons */}
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">

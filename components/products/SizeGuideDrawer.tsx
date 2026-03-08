@@ -15,6 +15,113 @@ import type { Region } from "@/lib/region";
 
 type Unit = "imperial" | "metric";
 
+/** Inline SVG garment diagram showing where measurements are taken. */
+function GarmentDiagram({ productType }: { productType: "tshirt" | "hoodie" }) {
+  const gc = "#B0A090"; // garment stroke — muted warm
+  const gf = "#F5EDE0"; // garment fill — warm cream
+  const mc = "#6B5044"; // measurement lines — darker warm brown
+
+  // Two separate arrowhead markers (start ← and end →) for reliable cross-browser rendering
+  const arrowEnd = (
+    <marker id={`ae-${productType}`} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill={mc} />
+    </marker>
+  );
+  const arrowStart = (
+    <marker id={`as-${productType}`} markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto">
+      <path d="M7,0 L0,3.5 L7,7 Z" fill={mc} />
+    </marker>
+  );
+  const mStart = `url(#as-${productType})`;
+  const mEnd = `url(#ae-${productType})`;
+
+  const labelProps = {
+    fontSize: 9,
+    fill: mc,
+    fontWeight: 600 as const,
+    fontFamily: "var(--font-sans, system-ui, sans-serif)",
+  };
+
+  if (productType === "tshirt") {
+    // viewBox 300×190. Shirt body: left x=88, right x=212, shoulder y=38, armpit y=82, hem y=166
+    // Sleeves: left tip (16,56)–(16,74), right tip (284,56)–(284,74)
+    return (
+      <svg viewBox="0 0 300 190" style={{ width: "100%", height: 210, display: "block" }} aria-hidden>
+        <defs>{arrowEnd}{arrowStart}</defs>
+
+        {/* T-shirt silhouette */}
+        <path
+          d="M 118,38 L 88,38 L 16,56 L 16,74 L 88,82 L 88,166 L 212,166 L 212,82 L 284,74 L 284,56 L 212,38 L 182,38 Q 150,54 118,38 Z"
+          fill={gf} stroke={gc} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round"
+        />
+
+        {/* ── Width ──────────────────────────────────────── */}
+        {/* tick marks */}
+        <line x1="88" y1="110" x2="88" y2="122" stroke={mc} strokeWidth="1" />
+        <line x1="212" y1="110" x2="212" y2="122" stroke={mc} strokeWidth="1" />
+        {/* double-headed arrow */}
+        <line x1="92" y1="116" x2="208" y2="116"
+          stroke={mc} strokeWidth="1.5" markerStart={mStart} markerEnd={mEnd} />
+        <text x="150" y="130" textAnchor="middle" {...labelProps}>Width</text>
+
+        {/* ── Length ─────────────────────────────────────── */}
+        {/* tick marks */}
+        <line x1="70" y1="38" x2="84" y2="38" stroke={mc} strokeWidth="1" />
+        <line x1="70" y1="166" x2="84" y2="166" stroke={mc} strokeWidth="1" />
+        {/* double-headed arrow */}
+        <line x1="77" y1="43" x2="77" y2="161"
+          stroke={mc} strokeWidth="1.5" markerStart={mStart} markerEnd={mEnd} />
+        {/* rotated label */}
+        <text x="63" y="102" textAnchor="middle" transform="rotate(-90,63,102)" {...labelProps}>Length</text>
+
+        {/* ── Sleeve length (center neck → right sleeve tip, above garment) ── */}
+        <line x1="154" y1="30" x2="280" y2="50"
+          stroke={mc} strokeWidth="1.5" strokeDasharray="4,2.5"
+          markerStart={mStart} markerEnd={mEnd} />
+        <text x="218" y="22" textAnchor="middle" {...labelProps}>Sleeve length</text>
+      </svg>
+    );
+  }
+
+  // Hoodie. viewBox 300×215.
+  // Hood dome: shoulder base y=72, peak Q 150,8. Body: armpit y=114, hem y=196.
+  // Sleeves: left tip (16,86)–(16,104), right tip (284,86)–(284,104)
+  return (
+    <svg viewBox="0 0 300 215" style={{ width: "100%", height: 230, display: "block" }} aria-hidden>
+      <defs>{arrowEnd}{arrowStart}</defs>
+
+      {/* Hoodie silhouette (hood + body + sleeves as one path) */}
+      <path
+        d="M 16,86 L 16,104 L 88,114 L 88,196 L 212,196 L 212,114 L 284,104 L 284,86 L 212,72 Q 150,8 88,72 L 16,86 Z"
+        fill={gf} stroke={gc} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round"
+      />
+      {/* Hood face opening — open arc inside the hood */}
+      <path d="M 113,52 Q 150,67 187,52"
+        fill="none" stroke={gc} strokeWidth="1.2" strokeLinecap="round" />
+
+      {/* ── Width ──────────────────────────────────────── */}
+      <line x1="88" y1="148" x2="88" y2="160" stroke={mc} strokeWidth="1" />
+      <line x1="212" y1="148" x2="212" y2="160" stroke={mc} strokeWidth="1" />
+      <line x1="92" y1="154" x2="208" y2="154"
+        stroke={mc} strokeWidth="1.5" markerStart={mStart} markerEnd={mEnd} />
+      <text x="150" y="168" textAnchor="middle" {...labelProps}>Width</text>
+
+      {/* ── Length (shoulder base → hem) ────────────── */}
+      <line x1="70" y1="72" x2="84" y2="72" stroke={mc} strokeWidth="1" />
+      <line x1="70" y1="196" x2="84" y2="196" stroke={mc} strokeWidth="1" />
+      <line x1="77" y1="77" x2="77" y2="191"
+        stroke={mc} strokeWidth="1.5" markerStart={mStart} markerEnd={mEnd} />
+      <text x="63" y="134" textAnchor="middle" transform="rotate(-90,63,134)" {...labelProps}>Length</text>
+
+      {/* ── Sleeve length (center hood base → right sleeve tip, above garment) ── */}
+      <line x1="154" y1="64" x2="280" y2="80"
+        stroke={mc} strokeWidth="1.5" strokeDasharray="4,2.5"
+        markerStart={mStart} markerEnd={mEnd} />
+      <text x="218" y="56" textAnchor="middle" {...labelProps}>Sleeve length</text>
+    </svg>
+  );
+}
+
 export type SizeGuideDrawerProps = {
   open: boolean;
   onClose: () => void;
@@ -93,6 +200,14 @@ export function SizeGuideDrawer({
           </button>
         </div>
       </div>
+      {/* Garment diagram */}
+      <div className="mt-4 flex flex-col items-center">
+        <GarmentDiagram productType={productType} />
+        <p className="mt-1 text-[10px] text-black/40 text-center">
+          Measurements are taken with the garment laid flat
+        </p>
+      </div>
+
       <div className="mt-4 flex-1 overflow-x-auto overflow-y-auto">
         <table className="w-full min-w-[320px] text-sm border-collapse">
           <thead>

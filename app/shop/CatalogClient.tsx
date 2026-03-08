@@ -218,9 +218,9 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
       </div>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 gap-1.5 border-t border-charcoal/8 px-4 py-4">
-        {/* Stars */}
-        <div className="flex items-center gap-1.5">
+      <div className="flex flex-col flex-1 gap-1.5 border-t border-charcoal/8 px-3 py-3 sm:px-4 sm:py-4">
+        {/* Stars — hidden on mobile to keep cards compact */}
+        <div className="hidden items-center gap-1.5 sm:flex">
           <span className="text-sm leading-none" style={{ color: "var(--color-gold)" }}>
             {renderStars(product.rating)}
           </span>
@@ -233,17 +233,17 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
         <p className="font-sans font-semibold text-charcoal text-sm leading-snug">{product.name}</p>
 
         {/* Price */}
-        <p className="font-bold text-charcoal text-lg">{fmtPrice(product.price, region)}</p>
+        <p className="font-bold text-charcoal text-base sm:text-lg">{fmtPrice(product.price, region)}</p>
 
-        {/* Sold this week */}
-        <p className="font-medium" style={{ fontSize: "11px", color: "var(--color-terracotta)" }}>
+        {/* Sold this week — hidden on mobile */}
+        <p className="hidden font-medium sm:block" style={{ fontSize: "11px", color: "var(--color-terracotta)" }}>
           Popular this week
         </p>
 
         {/* CTA */}
         <Link
           href={productHref(product)}
-          className="mt-auto block w-full rounded-lg py-3 text-center text-sm font-semibold text-white transition-opacity hover:opacity-85"
+          className="mt-auto block w-full rounded-lg py-2.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-85 sm:py-3"
           style={{ backgroundColor: "var(--color-terracotta)" }}
         >
           Personalise Now
@@ -299,11 +299,11 @@ export function CatalogClient() {
     <div className="min-h-screen" style={{ backgroundColor: "var(--color-cream)" }}>
       {/* ── Hero banner — terracotta ── */}
       <section
-        className="py-16 sm:py-20"
+        className="py-10 sm:py-20"
         style={{ backgroundColor: "var(--color-terracotta)" }}
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -312,10 +312,10 @@ export function CatalogClient() {
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/60">
                 Keepsy
               </p>
-              <h1 className="mt-3 font-serif text-5xl font-bold tracking-[-0.04em] text-white sm:text-6xl">
+              <h1 className="mt-2 font-serif text-4xl font-bold tracking-[-0.04em] text-white sm:text-6xl">
                 Our Collection
               </h1>
-              <p className="mt-3 text-base text-white/70">
+              <p className="mt-2 text-sm text-white/70 sm:text-base sm:mt-3">
                 Personalised gifts she&apos;ll treasure forever
               </p>
             </motion.div>
@@ -324,7 +324,7 @@ export function CatalogClient() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className="flex gap-6 sm:text-right"
+              className="hidden gap-6 sm:flex sm:text-right"
             >
               <div>
                 <p className="font-serif text-2xl font-bold text-white">{PRODUCTS.length}</p>

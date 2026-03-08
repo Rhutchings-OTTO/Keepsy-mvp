@@ -65,7 +65,7 @@ const REVIEWS = [
 export function ReviewsSection() {
   return (
     <section
-      className="py-20 sm:py-28"
+      className="py-12 sm:py-20"
       style={{ backgroundColor: "var(--color-charcoal)" }}
     >
       <div className={CONTAINER}>
@@ -78,12 +78,12 @@ export function ReviewsSection() {
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
             Customer Love
           </p>
-          <h2 className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="mt-3 font-serif text-3xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
             What Our Customers Say
           </h2>
         </motion.div>
 
-        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-6 sm:mt-14 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
           {REVIEWS.map((review, index) => (
             <motion.div
               key={review.name}
@@ -91,7 +91,7 @@ export function ReviewsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
-              className="flex flex-col rounded-2xl border border-white/8 bg-white/5 p-6"
+              className={`flex flex-col rounded-2xl border border-white/8 bg-white/5 p-6 ${index > 0 ? "hidden sm:flex" : ""}`}
             >
               {/* Stars */}
               <span className="text-sm" style={{ color: "var(--color-gold)" }}>★★★★★</span>

@@ -110,6 +110,7 @@ export function CreatePageLayoutLean({
 }: CreatePageLayoutLeanProps) {
   const [createMode, setCreateMode] = useState<"describe" | "upload">("describe");
   const [pendingReplace, setPendingReplace] = useState<string | null>(null);
+  const [ideasOpen, setIdeasOpen] = useState(false);
   const activeProduct = PRODUCTS.find((product) => product.type === (selectedProductType ?? "tshirt")) ?? PRODUCTS[0];
   const ActiveProductIcon = activeProduct.Icon;
 
@@ -151,7 +152,7 @@ export function CreatePageLayoutLean({
       animate="animate"
       exit={{ opacity: 0, scale: 0.98 }}
       variants={fadeInUp}
-      className="mx-auto mt-6 flex max-w-6xl flex-col gap-8 px-1 sm:mt-8 sm:gap-10"
+      className="mx-auto mt-4 flex max-w-6xl flex-col gap-6 px-1 sm:mt-8 sm:gap-10"
     >
       <div className="grid gap-6 lg:grid-cols-[1.06fr_0.94fr] lg:gap-8">
         <motion.section variants={fadeInUp} className="max-w-2xl">
@@ -161,14 +162,14 @@ export function CreatePageLayoutLean({
             <Heart size={14} style={{ color: "var(--color-terracotta)" }} />
             Make a thoughtful personalised gift
           </div>
-          <h1 className="mt-5 font-serif text-[clamp(2.2rem,4.6vw,4.4rem)] leading-[1.02] tracking-[-0.04em] text-charcoal">
+          <h1 className="mt-4 font-serif text-[clamp(1.9rem,4.6vw,4.4rem)] leading-[1.05] tracking-[-0.04em] text-charcoal sm:mt-5 sm:leading-[1.02]">
             Create something personal in a way that feels easy.
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-8 text-charcoal/60">
+          <p className="mt-4 hidden max-w-xl text-lg leading-8 text-charcoal/60 sm:block">
             Tell us what you want to make, or upload a photo. We&apos;ll turn it into a polished design and show you how it will look before you buy.
           </p>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+          <div className="mt-6 hidden gap-3 sm:mt-8 sm:grid sm:grid-cols-3">
             {[
               "Write one simple sentence",
               "Preview your design on a product",
@@ -381,20 +382,33 @@ export function CreatePageLayoutLean({
         </motion.section>
       </div>
 
-      <motion.section variants={fadeInUp} className="grid gap-4 lg:grid-cols-[1fr_1fr]">
-        <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Need ideas?</p>
-          <PromptHelperCollapsible onUsePrompt={handleUsePrompt} />
-        </div>
-        <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
-          <IdeasForYou
-            region={region}
-            onUsePrompt={handleChipPrompt}
-            onAppendStyle={handleAppendStyle}
-            onReplaceConfirm={handleReplaceConfirm}
-            onReplaceCancel={() => setPendingReplace(null)}
-            pendingReplace={pendingReplace}
-          />
+      <motion.section variants={fadeInUp}>
+        {/* Mobile: collapsible toggle */}
+        <button
+          type="button"
+          onClick={() => setIdeasOpen(!ideasOpen)}
+          className="flex w-full items-center justify-between rounded-xl border border-charcoal/8 bg-white px-4 py-3.5 text-sm font-semibold text-charcoal/65 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:hidden"
+        >
+          <span>Need ideas? Browse prompts &amp; styles</span>
+          <span className="text-charcoal/40">{ideasOpen ? "−" : "+"}</span>
+        </button>
+
+        {/* Content: collapsible on mobile, always visible on sm+ */}
+        <div className={`mt-3 grid gap-4 lg:grid-cols-[1fr_1fr] ${ideasOpen ? "block" : "hidden"} sm:mt-0 sm:block`}>
+          <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Need ideas?</p>
+            <PromptHelperCollapsible onUsePrompt={handleUsePrompt} />
+          </div>
+          <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
+            <IdeasForYou
+              region={region}
+              onUsePrompt={handleChipPrompt}
+              onAppendStyle={handleAppendStyle}
+              onReplaceConfirm={handleReplaceConfirm}
+              onReplaceCancel={() => setPendingReplace(null)}
+              pendingReplace={pendingReplace}
+            />
+          </div>
         </div>
       </motion.section>
 

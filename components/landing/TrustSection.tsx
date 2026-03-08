@@ -25,7 +25,7 @@ const TRUST_BADGES = [
 
 export function TrustSection() {
   return (
-    <section className="py-20 sm:py-28" style={{ backgroundColor: "var(--color-cream)" }}>
+    <section className="py-10 sm:py-20" style={{ backgroundColor: "var(--color-cream)" }}>
       <div className={CONTAINER}>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -34,12 +34,26 @@ export function TrustSection() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="text-center"
         >
-          <h2 className="font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-4xl">
+          <h2 className="font-serif text-2xl font-bold tracking-[-0.03em] text-charcoal sm:text-4xl">
             Why Thousands Choose Keepsy
           </h2>
         </motion.div>
 
-        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        {/* Mobile: horizontal scroll strip */}
+        <div className="mt-6 flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory sm:hidden">
+          {TRUST_BADGES.map(({ icon: Icon, label }) => (
+            <div
+              key={label}
+              className="flex w-[38vw] flex-shrink-0 snap-start flex-col items-center gap-2 rounded-xl border border-charcoal/8 bg-white px-3 py-4 text-center"
+            >
+              <Icon size={22} style={{ color: "var(--color-terracotta)" }} />
+              <p className="text-[11px] font-semibold leading-snug text-charcoal">{label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* sm+: grid */}
+        <div className="mt-8 hidden gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-6">
           {TRUST_BADGES.map((badge, index) => {
             const Icon = badge.icon;
             return (

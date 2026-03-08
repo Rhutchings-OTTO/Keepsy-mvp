@@ -12,7 +12,7 @@ import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 const usageByKey = new Map<string, UsageRecord>();
 
 const DAILY_CAP: Record<UserTier, number> = {
-  free: 3,
+  free: 2,
   paid: 25,
 };
 
@@ -55,7 +55,7 @@ function enforceUsageGuardsMemory(clientKey: string, tier: UserTier): GuardResul
   }
 
   if (usage.usedToday >= DAILY_CAP[tier]) {
-    return { ok: false, status: 429, error: `Daily generation limit reached (${DAILY_CAP[tier]}).` };
+    return { ok: false, status: 429, error: `Daily generation limit reached. You've used your ${DAILY_CAP[tier]} free designs for today. Come back tomorrow or purchase a design to continue.` };
   }
 
   usage.lastRequestAtMs = now;
@@ -85,7 +85,10 @@ async function enforceUsageGuardsSupabase(clientKey: string, fallbackTier: UserT
 
   const row = data[0] as { allowed: boolean; error: string | null };
   if (!row.allowed) {
-    return { ok: false, status: 429, error: row.error || "Usage limit reached." };
+    const limitMsg = row.error?.toLowerCase().includes("interval")
+      ? row.error
+      : `You've used your ${DAILY_CAP[tier]} free designs for today. Come back tomorrow or purchase a design to continue.`;
+    return { ok: false, status: 429, error: limitMsg };
   }
   return { ok: true, tier };
 }

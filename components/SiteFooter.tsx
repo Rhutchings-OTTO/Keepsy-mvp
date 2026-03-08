@@ -87,6 +87,9 @@ export function SiteFooter() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [footerError, setFooterError] = useState<string | null>(null);
+  const [shopOpen, setShopOpen] = useState(false);
+  const [companyOpen, setCompanyOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -203,11 +206,12 @@ export function SiteFooter() {
 
         {/* ── Trust badges ── */}
         <div
-          className="border-b py-5"
+          className="border-b py-4"
           style={{ borderColor: "var(--border)" }}
         >
           <div className={CONTAINER}>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:justify-start">
+            {/* Mobile: single scrollable row */}
+            <div className="flex gap-6 overflow-x-auto pb-1 sm:flex-wrap sm:items-center sm:justify-start">
               <TrustBadge icon="✦" label="Premium Quality" />
               <TrustBadge icon="↩" label="30-Day Returns" />
               <TrustBadge icon="⚡" label="Fast Delivery" />
@@ -216,90 +220,75 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {/* ── 4-column grid ── */}
-        <div className={`${CONTAINER} py-14`}>
-          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Col 1: Brand */}
-            <div className="space-y-4">
-              <p
-                className="font-serif text-2xl font-bold tracking-tight"
-                style={{ color: "var(--color-charcoal)" }}
-              >
-                Keepsy
-              </p>
-              <p
-                className="font-serif text-base italic"
-                style={{ color: "var(--color-terracotta)" }}
-              >
-                Gifts they&apos;ll never forget.
-              </p>
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: "var(--ink-muted)" }}
-              >
-                Turn a photo, memory, pet, home, or occasion into a polished
-                personalised keepsake — mugs, tees, hoodies, and greeting
-                cards, all beautifully made.
-              </p>
-              {/* Social icons */}
-              <div className="flex items-center gap-3 pt-1">
-                {[
-                  {
-                    href: "https://instagram.com/keepsy.store",
-                    Icon: InstagramIcon,
-                    label: "Instagram",
-                  },
-                  {
-                    href: "https://pinterest.com/keepsystore",
-                    Icon: PinterestIcon,
-                    label: "Pinterest",
-                  },
-                  {
-                    href: "https://facebook.com/keepsystore",
-                    Icon: FacebookIcon,
-                    label: "Facebook",
-                  },
-                ].map(({ href, Icon, label }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border transition hover:border-transparent hover:text-white"
-                    style={{
-                      borderColor: "var(--border)",
-                      color: "var(--ink-muted)",
-                      // hover handled via tailwind group or inline — using CSS vars via style isn't straightforward for hover, keep simple
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.backgroundColor =
-                        "var(--color-terracotta)";
-                      (e.currentTarget as HTMLAnchorElement).style.color =
-                        "#fff";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.backgroundColor =
-                        "";
-                      (e.currentTarget as HTMLAnchorElement).style.color =
-                        "var(--ink-muted)";
-                    }}
-                  >
-                    <Icon />
-                  </a>
-                ))}
-              </div>
+        {/* ── Grid: Brand + accordions ── */}
+        <div className={`${CONTAINER} py-10 sm:py-14`}>
+          {/* Brand — always visible */}
+          <div className="space-y-3 pb-6 sm:pb-0">
+            <p
+              className="font-serif text-2xl font-bold tracking-tight"
+              style={{ color: "var(--color-charcoal)" }}
+            >
+              Keepsy
+            </p>
+            <p
+              className="font-serif text-base italic"
+              style={{ color: "var(--color-terracotta)" }}
+            >
+              Gifts they&apos;ll never forget.
+            </p>
+            <p
+              className="hidden text-sm leading-relaxed sm:block"
+              style={{ color: "var(--ink-muted)" }}
+            >
+              Turn a photo, memory, pet, home, or occasion into a polished
+              personalised keepsake — mugs, tees, hoodies, and greeting
+              cards, all beautifully made.
+            </p>
+            {/* Social icons */}
+            <div className="flex items-center gap-3 pt-1">
+              {[
+                { href: "https://instagram.com/keepsy.store", Icon: InstagramIcon, label: "Instagram" },
+                { href: "https://pinterest.com/keepsystore", Icon: PinterestIcon, label: "Pinterest" },
+                { href: "https://facebook.com/keepsystore", Icon: FacebookIcon, label: "Facebook" },
+              ].map(({ href, Icon, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border transition hover:border-transparent hover:text-white"
+                  style={{ borderColor: "var(--border)", color: "var(--ink-muted)" }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "var(--color-terracotta)";
+                    (e.currentTarget as HTMLAnchorElement).style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "";
+                    (e.currentTarget as HTMLAnchorElement).style.color = "var(--ink-muted)";
+                  }}
+                >
+                  <Icon />
+                </a>
+              ))}
             </div>
+          </div>
 
-            {/* Col 2: Shop */}
-            <div className="space-y-4">
-              <p
-                className="text-xs font-bold uppercase tracking-[0.16em]"
-                style={{ color: "var(--ink-faint)" }}
+          {/* Link columns — accordion on mobile, 3-col grid on sm+ */}
+          <div className="divide-y sm:mt-10 sm:divide-y-0 sm:grid sm:grid-cols-3 sm:gap-10 lg:grid-cols-3" style={{ borderColor: "var(--border)" }}>
+            {/* Shop */}
+            <div className="py-3 sm:py-0">
+              <button
+                type="button"
+                onClick={() => setShopOpen(!shopOpen)}
+                className="flex w-full items-center justify-between sm:pointer-events-none"
               >
-                Shop
-              </p>
-              <div className="flex flex-col gap-2.5">
+                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "var(--ink-faint)" }}>
+                  Shop
+                </p>
+                <span className="text-sm sm:hidden" style={{ color: "var(--ink-faint)" }}>{shopOpen ? "−" : "+"}</span>
+              </button>
+              <div className={`mt-3 flex-col gap-2.5 ${shopOpen ? "flex" : "hidden"} sm:flex`}>
                 {[
                   { href: "/shop", label: "All Products" },
                   { href: "/gift-ideas", label: "Gift Ideas" },
@@ -309,27 +298,26 @@ export function SiteFooter() {
                   { href: "/product/hoodie", label: "Hoodies" },
                   { href: "/product/card", label: "Greeting Cards" },
                 ].map(({ href, label }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="text-sm transition hover:underline"
-                    style={{ color: "var(--ink-muted)" }}
-                  >
+                  <Link key={href} href={href} className="text-sm transition hover:underline" style={{ color: "var(--ink-muted)" }}>
                     {label}
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* Col 3: Company */}
-            <div className="space-y-4">
-              <p
-                className="text-xs font-bold uppercase tracking-[0.16em]"
-                style={{ color: "var(--ink-faint)" }}
+            {/* Company */}
+            <div className="py-3 sm:py-0">
+              <button
+                type="button"
+                onClick={() => setCompanyOpen(!companyOpen)}
+                className="flex w-full items-center justify-between sm:pointer-events-none"
               >
-                Company
-              </p>
-              <div className="flex flex-col gap-2.5">
+                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "var(--ink-faint)" }}>
+                  Company
+                </p>
+                <span className="text-sm sm:hidden" style={{ color: "var(--ink-faint)" }}>{companyOpen ? "−" : "+"}</span>
+              </button>
+              <div className={`mt-3 flex-col gap-2.5 ${companyOpen ? "flex" : "hidden"} sm:flex`}>
                 {[
                   { href: "/about", label: "About Us" },
                   { href: "/terms", label: "Terms & Conditions" },
@@ -338,57 +326,42 @@ export function SiteFooter() {
                   { href: "/refunds", label: "Refund Policy" },
                   { href: "/shipping", label: "Shipping Info" },
                 ].map(({ href, label }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="text-sm transition hover:underline"
-                    style={{ color: "var(--ink-muted)" }}
-                  >
+                  <Link key={href} href={href} className="text-sm transition hover:underline" style={{ color: "var(--ink-muted)" }}>
                     {label}
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* Col 4: Help */}
-            <div className="space-y-4">
-              <p
-                className="text-xs font-bold uppercase tracking-[0.16em]"
-                style={{ color: "var(--ink-faint)" }}
+            {/* Help */}
+            <div className="py-3 sm:py-0">
+              <button
+                type="button"
+                onClick={() => setHelpOpen(!helpOpen)}
+                className="flex w-full items-center justify-between sm:pointer-events-none"
               >
-                Help
-              </p>
-              <div className="flex flex-col gap-2.5">
-                <a
-                  href="mailto:support@keepsy.store"
-                  className="text-sm transition hover:underline"
-                  style={{ color: "var(--color-terracotta)" }}
-                >
+                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "var(--ink-faint)" }}>
+                  Help
+                </p>
+                <span className="text-sm sm:hidden" style={{ color: "var(--ink-faint)" }}>{helpOpen ? "−" : "+"}</span>
+              </button>
+              <div className={`mt-3 flex-col gap-2.5 ${helpOpen ? "flex" : "hidden"} sm:flex`}>
+                <a href="mailto:support@keepsy.store" className="text-sm transition hover:underline" style={{ color: "var(--color-terracotta)" }}>
                   support@keepsy.store
                 </a>
-                <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
-                  Made with love, shipped worldwide
-                </p>
-                <p
-                  className="text-xs"
-                  style={{ color: "var(--ink-faint)" }}
-                >
-                  Support available 7 days a week
-                </p>
-              </div>
-              {/* Payment icons */}
-              <div>
-                <p
-                  className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em]"
-                  style={{ color: "var(--ink-faint)" }}
-                >
-                  We accept
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  <PaymentBadge label="VISA" />
-                  <PaymentBadge label="MC" />
-                  <PaymentBadge label="AMEX" />
-                  <PaymentBadge label="PayPal" />
+                <p className="text-sm" style={{ color: "var(--ink-muted)" }}>Made with love, shipped worldwide</p>
+                <p className="text-xs" style={{ color: "var(--ink-faint)" }}>Support available 7 days a week</p>
+                {/* Payment icons */}
+                <div className="mt-1">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--ink-faint)" }}>
+                    We accept
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    <PaymentBadge label="VISA" />
+                    <PaymentBadge label="MC" />
+                    <PaymentBadge label="AMEX" />
+                    <PaymentBadge label="PayPal" />
+                  </div>
                 </div>
               </div>
             </div>

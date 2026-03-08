@@ -251,7 +251,7 @@ function FeaturedProductCard({
         <p className="font-serif text-base font-bold leading-tight text-charcoal sm:text-lg">
           {product.name}
         </p>
-        <div className="mt-1.5 flex items-center gap-1.5">
+        <div className="mt-1.5 hidden items-center gap-1.5 sm:flex">
           <span className="text-sm" style={{ color: "var(--color-gold)" }}>{product.rating}</span>
           <span className="text-xs text-charcoal/45">(100+)</span>
         </div>
@@ -291,6 +291,9 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [footerShopOpen, setFooterShopOpen] = useState(false);
+  const [footerCompanyOpen, setFooterCompanyOpen] = useState(false);
+  const [footerHelpOpen, setFooterHelpOpen] = useState(false);
 
   const activeRegion = region ?? "US";
 
@@ -381,7 +384,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             {/* ── 1. HERO — editorial split layout ── */}
             <section className="overflow-hidden">
               <div className={CONTAINER}>
-                <div className="grid min-h-[90vh] items-center gap-10 py-16 lg:grid-cols-[3fr_2fr] lg:gap-16 lg:py-24">
+                <div className="grid items-center gap-8 py-10 lg:min-h-[90vh] lg:grid-cols-[3fr_2fr] lg:gap-16 lg:py-24">
                   {/* Left: Editorial headline */}
                   <motion.div
                     initial={shouldReduceMotion ? {} : { opacity: 0, x: -28 }}
@@ -403,7 +406,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     {/* Main headline */}
                     <h1
                       className="mt-5 font-serif font-bold leading-[0.95] tracking-[-0.05em] text-charcoal"
-                      style={{ fontSize: "clamp(3.2rem, 7vw, 6.5rem)" }}
+                      style={{ fontSize: "clamp(2.4rem, 7vw, 6.5rem)" }}
                     >
                       Gifts<br />They&apos;ll<br />Never<br />Forget.
                     </h1>
@@ -414,12 +417,12 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       <span className="text-sm text-charcoal/55">Thousands of happy customers</span>
                     </div>
 
-                    <p className="mt-6 max-w-sm text-base leading-8 text-charcoal/65">
+                    <p className="mt-4 max-w-sm text-base leading-7 text-charcoal/65 sm:mt-6 sm:leading-8">
                       Turn your favourite photos and memories into beautiful, personalised keepsakes — mugs, cards, tees, hoodies.
                     </p>
 
-                    {/* Trust bullets */}
-                    <ul className="mt-6 space-y-2">
+                    {/* Trust bullets — hidden on mobile to keep hero tight */}
+                    <ul className="mt-4 hidden space-y-2 sm:block">
                       {HERO_BULLETS.map((item) => (
                         <li key={item} className="flex items-center gap-3 text-sm text-charcoal/65">
                           <span
@@ -433,8 +436,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       ))}
                     </ul>
 
-                    {/* CTAs */}
-                    <div className="mt-8 flex flex-wrap gap-3">
+                    {/* CTAs — secondary hidden on mobile to keep hero tight */}
+                    <div className="mt-6 flex flex-wrap gap-3">
                       <Link
                         href="/shop"
                         className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl px-8 text-base font-semibold text-white shadow-[0_12px_28px_-12px_rgba(196,113,74,0.55)] transition-all hover:shadow-[0_16px_36px_-14px_rgba(196,113,74,0.65)] hover:-translate-y-0.5"
@@ -445,7 +448,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       </Link>
                       <Link
                         href="/create"
-                        className="inline-flex min-h-[52px] items-center justify-center rounded-xl border-2 px-8 text-base font-semibold text-charcoal transition-all hover:-translate-y-0.5"
+                        className="hidden min-h-[52px] items-center justify-center rounded-xl border-2 px-8 text-base font-semibold text-charcoal transition-all hover:-translate-y-0.5 sm:inline-flex"
                         style={{ borderColor: "var(--color-charcoal)" }}
                       >
                         Design a Personal Gift
@@ -453,16 +456,26 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     </div>
                   </motion.div>
 
-                  {/* Right: Product gallery */}
+                  {/* Right: Product gallery — horizontal scroll on mobile, 2-col grid on desktop */}
                   <motion.div
                     initial={shouldReduceMotion ? {} : { opacity: 0, x: 28 }}
                     animate={shouldReduceMotion ? {} : { opacity: 1, x: 0 }}
                     transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                    className="grid grid-cols-2 gap-3"
                   >
-                    {PRODUCT_IMAGES.map((img, i) => (
-                      <ProductCollectionCard key={img.label} {...img} index={i} priority={i < 2} />
-                    ))}
+                    {/* Mobile: horizontal scroll strip showing 2.5 tiles */}
+                    <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory sm:-mx-8 sm:px-8 lg:hidden">
+                      {PRODUCT_IMAGES.map((img, i) => (
+                        <div key={img.label} className="w-[44vw] flex-shrink-0 snap-start">
+                          <ProductCollectionCard {...img} index={i} priority={i < 2} />
+                        </div>
+                      ))}
+                    </div>
+                    {/* Desktop: 2-col grid */}
+                    <div className="hidden grid-cols-2 gap-3 lg:grid">
+                      {PRODUCT_IMAGES.map((img, i) => (
+                        <ProductCollectionCard key={img.label} {...img} index={i} priority={i < 2} />
+                      ))}
+                    </div>
                   </motion.div>
                 </div>
               </div>
@@ -502,7 +515,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             </section>
 
             {/* ── 3. Featured Products ── */}
-            <section className="py-20 sm:py-28">
+            <section className="py-12 sm:py-20">
               <div className={CONTAINER}>
                 <div className="flex items-end justify-between">
                   <motion.div
@@ -553,7 +566,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
             {/* ── 4. Emotional storytelling — editorial split ── */}
             <section
-              className="py-20 sm:py-28"
+              className="py-12 sm:py-20"
               style={{ backgroundColor: "#F5EDE0" }}
             >
               <div className={CONTAINER}>
@@ -564,7 +577,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.3 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="relative overflow-hidden rounded-2xl bg-[#E8DDD0] lg:order-2"
+                    className="relative hidden overflow-hidden rounded-2xl bg-[#E8DDD0] lg:order-2 lg:block"
                     style={{ aspectRatio: "4/5" }}
                   >
                     <Image
@@ -595,7 +608,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     >
                       Our Story
                     </p>
-                    <h2 className="mt-4 font-serif text-4xl font-bold leading-[1.05] tracking-[-0.04em] text-charcoal sm:text-5xl lg:text-6xl">
+                    <h2 className="mt-4 font-serif text-3xl font-bold leading-[1.05] tracking-[-0.04em] text-charcoal sm:text-5xl lg:text-6xl">
                       Every Keepsake<br />Tells a Story
                     </h2>
                     <div className="mt-6 h-px w-12" style={{ backgroundColor: "var(--color-terracotta)" }} />
@@ -620,7 +633,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             </section>
 
             {/* ── 5. How It Works — editorial numbered list ── */}
-            <section className="py-20 sm:py-28">
+            <section className="py-12 sm:py-20">
               <div className={CONTAINER}>
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
@@ -634,12 +647,12 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   >
                     The Process
                   </p>
-                  <h2 className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
+                  <h2 className="mt-3 font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
                     Three Simple Steps
                   </h2>
                 </motion.div>
 
-                <div className="mt-14 space-y-0">
+                <div className="mt-8 space-y-0 sm:mt-14">
                   {HOW_IT_WORKS_STEPS.map((step, index) => {
                     const Icon = step.icon;
                     return (
@@ -649,12 +662,12 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, amount: 0.2 }}
                         transition={{ duration: 0.5, delay: index * 0.12, ease: "easeOut" }}
-                        className="grid grid-cols-[auto_1fr] gap-8 border-b border-charcoal/10 py-8 lg:grid-cols-[120px_1fr_auto] lg:items-center last:border-0"
+                        className="grid grid-cols-[auto_1fr] gap-5 border-b border-charcoal/10 py-6 last:border-0 sm:gap-8 sm:py-8 lg:grid-cols-[120px_1fr_auto] lg:items-center"
                       >
                         {/* Step number */}
                         <span
-                          className="font-serif text-5xl font-bold leading-none"
-                          style={{ color: "rgba(196,113,74,0.25)", minWidth: "3.5rem" }}
+                          className="font-serif text-4xl font-bold leading-none sm:text-5xl"
+                          style={{ color: "rgba(196,113,74,0.25)", minWidth: "2.5rem" }}
                         >
                           {step.step}
                         </span>
@@ -691,7 +704,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
 
             {/* ── 8. Email capture — forest green ── */}
             <section
-              className="py-20 sm:py-28"
+              className="py-12 sm:py-20"
               style={{ backgroundColor: "var(--color-forest)" }}
             >
               <div className={CONTAINER}>
@@ -705,10 +718,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
                       Join the Keepsy Family
                     </p>
-                    <h2 className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
+                    <h2 className="mt-3 font-serif text-3xl font-bold tracking-[-0.03em] text-white sm:text-4xl sm:text-5xl">
                       Get 10% Off<br />Your First Order
                     </h2>
-                    <p className="mt-4 max-w-sm text-base leading-7 text-white/65">
+                    <p className="mt-4 hidden max-w-sm text-base leading-7 text-white/65 sm:block">
                       Plus gifting ideas, new designs &amp; seasonal inspiration — delivered to your inbox.
                     </p>
                   </motion.div>
@@ -768,7 +781,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         </motion.form>
                       )}
                     </AnimatePresence>
-                    <p className="mt-3 text-xs text-white/40">
+                    <p className="mt-3 hidden text-xs text-white/40 sm:block">
                       Join the people who love thoughtful gifting · Unsubscribe anytime
                     </p>
                   </motion.div>
@@ -778,54 +791,81 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
           </main>
 
           {/* ── Footer ── */}
-          <footer className="py-14" style={{ backgroundColor: "var(--color-charcoal)" }}>
+          <footer className="py-10 sm:py-14" style={{ backgroundColor: "var(--color-charcoal)" }}>
             <div className={CONTAINER}>
-              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="sm:col-span-2 lg:col-span-1">
-                  <p className="font-serif text-2xl font-bold text-white">Keepsy</p>
-                  <p className="mt-2 text-sm text-white/50">
-                    Beautiful personalised gifts, made simple.
-                  </p>
-                  <p className="mt-3 text-xs text-white/35">
-                    🇬🇧 UK &amp; 🇺🇸 US shipping · Made with care
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-4">Shop</p>
-                  <div className="flex flex-col gap-2.5">
+              {/* Brand info — always visible */}
+              <div className="mb-6 sm:mb-0">
+                <p className="font-serif text-2xl font-bold text-white">Keepsy</p>
+                <p className="mt-2 text-sm text-white/50">
+                  Beautiful personalised gifts, made simple.
+                </p>
+                <p className="mt-3 text-xs text-white/35">
+                  🇬🇧 UK &amp; 🇺🇸 US shipping · Made with care
+                </p>
+              </div>
+
+              {/* Link columns — accordion on mobile, grid on sm+ */}
+              <div className="mt-6 divide-y divide-white/8 sm:mt-8 sm:divide-y-0 sm:grid sm:grid-cols-3 sm:gap-8 lg:grid-cols-3">
+                {/* Shop */}
+                <div className="py-3 sm:py-0">
+                  <button
+                    type="button"
+                    onClick={() => setFooterShopOpen(!footerShopOpen)}
+                    className="flex w-full items-center justify-between sm:pointer-events-none"
+                  >
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">Shop</p>
+                    <span className="text-white/40 sm:hidden">{footerShopOpen ? "−" : "+"}</span>
+                  </button>
+                  <div className={`mt-3 flex-col gap-2.5 ${footerShopOpen ? "flex" : "hidden"} sm:flex`}>
                     {[
                       { href: "/shop", label: "All Products" },
                       { href: "/gift-ideas", label: "Gift Ideas" },
                       { href: "/create", label: "Design a Gift" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white" style={{ color: "rgba(255,255,255,0.55)" }}>
+                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
                         {label}
                       </Link>
                     ))}
                   </div>
                 </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-4">Company</p>
-                  <div className="flex flex-col gap-2.5">
+                {/* Company */}
+                <div className="py-3 sm:py-0">
+                  <button
+                    type="button"
+                    onClick={() => setFooterCompanyOpen(!footerCompanyOpen)}
+                    className="flex w-full items-center justify-between sm:pointer-events-none"
+                  >
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">Company</p>
+                    <span className="text-white/40 sm:hidden">{footerCompanyOpen ? "−" : "+"}</span>
+                  </button>
+                  <div className={`mt-3 flex-col gap-2.5 ${footerCompanyOpen ? "flex" : "hidden"} sm:flex`}>
                     {[
                       { href: "/community", label: "Customer Stories" },
                       { href: "/terms", label: "Terms" },
                       { href: "/privacy", label: "Privacy" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white" style={{ color: "rgba(255,255,255,0.55)" }}>
+                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
                         {label}
                       </Link>
                     ))}
                   </div>
                 </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-4">Help</p>
-                  <div className="flex flex-col gap-2.5">
+                {/* Help */}
+                <div className="py-3 sm:py-0">
+                  <button
+                    type="button"
+                    onClick={() => setFooterHelpOpen(!footerHelpOpen)}
+                    className="flex w-full items-center justify-between sm:pointer-events-none"
+                  >
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">Help</p>
+                    <span className="text-white/40 sm:hidden">{footerHelpOpen ? "−" : "+"}</span>
+                  </button>
+                  <div className={`mt-3 flex-col gap-2.5 ${footerHelpOpen ? "flex" : "hidden"} sm:flex`}>
                     {[
                       { href: "/shipping", label: "Shipping" },
                       { href: "/refunds", label: "Refunds" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white" style={{ color: "rgba(255,255,255,0.55)" }}>
+                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
                         {label}
                       </Link>
                     ))}
@@ -841,7 +881,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               </div>
 
               <div
-                className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t pt-8"
+                className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t pt-6"
                 style={{ borderColor: "rgba(255,255,255,0.08)" }}
               >
                 <p className="text-xs text-white/30">

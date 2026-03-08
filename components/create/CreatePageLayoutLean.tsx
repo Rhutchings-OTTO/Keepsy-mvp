@@ -69,6 +69,7 @@ export type CreatePageLayoutLeanProps = {
   onUseSuggestedPromptClick?: (prompt: string) => void;
   checkoutStatus: "success" | "canceled" | null;
   isBusy: boolean;
+  isCompressingImage?: boolean;
   onGenerate: () => void;
   onUploadFile: (file: File) => void;
   onClearUploadedImage: (e: React.MouseEvent) => void;
@@ -97,6 +98,7 @@ export function CreatePageLayoutLean({
   onUseSuggestedPromptClick,
   checkoutStatus,
   isBusy,
+  isCompressingImage = false,
   onGenerate,
   onUploadFile,
   onClearUploadedImage,
@@ -270,11 +272,18 @@ export function CreatePageLayoutLean({
                       ref={fileInputRef}
                       id="create-upload-input"
                       type="file"
-                      accept="image/png,image/jpeg"
+                      accept="image/png,image/jpeg,image/webp"
                       onChange={handleFileUpload}
                       className="hidden"
                     />
-                    {!uploadedImage ? (
+                    {isCompressingImage ? (
+                      <div className="flex flex-col items-center gap-2 py-5 text-center">
+                        <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm animate-pulse" style={{ color: "var(--color-terracotta)" }}>
+                          <Upload size={18} />
+                        </div>
+                        <span className="text-sm font-semibold text-charcoal/70">Optimising your photo…</span>
+                      </div>
+                    ) : !uploadedImage ? (
                       <label htmlFor="create-upload-input" className="flex cursor-pointer flex-col items-center gap-2 py-5 text-center">
                         <div
                           className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm"
@@ -283,7 +292,7 @@ export function CreatePageLayoutLean({
                           <Upload size={18} />
                         </div>
                         <span className="text-base font-medium text-charcoal">Choose a photo</span>
-                        <span className="text-sm text-charcoal/55">PNG or JPG, up to 5MB</span>
+                        <span className="text-sm text-charcoal/55">PNG, JPG or WebP — up to 25MB</span>
                       </label>
                     ) : (
                       <div className="flex items-center gap-3 rounded-xl bg-white p-3">

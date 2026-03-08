@@ -157,7 +157,7 @@ export default function CreateModePanel({
                   Choose photo
                   <input
                     type="file"
-                    accept="image/png,image/jpeg"
+                    accept="image/png,image/jpeg,image/webp"
                     className="hidden"
                     onChange={(event) => {
                       const file = event.target.files?.[0];

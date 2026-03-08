@@ -74,6 +74,36 @@ import {
   Star,
 } from "lucide-react";
 
+/** Resize and compress an image file client-side before upload.
+ *  Max dimension 4096px on the longest side, JPEG quality 0.85.
+ *  Brings any modern phone photo (~12MP, 4-10MB) down to <2MB. */
+function compressImageFile(file: File): Promise<string> {
+  const MAX_DIM = 4096;
+  const QUALITY = 0.85;
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new window.Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { naturalWidth: w, naturalHeight: h } = img;
+      if (w > MAX_DIM || h > MAX_DIM) {
+        const scale = MAX_DIM / Math.max(w, h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { reject(new Error("Canvas unavailable")); return; }
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL("image/jpeg", QUALITY));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Image load failed")); };
+    img.src = url;
+  });
+}
+
 /** Types */
 interface CartItem {
   id: string;
@@ -426,6 +456,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [croppedImageDataUrl, setCroppedImageDataUrl] = useState<string | null>(null);
   const [croppedImageHttpsUrl, setCroppedImageHttpsUrl] = useState<string | null>(null);
   const [isCropping, setIsCropping] = useState(false);
+  const [isCompressingImage, setIsCompressingImage] = useState(false);
   const [addToCartConfirmation, setAddToCartConfirmation] = useState<string | null>(null);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -919,26 +950,27 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   };
 
   const handleUploadFile = (file: File) => {
-    const validTypes = ["image/jpeg", "image/png"];
-    const maxFileSizeBytes = 5 * 1024 * 1024;
-
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/heic"];
     if (!validTypes.includes(file.type)) {
-      alert("Please upload a JPG or PNG image.");
+      alert("Please upload a JPG, PNG, or WebP image.");
       return;
     }
-    if (file.size > maxFileSizeBytes) {
-      alert("Please upload an image under 5MB.");
+    if (file.size > 25 * 1024 * 1024) {
+      alert("This photo is a bit too large — try a different one or take a screenshot of it to reduce the size.");
       return;
     }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setUploadedImage(reader.result as string);
-      setUploadedFileName(file.name);
-      setGenerationError(null);
-      setGenerationContentBlock(null);
-    };
-    reader.readAsDataURL(file);
+    setIsCompressingImage(true);
+    compressImageFile(file)
+      .then((dataUrl) => {
+        setUploadedImage(dataUrl);
+        setUploadedFileName(file.name);
+        setGenerationError(null);
+        setGenerationContentBlock(null);
+      })
+      .catch(() => {
+        alert("Could not process this photo — please try a different one.");
+      })
+      .finally(() => setIsCompressingImage(false));
   };
 
 
@@ -1037,6 +1069,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   }}
                   checkoutStatus={checkoutStatus}
                   isBusy={isBusy}
+                  isCompressingImage={isCompressingImage}
                   onGenerate={handleGenerate}
                   onUploadFile={handleUploadFile}
                   onClearUploadedImage={clearUploadedImage}

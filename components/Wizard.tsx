@@ -8,6 +8,36 @@ import { STYLE_OPTIONS, type ProductType, type StyleOption } from "@/lib/siteCon
 import { ProductGrid, PRODUCT_CARDS } from "@/components/ProductGrid";
 import { PriceSummary } from "@/components/PriceSummary";
 
+/** Resize and compress an image file client-side before upload.
+ *  Max dimension 4096px on the longest side, JPEG quality 0.85.
+ *  Brings any modern phone photo (~12MP, 4-10MB) down to <2MB. */
+function compressImageFile(file: File): Promise<string> {
+  const MAX_DIM = 4096;
+  const QUALITY = 0.85;
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new window.Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { naturalWidth: w, naturalHeight: h } = img;
+      if (w > MAX_DIM || h > MAX_DIM) {
+        const scale = MAX_DIM / Math.max(w, h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { reject(new Error("Canvas unavailable")); return; }
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL("image/jpeg", QUALITY));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Image load failed")); };
+    img.src = url;
+  });
+}
+
 type WizardProps = {
   initialStyle?: StyleOption;
   initialProduct?: ProductType;
@@ -68,23 +98,29 @@ export function Wizard({ initialStyle, initialProduct }: WizardProps) {
   const productMeta = useMemo(() => PRODUCT_CARDS.find((p) => p.type === product) ?? null, [product]);
   const upsellLabel = product === "mug" ? "Add matching card (+£6)" : "Add matching mug (+£12)";
 
+  const [isOptimising, setIsOptimising] = useState(false);
+
   const onSelectFile = (file: File | undefined) => {
     if (!file) return;
-    if (!["image/jpeg", "image/png"].includes(file.type)) {
-      window.alert("Please upload a JPG or PNG image.");
+    if (!["image/jpeg", "image/png", "image/webp", "image/heic"].includes(file.type)) {
+      window.alert("Please upload a JPG, PNG, or WebP image.");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      window.alert("Please upload an image under 5MB.");
+    if (file.size > 25 * 1024 * 1024) {
+      window.alert("This photo is a bit too large — try a different one or take a screenshot of it to reduce the size.");
       return;
     }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPhotoDataUrl(reader.result as string);
-      trackEvent("UploadPhoto");
-      setStep(2);
-    };
-    reader.readAsDataURL(file);
+    setIsOptimising(true);
+    compressImageFile(file)
+      .then((dataUrl) => {
+        setPhotoDataUrl(dataUrl);
+        trackEvent("UploadPhoto");
+        setStep(2);
+      })
+      .catch(() => {
+        window.alert("Could not process this photo — please try a different one.");
+      })
+      .finally(() => setIsOptimising(false));
   };
 
   const generatePreview = async () => {
@@ -163,11 +199,17 @@ export function Wizard({ initialStyle, initialProduct }: WizardProps) {
               className="flex min-h-52 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-black/20 bg-[#F7F1EB] text-center hover:border-black/35"
             >
               <div>
-                <p className="font-bold">Drag and drop your photo here</p>
-                <p className="text-sm text-black/60">or tap to upload JPG/PNG up to 5MB</p>
+                {isOptimising ? (
+                  <p className="font-bold text-black/60">Optimising your photo…</p>
+                ) : (
+                  <>
+                    <p className="font-bold">Drag and drop your photo here</p>
+                    <p className="text-sm text-black/60">or tap to upload — up to 25MB</p>
+                  </>
+                )}
               </div>
             </label>
-            <input id="photo-upload" type="file" accept="image/jpeg,image/png" className="sr-only" onChange={(e) => onSelectFile(e.target.files?.[0])} />
+            <input id="photo-upload" type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => onSelectFile(e.target.files?.[0])} />
           </div>
         )}
 

@@ -98,7 +98,8 @@ export async function POST(req: Request) {
 
   try {
     recordGenerationMetric("totalRequests", 1);
-    const parsed = await parseAndValidate(req, generateBodySchema);
+    // Use image-aware body limit (sourceImageDataUrl can be ~3-4MB as base64 after client compression)
+    const parsed = await parseAndValidate(req, generateBodySchema, MAX_SOURCE_IMAGE_DATA_URL_CHARS);
     if ("error" in parsed) {
       return NextResponse.json(parsed.error, {
         status: parsed.status,

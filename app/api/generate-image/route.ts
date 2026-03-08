@@ -16,6 +16,7 @@ import { parseAndValidate, Constraints } from "@/lib/http/validate";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+export const maxDuration = 120;
 
 const CACHE_TTL_MS = 3 * 60 * 1000;
 const MAX_IN_FLIGHT_GENERATIONS = 8;

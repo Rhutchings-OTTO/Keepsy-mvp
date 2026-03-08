@@ -247,6 +247,7 @@ export async function POST(req: Request) {
           variant_color: safeCartSummary[0]?.color ?? "",
         },
         client_reference_id: orderRef,
+        allow_promotion_codes: true,
       },
       { idempotencyKey }
     );

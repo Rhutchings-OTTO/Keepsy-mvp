@@ -324,7 +324,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailValue.trim() }),
       });
-      const data = await res.json() as { success?: boolean; error?: string };
+      const data = await res.json() as { success?: boolean; alreadySubscribed?: boolean; error?: string };
       if (!res.ok || !data.success) {
         setEmailError(data.error ?? "Something went wrong. Please try again.");
       } else {

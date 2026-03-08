@@ -85,11 +85,30 @@ function PaymentBadge({ label }: { label: string }) {
 export function SiteFooter() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [footerError, setFooterError] = useState<string | null>(null);
 
-  function handleSignup(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-    if (email.trim()) {
-      setSubmitted(true);
+    if (!email.trim() || loading) return;
+    setLoading(true);
+    setFooterError(null);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const data = await res.json() as { success?: boolean; alreadySubscribed?: boolean; error?: string };
+      if (!res.ok || !data.success) {
+        setFooterError(data.error ?? "Something went wrong. Please try again.");
+      } else {
+        setSubmitted(true);
+      }
+    } catch {
+      setFooterError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -143,34 +162,40 @@ export function SiteFooter() {
                   🎉 You&apos;re in! Check your inbox.
                 </p>
               ) : (
-                <form
-                  onSubmit={handleSignup}
-                  className="flex w-full max-w-sm gap-2"
-                >
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
-                    required
-                    className="flex-1 rounded-full border px-4 py-2.5 text-sm outline-none transition focus:ring-2"
-                    style={{
-                      borderColor: "var(--border)",
-                      backgroundColor: "rgba(255,255,255,0.7)",
-                      color: "var(--color-charcoal)",
-                      // @ts-expect-error CSS custom property
-                      "--tw-ring-color": "var(--color-terracotta)",
-                    }}
-                    aria-label="Email address"
-                  />
-                  <button
-                    type="submit"
-                    className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
-                    style={{ backgroundColor: "var(--color-terracotta)" }}
+                <div className="flex flex-col gap-1.5 w-full max-w-sm">
+                  <form
+                    onSubmit={(e) => { void handleSignup(e); }}
+                    className="flex w-full gap-2"
                   >
-                    Get 10% Off
-                  </button>
-                </form>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      required
+                      className="flex-1 rounded-full border px-4 py-2.5 text-sm outline-none transition focus:ring-2"
+                      style={{
+                        borderColor: "var(--border)",
+                        backgroundColor: "rgba(255,255,255,0.7)",
+                        color: "var(--color-charcoal)",
+                        // @ts-expect-error CSS custom property
+                        "--tw-ring-color": "var(--color-terracotta)",
+                      }}
+                      aria-label="Email address"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+                      style={{ backgroundColor: "var(--color-terracotta)" }}
+                    >
+                      {loading ? "…" : "Get 10% Off"}
+                    </button>
+                  </form>
+                  {footerError && (
+                    <p className="text-xs" style={{ color: "var(--color-terracotta)" }}>{footerError}</p>
+                  )}
+                </div>
               )}
             </div>
           </div>

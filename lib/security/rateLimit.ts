@@ -53,6 +53,7 @@ const ENDPOINT_CONFIG: Record<string, RateLimitConfig> = {
   "/api/checkout": { windowSec: 60, limit: 10 },
   "/api/upload": { windowSec: 60, limit: 10 },
   "upload-hourly": { windowSec: 3600, limit: 60 },
+  "/api/subscribe": { windowSec: 3600, limit: 5 },
   "/api/delete-my-data": { windowSec: 60, limit: 5 },
   "/api/debug/status": { windowSec: 60, limit: 30 },
   "/api/health": { windowSec: 60, limit: 30 },
@@ -71,6 +72,9 @@ export function getConfigForEndpoint(pathname: string, method: string): RateLimi
   }
   if (pathname.includes("/api/upload") && method === "POST") {
     return ENDPOINT_CONFIG["/api/upload"];
+  }
+  if (pathname === "/api/subscribe" && method === "POST") {
+    return ENDPOINT_CONFIG["/api/subscribe"];
   }
   if (pathname === "/api/delete-my-data" && method === "POST") {
     return ENDPOINT_CONFIG["/api/delete-my-data"];

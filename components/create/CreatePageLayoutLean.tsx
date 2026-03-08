@@ -221,6 +221,30 @@ export function CreatePageLayoutLean({
                   />
                 </label>
 
+                <details className="group rounded-xl border border-charcoal/8 bg-charcoal/[0.02] px-4 py-3">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs font-medium text-charcoal/45 select-none">
+                    <span>Tips for best results</span>
+                    <svg
+                      className="h-3.5 w-3.5 transition-transform duration-150 group-open:rotate-180"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M2 4l4 4 4-4" />
+                    </svg>
+                  </summary>
+                  <ul className="mt-3 space-y-1.5 text-xs text-charcoal/40">
+                    <li>Avoid brand names &amp; logos (Nike, Disney, etc.)</li>
+                    <li>No copyrighted characters (Mickey Mouse, Spider-Man, etc.)</li>
+                    <li>Skip celebrity names &amp; likenesses</li>
+                    <li>Avoid explicit or offensive content</li>
+                    <li>Simple, descriptive prompts work best</li>
+                  </ul>
+                </details>
+
                 {createMode === "upload" ? (
                   <div
                     className="rounded-xl border border-dashed border-charcoal/20 p-4"

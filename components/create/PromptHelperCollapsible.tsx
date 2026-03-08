@@ -99,7 +99,7 @@ export function PromptHelperCollapsible({ onUsePrompt }: Props) {
             onClick={() => onUsePrompt(builtPrompt)}
             className="w-full rounded-full bg-terracotta px-4 py-3 text-sm font-bold text-white shadow-terra-glow transition hover:opacity-90"
           >
-            Use this prompt
+            Use this description
           </button>
         </div>
       )}

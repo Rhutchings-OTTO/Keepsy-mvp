@@ -108,7 +108,7 @@ export function DesignConfirmation({
         type="button"
       >
         <ChevronLeft size={16} aria-hidden />
-        Back to prompt
+        Change my description
       </button>
 
       {/* Section 1 — Title + reassurance */}

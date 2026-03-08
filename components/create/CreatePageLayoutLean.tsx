@@ -241,7 +241,7 @@ export function CreatePageLayoutLean({
                     <li>No copyrighted characters (Mickey Mouse, Spider-Man, etc.)</li>
                     <li>Skip celebrity names &amp; likenesses</li>
                     <li>Avoid explicit or offensive content</li>
-                    <li>Simple, descriptive prompts work best</li>
+                    <li>Simple descriptions work best — the more specific you are, the better</li>
                   </ul>
                 </details>
 
@@ -304,7 +304,7 @@ export function CreatePageLayoutLean({
                     </>
                   ) : (
                     <>
-                      Generate preview
+                      Create my design
                       <ArrowRight size={18} />
                     </>
                   )}

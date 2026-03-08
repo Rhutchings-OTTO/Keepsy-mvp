@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Create Your Custom Gift",
-  description: "Design a unique personalised gift in seconds. Describe your memory, pick a product, and we'll bring it to life with AI.",
+  description: "Design a unique personalised gift in seconds. Describe your memory, pick a product, and we'll bring it to life.",
   alternates: { canonical: "https://keepsy.store/create" },
 };
 

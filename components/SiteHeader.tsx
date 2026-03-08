@@ -12,7 +12,7 @@ const CONTAINER = "mx-auto w-full max-w-6xl px-4 sm:px-6";
 const NAV_ITEMS = [
   { href: "/shop", label: "Shop" },
   { href: "/gift-ideas", label: "Gift Ideas" },
-  { href: "/create", label: "Create" },
+  { href: "/create", label: "Personalise" },
   { href: "/community", label: "Reviews" },
 ];
 
@@ -214,7 +214,7 @@ function MobileOverlay({
               className="flex min-h-[52px] items-center justify-center rounded-full text-base font-semibold text-white transition hover:opacity-90"
               style={{ backgroundColor: "var(--color-terracotta)" }}
             >
-              Start Creating
+              Make a Gift
             </Link>
           </div>
         </motion.div>
@@ -324,7 +324,7 @@ export function SiteHeader() {
               className="hidden min-h-10 items-center justify-center rounded-full px-5 text-sm font-semibold text-white shadow-[0_16px_32px_-20px_rgba(196,113,74,0.5)] transition hover:opacity-90 md:inline-flex"
               style={{ backgroundColor: "var(--color-terracotta)" }}
             >
-              Start Creating
+              Make a Gift
             </Link>
           </div>
         </div>

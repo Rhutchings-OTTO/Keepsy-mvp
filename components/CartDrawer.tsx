@@ -457,7 +457,7 @@ export function CartDrawer() {
                       {shippingFree ? (
                         <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free</span>
                       ) : (
-                        "Calculated at checkout"
+                        <span>From {region === "US" ? "$3.99" : "£3.99"}</span>
                       )}
                     </span>
                   </div>
@@ -488,7 +488,7 @@ export function CartDrawer() {
                     style={{ backgroundColor: "var(--color-terracotta)" }}
                     onClick={() => void handleCheckout()}
                   >
-                    {isCheckingOut ? "Taking you to checkout…" : "Checkout"}
+                    {isCheckingOut ? "Taking you to checkout…" : "Go to Secure Checkout"}
                   </button>
 
                   <p className="mt-2 text-center text-[11px] text-charcoal/50 leading-relaxed font-medium">
@@ -497,7 +497,10 @@ export function CartDrawer() {
 
                   {/* Trust badges */}
                   <p className="mt-2 text-center text-[11px] text-charcoal/40 leading-relaxed">
-                    Secure Checkout · Handmade With Care · 30-Day Returns
+                    Secure Checkout · Handmade With Care ·{" "}
+                    <Link href="/refunds" className="underline underline-offset-2 hover:text-charcoal/60">
+                      30-Day Returns
+                    </Link>
                   </p>
                   <p className="mt-1.5 text-center text-[11px] text-charcoal/35 leading-relaxed">
                     Every design in your bag is one of a kind — made uniquely for you.

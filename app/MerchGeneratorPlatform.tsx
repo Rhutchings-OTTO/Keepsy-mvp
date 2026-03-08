@@ -1074,7 +1074,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
                   <div className="space-y-6">
                     <div className="rounded-2xl bg-white border border-charcoal/8 p-6 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Configure your gift</p>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Customise your gift</p>
                       <KineticHeading as="h2" className="mb-2 mt-3 text-4xl font-black">{selectedProduct.name}</KineticHeading>
                       <p className="font-semibold text-charcoal/55">{selectedProduct.description}</p>
                     </div>

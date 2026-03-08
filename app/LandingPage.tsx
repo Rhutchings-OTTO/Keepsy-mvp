@@ -442,7 +442,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         className="inline-flex min-h-[52px] items-center justify-center rounded-xl border-2 px-8 text-base font-semibold text-charcoal transition-all hover:-translate-y-0.5"
                         style={{ borderColor: "var(--color-charcoal)" }}
                       >
-                        Create Your Own
+                        Design a Personal Gift
                       </Link>
                     </div>
                   </motion.div>
@@ -780,7 +780,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     Beautiful personalised gifts, made simple.
                   </p>
                   <p className="mt-3 text-xs text-white/35">
-                    🇬🇧 UK &amp; 🇺🇸 US shipping · Powered by AI
+                    🇬🇧 UK &amp; 🇺🇸 US shipping · Made with care
                   </p>
                 </div>
                 <div>
@@ -789,7 +789,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     {[
                       { href: "/shop", label: "All Products" },
                       { href: "/gift-ideas", label: "Gift Ideas" },
-                      { href: "/create", label: "Create Your Own" },
+                      { href: "/create", label: "Design a Gift" },
                     ].map(({ href, label }) => (
                       <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white" style={{ color: "rgba(255,255,255,0.55)" }}>
                         {label}

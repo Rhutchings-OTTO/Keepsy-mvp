@@ -105,10 +105,10 @@ export function OrderConfirmationEmail({ customerName, orderRef, productName, de
       <body style={base}>
         <div style={container}>
           <p style={eyebrow}>Order Confirmed</p>
-          <h1 style={heading}>Your vision is taking form.</h1>
+          <h1 style={heading}>Your order is confirmed!</h1>
           <p style={body}>
             {customerName ? `Hi ${customerName}, ` : ""}
-            Thank you for your order. We&apos;ve received your {designPrompt ? `&apos;${designPrompt}&apos; ` : ""}design and our studio is preparing to bring it to life. Our machines are currently calibrating the pigment density — every detail will be carefully rendered on premium materials before it reaches you.
+            Thank you for your order{designPrompt ? ` for your &apos;${designPrompt}&apos; design` : ""}. We&apos;ve received it and our team is preparing it for print. You&apos;ll receive another email as soon as it&apos;s on its way to you.
           </p>
           <a href={trackUrl} style={badge}>Track Your Order</a>
           <hr style={divider} />
@@ -121,7 +121,7 @@ export function OrderConfirmationEmail({ customerName, orderRef, productName, de
               </>
             )}
           </p>
-          <p style={sig}>— The Keepsy Atelier</p>
+          <p style={sig}>— The Keepsy Team</p>
         </div>
       </body>
     </html>
@@ -156,7 +156,7 @@ export function InProductionEmail({ customerName, orderRef, productName }: InPro
             <br />
             <strong>Estimated delivery:</strong> 5–10 business days
           </p>
-          <p style={sig}>— The Keepsy Atelier</p>
+          <p style={sig}>— The Keepsy Team</p>
         </div>
       </body>
     </html>
@@ -201,7 +201,7 @@ export function ShippedEmail({ customerName, orderRef, productName, trackingNumb
               </>
             )}
           </p>
-          <p style={sig}>— The Keepsy Atelier</p>
+          <p style={sig}>— The Keepsy Team</p>
         </div>
       </body>
     </html>
@@ -236,7 +236,7 @@ export function DeliveredEmail({ customerName, orderRef, productName }: Delivere
           <p style={meta}>
             <strong>Order reference:</strong> {orderRef}
           </p>
-          <p style={sig}>— The Keepsy Atelier</p>
+          <p style={sig}>— The Keepsy Team</p>
         </div>
       </body>
     </html>
@@ -294,7 +294,7 @@ export function PostDeliveryFollowUpEmail({ customerName, orderRef, productName 
               </>
             )}
           </p>
-          <p style={sig}>— The Keepsy Atelier</p>
+          <p style={sig}>— The Keepsy Team</p>
         </div>
       </body>
     </html>

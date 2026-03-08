@@ -129,20 +129,11 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
                 </span>
               </p>
             )}
-            {sessionId && (
+            {!isFailed && (
               <p>
-                Session: <span className="font-mono text-xs">{sessionId}</span>
+                Your order is being prepared and will be on its way soon.
               </p>
             )}
-            <p>
-              Status:{" "}
-              <span
-                className="font-bold uppercase"
-                style={{ color: "var(--color-terracotta)" }}
-              >
-                {status}
-              </span>
-            </p>
           </div>
 
           {/* Total */}

@@ -9,42 +9,52 @@ type AssistantMessage = {
 };
 
 const STORAGE_KEY = "keepsy-gift-assistant-v1";
-const SUGGESTIONS = ["Help me write a prompt", "What gift should I choose?", "Make it funny but tasteful"];
+const SUGGESTIONS = ["Help me describe what I want", "What gift should I choose?", "Make it fun and cheeky"];
 
 function buildAssistantResponse(input: string) {
   const lower = input.toLowerCase();
   if (lower.includes("mum") && lower.includes("cat")) {
     return [
-      "Try these prompt ideas:",
+      "Here are some ideas you could describe:",
       "1) Warm watercolor portrait of Mum cuddling her cat by a sunny window.",
       "2) Elegant illustrated keepsake of Mum and her cat with floral accents.",
-      "3) Funny but tasteful cartoon of Mum and cat sharing tea in a cozy kitchen.",
-      "Best product fit: a card for sentiment or a mug for everyday smiles.",
+      "3) Funny cartoon of Mum and cat sharing tea in a cozy kitchen.",
+      "Best product: a card for something sentimental, or a mug for everyday smiles.",
     ].join("\n");
   }
 
-  if (lower.includes("funny")) {
+  if (lower.includes("funny") || lower.includes("fun") || lower.includes("cheeky")) {
     return [
-      "A playful prompt that stays tasteful:",
-      '"Create a charming cartoon scene with gentle humor, expressive characters, and clean composition suitable for a gift print."',
-      "Best product fit: tee or mug for playful designs.",
+      "Try describing something like this:",
+      '"A charming cartoon scene with gentle humour, expressive characters, and a clean look — perfect as a gift."',
+      "Best product: a tee or mug works really well for fun designs.",
     ].join("\n");
   }
 
-  if (lower.includes("gift") || lower.includes("choose")) {
+  if (lower.includes("describe") || lower.includes("help") || lower.includes("started")) {
+    return [
+      "No problem! Just tell me:",
+      "1) Who is this gift for? (e.g. Mum, husband, best friend)",
+      "2) What do they love? (e.g. gardening, dogs, football, travel)",
+      "3) What's the occasion? (e.g. birthday, Christmas, just because)",
+      "I'll suggest some ideas you can use straight away.",
+    ].join("\n");
+  }
+
+  if (lower.includes("gift") || lower.includes("choose") || lower.includes("what")) {
     return [
       "Quick gift guide:",
-      "- Card: sentimental and personal",
-      "- Mug: practical daily keepsake",
-      "- Tee/Hoodie: bold visual statement",
-      "If you want, tell me recipient + vibe and I will draft 3 prompts.",
+      "- Card: sentimental and personal — great for any occasion",
+      "- Mug: something they'll use every day",
+      "- Tee or Hoodie: a bold, wearable keepsake",
+      "Tell me who you're buying for and I can suggest some ideas.",
     ].join("\n");
   }
 
   return [
-    "Here is a strong prompt starter:",
-    '"Create a premium gift-ready artwork with clear subject focus, warm lighting, and balanced composition for print."',
-    "Share recipient + style and I can tailor it.",
+    "Here's a description you could start with:",
+    '"A beautiful, personalised artwork with warm colours and a clean look — perfect for printing on a gift."',
+    "Tell me who it's for and their interests, and I can tailor it for you.",
   ].join("\n");
 }
 
@@ -53,11 +63,11 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<AssistantMessage[]>(() => {
     if (typeof window === "undefined") {
-      return [{ role: "assistant", text: "Hi, I am Keepsy's AI gift assistant. Tell me who this gift is for and your style." }];
+      return [{ role: "assistant", text: "Hi! I'm here to help you find the perfect gift. Who are you buying for?" }];
     }
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return [{ role: "assistant", text: "Hi, I am Keepsy's AI gift assistant. Tell me who this gift is for and your style." }];
+      return [{ role: "assistant", text: "Hi! I'm here to help you find the perfect gift. Who are you buying for?" }];
     }
     try {
       const parsed = JSON.parse(raw) as AssistantMessage[];
@@ -65,7 +75,7 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
     }
-    return [{ role: "assistant", text: "Hi, I am Keepsy's AI gift assistant. Tell me who this gift is for and your style." }];
+    return [{ role: "assistant", text: "Hi! I'm here to help you find the perfect gift. Who are you buying for?" }];
   });
 
   useEffect(() => {
@@ -94,7 +104,7 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
           style={{ backgroundColor: "var(--color-cream)" }}
         >
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-sm font-semibold text-charcoal">AI Gift Assistant</p>
+            <p className="text-sm font-semibold text-charcoal">Gift Ideas Helper</p>
             <button type="button" onClick={() => setOpen(false)} className="text-xs text-charcoal/60">
               Close
             </button>
@@ -163,7 +173,7 @@ export default function GiftAssistantWidget({ onApplyPrompt }: { onApplyPrompt: 
           style={{ backgroundColor: "var(--color-cream)" }}
         >
           <MessageCircleHeart className="h-4 w-4" aria-hidden="true" />
-          AI gift assistant
+          Gift ideas helper
         </button>
       )}
     </div>

@@ -241,7 +241,9 @@ export async function baselineGenerate(
   }
 
   const uploadResult = await uploadImageToCloudinary(imageDataUrl);
-  const designUrl = uploadResult.ok ? uploadResult.url : imageDataUrl;
+  // Use empty string (not imageDataUrl) on failure — makes the missing upload explicit.
+  // Downstream: checkoutViaKeepsyAPI strips base64 anyway; empty string is detectable.
+  const designUrl = uploadResult.ok ? uploadResult.url : "";
 
   return {
     ok: true,

@@ -14,6 +14,11 @@ export async function uploadImageToCloudinary(
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
   if (!cloudName || !apiKey || !apiSecret) {
+    console.error(
+      "[cloudinary] Upload skipped — CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, or " +
+      "CLOUDINARY_API_SECRET not set. Images will use base64 fallback and Printify " +
+      "fulfillment will be skipped for this order."
+    );
     return { ok: false, error: "Image hosting not configured." };
   }
 
@@ -38,6 +43,7 @@ export async function uploadImageToCloudinary(
 
     const url = result?.secure_url;
     if (!url || typeof url !== "string") {
+      console.error("[cloudinary] Upload succeeded but no secure_url returned.");
       return { ok: false, error: "Upload succeeded but no URL returned." };
     }
     // Add immutable cache flag for CDN (public, max-age=31536000, immutable)
@@ -45,6 +51,7 @@ export async function uploadImageToCloudinary(
     return { ok: true, url: cdnUrl };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Upload failed";
+    console.error("[cloudinary] Upload failed:", msg);
     return { ok: false, error: msg };
   }
 }

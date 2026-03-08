@@ -268,6 +268,7 @@ export async function sendOrderConfirmationEmail(
       subject: `Thank you for your Keepsy order — ${params.orderRef}`,
       react: OrderConfirmationEmail(params),
       text: `Thank you for your Keepsy order. Your ${params.designPrompt ? `'${params.designPrompt}' ` : ""}design is being prepared. Track your order: ${SITE_URL}/track?ref=${params.orderRef}`,
+      headers: { "List-Unsubscribe": "<mailto:hello@keepsy.store?subject=unsubscribe>" },
     });
     if (error) {
       console.error("[email] order-confirmation send failed:", error);
@@ -291,6 +292,7 @@ export async function sendInProductionEmail(params: InProductionEmailProps & { t
       subject: `Your Keepsy order is being crafted — ${params.orderRef}`,
       react: InProductionEmail(params),
       text: `Your ${params.productName ?? "order"} is now in production. Track it at ${SITE_URL}/track?ref=${params.orderRef}`,
+      headers: { "List-Unsubscribe": "<mailto:hello@keepsy.store?subject=unsubscribe>" },
     });
     if (error) { console.error("[email] in-production send failed:", error); return false; }
     return true;
@@ -310,6 +312,7 @@ export async function sendShippedEmail(params: ShippedEmailProps & { to: string 
       subject: `Your Keepsy order is on its way — ${params.orderRef}`,
       react: ShippedEmail(params),
       text: `Your ${params.productName ?? "order"} has shipped.${params.trackingNumber ? ` Tracking: ${params.trackingNumber}` : ""} View status: ${SITE_URL}/track?ref=${params.orderRef}`,
+      headers: { "List-Unsubscribe": "<mailto:hello@keepsy.store?subject=unsubscribe>" },
     });
     if (error) { console.error("[email] shipped send failed:", error); return false; }
     return true;
@@ -330,6 +333,7 @@ export async function sendDeliveredEmail(params: DeliveredEmailProps & { to: str
       subject: "Your Keepsy order has arrived — we'd love your thoughts",
       react: DeliveredEmail(params),
       text: `Your ${params.productName ?? "order"} has been delivered. We'd love to hear how it turned out — simply reply to this email. Create another keepsake: ${SITE_URL}/create`,
+      headers: { "List-Unsubscribe": "<mailto:hello@keepsy.store?subject=unsubscribe>" },
     });
     if (error) { console.error("[email] delivered send failed:", error); return false; }
     return true;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import type { Region } from "@/lib/region";
@@ -14,7 +14,7 @@ type BeforeAfterCarouselProps = {
   region: Region;
 };
 
-export default function BeforeAfterCarousel({ region }: BeforeAfterCarouselProps) {
+const BeforeAfterCarousel = React.memo(function BeforeAfterCarousel({ region }: BeforeAfterCarouselProps) {
   const [showMobile, setShowMobile] = useState(false);
 
   if (!FF.beforeAfter) return null;
@@ -64,4 +64,6 @@ export default function BeforeAfterCarousel({ region }: BeforeAfterCarouselProps
       </div>
     </motion.section>
   );
-}
+});
+
+export default BeforeAfterCarousel;

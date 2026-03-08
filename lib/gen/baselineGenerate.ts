@@ -157,6 +157,22 @@ async function callEdit(
   return `data:image/png;base64,${b64}`;
 }
 
+/**
+ * Retry helper: runs `fn` once; if it throws with a transient error (500 or 503),
+ * waits 1 second and tries exactly one more time. Any other error is re-thrown immediately.
+ */
+async function callWithSingleRetry<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err: unknown) {
+    const status = (err as { status?: number })?.status;
+    const isTransient = status === 500 || status === 503;
+    if (!isTransient) throw err;
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return fn();
+  }
+}
+
 /** DEV-only: log fidelity metadata. Never log full prompts in production. */
 function devLogFidelity(params: {
   promptHash: string;
@@ -235,9 +251,9 @@ export async function baselineGenerate(
 
   let imageDataUrl: string;
   if (mode === "upload" && referenceImageDataUrl) {
-    imageDataUrl = await callEdit(finalPrompt, referenceImageDataUrl, size);
+    imageDataUrl = await callWithSingleRetry(() => callEdit(finalPrompt, referenceImageDataUrl!, size));
   } else {
-    imageDataUrl = await callGenerate(finalPrompt, size);
+    imageDataUrl = await callWithSingleRetry(() => callGenerate(finalPrompt, size));
   }
 
   const uploadResult = await uploadImageToCloudinary(imageDataUrl);

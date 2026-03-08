@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import type { Region } from "@/lib/region";
 import { KineticHeading } from "@/components/motion/KineticHeading";
 import { REGION_CONTENT } from "@/content/regionContent";
@@ -30,7 +30,7 @@ type IdeasForYouProps = {
   pendingReplace: string | null;
 };
 
-export function IdeasForYou({
+export const IdeasForYou = React.memo(function IdeasForYou({
   region,
   onUsePrompt,
   onAppendStyle,
@@ -127,4 +127,4 @@ export function IdeasForYou({
       ) : null}
     </section>
   );
-}
+});

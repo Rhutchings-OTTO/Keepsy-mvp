@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 const WHO_OPTIONS = ["Person", "Pet", "Family", "Home", "Couple", "Baby"];
@@ -12,7 +12,7 @@ type Props = {
   onUsePrompt: (prompt: string) => void;
 };
 
-export function PromptHelperCollapsible({ onUsePrompt }: Props) {
+export const PromptHelperCollapsible = React.memo(function PromptHelperCollapsible({ onUsePrompt }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [who, setWho] = useState("Person");
   const [style, setStyle] = useState("Watercolor");
@@ -105,4 +105,4 @@ export function PromptHelperCollapsible({ onUsePrompt }: Props) {
       )}
     </div>
   );
-}
+});

@@ -328,7 +328,8 @@ export function Wizard({ initialStyle, initialProduct }: WizardProps) {
                 type="button"
                 onClick={() => void startCheckout()}
                 disabled={!generatedImage || isCheckingOut}
-                className="min-h-12 w-full rounded-2xl bg-black px-4 py-3 text-lg font-bold text-white shadow-sm disabled:opacity-50"
+                className="min-h-12 w-full rounded-2xl px-4 py-3 text-lg font-bold text-white shadow-[0_12px_28px_-12px_rgba(196,113,74,0.55)] transition hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: "var(--color-terracotta)" }}
               >
                 {isCheckingOut ? "Crafting checkout…" : "Checkout"}
               </button>

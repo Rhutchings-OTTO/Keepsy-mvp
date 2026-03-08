@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -71,7 +71,7 @@ export type CreatePageLayoutLeanProps = {
   checkoutStatus: "success" | "canceled" | null;
   isBusy: boolean;
   isCompressingImage?: boolean;
-  onGenerate: () => void;
+  onGenerate: (promptOverride?: string) => void;
   onUploadFile: (file: File) => void;
   onClearUploadedImage: (e: React.MouseEvent) => void;
   onProductSelect: (type: "tshirt" | "mug" | "card" | "hoodie") => void;
@@ -111,11 +111,35 @@ export function CreatePageLayoutLean({
   const [createMode, setCreateMode] = useState<"describe" | "upload">("describe");
   const [pendingReplace, setPendingReplace] = useState<string | null>(null);
   const [ideasOpen, setIdeasOpen] = useState(false);
+
+  // Local textarea state — isolates keystrokes from parent re-renders.
+  // The parent's `prompt` is only updated on blur or on generate.
+  const [localPrompt, setLocalPrompt] = useState<string>(
+    typeof prompt === "string" ? prompt : ""
+  );
+  const localPromptRef = useRef(localPrompt);
+  localPromptRef.current = localPrompt;
+
+  // Sync inbound prop changes (chips, suggestions, initial query) into local state.
+  useEffect(() => {
+    setLocalPrompt(typeof prompt === "string" ? prompt : "");
+  }, [prompt]);
+
   const activeProduct = PRODUCTS.find((product) => product.type === (selectedProductType ?? "tshirt")) ?? PRODUCTS[0];
   const ActiveProductIcon = activeProduct.Icon;
 
+  // Flush local prompt to parent and pass it as override to onGenerate so
+  // the parent handler always has the latest value even before the setState
+  // from setPrompt has committed (avoids stale closure on prompt state).
+  const handleGenerate = () => {
+    const latest = localPromptRef.current;
+    setPrompt(latest);
+    onGenerate(latest);
+  };
+
   const handleChipPrompt = (nextPrompt: string) => {
-    if (!prompt.trim()) {
+    if (!localPrompt.trim()) {
+      setLocalPrompt(nextPrompt);
       setPrompt(nextPrompt);
       setPendingReplace(null);
       return;
@@ -125,18 +149,22 @@ export function CreatePageLayoutLean({
 
   const handleReplaceConfirm = () => {
     if (!pendingReplace) return;
+    setLocalPrompt(pendingReplace);
     setPrompt(pendingReplace);
     setPendingReplace(null);
   };
 
   const handleUsePrompt = (nextPrompt: string) => {
+    setLocalPrompt(nextPrompt);
     setPrompt(nextPrompt);
     setPendingReplace(null);
   };
 
   const handleAppendStyle = (style: string) => {
-    const current = (typeof prompt === "string" ? prompt : "").trim();
-    setPrompt(current ? `${current}, ${style.toLowerCase()} style` : `${style.toLowerCase()} style`);
+    const current = (typeof localPrompt === "string" ? localPrompt : "").trim();
+    const next = current ? `${current}, ${style.toLowerCase()} style` : `${style.toLowerCase()} style`;
+    setLocalPrompt(next);
+    setPrompt(next);
     setHasUserTypedPrompt(true);
   };
 
@@ -227,11 +255,12 @@ export function CreatePageLayoutLean({
                     </>
                   )}
                   <textarea
-                    value={typeof prompt === "string" ? prompt : ""}
+                    value={localPrompt}
                     onChange={(e) => {
-                      setPrompt(e.target.value);
+                      setLocalPrompt(e.target.value);
                       setHasUserTypedPrompt(true);
                     }}
+                    onBlur={() => setPrompt(localPromptRef.current)}
                     placeholder={
                       createMode === "upload"
                         ? "Example: Turn this family photo into a soft watercolor birthday card"
@@ -320,8 +349,8 @@ export function CreatePageLayoutLean({
                 ) : null}
 
                 <MagneticButton
-                  onClick={() => onGenerate()}
-                  disabled={(!(typeof prompt === "string" ? prompt : "").trim() && !uploadedImage) || isBusy}
+                  onClick={handleGenerate}
+                  disabled={(!localPrompt.trim() && !uploadedImage) || isBusy}
                   className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-xl px-6 text-base font-semibold text-white shadow-[0_16px_32px_-20px_rgba(196,113,74,0.45)] disabled:cursor-not-allowed disabled:opacity-45"
                   style={{ backgroundColor: "var(--color-terracotta)" }}
                 >

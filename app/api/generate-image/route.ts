@@ -64,13 +64,24 @@ const OPENAI_BLOCK_RESPONSE = {
   ],
 };
 
-function normalizeOpenAIError(message: string): { status: number; contentBlock: boolean; error: string } {
+function normalizeOpenAIError(message: string): { status: number; contentBlock: boolean; rateLimited: boolean; error: string } {
   const lower = message.toLowerCase();
   const isBlock = lower.includes("safety system") || lower.includes("content policy");
+  const isRateLimit =
+    lower.includes("rate limit") ||
+    lower.includes("rate_limit") ||
+    lower.includes("too many requests") ||
+    lower.includes("busy") ||
+    lower.includes("temporarily");
   return {
-    status: isBlock ? 400 : 500,
+    status: isBlock ? 400 : isRateLimit ? 429 : 500,
     contentBlock: isBlock,
-    error: isBlock ? OPENAI_BLOCK_RESPONSE.message : message,
+    rateLimited: isRateLimit,
+    error: isBlock
+      ? OPENAI_BLOCK_RESPONSE.message
+      : isRateLimit
+      ? "We're experiencing high demand right now. Please wait a moment and try again."
+      : message,
   };
 }
 
@@ -268,6 +279,14 @@ export async function POST(req: Request) {
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Server error";
     recordGenerationMetric("totalErrors", 1);
+    // Check for OpenAI SDK numeric status (e.g. 429 from the SDK) before string matching
+    const sdkStatus = (e as { status?: number })?.status;
+    if (sdkStatus === 429 || sdkStatus === 503) {
+      return NextResponse.json(
+        { ok: false, error: "We're experiencing high demand right now. Please wait a moment and try again." },
+        { status: 429, headers: noStoreHeaders }
+      );
+    }
     const normalized = normalizeOpenAIError(message);
     const body = normalized.contentBlock
       ? { ok: false, error: normalized.error, ...OPENAI_BLOCK_RESPONSE }

@@ -120,12 +120,12 @@ export function DesignConfirmation({
 
       {/* Section 2 — Large image preview */}
       <div className="mb-6 flex justify-center sm:mb-10">
-        <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-charcoal/8 bg-white p-3 shadow-[0_30px_72px_-40px_rgba(45,41,38,0.20)]">
+        <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-charcoal/8 bg-white p-2 shadow-[0_30px_72px_-40px_rgba(45,41,38,0.20)] sm:p-3">
           {/* One-of-a-kind badge */}
-          <div className="absolute left-5 top-5 z-30 flex items-center gap-1.5 rounded-full border border-white/30 bg-charcoal/80 px-3 py-1.5 backdrop-blur-sm">
+          <div className="absolute left-4 top-4 z-30 flex items-center gap-1.5 rounded-full border border-white/30 bg-charcoal/80 px-3 py-1.5 backdrop-blur-sm sm:left-5 sm:top-5">
             <span className="text-[10px] font-bold uppercase tracking-widest text-white/90">✦ One of a kind</span>
           </div>
-          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-charcoal/8 bg-white">
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-charcoal/8 bg-white sm:aspect-[16/10]">
           {isRefining ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-xl bg-[#F5EDE0]">
               <div className="w-8 h-8 border-2 border-charcoal/20 border-t-charcoal rounded-full animate-spin" />

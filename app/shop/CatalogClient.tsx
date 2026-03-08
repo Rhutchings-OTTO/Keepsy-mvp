@@ -9,13 +9,13 @@ import { getRegion, type Region } from "@/lib/region";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Category = "all" | "mug" | "tee" | "hoodie" | "card";
+type Category = "all" | "mug" | "tee" | "hoodie" | "card" | "canvas";
 type SortKey = "popular" | "price-asc" | "price-desc";
 
 interface CatalogProduct {
   id: string;
   name: string;
-  category: "mug" | "tee" | "hoodie" | "card";
+  category: "mug" | "tee" | "hoodie" | "card" | "canvas";
   color?: "white" | "black" | "blue";
   price: number;
   rating: number;
@@ -124,6 +124,39 @@ const PRODUCTS: CatalogProduct[] = [
     badge: "Bestseller",
     image: "/images/products/greeting-card.jpg",
   },
+  {
+    id: "canvas-family",
+    name: "Personalised Canvas",
+    category: "canvas",
+    price: 79.99,
+    rating: 4.9,
+    reviewCount: 64,
+    soldThisWeek: 12,
+    badge: "New",
+    image: "/images/canvas/canvas-family.png",
+  },
+  {
+    id: "canvas-pet",
+    name: "Personalised Canvas — Square",
+    category: "canvas",
+    price: 49.99,
+    rating: 4.9,
+    reviewCount: 41,
+    soldThisWeek: 8,
+    badge: "New",
+    image: "/images/canvas/canvas-pet.png",
+  },
+  {
+    id: "canvas-house",
+    name: "Personalised Canvas — Portrait",
+    category: "canvas",
+    price: 49.99,
+    rating: 4.8,
+    reviewCount: 29,
+    soldThisWeek: 6,
+    badge: "New",
+    image: "/images/canvas/canvas-house.png",
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -135,6 +168,7 @@ function renderStars(rating: number) {
 
 function productHref(product: CatalogProduct) {
   const base = `/create?product=${product.category === "tee" ? "tee" : product.category}`;
+  if (product.category === "canvas") return "/create?product=canvas";
   return product.color ? `${base}&color=${product.color}` : base;
 }
 
@@ -228,6 +262,7 @@ const CATEGORIES: { key: Category; label: string }[] = [
   { key: "tee", label: "Tees" },
   { key: "hoodie", label: "Hoodies" },
   { key: "card", label: "Cards" },
+  { key: "canvas", label: "Canvas" },
 ];
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [

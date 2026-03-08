@@ -73,6 +73,12 @@ const PRODUCT_IMAGES = [
     label: "Hoodies",
     tag: "From $56",
   },
+  {
+    src: "/images/canvas/canvas-family.png",
+    alt: "Personalised canvas print",
+    label: "Canvas",
+    tag: "From £29.99",
+  },
 ];
 
 const SOCIAL_PROOF_ITEMS = [

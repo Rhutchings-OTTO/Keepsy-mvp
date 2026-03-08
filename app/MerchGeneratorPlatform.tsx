@@ -415,6 +415,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [checkoutSuccess] = useState(false);
   const [checkoutStatus, setCheckoutStatus] = useState<"success" | "canceled" | null>(null);
   const didApplyInitialQuery = useRef(false);
+  const isSecuringRef = useRef(false);
   const cartCount = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
     [cartItems]
@@ -824,11 +825,17 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   };
 
   const runCheckout = async (mode: "single" | "cart") => {
-    if (mode === "cart") {
-      await handleCartCheckout();
-      return;
+    if (isSecuringRef.current) return;
+    isSecuringRef.current = true;
+    try {
+      if (mode === "cart") {
+        await handleCartCheckout();
+        return;
+      }
+      await handleCheckout();
+    } finally {
+      isSecuringRef.current = false;
     }
-    await handleCheckout();
   };
 
   const requestCheckout = (mode: "single" | "cart") => {
@@ -1253,6 +1260,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       </AnimatePresence>
                     </MagneticButton>
 
+                    <p className="mt-3 text-center text-xs text-charcoal/50 font-medium">
+                      No account required · Secure checkout
+                    </p>
                     <button onClick={() => setStep(3)} className="mt-4 text-sm font-extrabold inline-flex items-center gap-2 hover:opacity-100" style={{ color: "rgba(45,41,38,0.55)" }}>
                       <ChevronLeft size={16} /> Back
                     </button>

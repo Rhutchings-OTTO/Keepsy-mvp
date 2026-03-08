@@ -17,6 +17,17 @@ export const runtime = "edge";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
+// Module-level singleton — one Stripe client per isolate, not per request.
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe | null {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) return null;
+    _stripe = new Stripe(key, { apiVersion: "2026-02-25.clover" });
+  }
+  return _stripe;
+}
+
 const lineItemSchema = z.object({
   productId: z.string().max(64).regex(/^[a-zA-Z0-9_-]+$/),
   name: z.string().max(200),
@@ -60,15 +71,15 @@ export async function POST(req: Request) {
   const rateLimitResult = await guardRateLimit(req, "/api/checkout", "POST", requestId);
   if ("response" in rateLimitResult) return rateLimitResult.response;
 
-  const secretKey = process.env.STRIPE_SECRET_KEY;
-  if (!secretKey) {
-    return new Response(
-      JSON.stringify({ error: "CHECKOUT_FAILED", message: "Checkout is not configured." }),
-      { status: 500, headers: JSON_HEADERS }
-    );
-  }
-
   try {
+    const stripe = getStripe();
+    if (!stripe) {
+      return new Response(
+        JSON.stringify({ error: "CHECKOUT_FAILED", message: "Checkout is not configured." }),
+        { status: 500, headers: JSON_HEADERS }
+      );
+    }
+
     const parsed = await parseAndValidate(req, schema, 64 * 1024);
     if ("error" in parsed) {
       return new Response(JSON.stringify(parsed.error), {
@@ -78,8 +89,6 @@ export async function POST(req: Request) {
     }
 
     const { cart, designUrl = "", productType = "" } = parsed.data;
-
-    const stripe = new Stripe(secretKey, { apiVersion: "2026-02-25.clover" });
 
     const cartSummary = cart.map((item) => {
       const catalog = PRODUCT_CATALOG[item.productId];

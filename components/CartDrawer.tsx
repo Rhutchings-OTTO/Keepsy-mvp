@@ -459,6 +459,13 @@ export function CartDrawer() {
                   </div>
                 </div>
 
+                {/* ── Delivery estimate ── */}
+                <div className="px-6 pb-1">
+                  <p className="text-center text-[11px] text-charcoal/40 leading-relaxed">
+                    Estimated delivery: 4–7 business days (UK) · 5–10 (US)
+                  </p>
+                </div>
+
                 {/* ── Checkout CTA ── */}
                 <div className="px-6 pb-6 pt-3">
                   {checkoutError && (
@@ -476,8 +483,12 @@ export function CartDrawer() {
                     {isCheckingOut ? "Taking you to checkout…" : "Checkout"}
                   </button>
 
+                  <p className="mt-2 text-center text-[11px] text-charcoal/50 leading-relaxed font-medium">
+                    No account required · Secure checkout
+                  </p>
+
                   {/* Trust badges */}
-                  <p className="mt-3 text-center text-[11px] text-charcoal/40 leading-relaxed">
+                  <p className="mt-2 text-center text-[11px] text-charcoal/40 leading-relaxed">
                     Secure Checkout · Handmade With Care · 30-Day Returns
                   </p>
                   <p className="mt-1.5 text-center text-[11px] text-charcoal/35 leading-relaxed">

@@ -18,6 +18,13 @@ export const runtime = "nodejs";
 
 const MAX_WEBHOOK_BODY = schemas.webhookMaxBytes;
 
+// Module-level singleton — one Stripe client per Node.js worker, not per request.
+// The webhook secret is validated at request time so missing-config still returns
+// a clean error response rather than crashing at import.
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
+  apiVersion: "2026-02-25.clover",
+});
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function regionFromCountry(country: string | null | undefined): "US" | "UK" {
@@ -56,10 +63,9 @@ function buildPrintifyAddress(session: Stripe.Checkout.Session): PrintifyAddress
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
-  const secretKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-  if (!secretKey || !webhookSecret) {
+  if (!process.env.STRIPE_SECRET_KEY || !webhookSecret) {
     return new Response(JSON.stringify({ error: "Missing Stripe webhook configuration." }), {
       status: 500,
     });
@@ -82,7 +88,6 @@ export async function POST(req: Request) {
     }
   }
 
-  const stripe = new Stripe(secretKey, { apiVersion: "2026-02-25.clover" });
   const payload = await req.text();
   if (payload.length > MAX_WEBHOOK_BODY) {
     logSecurityEvent({ type: "body_too_large", endpoint: "/api/stripe/webhook", size: payload.length });

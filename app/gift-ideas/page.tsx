@@ -3,9 +3,28 @@ import { PromoBanner } from "@/components/PromoBanner";
 import { Reveal } from "@/components/motion/Reveal";
 import Link from "next/link";
 
-export const metadata = {
-  title: "Gift Ideas by Occasion",
-  description: "Browse gift ideas by occasion — birthdays, anniversaries, holidays and more. Find the perfect personalised gift.",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Gift Ideas for Every Occasion",
+  description:
+    "Discover thoughtful gift ideas for every occasion. From unique gifts for her to personalised keepsakes for birthdays, anniversaries and holidays — curated with care at Keepsy.",
+  alternates: {
+    canonical: "https://keepsy.store/gift-ideas",
+  },
+  openGraph: {
+    title: "Gift Ideas for Every Occasion — Keepsy",
+    description:
+      "Find the perfect unique gift for her — or anyone. Browse personalised gift ideas by occasion: birthdays, anniversaries, Christmas and more.",
+    type: "website",
+    url: "https://keepsy.store/gift-ideas",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gift Ideas for Every Occasion — Keepsy",
+    description:
+      "Unique gifts for her and everyone you love. Browse personalised gift ideas by occasion at Keepsy.",
+  },
 };
 
 export default function GiftIdeasPage() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -126,19 +126,6 @@ const PRODUCTS: CatalogProduct[] = [
   },
 ];
 
-// ─── Toast data ───────────────────────────────────────────────────────────────
-
-const TOAST_COMBOS = [
-  { name: "Sarah", location: "Texas", product: "Personalised Mug", time: "3 min ago" },
-  { name: "Jennifer", location: "Ohio", product: "Black Hoodie", time: "7 min ago" },
-  { name: "Lisa", location: "California", product: "White T-Shirt", time: "2 min ago" },
-  { name: "Michelle", location: "Florida", product: "Personalised Greeting Card", time: "5 min ago" },
-  { name: "Karen", location: "Georgia", product: "Blue Hoodie", time: "9 min ago" },
-  { name: "Deborah", location: "Tennessee", product: "Personalised Mug", time: "1 min ago" },
-  { name: "Patricia", location: "Virginia", product: "Black T-Shirt", time: "4 min ago" },
-  { name: "Nancy", location: "Illinois", product: "White Hoodie", time: "6 min ago" },
-];
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function renderStars(rating: number) {
@@ -232,63 +219,6 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
   );
 }
 
-// ─── Purchase Toast ───────────────────────────────────────────────────────────
-
-function PurchaseToast() {
-  const [visible, setVisible] = useState(false);
-  const [combo, setCombo] = useState(TOAST_COMBOS[0]);
-  const indexRef = useRef(0);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    function showNext() {
-      indexRef.current = (indexRef.current + 1) % TOAST_COMBOS.length;
-      setCombo(TOAST_COMBOS[indexRef.current]);
-      setVisible(true);
-
-      timerRef.current = setTimeout(() => {
-        setVisible(false);
-        const delay = 15000 + Math.random() * 5000;
-        timerRef.current = setTimeout(showNext, delay);
-      }, 4000);
-    }
-
-    const initial = 8000 + Math.random() * 4000;
-    timerRef.current = setTimeout(showNext, initial);
-
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          key={combo.name + combo.product}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 20, opacity: 0 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-6 left-4 z-50 max-w-[280px] rounded-xl bg-white shadow-[0_8px_32px_-8px_rgba(45,41,38,0.22)] border-l-4 border-charcoal/10 pl-1 pr-4 py-3"
-          style={{ borderLeftColor: "var(--color-gold)" }}
-        >
-          <div className="flex items-start gap-2 pl-3">
-            <span className="text-xl leading-none mt-0.5">🛍️</span>
-            <div>
-              <p className="text-[12px] font-semibold text-charcoal leading-snug">
-                {combo.name} from {combo.location} just ordered
-              </p>
-              <p className="text-[11px] font-medium mt-0.5" style={{ color: "var(--color-terracotta)" }}>
-                {combo.product} · {combo.time}
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
 
 // ─── Category Tabs ────────────────────────────────────────────────────────────
 
@@ -458,8 +388,6 @@ export function CatalogClient() {
         )}
       </div>
 
-      {/* Purchase activity toast */}
-      <PurchaseToast />
     </div>
   );
 }

@@ -27,6 +27,8 @@ export async function uploadImageToCloudinary(
     return { ok: false, error: "Invalid image data format." };
   }
 
+  const UPLOAD_TIMEOUT_MS = 30_000;
+
   try {
     const { v2: cloudinary } = await import("cloudinary");
     cloudinary.config({
@@ -35,11 +37,19 @@ export async function uploadImageToCloudinary(
       api_secret: apiSecret,
     });
 
-    const result = await cloudinary.uploader.upload(imageDataUrl, {
+    const uploadPromise = cloudinary.uploader.upload(imageDataUrl, {
       folder: "keepsy-designs",
       resource_type: "image",
       overwrite: false,
     });
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(
+        () => reject(new Error("Cloudinary upload timed out after 30s")),
+        UPLOAD_TIMEOUT_MS
+      )
+    );
+
+    const result = await Promise.race([uploadPromise, timeoutPromise]);
 
     const url = result?.secure_url;
     if (!url || typeof url !== "string") {

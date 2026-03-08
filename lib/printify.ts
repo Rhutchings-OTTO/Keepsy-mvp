@@ -332,7 +332,7 @@ export async function deletePrintifyProduct(productId: string): Promise<void> {
 
 export function splitName(fullName: string): { first_name: string; last_name: string } {
   const parts = fullName.trim().split(/\s+/);
-  if (parts.length === 1) return { first_name: parts[0], last_name: parts[0] };
+  if (parts.length === 1) return { first_name: parts[0], last_name: "" };
   const first_name = parts.slice(0, -1).join(" ");
   const last_name = parts[parts.length - 1];
   return { first_name, last_name };

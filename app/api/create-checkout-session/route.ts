@@ -21,6 +21,19 @@ export const runtime = "edge";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
+// Module-level singleton — created once per isolate, not on every request.
+// Instantiation is deferred until first use so the missing-key error path still
+// returns a clean JSON response instead of crashing at import time.
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe | null {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) return null;
+    _stripe = new Stripe(key, { apiVersion: "2026-02-25.clover" });
+  }
+  return _stripe;
+}
+
 const lineItemSchema = z.object({
   productId: z.string().max(64).regex(/^[a-zA-Z0-9_-]+$/),
   name: z.string().max(200),
@@ -34,7 +47,7 @@ const lineItemSchema = z.object({
 const checkoutSchema = z
   .object({
     cart: z.array(lineItemSchema).min(1),
-    currency: z.literal("gbp").optional(),
+    currency: z.enum(["gbp", "usd"]).optional(),
     imageDataUrl: z.string().max(256).optional(),
     designUrl: z.string().max(2048).optional(),
     productType: z.string().max(64).optional(),
@@ -66,8 +79,8 @@ export async function POST(req: Request) {
   if ("response" in rateLimitResult) return rateLimitResult.response;
 
   try {
-    const secretKey = process.env.STRIPE_SECRET_KEY;
-    if (!secretKey) {
+    const stripe = getStripe();
+    if (!stripe) {
       if (process.env.NODE_ENV !== "production") {
         console.error("[checkout] STRIPE_SECRET_KEY is missing. Add it to .env.local (local) or Vercel env vars (production).");
       }
@@ -89,10 +102,6 @@ export async function POST(req: Request) {
       });
     }
     const body = parsed.data;
-
-    const stripe = new Stripe(secretKey, {
-      apiVersion: "2026-02-25.clover",
-    });
 
     const cart = body.cart;
     const cartSummary = cart.map((item) => {
@@ -141,6 +150,7 @@ export async function POST(req: Request) {
         { status: 500, headers: JSON_HEADERS }
       );
     }
+    const currency = body.currency ?? "gbp";
     const primaryProductName = safeCartSummary[0]?.name || "Keepsy order";
     const orderRef = `order_${globalThis.crypto.randomUUID()}`;
     const imageDataUrl = body.imageDataUrl ?? safeCartSummary[0]?.imageUrl ?? "";
@@ -162,7 +172,7 @@ export async function POST(req: Request) {
           order_ref: orderRef,
           stripe_session_id: `pending_${orderRef}`,
           status: "pending",
-          currency: "gbp",
+          currency,
           total_gbp: Number(totalGBP.toFixed(2)),
           prompt: "",
           generated_image_url: null,
@@ -207,7 +217,7 @@ export async function POST(req: Request) {
           meta.imageUrl = item.imageUrl ? "1" : "0";
           return {
             price_data: {
-              currency: "gbp",
+              currency,
               product_data: {
                 name: [item.name, item.size, item.color].filter(Boolean).join(" · ") || item.name,
                 description: "Custom AI keepsake print",

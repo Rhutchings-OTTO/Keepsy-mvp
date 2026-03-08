@@ -52,6 +52,33 @@ export const metadata: Metadata = {
   },
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://keepsy.store/#organization",
+      "name": "Keepsy",
+      "url": "https://keepsy.store",
+      "logo": "https://keepsy.store/images/logo.png",
+      "email": "hello@keepsy.store",
+      "sameAs": [
+        "https://www.instagram.com/keepsy.store",
+        "https://www.pinterest.com/keepsystore",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://keepsy.store/#website",
+      "url": "https://keepsy.store",
+      "name": "Keepsy",
+      "description":
+        "AI-powered personalised gifts — custom hoodies, mugs, t-shirts and greeting cards printed just for you.",
+      "publisher": { "@id": "https://keepsy.store/#organization" },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -59,6 +86,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={`${fraunces.variable} ${manrope.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+      </head>
       <body className="antialiased font-sans">
         <AtelierModeProvider>
           <SiteChrome>{children}</SiteChrome>

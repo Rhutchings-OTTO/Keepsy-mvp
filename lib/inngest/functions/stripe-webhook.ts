@@ -13,6 +13,19 @@ import {
 import { getPrintifyVariantId } from "@/lib/printify-blueprints";
 import { notifyFounders } from "@/lib/notifications";
 
+// ─── Stripe singleton ─────────────────────────────────────────────────────
+
+// Created once per worker process rather than once per Inngest step invocation.
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe | null {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) return null;
+    _stripe = new Stripe(key, { apiVersion: "2026-02-25.clover" });
+  }
+  return _stripe;
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
 /** Derive UK vs US from Stripe shipping/billing country. */
@@ -98,10 +111,8 @@ export const stripeWebhookProcess = inngest.createFunction(
     // ── checkout.session.completed ─────────────────────────────────────────
     if (eventType === "checkout.session.completed") {
       const session = payload.data.object as Stripe.Checkout.Session;
-      const secretKey = process.env.STRIPE_SECRET_KEY;
-      if (!secretKey) throw new Error("STRIPE_SECRET_KEY not set");
-
-      const stripe = new Stripe(secretKey, { apiVersion: "2026-02-25.clover" });
+      const stripe = getStripe();
+      if (!stripe) throw new Error("STRIPE_SECRET_KEY not set");
 
       // Expand price.product so we can access per-item metadata (productId, size, color)
       const [lineItems] = await Promise.all([

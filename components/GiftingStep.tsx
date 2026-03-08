@@ -60,6 +60,7 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
             onChange={(e) => onChange({ recipientName: e.target.value })}
             className={inputCls}
             placeholder="e.g. Mum"
+            style={{ fontSize: "16px" }}
           />
         </label>
 
@@ -69,6 +70,7 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
             value={value.relationship}
             onChange={(e) => onChange({ relationship: e.target.value as RelationshipOption })}
             className={inputCls}
+            style={{ fontSize: "16px" }}
           >
             {RELATIONSHIPS.map((option) => (
               <option key={option || "none"} value={option}>
@@ -84,6 +86,7 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
             value={value.occasion}
             onChange={(e) => onChange({ occasion: e.target.value })}
             className={inputCls}
+            style={{ fontSize: "16px" }}
           >
             {OCCASIONS.map((option) => (
               <option key={option || "none"} value={option}>
@@ -100,6 +103,7 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
             value={value.deliveryDate}
             onChange={(e) => onChange({ deliveryDate: e.target.value })}
             className={inputCls}
+            style={{ fontSize: "16px" }}
           />
         </label>
       </div>
@@ -111,6 +115,7 @@ export default function GiftingStep({ value, onChange, onSkip, onReopen, hidden 
           onChange={(e) => onChange({ giftMessage: e.target.value.slice(0, MESSAGE_LIMIT) })}
           className={`${inputCls} h-20 resize-none`}
           placeholder="Add a short note..."
+          style={{ fontSize: "16px" }}
         />
       </label>
       <p className="mt-1 text-right text-[11px] text-charcoal/40">

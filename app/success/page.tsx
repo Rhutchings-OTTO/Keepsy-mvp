@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { Reveal } from "@/components/motion/Reveal";
 import { OrderSuccess } from "@/components/OrderSuccess";
+import { SuccessPoller } from "@/components/SuccessPoller";
 
 export const dynamic = "force-dynamic";
 
@@ -76,6 +77,12 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
         </Reveal>
       </main>
     );
+  }
+
+  // Order not found on first server render — webhook may not have completed yet.
+  // Hand off to the client poller which retries every 2 s for up to 20 s.
+  if (status === "processing" && sessionId && !errorMessage) {
+    return <SuccessPoller sessionId={sessionId} />;
   }
 
   const isFailed = status === "failed";

@@ -208,6 +208,7 @@ export function getProductRegionKey(
   if (p === "hoodie") return region === "UK" ? "hoodie_uk" : "hoodie_us";
   if (p === "tee") return region === "UK" ? "tee_uk" : "tee_us";
   // fallback
+  console.error(`[printify] Unknown productId '${productId}' — falling back to card. Add blueprint mapping.`);
   return "card";
 }
 

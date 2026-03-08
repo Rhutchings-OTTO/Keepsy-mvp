@@ -2,9 +2,28 @@ import { TestimonialGrid } from "@/components/TestimonialGrid";
 import { Reveal } from "@/components/motion/Reveal";
 import Link from "next/link";
 
-export const metadata = {
-  title: "Customer Reviews",
-  description: "See what customers are saying about Keepsy personalised gifts. Loved by customers across the UK and US.",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Customer Reviews & Stories",
+  description:
+    "Real reviews from real Keepsy customers. See why thousands of gift-givers across the UK and US trust Keepsy for their most heartfelt, personalised presents.",
+  alternates: {
+    canonical: "https://keepsy.store/community",
+  },
+  openGraph: {
+    title: "Customer Reviews & Stories — Keepsy",
+    description:
+      "Honest words from people who found the perfect personalised gift. Browse hundreds of verified Keepsy customer reviews.",
+    type: "website",
+    url: "https://keepsy.store/community",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Customer Reviews & Stories — Keepsy",
+    description:
+      "See what real customers say about Keepsy personalised gifts. Loved by gift-givers across the UK and US.",
+  },
 };
 
 const PULL_QUOTES = [

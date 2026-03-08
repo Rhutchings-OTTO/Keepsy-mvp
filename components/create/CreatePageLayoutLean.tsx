@@ -67,6 +67,7 @@ export type CreatePageLayoutLeanProps = {
   } | null;
   onSuggestionClick?: (suggestion: string) => void;
   onUseSuggestedPromptClick?: (prompt: string) => void;
+  dailyGenerationsLeft?: number;
   checkoutStatus: "success" | "canceled" | null;
   isBusy: boolean;
   isCompressingImage?: boolean;
@@ -96,6 +97,7 @@ export function CreatePageLayoutLean({
   generationRewriteApplied,
   onSuggestionClick,
   onUseSuggestedPromptClick,
+  dailyGenerationsLeft,
   checkoutStatus,
   isBusy,
   isCompressingImage = false,
@@ -336,7 +338,9 @@ export function CreatePageLayoutLean({
                 </MagneticButton>
 
                 <p className="text-sm text-charcoal/55">
-                  Most designs are ready in 10 to 20 seconds. You can refine the result afterwards.
+                  {dailyGenerationsLeft !== undefined
+                    ? `${dailyGenerationsLeft} free design${dailyGenerationsLeft === 1 ? "" : "s"} remaining today · 3 edits per design`
+                    : "2 free designs per day · 3 edits each to get it just right"}
                 </p>
 
                 <GenerationSafetyNotice

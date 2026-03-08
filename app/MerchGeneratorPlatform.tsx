@@ -234,6 +234,31 @@ function getVisitorId(): string {
   return created;
 }
 
+const DAILY_GEN_STORAGE_KEY = "keepsy_daily_gens_v1";
+const MAX_DAILY_GENS = 2;
+
+function getDailyGensUsed(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const stored = window.localStorage.getItem(DAILY_GEN_STORAGE_KEY);
+    if (!stored) return 0;
+    const parsed = JSON.parse(stored) as { date: string; count: number };
+    const today = new Date().toISOString().slice(0, 10);
+    return parsed.date === today ? parsed.count : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function incrementDailyGens(): number {
+  if (typeof window === "undefined") return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const current = getDailyGensUsed();
+  const next = current + 1;
+  window.localStorage.setItem(DAILY_GEN_STORAGE_KEY, JSON.stringify({ date: today, count: next }));
+  return next;
+}
+
 function getFriendlyGenerationError(error: unknown): string {
   if (!(error instanceof Error)) return "Failed to generate. Please try again.";
   const message = error.message || "Failed to generate. Please try again.";
@@ -263,15 +288,17 @@ async function generateViaKeepsyAPI(args: {
   prompt: string;
   sourceImageDataUrl?: string | null;
   designShape: DesignShape;
+  isRefinement?: boolean;
   signal?: AbortSignal;
 }) {
   const payloadPrompt = typeof args.prompt === "string" ? args.prompt : "";
   const payloadImage =
     typeof args.sourceImageDataUrl === "string" ? args.sourceImageDataUrl : args.sourceImageDataUrl ?? null;
-  const payload: { prompt: string; sourceImageDataUrl: string | null; designShape: DesignShape } = {
+  const payload: { prompt: string; sourceImageDataUrl: string | null; designShape: DesignShape; isRefinement?: boolean } = {
     prompt: payloadPrompt,
     sourceImageDataUrl: payloadImage,
     designShape: args.designShape,
+    ...(args.isRefinement && { isRefinement: true }),
   };
 
   let body: string;
@@ -441,6 +468,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     appliedPatches?: Array<{ from: string; to: string }>;
   } | null>(null);
   const [refinementSuccess, setRefinementSuccess] = useState(false);
+  const [dailyGensUsed, setDailyGensUsed] = useState<number>(0);
+
+  useEffect(() => {
+    setDailyGensUsed(getDailyGensUsed());
+  }, []);
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
@@ -659,6 +691,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       }
 
       if (!result) throw new Error("Failed to generate image");
+      setDailyGensUsed(incrementDailyGens());
       setInitialGeneration({
         prompt: basePrompt,
         imageUrl: result.imageDataUrl,
@@ -733,6 +766,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         prompt: nextPrompt,
         sourceImageDataUrl: generatedImage,
         designShape: "square",
+        isRefinement: true,
         signal: controller.signal,
       });
 
@@ -1070,6 +1104,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     setGenerationContentBlock(null);
                     handleGenerate(suggestedPrompt);
                   }}
+                  dailyGenerationsLeft={Math.max(0, MAX_DAILY_GENS - dailyGensUsed)}
                   checkoutStatus={checkoutStatus}
                   isBusy={isBusy}
                   isCompressingImage={isCompressingImage}

@@ -26,6 +26,7 @@ const generateBodySchema = z
     prompt: z.string().max(Constraints.PROMPT_MAX_LEN),
     sourceImageDataUrl: z.string().max(MAX_SOURCE_IMAGE_DATA_URL_CHARS).optional().nullable(),
     designShape: z.enum(["square", "portrait", "landscape"]).optional(),
+    isRefinement: z.boolean().optional(),
   })
   .strict();
 
@@ -115,9 +116,11 @@ export async function POST(req: Request) {
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({ error: "Missing OPENAI_API_KEY" }, { status: 500 });
     }
-    const usageCheck = await enforceUsageGuards(req);
-    if (!usageCheck.ok) {
-      return NextResponse.json({ error: usageCheck.error }, { status: usageCheck.status });
+    if (!body.isRefinement) {
+      const usageCheck = await enforceUsageGuards(req);
+      if (!usageCheck.ok) {
+        return NextResponse.json({ error: usageCheck.error }, { status: usageCheck.status });
+      }
     }
 
     const sanitized = minimalSanitize(prompt);

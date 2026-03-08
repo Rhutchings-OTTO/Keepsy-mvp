@@ -723,12 +723,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     const controller = new AbortController();
     generateAbortRef.current = controller;
 
-    const nextPrompt = `${lastGenerationPrompt}\n\nRefinement request: ${trimmed}`;
+    // Pass the current image as the source — this routes through callEdit() (images/edits endpoint)
+    // so the model modifies the existing image rather than generating a new one from scratch.
+    // The prompt describes ONLY the change; the edit endpoint preserves everything else from the base image.
+    const nextPrompt = `Apply only this change to the image: ${trimmed}. Preserve all other aspects exactly — the composition, style, colours, background, lighting, and all other elements must remain identical.`;
 
     try {
       const result = await generateViaKeepsyAPI({
         prompt: nextPrompt,
-        sourceImageDataUrl: null,
+        sourceImageDataUrl: generatedImage,
         designShape: "square",
         signal: controller.signal,
       });

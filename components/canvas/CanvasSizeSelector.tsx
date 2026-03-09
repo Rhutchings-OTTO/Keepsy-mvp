@@ -117,7 +117,7 @@ export const CanvasSizeSelector = memo(function CanvasSizeSelector({
                 if (!sizes.length) return null;
                 return (
                   <div key={tier}>
-                    <p className="mb-1.5 px-1 text-[10px] font-extrabold uppercase tracking-widest text-charcoal/35">
+                    <p className="mb-1.5 px-1 text-[10px] font-extrabold uppercase tracking-widest text-charcoal/55">
                       {TIER_LABEL[tier]} — {GBP.format(sizes[0].priceGBP)}
                     </p>
                     <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">

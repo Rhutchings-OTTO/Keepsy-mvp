@@ -116,7 +116,7 @@ export default async function TrackPage({ searchParams }: TrackPageProps) {
                             : isActive
                             ? "var(--color-terracotta)"
                             : "rgba(45,41,38,0.08)",
-                          color: isDone || isActive ? "#fff" : "rgba(45,41,38,0.35)",
+                          color: isDone || isActive ? "#fff" : "rgba(45,41,38,0.55)",
                         }}
                       >
                         {isDone ? (
@@ -145,7 +145,7 @@ export default async function TrackPage({ searchParams }: TrackPageProps) {
                         className="font-serif text-base font-bold"
                         style={{
                           color: isPending
-                            ? "rgba(45,41,38,0.35)"
+                            ? "rgba(45,41,38,0.55)"
                             : "var(--color-charcoal)",
                         }}
                       >

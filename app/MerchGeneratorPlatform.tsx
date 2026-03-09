@@ -1298,9 +1298,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           {/* Workflow hint */}
                           <div className="mb-4 flex items-center gap-0 rounded-xl bg-[#F5EDE0] px-3 py-2.5 text-[11px] font-semibold text-charcoal/60">
                             <span className="font-extrabold text-charcoal/80">1&nbsp;</span><span>Choose size</span>
-                            <span className="mx-1.5 text-charcoal/30">→</span>
+                            <span className="mx-1.5 text-charcoal/50">→</span>
                             <span className="font-extrabold text-charcoal/80">2&nbsp;</span><span>Position image</span>
-                            <span className="mx-1.5 text-charcoal/30">→</span>
+                            <span className="mx-1.5 text-charcoal/50">→</span>
                             <span className="font-extrabold text-charcoal/80">3&nbsp;</span><span>Confirm &amp; preview</span>
                           </div>
                           <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">Canvas Size</h3>
@@ -1421,7 +1421,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                 (selectedProduct.hasSize && !selectedSize) ||
                                 (isCanvasProduct && !croppedImageDataUrl)
                               }
-                              className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-bold text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                              className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-bold text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                               style={{ backgroundColor: "var(--color-terracotta)" }}
                           >
                             Add to Cart <Plus size={18} />
@@ -1460,7 +1460,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         (selectedProduct.hasSize && !selectedSize) ||
                         (isCanvasProduct && !croppedImageDataUrl)
                       }
-                      className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-bold text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)] transition disabled:cursor-not-allowed disabled:opacity-40"
+                      className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-bold text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)] transition disabled:cursor-not-allowed disabled:opacity-60"
                       style={{ backgroundColor: "var(--color-terracotta)" }}
                     >
                       Add to Cart — {fmt(isCanvasProduct ? selectedCanvasSize.priceGBP : selectedProduct.basePrice)}
@@ -1490,7 +1490,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <MagneticButton
                       onClick={() => requestCheckout(hasCartItems ? "cart" : "single")}
                       disabled={isBusy || !canProceedToCheckout}
-                      className="relative w-full overflow-hidden rounded-2xl py-5 text-lg font-black shadow-terra-glow disabled:cursor-not-allowed disabled:opacity-40"
+                      className="relative w-full overflow-hidden rounded-2xl py-5 text-lg font-black shadow-terra-glow disabled:cursor-not-allowed disabled:opacity-60"
                       style={{ backgroundColor: "var(--color-terracotta)", color: "white" }}
                     >
                       <AnimatePresence mode="wait">
@@ -1764,7 +1764,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 <MagneticButton
                   onClick={() => requestCheckout("cart")}
                   disabled={isBusy || cartItems.length === 0}
-                  className="w-full py-3 rounded-xl bg-terracotta !text-white font-extrabold disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3 rounded-xl bg-terracotta !text-white font-extrabold disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isBusy ? "Securing…" : "Checkout"}
                 </MagneticButton>

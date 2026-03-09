@@ -183,7 +183,7 @@ function CartItemRow({
               onClick={() => onRemove(item.id)}
               className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-black/5"
             >
-              <Trash2 size={13} className="text-charcoal/35" />
+              <Trash2 size={13} className="text-charcoal/55" />
             </button>
           </div>
         </div>
@@ -435,7 +435,7 @@ export function CartDrawer() {
                           onChange={(e) => setGiftNote(e.target.value)}
                           placeholder="Write a personal message for the recipient…"
                           rows={3}
-                          className="mt-2 w-full resize-none rounded-xl border border-charcoal/10 p-3 text-sm text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:ring-2 focus:ring-terracotta/20"
+                          className="mt-2 w-full resize-none rounded-xl border border-charcoal/10 p-3 text-sm text-charcoal placeholder:text-charcoal/50 focus:outline-none focus:ring-2 focus:ring-terracotta/20"
                           style={{ backgroundColor: "var(--color-cream)", fontSize: "16px" }}
                         />
                       </motion.div>
@@ -496,13 +496,13 @@ export function CartDrawer() {
                   </p>
 
                   {/* Trust badges */}
-                  <p className="mt-2 text-center text-[11px] text-charcoal/40 leading-relaxed">
+                  <p className="mt-2 text-center text-[11px] text-charcoal/55 leading-relaxed">
                     Secure Checkout · Handmade With Care ·{" "}
                     <Link href="/refunds" className="underline underline-offset-2 hover:text-charcoal/60">
                       30-Day Returns
                     </Link>
                   </p>
-                  <p className="mt-1.5 text-center text-[11px] text-charcoal/35 leading-relaxed">
+                  <p className="mt-1.5 text-center text-[11px] text-charcoal/55 leading-relaxed">
                     Every design in your bag is one of a kind — made uniquely for you.
                   </p>
                 </div>

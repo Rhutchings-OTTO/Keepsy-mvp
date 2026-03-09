@@ -282,7 +282,7 @@ export function SiteFooter() {
                 onClick={() => setShopOpen(!shopOpen)}
                 className="flex w-full items-center justify-between sm:pointer-events-none"
               >
-                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/40">
+                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60">
                   Shop
                 </p>
                 <span className="text-sm sm:hidden" style={{ color: "var(--ink-faint)" }}>{shopOpen ? "−" : "+"}</span>
@@ -312,7 +312,7 @@ export function SiteFooter() {
                 onClick={() => setCompanyOpen(!companyOpen)}
                 className="flex w-full items-center justify-between sm:pointer-events-none"
               >
-                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/40">
+                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60">
                   Company
                 </p>
                 <span className="text-sm sm:hidden" style={{ color: "var(--ink-faint)" }}>{companyOpen ? "−" : "+"}</span>
@@ -340,7 +340,7 @@ export function SiteFooter() {
                 onClick={() => setHelpOpen(!helpOpen)}
                 className="flex w-full items-center justify-between sm:pointer-events-none"
               >
-                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/40">
+                <p className="text-xs font-bold uppercase tracking-widest text-charcoal/60">
                   Help
                 </p>
                 <span className="text-sm sm:hidden" style={{ color: "var(--ink-faint)" }}>{helpOpen ? "−" : "+"}</span>
@@ -379,10 +379,10 @@ export function SiteFooter() {
           <div
             className={`${CONTAINER} flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left`}
           >
-            <p className="text-xs text-charcoal/35">
+            <p className="text-xs text-charcoal/55">
               © {new Date().getFullYear()} Keepsy. All rights reserved.
             </p>
-            <p className="text-xs text-charcoal/35">
+            <p className="text-xs text-charcoal/55">
               Powered by AI · Fulfilled by Printify · Payments by Stripe
             </p>
           </div>

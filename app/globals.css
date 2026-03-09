@@ -595,7 +595,7 @@ select:focus {
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(45, 41, 38, 0.38);
+  color: rgba(45, 41, 38, 0.50);
 }
 
 /* Disabled state */

@@ -127,9 +127,13 @@ export function DesignConfirmation({
           </div>
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-charcoal/8 bg-white sm:aspect-[16/10]">
           {isRefining ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-xl bg-[#F5EDE0]">
-              <div className="w-8 h-8 border-2 border-charcoal/20 border-t-charcoal rounded-full animate-spin" />
-              <span className="text-sm font-semibold text-charcoal/60">Updating your design…</span>
+            <div className="absolute inset-0 rounded-xl overflow-hidden">
+              <div className="skeleton-shimmer absolute inset-0 rounded-xl" />
+              <div className="absolute inset-x-0 bottom-6 flex justify-center">
+                <span className="rounded-full bg-white/80 px-4 py-1.5 text-sm font-semibold text-charcoal/60 backdrop-blur-sm">
+                  Updating your design…
+                </span>
+              </div>
             </div>
           ) : (
             <>

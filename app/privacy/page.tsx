@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RevealObserver } from "@/components/RevealObserver";
 
 export const metadata = {
   title: "Privacy Policy",
@@ -18,6 +19,8 @@ export default function PrivacyPage() {
         ← Back to Keepsy
       </Link>
 
+      <RevealObserver />
+
       <div className="rounded-2xl border border-charcoal/8 bg-white p-8 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)] sm:p-10">
         <p className="text-[10px] font-bold uppercase tracking-[0.35em]" style={{ color: "var(--color-terracotta)" }}>
           Your Privacy
@@ -35,7 +38,7 @@ export default function PrivacyPage() {
         <div className="mt-10 space-y-10 border-t pt-10" style={{ borderColor: "rgba(45,41,38,0.10)" }}>
 
           {/* 1. Data Controller */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>1. Who We Are (Data Controller)</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               The data controller responsible for your personal data is Keepsy (trading as Keepsy). Our contact email for all data privacy matters is{" "}
@@ -53,7 +56,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 2. What We Collect */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>2. What Personal Data We Collect</h2>
             <div className="mt-3 space-y-4 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               <div>
@@ -90,7 +93,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 3. Lawful Basis */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>3. Lawful Basis for Processing</h2>
             <div className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               <p>We process your personal data on the following legal bases under UK GDPR Article 6:</p>
@@ -116,7 +119,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 4. How We Use Your Data */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>4. How We Use Your Data</h2>
             <ul className="mt-3 space-y-2 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               <li>• To process and fulfil your order and arrange delivery</li>
@@ -133,7 +136,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 5. Third-Party Processors */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>5. Third-Party Data Processors</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               We use the following third-party services to operate our business. Each acts as a data processor on our behalf and is subject to data processing agreements and their own privacy policies:
@@ -163,7 +166,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 6. International Transfers */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>6. International Data Transfers</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Some of our processors (Stripe, OpenAI, Resend, Printify) are based in the United States. When we transfer your personal data to the USA, we rely on the UK-US Data Bridge adequacy framework, Standard Contractual Clauses (UK IDTA addendum), or other appropriate safeguards as applicable. Details of the transfer mechanism for each processor are available in their respective privacy policies.
@@ -171,7 +174,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 7. Retention */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>7. How Long We Keep Your Data</h2>
             <div className="mt-3 space-y-2 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -196,7 +199,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 8. Your Rights */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>8. Your Rights Under UK GDPR</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               You have the following rights regarding your personal data. To exercise any of these rights, you can{" "}
@@ -245,7 +248,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 9. Cookies */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>9. Cookies</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               We use a small number of cookies to make our website function. For full details of the cookies we set, their purpose, and how to manage them, please see our{" "}
@@ -256,7 +259,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 10. Security */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>10. Security</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               We implement appropriate technical and organisational measures to protect your personal data, including HTTPS encryption, secure API authentication, and access controls. Payment data is handled entirely by Stripe and never passes through our systems. In the event of a data breach that affects your rights and freedoms, we will notify the ICO within 72 hours and you directly where required.
@@ -264,7 +267,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 11. Changes */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>11. Changes to This Policy</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               We may update this Privacy Policy from time to time. Material changes will be notified by updating the &quot;Last updated&quot; date at the top of this page. We encourage you to review this policy periodically.
@@ -272,7 +275,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* Contact */}
-          <section className="rounded-2xl border p-5" style={{ borderColor: "rgba(45,41,38,0.08)", backgroundColor: "rgba(255,255,255,0.50)" }}>
+          <section className="reveal-on-scroll rounded-2xl border p-5" style={{ borderColor: "rgba(45,41,38,0.08)", backgroundColor: "rgba(255,255,255,0.50)" }}>
             <h2 className="font-serif text-base font-semibold" style={{ color: "var(--color-charcoal)" }}>Contact Us</h2>
             <p className="mt-2 text-sm leading-7" style={{ color: "rgba(45,41,38,0.70)" }}>
               For any privacy-related questions or to exercise your rights, contact us at{" "}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RevealObserver } from "@/components/RevealObserver";
 
 export const metadata = {
   title: "Refund & Returns Policy",
@@ -18,6 +19,8 @@ export default function RefundsPage() {
         ← Back to Keepsy
       </Link>
 
+      <RevealObserver />
+
       <div className="rounded-2xl border border-charcoal/8 bg-white p-8 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)] sm:p-10">
         <p className="text-[10px] font-bold uppercase tracking-[0.35em]" style={{ color: "var(--color-terracotta)" }}>
           Our Promise
@@ -35,7 +38,7 @@ export default function RefundsPage() {
         <div className="mt-10 space-y-10 border-t pt-10" style={{ borderColor: "rgba(45,41,38,0.10)" }}>
 
           {/* Statutory Rights */}
-          <section className="rounded-2xl border p-6" style={{ borderColor: "rgba(44,74,62,0.20)", backgroundColor: "rgba(44,74,62,0.04)" }}>
+          <section className="reveal-on-scroll rounded-2xl border p-6" style={{ borderColor: "rgba(44,74,62,0.20)", backgroundColor: "rgba(44,74,62,0.04)" }}>
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-forest)" }}>Your Statutory Rights</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(44,74,62,0.85)" }}>
               Under the <strong>Consumer Rights Act 2015</strong>, all goods must be of satisfactory quality, fit for purpose, and as described. If your order does not meet these standards, you have the right to a repair, replacement, or refund.
@@ -46,7 +49,7 @@ export default function RefundsPage() {
           </section>
 
           {/* Personalised Goods — Cancellation Right */}
-          <section className="rounded-2xl border p-6" style={{ borderColor: "rgba(196,113,74,0.25)", backgroundColor: "rgba(196,113,74,0.04)" }}>
+          <section className="reveal-on-scroll rounded-2xl border p-6" style={{ borderColor: "rgba(196,113,74,0.25)", backgroundColor: "rgba(196,113,74,0.04)" }}>
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>Right to Cancel — Personalised Goods</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013, consumers who buy goods online generally have a <strong>14-day right to cancel</strong> their order and receive a full refund without giving a reason.
@@ -60,7 +63,7 @@ export default function RefundsPage() {
           </section>
 
           {/* When We Offer Refunds */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>When We Will Refund or Replace Your Order</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Even though the 14-day cancellation right does not apply to personalised goods, we will always make things right if there is a problem with your order. We offer a full refund or replacement in the following circumstances:
@@ -77,7 +80,7 @@ export default function RefundsPage() {
           </section>
 
           {/* How to Claim */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>How to Request a Refund or Replacement</h2>
             <ol className="mt-3 space-y-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               <li>
@@ -100,7 +103,7 @@ export default function RefundsPage() {
           </section>
 
           {/* Return Shipping */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>Return Shipping</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               For defective or incorrect items, we will cover the cost of return shipping or arrange a pre-paid return label. We will not ask you to return items at your own expense where the fault is ours.
@@ -108,7 +111,7 @@ export default function RefundsPage() {
           </section>
 
           {/* Outside UK */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>International Orders (US Customers)</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               US customers have equivalent protections under US consumer protection law. Our refund process above applies equally to US orders. Please contact us at{" "}
@@ -120,7 +123,7 @@ export default function RefundsPage() {
           </section>
 
           {/* Support */}
-          <section className="rounded-2xl border p-5" style={{ borderColor: "rgba(44,74,62,0.15)", backgroundColor: "rgba(44,74,62,0.04)" }}>
+          <section className="reveal-on-scroll rounded-2xl border p-5" style={{ borderColor: "rgba(44,74,62,0.15)", backgroundColor: "rgba(44,74,62,0.04)" }}>
             <h2 className="font-serif text-base font-semibold" style={{ color: "var(--color-forest)" }}>Customer Support</h2>
             <p className="mt-2 text-sm leading-7" style={{ color: "rgba(44,74,62,0.85)" }}>
               We typically respond within 24 hours, 7 days a week. Email us at{" "}

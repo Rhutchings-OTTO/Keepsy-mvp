@@ -239,7 +239,7 @@ export function SiteFooter() {
               Keepsy
             </p>
             <p
-              className="font-serif text-base italic"
+              className="serif-italic text-base"
               style={{ color: "var(--color-terracotta)" }}
             >
               Gifts they&apos;ll never forget.

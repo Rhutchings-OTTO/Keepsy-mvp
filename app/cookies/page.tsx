@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RevealObserver } from "@/components/RevealObserver";
 
 export const metadata = {
   title: "Cookie Policy | Keepsy",
@@ -18,6 +19,8 @@ export default function CookiesPage() {
         ← Back to Keepsy
       </Link>
 
+      <RevealObserver />
+
       <div className="rounded-2xl border border-charcoal/8 bg-white p-8 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)] sm:p-10">
         <p className="text-[10px] font-bold uppercase tracking-[0.35em]" style={{ color: "var(--color-terracotta)" }}>
           Transparency
@@ -35,7 +38,7 @@ export default function CookiesPage() {
         <div className="mt-10 space-y-10 border-t pt-10" style={{ borderColor: "rgba(45,41,38,0.10)" }}>
 
           {/* What are cookies */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>What Are Cookies?</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Cookies are small text files that are stored on your device (computer, tablet, or mobile phone) when you visit a website. They are widely used to make websites work, to improve performance, and to provide information to site owners.
@@ -46,7 +49,7 @@ export default function CookiesPage() {
           </section>
 
           {/* Legal basis */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>Legal Basis</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Our use of cookies is governed by the Privacy and Electronic Communications Regulations (PECR) 2003 and UK GDPR. We only set strictly necessary cookies without your prior consent. If we add any non-essential cookies (such as analytics or marketing cookies) in the future, we will obtain your consent first via a cookie consent banner.
@@ -54,7 +57,7 @@ export default function CookiesPage() {
           </section>
 
           {/* Cookies we use */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>Cookies and Local Storage We Currently Use</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Keepsy currently uses only strictly necessary cookies and local storage entries:
@@ -125,7 +128,7 @@ export default function CookiesPage() {
           </section>
 
           {/* How to control */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>How to Control and Delete Cookies</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               You can control and delete cookies using your browser settings. Instructions for the most common browsers:
@@ -164,7 +167,7 @@ export default function CookiesPage() {
           </section>
 
           {/* Changes */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>Changes to This Policy</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               We will update this Cookie Policy if we change the cookies we use. We recommend checking this page periodically for updates.
@@ -172,7 +175,7 @@ export default function CookiesPage() {
           </section>
 
           {/* Contact */}
-          <section className="rounded-2xl border p-5" style={{ borderColor: "rgba(45,41,38,0.08)", backgroundColor: "rgba(255,255,255,0.50)" }}>
+          <section className="reveal-on-scroll rounded-2xl border p-5" style={{ borderColor: "rgba(45,41,38,0.08)", backgroundColor: "rgba(255,255,255,0.50)" }}>
             <h2 className="font-serif text-base font-semibold" style={{ color: "var(--color-charcoal)" }}>Questions?</h2>
             <p className="mt-2 text-sm leading-7" style={{ color: "rgba(45,41,38,0.70)" }}>
               For any questions about our use of cookies, contact us at{" "}

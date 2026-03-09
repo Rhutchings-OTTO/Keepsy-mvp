@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RevealObserver } from "@/components/RevealObserver";
 
 export const metadata = {
   title: "Terms & Conditions",
@@ -18,6 +19,8 @@ export default function TermsPage() {
         ← Back to Keepsy
       </Link>
 
+      <RevealObserver />
+
       <div className="rounded-2xl border border-charcoal/8 bg-white p-8 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)] sm:p-10">
         <p className="text-[10px] font-bold uppercase tracking-[0.35em]" style={{ color: "var(--color-terracotta)" }}>
           The Fine Print
@@ -35,7 +38,7 @@ export default function TermsPage() {
         <div className="mt-10 space-y-10 border-t pt-10" style={{ borderColor: "rgba(45,41,38,0.10)" }}>
 
           {/* 1. About Us */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>1. About Us</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               These terms and conditions govern your use of keepsy.store and any purchase you make from Keepsy ("we", "us", "our"). For enquiries, please contact us at{" "}
@@ -46,7 +49,7 @@ export default function TermsPage() {
           </section>
 
           {/* 2. Eligibility */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>2. Eligibility</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               By placing an order, you confirm that you are at least 18 years of age and have the legal capacity to enter into a binding contract. If you are under 18, you may only use this site with the involvement and consent of a parent or guardian who agrees to these terms.
@@ -54,7 +57,7 @@ export default function TermsPage() {
           </section>
 
           {/* 3. How the Contract is Formed */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>3. How Your Contract with Us is Formed</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Browsing our website and placing items in your cart does not constitute a contract. A legally binding contract between you and Keepsy is formed when we send you an order confirmation email. We reserve the right to decline or cancel any order before confirmation — for example, if a product is unavailable, there is an error in the price or description, or we are unable to verify payment.
@@ -62,7 +65,7 @@ export default function TermsPage() {
           </section>
 
           {/* 4. Prices and Payment */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>4. Prices and Payment</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               All prices are displayed in GBP (British Pounds) for UK customers and USD for US customers. The total price including any applicable shipping costs will be shown before you complete payment. Payments are processed securely by Stripe. Your card details are handled directly by Stripe and never stored or accessed by Keepsy.
@@ -73,7 +76,7 @@ export default function TermsPage() {
           </section>
 
           {/* 5. Personalised Goods — Important Notice */}
-          <section className="rounded-2xl border p-6" style={{ borderColor: "rgba(196,113,74,0.25)", backgroundColor: "rgba(196,113,74,0.04)" }}>
+          <section className="reveal-on-scroll rounded-2xl border p-6" style={{ borderColor: "rgba(196,113,74,0.25)", backgroundColor: "rgba(196,113,74,0.04)" }}>
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>5. Personalised Goods — Important Notice Before You Order</h2>
             <p className="mt-3 text-sm leading-7 font-medium" style={{ color: "rgba(45,41,38,0.85)" }}>
               All Keepsy products are made to order and are clearly personalised to your individual specifications (including your uploaded photos, custom prompts, chosen colours, and sizes). Because of this:
@@ -94,7 +97,7 @@ export default function TermsPage() {
           </section>
 
           {/* 6. Production and Delivery */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>6. Production and Delivery</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Standard production time is 2–4 business days. Estimated delivery times after dispatch are 2–3 business days for UK orders and 3–6 business days for US orders. These are estimates and not guaranteed delivery dates.
@@ -108,7 +111,7 @@ export default function TermsPage() {
           </section>
 
           {/* 7. Defective / Damaged Goods */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>7. Defective or Damaged Goods</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Under the Consumer Rights Act 2015, goods must be of satisfactory quality, fit for purpose, and as described. If your order arrives damaged, mispriinted, or otherwise defective, you have the right to a repair, replacement, or refund. Please contact us within 30 days of delivery with photo evidence at{" "}
@@ -119,7 +122,7 @@ export default function TermsPage() {
           </section>
 
           {/* 8. Intellectual Property */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>8. Intellectual Property and AI-Generated Designs</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Designs generated on Keepsy using our AI tools are created by you using our platform. To the extent that copyright or other intellectual property rights subsist in AI-generated outputs under applicable law, those rights belong to you as the person who directed the creative process.
@@ -136,7 +139,7 @@ export default function TermsPage() {
           </section>
 
           {/* 9. Acceptable Use */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>9. Acceptable Use / Content Policy</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               By uploading content or entering prompts on our platform, you confirm that:
@@ -154,7 +157,7 @@ export default function TermsPage() {
           </section>
 
           {/* 10. IP Infringement / Takedown */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>10. Intellectual Property Infringement Notifications</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               If you believe that content on our platform infringes your intellectual property rights, please notify us at{" "}
@@ -166,7 +169,7 @@ export default function TermsPage() {
           </section>
 
           {/* 11. Liability */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>11. Our Liability</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Nothing in these terms limits or excludes our liability for: death or personal injury caused by our negligence; fraud or fraudulent misrepresentation; any liability that cannot be limited or excluded by law.
@@ -183,7 +186,7 @@ export default function TermsPage() {
           </section>
 
           {/* 12. Dispute Resolution */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>12. Dispute Resolution</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               If you have a dispute with us, please contact us first at{" "}
@@ -201,7 +204,7 @@ export default function TermsPage() {
           </section>
 
           {/* 13. Governing Law */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>13. Governing Law</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               These terms are governed by the laws of England and Wales. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts of England and Wales, except that consumers in Scotland, Northern Ireland, or other jurisdictions retain the right to bring proceedings in their local courts.
@@ -209,7 +212,7 @@ export default function TermsPage() {
           </section>
 
           {/* 14. Changes */}
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>14. Changes to These Terms</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               We may update these terms from time to time. The current version will always be published on this page with the &quot;Last updated&quot; date. Changes do not affect orders already confirmed before the change takes effect.
@@ -217,7 +220,7 @@ export default function TermsPage() {
           </section>
 
           {/* Contact */}
-          <section className="rounded-2xl border p-5" style={{ borderColor: "rgba(45,41,38,0.08)", backgroundColor: "rgba(255,255,255,0.50)" }}>
+          <section className="reveal-on-scroll rounded-2xl border p-5" style={{ borderColor: "rgba(45,41,38,0.08)", backgroundColor: "rgba(255,255,255,0.50)" }}>
             <h2 className="font-serif text-base font-semibold" style={{ color: "var(--color-charcoal)" }}>Contact Us</h2>
             <p className="mt-2 text-sm leading-7" style={{ color: "rgba(45,41,38,0.70)" }}>
               For questions about these terms, email us at{" "}

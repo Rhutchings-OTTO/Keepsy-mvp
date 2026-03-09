@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RevealObserver } from "@/components/RevealObserver";
 
 export const metadata = {
   title: "Shipping & Delivery",
@@ -16,6 +17,8 @@ export default function ShippingPage() {
         ← Back to Keepsy
       </Link>
 
+      <RevealObserver />
+
       <div className="rounded-2xl border border-charcoal/8 bg-white p-8 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)] sm:p-10">
         <p className="text-[10px] font-bold uppercase tracking-[0.35em]" style={{ color: "var(--color-terracotta)" }}>
           Fast & Reliable
@@ -28,7 +31,7 @@ export default function ShippingPage() {
         </p>
 
         <div className="mt-10 space-y-6 border-t pt-10" style={{ borderColor: "rgba(45,41,38,0.10)" }}>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="reveal-on-scroll grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl border p-5" style={{ borderColor: "rgba(45,41,38,0.10)", backgroundColor: "rgba(255,255,255,0.60)" }}>
               <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--color-terracotta)" }}>🇬🇧 United Kingdom</p>
               <h2 className="mt-2 font-serif text-lg font-semibold" style={{ color: "var(--color-charcoal)" }}>UK Delivery</h2>
@@ -45,14 +48,14 @@ export default function ShippingPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border p-5" style={{ borderColor: "rgba(44,74,62,0.15)", backgroundColor: "rgba(44,74,62,0.04)" }}>
+          <div className="reveal-on-scroll rounded-2xl border p-5" style={{ borderColor: "rgba(44,74,62,0.15)", backgroundColor: "rgba(44,74,62,0.04)" }}>
             <h2 className="font-serif text-base font-semibold" style={{ color: "var(--color-forest)" }}>Seasonal Cutoff Notice</h2>
             <p className="mt-2 text-sm leading-7" style={{ color: "rgba(44,74,62,0.85)" }}>
               For major holidays (Christmas, Valentine&apos;s Day, Mother&apos;s Day), place your order at least <strong>7 days before</strong> your gifting date to allow for production and delivery.
             </p>
           </div>
 
-          <section>
+          <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>Free Shipping</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
               Free shipping on all orders over £75 (UK) or $75 (US). Standard shipping rates apply below that threshold and are calculated at checkout.

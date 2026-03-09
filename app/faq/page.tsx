@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { RevealObserver } from "@/components/RevealObserver";
 
 export const metadata: Metadata = {
   title: "FAQ — Frequently Asked Questions",
@@ -192,16 +193,17 @@ export default function FaqPage() {
           </a>.
         </p>
 
+        <RevealObserver />
         <div className="space-y-8">
           {faqs.map((faq, i) => (
-            <div key={i} className="border-b border-charcoal/10 pb-8">
+            <div key={i} className="reveal-on-scroll border-b border-charcoal/10 pb-8">
               <h2 className="text-lg font-bold text-charcoal mb-2">{faq.name}</h2>
               <p className="text-charcoal/70 leading-relaxed">{faq.acceptedAnswer.text}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 rounded-2xl bg-[#F5EDE0] p-6">
+        <div className="reveal-on-scroll mt-12 rounded-2xl bg-[#F5EDE0] p-6">
           <h2 className="text-xl font-bold text-charcoal mb-2">Ready to create a personalised gift?</h2>
           <p className="text-charcoal/70 mb-4">
             Design something unique in seconds — describe your idea or upload a photo and see it on a hoodie, mug, card, t-shirt, or canvas before you order.

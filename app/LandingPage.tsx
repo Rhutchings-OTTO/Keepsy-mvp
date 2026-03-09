@@ -462,12 +462,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     animate={shouldReduceMotion ? {} : { opacity: 1, x: 0 }}
                     transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    {/* Mobile: horizontal scroll strip showing 2.5 tiles */}
-                    <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory sm:-mx-8 sm:px-8 lg:hidden">
+                    {/* Mobile/tablet: 2-col grid — no horizontal scroll */}
+                    <div className="grid grid-cols-2 gap-3 lg:hidden">
                       {PRODUCT_IMAGES.map((img, i) => (
-                        <div key={img.label} className="w-[44vw] flex-shrink-0 snap-start">
-                          <ProductCollectionCard {...img} index={i} priority={i < 2} />
-                        </div>
+                        <ProductCollectionCard key={img.label} {...img} index={i} priority={i < 2} />
                       ))}
                     </div>
                     {/* Desktop: 2-col grid */}

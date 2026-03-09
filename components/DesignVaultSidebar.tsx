@@ -32,33 +32,20 @@ export function DesignVaultSidebar({
   if (entries.length === 0) return null;
 
   return (
-    <div
-      className={`flex flex-col border-r border-charcoal/10 rounded-l-2xl overflow-hidden transition-all ${className}`}
-      style={{ backgroundColor: "rgba(253,246,238,0.7)", width: collapsed ? 48 : 140 }}
-    >
-      <button
-        type="button"
-        onClick={() => setCollapsed((c) => !c)}
-        className="flex items-center justify-between px-3 py-2.5 border-b border-charcoal/5 hover:bg-charcoal/5 transition-colors"
-        aria-expanded={!collapsed}
+    <>
+      {/* ── Mobile: horizontal vault strip ── */}
+      <div
+        className="flex md:hidden items-center gap-2 overflow-x-auto rounded-xl border border-charcoal/8 px-2 py-1.5"
+        style={{ backgroundColor: "rgba(253,246,238,0.7)" }}
       >
-        <div className="flex items-center gap-2 min-w-0">
-          <FolderOpen size={18} className="shrink-0 text-charcoal/60" />
-          {!collapsed && (
-            <span className="text-xs font-bold truncate">Design Vault</span>
-          )}
+        <div className="flex items-center gap-1.5 shrink-0 pr-2 border-r border-charcoal/10">
+          <FolderOpen size={14} className="shrink-0 text-charcoal/50" />
+          <span className="text-[10px] font-bold text-charcoal/50 whitespace-nowrap">Vault</span>
         </div>
-        {collapsed ? (
-          <ChevronRight size={16} className="shrink-0 text-charcoal/40" />
-        ) : (
-          <ChevronLeft size={16} className="shrink-0 text-charcoal/40" />
-        )}
-      </button>
-
-      <div className="flex-1 overflow-y-auto p-2 min-h-0">
         <AnimatePresence mode="popLayout">
           {entries.map((entry, i) => {
-            const isActive = currentImageUrl === entry.imageUrl || 
+            const isActive =
+              currentImageUrl === entry.imageUrl ||
               (entry.designUrl && currentImageUrl === entry.designUrl);
             return (
               <motion.button
@@ -69,10 +56,10 @@ export function DesignVaultSidebar({
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ delay: i * 0.03 }}
                 onClick={() => onSelectDesign(entry)}
-                className={`w-full aspect-square rounded-xl overflow-hidden border-2 transition-all mb-2 last:mb-0 focus:outline-none focus:ring-2 focus:ring-charcoal/20 ${
+                className={`h-10 w-10 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-charcoal/20 ${
                   isActive
                     ? "border-charcoal ring-2 ring-charcoal/10"
-                    : "border-charcoal/10 hover:border-charcoal/30"
+                    : "border-charcoal/15 hover:border-charcoal/30"
                 }`}
                 title={entry.prompt ? entry.prompt.slice(0, 60) + "…" : "Previous design"}
               >
@@ -87,11 +74,69 @@ export function DesignVaultSidebar({
         </AnimatePresence>
       </div>
 
-      {!collapsed && (
-        <p className="text-[10px] text-charcoal/40 px-2 py-1.5 border-t border-charcoal/5">
-          Click to re-skin
-        </p>
-      )}
-    </div>
+      {/* ── Desktop: vertical sidebar ── */}
+      <div
+        className={`hidden md:flex flex-col border-r border-charcoal/10 rounded-l-2xl overflow-hidden transition-all ${className}`}
+        style={{ backgroundColor: "rgba(253,246,238,0.7)", width: collapsed ? 48 : 140 }}
+      >
+        <button
+          type="button"
+          onClick={() => setCollapsed((c) => !c)}
+          className="flex items-center justify-between px-3 py-2.5 border-b border-charcoal/5 hover:bg-charcoal/5 transition-colors"
+          aria-expanded={!collapsed}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <FolderOpen size={18} className="shrink-0 text-charcoal/60" />
+            {!collapsed && (
+              <span className="text-xs font-bold truncate">Design Vault</span>
+            )}
+          </div>
+          {collapsed ? (
+            <ChevronRight size={16} className="shrink-0 text-charcoal/40" />
+          ) : (
+            <ChevronLeft size={16} className="shrink-0 text-charcoal/40" />
+          )}
+        </button>
+
+        <div className="flex-1 overflow-y-auto p-2 min-h-0">
+          <AnimatePresence mode="popLayout">
+            {entries.map((entry, i) => {
+              const isActive =
+                currentImageUrl === entry.imageUrl ||
+                (entry.designUrl && currentImageUrl === entry.designUrl);
+              return (
+                <motion.button
+                  key={entry.id}
+                  type="button"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ delay: i * 0.03 }}
+                  onClick={() => onSelectDesign(entry)}
+                  className={`w-full aspect-square rounded-xl overflow-hidden border-2 transition-all mb-2 last:mb-0 focus:outline-none focus:ring-2 focus:ring-charcoal/20 ${
+                    isActive
+                      ? "border-charcoal ring-2 ring-charcoal/10"
+                      : "border-charcoal/10 hover:border-charcoal/30"
+                  }`}
+                  title={entry.prompt ? entry.prompt.slice(0, 60) + "…" : "Previous design"}
+                >
+                  <img
+                    src={entry.designUrl || entry.imageUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </motion.button>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+
+        {!collapsed && (
+          <p className="text-[10px] text-charcoal/40 px-2 py-1.5 border-t border-charcoal/5">
+            Click to re-skin
+          </p>
+        )}
+      </div>
+    </>
   );
 }

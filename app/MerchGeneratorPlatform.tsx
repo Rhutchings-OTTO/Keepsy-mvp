@@ -1162,7 +1162,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   exit={{ opacity: 0, x: -40 }}
                   className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]"
                 >
-                  <div className="sticky top-24 flex gap-0">
+                  <div className="sticky top-24 flex flex-col gap-2 md:flex-row md:gap-0">
                     <DesignVaultSidebar
                       currentImageUrl={generatedImage}
                       onSelectDesign={(entry) => {
@@ -1215,24 +1215,24 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             />
                           </motion.div>
                         )}
-                        <div className="mt-5 flex flex-wrap items-center gap-3">
+                        <div className="mt-4 flex flex-wrap gap-2">
                           {isCanvasProduct && !isCropping && (
                             <button
                               type="button"
                               onClick={() => setIsCropping(true)}
-                              className="inline-flex items-center gap-2 rounded-lg border border-terracotta/30 bg-terracotta/8 px-3 py-2 text-xs font-extrabold text-terracotta hover:bg-terracotta/15 transition"
+                              className="flex-1 sm:flex-none min-h-[44px] inline-flex items-center justify-center gap-2 rounded-lg border border-terracotta/30 bg-terracotta/8 px-3 py-2 text-xs font-extrabold text-terracotta hover:bg-terracotta/15 transition"
                             >
                               ✂ {croppedImageDataUrl ? "Recrop" : "Set crop"}
                             </button>
                           )}
                           {!isCanvasProduct && (
-                            <div className="inline-flex rounded-lg border border-charcoal/10 bg-[#F5EDE0] px-3 py-2 text-xs font-extrabold">
+                            <div className="inline-flex min-h-[44px] items-center rounded-lg border border-charcoal/10 bg-[#F5EDE0] px-3 py-2 text-xs font-extrabold">
                               <span className="inline-flex items-center gap-2 text-charcoal/70"><Sparkles size={14} /> Real product preview</span>
                             </div>
                           )}
                           <button
                             onClick={() => setStep(2)}
-                            className="inline-flex items-center gap-2 text-xs font-extrabold text-charcoal/55 hover:text-charcoal"
+                            className="flex-1 sm:flex-none min-h-[44px] inline-flex items-center justify-center gap-2 rounded-lg border border-charcoal/10 bg-white px-3 py-2 text-xs font-extrabold text-charcoal/55 hover:text-charcoal transition"
                           >
                             <ChevronLeft size={16} />
                             Back
@@ -1247,7 +1247,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     </div>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-6 pb-24 md:pb-0">
                     <div className="rounded-2xl bg-white border border-charcoal/8 p-6 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Customise your gift</p>
                       <KineticHeading as="h2" className="mb-2 mt-3 text-4xl font-black">
@@ -1446,6 +1446,27 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       region={region}
                     />
                   )}
+
+                  {/* Mobile sticky add-to-cart bar */}
+                  <div
+                    className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-charcoal/10 bg-white px-4 pt-3 shadow-[0_-4px_20px_-8px_rgba(45,41,38,0.12)]"
+                    style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
+                  >
+                    <motion.button
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleAddToCart}
+                      disabled={
+                        !generatedImage ||
+                        (selectedProduct.hasSize && !selectedSize) ||
+                        (isCanvasProduct && !croppedImageDataUrl)
+                      }
+                      className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-bold text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)] transition disabled:cursor-not-allowed disabled:opacity-40"
+                      style={{ backgroundColor: "var(--color-terracotta)" }}
+                    >
+                      Add to Cart — {fmt(isCanvasProduct ? selectedCanvasSize.priceGBP : selectedProduct.basePrice)}
+                      <Plus size={18} />
+                    </motion.button>
+                  </div>
                 </motion.div>
               )}
 

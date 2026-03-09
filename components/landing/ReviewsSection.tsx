@@ -65,7 +65,7 @@ const REVIEWS = [
 export function ReviewsSection() {
   return (
     <section
-      className="py-12 sm:py-20"
+      className="hidden md:block py-12 sm:py-20"
       style={{ backgroundColor: "var(--color-charcoal)" }}
     >
       <div className={CONTAINER}>

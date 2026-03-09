@@ -26,10 +26,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Keepsy — Personalised Gifts She'll Never Forget",
+    default: "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
     template: "%s — Keepsy",
   },
-  description: "Turn your favourite photos and memories into beautiful, personalised keepsakes. Custom mugs, greeting cards, tees and hoodies — premium quality, shipped to US & UK.",
+  description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £9.99.",
   keywords: ["personalised gifts", "custom mugs", "custom hoodies", "keepsake gifts", "photo gifts", "personalised cards"],
   metadataBase: new URL("https://keepsy.store"),
   alternates: {
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "https://keepsy.store",
-    title: "Keepsy",
-    description: "Keep what matters — turn it into a gift.",
+    title: "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
+    description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £9.99.",
     siteName: "Keepsy",
     images: [
       {
@@ -56,9 +56,22 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Keepsy",
-    description: "Keep what matters — turn it into a gift.",
+    title: "Keepsy — Personalised Gifts",
+    description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy.",
     images: ["/twitter-image"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    other: [
+      { rel: "manifest", url: "/site.webmanifest" },
+    ],
   },
 };
 
@@ -73,8 +86,9 @@ const organizationJsonLd = {
       "logo": "https://keepsy.store/images/logo.png",
       "email": "hello@keepsy.store",
       "sameAs": [
-        "https://www.instagram.com/keepsy.store",
-        "https://www.pinterest.com/keepsystore",
+        "https://www.instagram.com/wearekeepsy",
+        "https://www.facebook.com/wearekeepsy",
+        "https://www.tiktok.com/@wearekeepsy",
       ],
       "contactPoint": {
         "@type": "ContactPoint",

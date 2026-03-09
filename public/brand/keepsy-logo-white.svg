@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50" overflow="visible" role="img" aria-label="Keepsy">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&amp;display=swap');
+    </style>
+  </defs>
+  <text
+    x="0"
+    y="40"
+    fill="#FFFFFF"
+    font-family="Fraunces, Georgia, serif"
+    font-size="40"
+    font-weight="700"
+    letter-spacing="0.02em"
+  >Keepsy</text>
+</svg>

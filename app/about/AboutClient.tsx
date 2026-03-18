@@ -118,7 +118,7 @@ function OriginStory() {
             className="mt-8 border-l-2 pl-5"
             style={{ borderColor: "var(--color-terracotta)" }}
           >
-            <p className="font-serif text-base italic leading-relaxed text-charcoal/80">
+            <p className="serif-italic text-base leading-relaxed text-charcoal/80">
               "We just wanted to make our mums smile. Turns out, a lot of
               people feel the same way."
             </p>

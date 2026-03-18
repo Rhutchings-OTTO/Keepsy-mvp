@@ -1215,6 +1215,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             />
                           </motion.div>
                         )}
+                        {selectedProduct.id === "mug" && (
+                          <p className="mt-2 text-center text-[11px] text-charcoal/45">
+                            Your design will appear on both sides of the mug
+                          </p>
+                        )}
                         <div className="mt-4 flex flex-wrap gap-2">
                           {isCanvasProduct && !isCropping && (
                             <button

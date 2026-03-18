@@ -10,16 +10,22 @@ import sharp from "sharp";
 
 // ── Print area constants (pixels at 300 DPI) ──────────────────────────────────
 
-/** Greeting card print area */
-const CARD_W = 3000;
-const CARD_H = 2102;
-
 /**
- * Card safe zone: 80% of print area.
- * Gives ~300 px white border on left/right and ~210 px on top/bottom.
+ * Greeting card print area — landscape sheet that folds in half vertically.
+ *
+ *   Left half  [0–1500 px]:  inside-left panel (branding)
+ *   Right half [1500–3000 px]: front cover (AI image)
+ *
+ * Content in both halves is rotated 90° CCW so it appears upright once the
+ * card is folded and held in portrait orientation.
  */
-const CARD_SAFE_W = Math.round(CARD_W * 0.8); // 2400
-const CARD_SAFE_H = Math.round(CARD_H * 0.8); // 1682
+const CARD_W      = 3000;
+const CARD_H      = 2102;
+const CARD_HALF_W = CARD_W / 2; // 1500 — width of each panel
+
+/** Front-cover safe zone: 80% of the right half. */
+const COVER_SAFE_W = Math.round(CARD_HALF_W * 0.8); // 1200
+const COVER_SAFE_H = Math.round(CARD_H       * 0.8); // 1682
 
 /** 11 oz mug full-wrap print area */
 const MUG_W = 2582;
@@ -104,25 +110,71 @@ export async function getContainScaleFromUrl(
 }
 
 /**
- * Card: composite the AI image onto a white 3000 × 2102 canvas.
+ * Card: composite the AI image and branding onto a white 3000 × 2102 canvas.
  *
- * The image is contain-fitted to 80% of the print area (2400 × 1682) and
- * centred, leaving a guaranteed white border on all four edges.
+ * The print area is a landscape sheet that folds in half vertically:
+ *   • Right half [1500–3000 px] = front cover
+ *     - AI image rotated 90° CCW, contain-fitted to 80% of the 1500×2102 panel,
+ *       centred in the right half. Appears upright in portrait once folded.
+ *   • Left half [0–1500 px] = inside-left panel
+ *     - Subtle "made with / Keepsy.store" branding, also rotated 90° CCW.
  *
  * Returns a PNG Buffer for upload to Printify at scale:1.0 / position:0.5,0.5.
  */
 export async function compositeCardImage(imageUrl: string): Promise<Buffer> {
   const srcBuf = await fetchBuffer(imageUrl);
 
-  const resized = await sharp(srcBuf)
-    .resize(CARD_SAFE_W, CARD_SAFE_H, { fit: "inside", withoutEnlargement: false })
+  // ── Front cover: rotate 90° CCW then contain-fit within safe zone ────────────
+  const rotated = await sharp(srcBuf).rotate(-90).png().toBuffer();
+
+  const resized = await sharp(rotated)
+    .resize(COVER_SAFE_W, COVER_SAFE_H, { fit: "inside", withoutEnlargement: false })
     .png()
     .toBuffer();
 
-  const { width: rw = CARD_SAFE_W, height: rh = CARD_SAFE_H } = await sharp(resized).metadata();
+  const { width: rw = COVER_SAFE_W, height: rh = COVER_SAFE_H } = await sharp(resized).metadata();
 
-  const left = Math.round((CARD_W - rw) / 2);
-  const top  = Math.round((CARD_H - rh) / 2);
+  // Centre within the right half (x: CARD_HALF_W → CARD_W, y: 0 → CARD_H)
+  const imageLeft = CARD_HALF_W + Math.round((CARD_HALF_W - rw) / 2);
+  const imageTop  = Math.round((CARD_H - rh) / 2);
+
+  // ── Inside-left panel: branding SVG rotated 90° CCW ──────────────────────────
+  // "Georgia, serif" is used for Keepsy (serif brand font, reliable in librsvg).
+  // "Arial, sans-serif" for body text (matches site sans-serif).
+  const FONT_BODY  = 42;  // "made with" and ".store" (~10pt at 300 DPI)
+  const FONT_BRAND = 52;  // "Keepsy" — ~24% larger (~12.5pt at 300 DPI)
+  const TEXT_COLOR = "#AAAAAA";
+  const cx = CARD_HALF_W / 2; // 750 — horizontal centre of left half
+  const cy = CARD_H / 2;      // 1051 — vertical centre
+
+  // Both lines centred around the rotated origin; baselines spaced ~90 px apart.
+  // After 90° CCW rotation these y-offsets become the x-spread, so spacing looks
+  // like comfortable leading when the card is held upright.
+  const brandingSvg = Buffer.from(
+    `<svg width="${CARD_HALF_W}" height="${CARD_H}" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(${cx},${cy}) rotate(-90)">
+        <text x="0" y="-45"
+          text-anchor="middle"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="${FONT_BODY}"
+          font-weight="400"
+          letter-spacing="3"
+          fill="${TEXT_COLOR}"
+        >made with</text>
+        <text x="0" y="47"
+          text-anchor="middle"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="${FONT_BRAND}"
+          font-weight="700"
+          fill="${TEXT_COLOR}"
+        >Keepsy<tspan
+            font-family="Arial, Helvetica, sans-serif"
+            font-size="${FONT_BODY}"
+            font-weight="400"
+          >.store</tspan></text>
+      </g>
+    </svg>`
+  );
 
   return sharp({
     create: {
@@ -132,7 +184,10 @@ export async function compositeCardImage(imageUrl: string): Promise<Buffer> {
       background: { r: 255, g: 255, b: 255 },
     },
   })
-    .composite([{ input: resized, left, top }])
+    .composite([
+      { input: resized,     left: imageLeft, top: imageTop },
+      { input: brandingSvg, left: 0,         top: 0        },
+    ])
     .png()
     .toBuffer();
 }

@@ -31,6 +31,7 @@ export function setRegion(region: Region): void {
   }
   if (typeof window !== "undefined") {
     window.localStorage.setItem(REGION_COOKIE_KEY, region);
+    window.dispatchEvent(new Event("keepsy-region-set"));
   }
 }
 

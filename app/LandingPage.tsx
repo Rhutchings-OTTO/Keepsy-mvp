@@ -788,8 +788,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
             </section>
           </main>
 
-          {/* ── Footer ── */}
-          <footer className="py-10 sm:py-14" style={{ backgroundColor: "var(--color-charcoal)" }}>
+          {/* ── Footer — hidden while gateway is shown so it doesn't bleed through on mobile ── */}
+          {!showGateway && <footer className="py-10 sm:py-14" style={{ backgroundColor: "var(--color-charcoal)" }}>
             <div className={CONTAINER}>
               {/* Brand info — always visible */}
               <div className="mb-6 sm:mb-0">
@@ -811,7 +811,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     onClick={() => setFooterShopOpen(!footerShopOpen)}
                     className="flex w-full items-center justify-between sm:pointer-events-none"
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">Shop</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/60">Shop</p>
                     <span className="text-white/40 sm:hidden">{footerShopOpen ? "−" : "+"}</span>
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerShopOpen ? "flex" : "hidden"} sm:flex`}>
@@ -820,7 +820,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/gift-ideas", label: "Gift Ideas" },
                       { href: "/create", label: "Design a Gift" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm text-white/75 transition hover:text-white">
                         {label}
                       </Link>
                     ))}
@@ -833,7 +833,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     onClick={() => setFooterCompanyOpen(!footerCompanyOpen)}
                     className="flex w-full items-center justify-between sm:pointer-events-none"
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">Company</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/60">Company</p>
                     <span className="text-white/40 sm:hidden">{footerCompanyOpen ? "−" : "+"}</span>
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerCompanyOpen ? "flex" : "hidden"} sm:flex`}>
@@ -842,7 +842,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/terms", label: "Terms" },
                       { href: "/privacy", label: "Privacy" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm text-white/75 transition hover:text-white">
                         {label}
                       </Link>
                     ))}
@@ -855,7 +855,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     onClick={() => setFooterHelpOpen(!footerHelpOpen)}
                     className="flex w-full items-center justify-between sm:pointer-events-none"
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">Help</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/60">Help</p>
                     <span className="text-white/40 sm:hidden">{footerHelpOpen ? "−" : "+"}</span>
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerHelpOpen ? "flex" : "hidden"} sm:flex`}>
@@ -863,14 +863,14 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/shipping", label: "Shipping" },
                       { href: "/refunds", label: "Refunds" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/55 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm text-white/75 transition hover:text-white">
                         {label}
                       </Link>
                     ))}
                     <button
                       type="button"
                       onClick={() => setIsRegionSelectorOpen(true)}
-                      className="text-left text-sm text-white/55 transition hover:text-white"
+                      className="text-left text-sm text-white/75 transition hover:text-white"
                     >
                       {activeRegion} shipping ↗
                     </button>
@@ -886,11 +886,11 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   © {new Date().getFullYear()} Keepsy Ltd. All rights reserved.
                 </p>
                 <p className="text-xs text-white/25">
-                  Payments by Stripe · Printing by Printful
+                  Payments by Stripe · Printing by Printify
                 </p>
               </div>
             </div>
-          </footer>
+          </footer>}
 
           {/* ── Region Selector ── */}
           <RegionSelector

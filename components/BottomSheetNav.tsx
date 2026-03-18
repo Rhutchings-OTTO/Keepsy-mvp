@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, ShoppingBag, Sparkles, User } from "lucide-react";
+import { getRegion } from "@/lib/region";
 
 const TABS = [
   { href: "/", label: "Home", Icon: Home },
@@ -13,6 +15,16 @@ const TABS = [
 
 export function BottomSheetNav() {
   const pathname = usePathname();
+  const [hasRegion, setHasRegion] = useState(false);
+
+  useEffect(() => {
+    const check = () => setHasRegion(!!getRegion());
+    check();
+    window.addEventListener("keepsy-region-set", check);
+    return () => window.removeEventListener("keepsy-region-set", check);
+  }, []);
+
+  if (!hasRegion) return null;
 
   return (
     <nav

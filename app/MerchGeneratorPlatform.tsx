@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { useLenis } from "lenis/react";
 import useSWR from "swr";
 import { flushSync } from "react-dom";
 import Link from "next/link";
@@ -443,6 +444,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [region] = useState<Region>(() => getRegion() ?? "UK");
   const fmt = (n: number) => region === "US" ? USD_FORMATTER.format(n) : GBP_FORMATTER.format(n);
+  const lenis = useLenis();
+  const scrollToTop = useCallback(() => {
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [lenis]);
 
   const [prompt, setPromptState] = useState<string>("");
 
@@ -716,6 +725,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setRefinementSuccess(false);
       setStep(2);
       setView("home");
+      scrollToTop();
     } catch (e) {
       console.error(e);
       const aborted = e instanceof Error && e.name === "AbortError";
@@ -783,6 +793,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setGenerationRewriteApplied(null);
       setRefinementSuccess(true);
       setGenerationError(null);
+      scrollToTop();
     } catch (e) {
       const aborted = e instanceof Error && e.name === "AbortError";
       const err = e as Error & { contentBlock?: { title: string; message: string; suggestions: string[] } };
@@ -1129,7 +1140,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 <DesignConfirmation
                   generatedImage={generatedImage}
                   region={region}
-                  onContinue={() => setStep(3)}
+                  onContinue={() => { setStep(3); scrollToTop(); }}
                   onRefine={handleRefine}
                   onBackToPrompt={() => setStep(1)}
                   onStartFresh={() => {

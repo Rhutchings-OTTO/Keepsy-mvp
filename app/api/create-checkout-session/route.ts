@@ -178,6 +178,9 @@ export async function POST(req: Request) {
           total_gbp: Number(totalGBP.toFixed(2)),
           prompt: "",
           generated_image_url: null,
+          // Store the full cropped image URL here so the webhook can retrieve it
+          // without relying on Stripe metadata (which truncates values to 500 chars).
+          cropped_image_url: croppedImageUrl || null,
         },
         { onConflict: "order_ref" }
       );

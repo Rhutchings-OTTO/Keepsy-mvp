@@ -136,18 +136,27 @@ export type PrintifyShippingRate = {
 /* ─── 1. Upload image ─────────────────────────────────────────────────────── */
 
 /**
- * Upload a design image URL to the Printify media library.
+ * Upload a design image to the Printify media library.
+ *
+ * Accepts either:
+ *   - An HTTPS URL string  → Printify fetches it directly via `url`
+ *   - A Buffer             → sent as base64 `contents` (used for composited images)
+ *
  * Returns the Printify image ID (used in createProduct).
  */
 export async function uploadImageToPrintify(
-  imageUrl: string,
+  image: string | Buffer,
   fileName: string
 ): Promise<string> {
+  const body = Buffer.isBuffer(image)
+    ? { file_name: fileName, contents: image.toString("base64") }
+    : { file_name: fileName, url: image };
+
   const data = await printifyJSON<PrintifyImageUpload>(
     "/uploads/images.json",
     {
       method: "POST",
-      body: JSON.stringify({ file_name: fileName, url: imageUrl }),
+      body: JSON.stringify(body),
     }
   );
   return data.id;
@@ -156,19 +165,40 @@ export async function uploadImageToPrintify(
 /* ─── 2. Create product ───────────────────────────────────────────────────── */
 
 /**
- * Returns centered image placement values for each product type.
- * The generated AI image is always square; scale leaves visible margin on all sides.
+ * Returns image placement values for each product type.
+ *
+ * Card / Mug / Canvas: scale:1.0 because a composited image is uploaded that
+ * already has the correct dimensions (white borders baked in for card/mug,
+ * user-cropped for canvas).
+ *
+ * Tee / Hoodie: scale is computed dynamically in the webhook based on the
+ * actual source image dimensions (contain-fit logic). The value here is used
+ * only as a safe default if the dynamic override is not provided.
  */
-function getImagePlacement(productType: string): { x: number; y: number; scale: number } {
+function getImagePlacement(
+  productType: string,
+  scaleOverride?: number
+): { x: number; y: number; scale: number } {
   const p = productType.toLowerCase();
-  if (p.includes("mug"))    return { x: 0.5, y: 0.5,  scale: 0.65 };
-  if (p.includes("card"))   return { x: 0.5, y: 0.5,  scale: 0.75 };
-  if (p.includes("hoodie")) return { x: 0.5, y: 0.38, scale: 0.5  };
-  if (p.includes("tee") || p.includes("tshirt") || p.includes("t-shirt"))
-                            return { x: 0.5, y: 0.42, scale: 0.55 };
-  // Canvas: full-bleed — the cropped image fills the entire print area
-  if (p.includes("canvas")) return { x: 0.5, y: 0.5,  scale: 1.0  };
-  return                           { x: 0.5, y: 0.5,  scale: 0.7  };
+
+  // Card and mug receive a pre-composited full-bleed image.
+  if (p.includes("card"))   return { x: 0.5, y: 0.5, scale: 1.0 };
+  if (p.includes("mug"))    return { x: 0.5, y: 0.5, scale: 1.0 };
+
+  // Canvas: user-cropped full-bleed.
+  if (p.includes("canvas")) return { x: 0.5, y: 0.5, scale: 1.0 };
+
+  // Tee / Hoodie: dynamic contain scale, centred.
+  if (
+    p.includes("tee") ||
+    p.includes("tshirt") ||
+    p.includes("t-shirt") ||
+    p.includes("hoodie")
+  ) {
+    return { x: 0.5, y: 0.5, scale: scaleOverride ?? 1.0 };
+  }
+
+  return { x: 0.5, y: 0.5, scale: scaleOverride ?? 0.7 };
 }
 
 /**
@@ -183,10 +213,12 @@ export async function createPrintifyProduct(params: {
   printImageId: string;
   printPosition: string;
   productType: string;
+  /** Override the computed scale (used for dynamic contain-fit on tee/hoodie). */
+  scaleOverride?: number;
 }): Promise<string> {
-  const { title, blueprintId, printProviderId, variantId, printImageId, printPosition, productType } = params;
+  const { title, blueprintId, printProviderId, variantId, printImageId, printPosition, productType, scaleOverride } = params;
 
-  const { x, y, scale } = getImagePlacement(productType);
+  const { x, y, scale } = getImagePlacement(productType, scaleOverride);
 
   const body = {
     title,

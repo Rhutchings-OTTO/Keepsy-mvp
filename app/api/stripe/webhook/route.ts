@@ -13,6 +13,16 @@ import {
 } from "@/lib/printify";
 import { getPrintifyVariantId } from "@/lib/printify-blueprints";
 import { notifyFounders } from "@/lib/notifications";
+import sharp from "sharp";
+import {
+  compositeCardImage,
+  compositeMugImage,
+  computeContainScale,
+  TEE_PRINT_W,
+  TEE_PRINT_H,
+  HOODIE_PRINT_W,
+  HOODIE_PRINT_H,
+} from "@/lib/image-composite";
 
 export const runtime = "nodejs";
 
@@ -204,7 +214,20 @@ async function handleCheckoutCompleted(
     session.metadata?.order_ref || session.client_reference_id || `order_${session.id}`;
   const prompt = session.metadata?.prompt || "";
   const designUrl = session.metadata?.design_url || null;
-  const croppedImageUrl = session.metadata?.cropped_image_url || null;
+
+  // Prefer the full URL stored in Supabase over the Stripe metadata value,
+  // which is truncated to 490 chars and can corrupt long Cloudinary URLs.
+  let croppedImageUrl = session.metadata?.cropped_image_url || null;
+  {
+    const { data: orderAsset } = await supabase
+      .from("orders")
+      .select("cropped_image_url")
+      .eq("order_ref", orderRef)
+      .maybeSingle();
+    if (orderAsset?.cropped_image_url) {
+      croppedImageUrl = orderAsset.cropped_image_url as string;
+    }
+  }
   const amountTotal = (session.amount_total ?? 0) / 100;
 
   const customerEmail =
@@ -327,11 +350,61 @@ async function handleCheckoutCompleted(
       session.customer_details?.address?.country;
     const region = regionFromCountry(shippingCountry);
 
-    // For canvas orders a cropped image URL is preferred over the original design.
+    // Canvas uses the cropped image; all other products use the original design.
     const printifySourceUrl = croppedImageUrl || designUrl;
 
-    // Upload design image to Printify
-    const printifyImageId = await uploadImageToPrintify(printifySourceUrl, `keepsy-${orderRef}.png`);
+    // ── Product-specific image preparation ───────────────────────────────────
+    //
+    // Card  → white-bordered composite (3000×2102) uploaded as Buffer
+    // Mug   → dual front-face composite (2582×1120) uploaded as Buffer
+    // Tee   → original image, but scale computed dynamically (contain-fit)
+    // Hoodie→ original image, but scale computed dynamically (contain-fit)
+    // Canvas→ cropped image, scale:1.0 full-bleed (already handled above)
+    // Other → original image, default placement
+
+    let printifyImageId: string;
+    let scaleOverride: number | undefined;
+    const pType = productId.toLowerCase();
+
+    if (pType.includes("card")) {
+      console.log("[printify] Compositing card with white border");
+      const buf = await compositeCardImage(printifySourceUrl);
+      printifyImageId = await uploadImageToPrintify(buf, `keepsy-${orderRef}.png`);
+
+    } else if (pType.includes("mug")) {
+      console.log("[printify] Compositing mug with dual front-face placement");
+      const buf = await compositeMugImage(printifySourceUrl);
+      printifyImageId = await uploadImageToPrintify(buf, `keepsy-${orderRef}.png`);
+
+    } else if (
+      pType.includes("tee") ||
+      pType.includes("tshirt") ||
+      pType.includes("t-shirt")
+    ) {
+      // Fetch once, compute contain scale, upload buffer directly
+      const res = await fetch(printifySourceUrl);
+      const imgBuf = Buffer.from(await res.arrayBuffer());
+      const { width, height } = await sharp(imgBuf).metadata();
+      if (width && height) {
+        scaleOverride = computeContainScale(width, height, TEE_PRINT_W, TEE_PRINT_H);
+        console.log(`[printify] Tee contain scale: ${scaleOverride} (image ${width}×${height})`);
+      }
+      printifyImageId = await uploadImageToPrintify(imgBuf, `keepsy-${orderRef}.png`);
+
+    } else if (pType.includes("hoodie")) {
+      const res = await fetch(printifySourceUrl);
+      const imgBuf = Buffer.from(await res.arrayBuffer());
+      const { width, height } = await sharp(imgBuf).metadata();
+      if (width && height) {
+        scaleOverride = computeContainScale(width, height, HOODIE_PRINT_W, HOODIE_PRINT_H);
+        console.log(`[printify] Hoodie contain scale: ${scaleOverride} (image ${width}×${height})`);
+      }
+      printifyImageId = await uploadImageToPrintify(imgBuf, `keepsy-${orderRef}.png`);
+
+    } else {
+      printifyImageId = await uploadImageToPrintify(printifySourceUrl, `keepsy-${orderRef}.png`);
+    }
+
     await supabase
       .from("orders")
       .update({ printify_image_id: printifyImageId, printify_status: "image_uploaded" })
@@ -347,6 +420,7 @@ async function handleCheckoutCompleted(
       printImageId: printifyImageId,
       printPosition: config.printPosition,
       productType: productId,
+      scaleOverride,
     });
     await supabase
       .from("orders")

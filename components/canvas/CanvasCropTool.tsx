@@ -281,9 +281,9 @@ export function CanvasCropTool({
       });
       const json = await res.json() as { url?: string; error?: string };
       if (!res.ok || !json.url) {
-        // If upload fails, proceed with data URL (Printify will skip fulfillment but canvas mockup still works)
-        console.warn("[crop] Upload failed, using data URL fallback:", json.error);
-        onConfirm(dataUrl, dataUrl);
+        // Upload failed — show error so user can retry rather than silently
+        // passing a huge data URL through Stripe metadata (which truncates at 500 chars).
+        setUploadError("Upload failed — please try again. " + (json.error ?? ""));
         return;
       }
 
@@ -300,6 +300,11 @@ export function CanvasCropTool({
   const pa = printArea();
   const imgTL = imageTopLeft();
   const id = imageDisplay();
+
+  // Gallery wrap guide: 1.25" per side wraps around the frame and won't be
+  // visible from the front. Show as semi-transparent amber inset overlay.
+  const wrapPxW = (pa.w * 1.25) / canvasSize.width;
+  const wrapPxH = (pa.h * 1.25) / canvasSize.height;
 
   return (
     <div className={`flex flex-col ${className}`}>
@@ -376,7 +381,25 @@ export function CanvasCropTool({
               }}
             />
           )}
+
+          {/* Gallery wrap guide — shows the 1.25" edge that wraps around the frame */}
+          <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+            {/* Top wrap */}
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: wrapPxH, background: "rgba(255,140,0,0.22)" }} />
+            {/* Bottom wrap */}
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: wrapPxH, background: "rgba(255,140,0,0.22)" }} />
+            {/* Left wrap */}
+            <div style={{ position: "absolute", top: wrapPxH, bottom: wrapPxH, left: 0, width: wrapPxW, background: "rgba(255,140,0,0.22)" }} />
+            {/* Right wrap */}
+            <div style={{ position: "absolute", top: wrapPxH, bottom: wrapPxH, right: 0, width: wrapPxW, background: "rgba(255,140,0,0.22)" }} />
+          </div>
         </div>
+
+        {/* Wrap zone legend */}
+        <p className="pointer-events-none mt-1 text-center text-[10px] text-charcoal/45">
+          <span style={{ display: "inline-block", width: 8, height: 8, background: "rgba(255,140,0,0.55)", borderRadius: 2, marginRight: 4, verticalAlign: "middle" }} />
+          Highlighted edges wrap around the frame and won&apos;t be visible from the front
+        </p>
 
         {/* Dimension label */}
         <div

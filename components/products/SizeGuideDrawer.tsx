@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import Image from "next/image";
 import {
   TSHIRT_IMPERIAL,
   TSHIRT_METRIC,
@@ -93,21 +92,6 @@ export function SizeGuideDrawer({
           </button>
         </div>
       </div>
-      {/* Garment diagram */}
-      <div className="mt-4 flex flex-col items-center">
-        <Image
-          src={productType === "tshirt" ? "/size-guide/tshirt-measurements.png" : "/size-guide/hoodie-measurements.png"}
-          alt={`${productType === "tshirt" ? "T-shirt" : "Hoodie"} measurement diagram showing Width, Length, and Sleeve length`}
-          width={250}
-          height={250}
-          className="rounded-lg"
-          priority
-        />
-        <p className="mt-1 text-[10px] text-black/40 text-center">
-          Measurements are taken with the garment laid flat
-        </p>
-      </div>
-
       <div className="mt-4 flex-1 overflow-x-auto overflow-y-auto">
         <table className="w-full min-w-[320px] text-sm border-collapse">
           <thead>

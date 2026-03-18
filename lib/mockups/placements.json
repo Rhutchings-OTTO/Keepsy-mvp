@@ -3,8 +3,8 @@
     "white": {
       "baseMockupSrc": "/product-tiles/tee-white.png",
       "aspectRatio": 1.8333,
-      "opacity": 0.9,
-      "dropShadow": "0 3px 10px rgba(0,0,0,0.16)",
+      "opacity": 1.0,
+      "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
       "placement": {
         "kind": "rect",
         "rect": {
@@ -20,8 +20,8 @@
     "blue": {
       "baseMockupSrc": "/product-tiles/tee-blue.png",
       "aspectRatio": 1.8333,
-      "opacity": 0.9,
-      "dropShadow": "0 3px 10px rgba(0,0,0,0.16)",
+      "opacity": 1.0,
+      "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
       "placement": {
         "kind": "rect",
         "rect": {
@@ -37,8 +37,8 @@
     "black": {
       "baseMockupSrc": "/mockups/tee-black.png",
       "aspectRatio": 1.5015,
-      "opacity": 0.9,
-      "dropShadow": "0 3px 10px rgba(0,0,0,0.16)",
+      "opacity": 1.0,
+      "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
       "placement": {
         "kind": "rect",
         "rect": {
@@ -114,10 +114,10 @@
       "placement": {
         "kind": "rect",
         "rect": {
-          "xPct": 38,
+          "xPct": 46.9,
           "yPct": 50,
-          "wPct": 14,
-          "hPct": 36,
+          "wPct": 28,
+          "hPct": 50,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         }
@@ -133,10 +133,10 @@
       "placement": {
         "kind": "rect",
         "rect": {
-          "xPct": 49,
-          "yPct": 52,
-          "wPct": 42,
-          "hPct": 54,
+          "xPct": 51,
+          "yPct": 53,
+          "wPct": 78,
+          "hPct": 64,
           "rotateDeg": 0,
           "borderRadiusPct": 1.8
         }

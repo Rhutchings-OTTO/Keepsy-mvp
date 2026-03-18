@@ -13,6 +13,13 @@ type RectPlacement = {
 
 const DARK_GARMENT_COLORS: MockupColor[] = ["black", "blue"];
 
+// SVG feDisplacementMap filter for mug cylindrical curvature.
+// R channel gradient (left=160 → center=128 → right=96) compresses the image
+// edges inward to simulate the design wrapping around a cylindrical surface.
+const MUG_CYL_FILTER_ID = "keepsy-mug-cyl-warp";
+const _MUG_DISP_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="4"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgb(160,128,128)"/><stop offset=".5" stop-color="rgb(128,128,128)"/><stop offset="1" stop-color="rgb(96,128,128)"/></linearGradient></defs><rect width="200" height="4" fill="url(#g)"/></svg>`;
+const MUG_DISP_MAP_HREF = `data:image/svg+xml,${encodeURIComponent(_MUG_DISP_SVG)}`;
+
 function isDarkGarment(productType: MockupProductType, color?: MockupColor): boolean {
   if (productType !== "tshirt" && productType !== "hoodie") return false;
   return !!color && DARK_GARMENT_COLORS.includes(color);
@@ -77,7 +84,9 @@ function getArtworkFilter(productType: MockupProductType, color?: MockupColor, d
           ? "saturate(1.0) contrast(1.02) brightness(1.01)"
           // White garment: gentle desaturation mimics real DTG ink absorption into fabric
           : "saturate(0.9) contrast(1.06) brightness(0.96)";
-  return dropShadow ? `${tonal} drop-shadow(${dropShadow})` : tonal;
+  const base = dropShadow ? `${tonal} drop-shadow(${dropShadow})` : tonal;
+  // Append SVG displacement filter for cylindrical surface curvature on mugs
+  return productType === "mug" ? `${base} url(#${MUG_CYL_FILTER_ID})` : base;
 }
 
 function getTextureVeil(productType: MockupProductType): CSSProperties | null {
@@ -133,6 +142,32 @@ export function ArtworkLayer(props: ArtworkLayerProps) {
     const transform = getArtworkTransform(productType, baseTransform, false);
     return (
       <>
+        {/* SVG filter for mug cylindrical warp — must be in the DOM for url(#id) to resolve */}
+        {productType === "mug" && (
+          <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
+            <defs>
+              <filter
+                id={MUG_CYL_FILTER_ID}
+                x="0%" y="0%" width="100%" height="100%"
+                colorInterpolationFilters="sRGB"
+              >
+                <feImage
+                  href={MUG_DISP_MAP_HREF}
+                  result="map"
+                  x="0" y="0" width="100%" height="100%"
+                  preserveAspectRatio="none"
+                />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="map"
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                  scale="18"
+                />
+              </filter>
+            </defs>
+          </svg>
+        )}
         <motion.img
           key={`art-rect-${generatedImage.slice(0, 50)}`}
           initial={{ opacity: 0 }}

@@ -267,7 +267,7 @@ export function CreatePageLayoutLean({
                         : "Example: A golden retriever sitting in a field of sunflowers"
                     }
                     rows={5}
-                    className="min-h-[144px] w-full resize-none rounded-xl border border-charcoal/10 bg-white px-4 py-4 text-base leading-7 text-charcoal outline-none placeholder:text-charcoal/35 focus:border-terracotta/40 focus:ring-2 focus:ring-terracotta/15"
+                    className="min-h-[144px] w-full resize-none rounded-xl border border-charcoal/10 bg-white px-4 py-4 text-[16px] leading-7 text-charcoal outline-none placeholder:text-charcoal/35 focus:border-terracotta/40 focus:ring-2 focus:ring-terracotta/15"
                   />
                 </label>
 

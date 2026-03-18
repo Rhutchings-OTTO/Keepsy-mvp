@@ -568,7 +568,7 @@ input[type="number"],
 input[type="search"],
 textarea,
 select {
-  font-size: 1rem; /* 16px — prevents iOS zoom on focus */
+  font-size: 16px; /* absolute px — prevents iOS Safari auto-zoom on focus */
   font-family: var(--font-sans, Manrope, sans-serif);
   color: #2D2926;
   background: rgba(255, 255, 255, 0.85);

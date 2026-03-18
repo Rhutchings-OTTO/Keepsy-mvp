@@ -87,12 +87,12 @@ export const PRODUCT_CATALOG_IDS: Record<ProductType, string> = {
   hoodie: "hoodie",
   mug: "mug",
   card: "card",
-  // Canvas uses size-tier IDs (canvas_small/medium/large/xlarge) — handled specially at cart build time
+  // Canvas uses per-size IDs (canvas_10x8, canvas_20x16, etc.) — handled specially at cart build time
   canvas: "canvas",
 };
 
 export function getProductByCatalogId(catalogId: string): Product | null {
-  // Canvas tier IDs (canvas_small / canvas_medium / canvas_large / canvas_xlarge)
+  // Canvas per-size IDs all start with "canvas_"
   if (catalogId.startsWith("canvas")) return PRODUCTS.canvas;
   const entry = Object.entries(PRODUCT_CATALOG_IDS).find(([, id]) => id === catalogId);
   return entry ? PRODUCTS[entry[0] as ProductType] : null;

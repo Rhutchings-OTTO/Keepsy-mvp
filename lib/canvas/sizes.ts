@@ -1,6 +1,7 @@
 /**
  * Canvas size catalogue — all sizes available from Printify blueprint 1159 (Jondo provider 105).
  * Sizes are width × height in inches. Depth is always 1.25".
+ * USD prices = floor(GBP × 1.27) + 0.99
  */
 
 export type CanvasOrientation = "Horizontal" | "Vertical" | "Square";
@@ -14,15 +15,76 @@ export type CanvasSize = {
   orientation: CanvasOrientation;
   tier: CanvasTier;
   priceGBP: number;
-  /** Key into PRODUCT_CATALOG, e.g. "canvas_medium" */
+  priceUSD: number;
+  /** Key into PRODUCT_CATALOG, e.g. "canvas_20x16" */
   catalogId: string;
 };
 
-const TIER_PRICES: Record<CanvasTier, { priceGBP: number; catalogId: string }> = {
-  small:  { priceGBP: 29.99,  catalogId: "canvas_small" },
-  medium: { priceGBP: 49.99,  catalogId: "canvas_medium" },
-  large:  { priceGBP: 79.99,  catalogId: "canvas_large" },
-  xlarge: { priceGBP: 109.99, catalogId: "canvas_xlarge" },
+/** Per-size prices from Printify Jondo provider */
+const PRICES: Record<string, { priceGBP: number; priceUSD: number }> = {
+  // ── Horizontal ──────────────────────────────────────────────────────────
+  "10x8":  { priceGBP: 29.99,  priceUSD: 38.99  },
+  "12x9":  { priceGBP: 34.99,  priceUSD: 44.99  },
+  "14x11": { priceGBP: 39.99,  priceUSD: 50.99  },
+  "16x12": { priceGBP: 44.99,  priceUSD: 57.99  },
+  "18x12": { priceGBP: 49.99,  priceUSD: 63.99  },
+  "20x10": { priceGBP: 49.99,  priceUSD: 63.99  },
+  "20x16": { priceGBP: 54.99,  priceUSD: 69.99  },
+  "24x16": { priceGBP: 59.99,  priceUSD: 76.99  },
+  "24x18": { priceGBP: 64.99,  priceUSD: 82.99  },
+  "24x20": { priceGBP: 69.99,  priceUSD: 88.99  },
+  "30x15": { priceGBP: 74.99,  priceUSD: 95.99  },
+  "30x20": { priceGBP: 74.99,  priceUSD: 95.99  },
+  "30x24": { priceGBP: 84.99,  priceUSD: 107.99 },
+  "32x24": { priceGBP: 84.99,  priceUSD: 107.99 },
+  "36x12": { priceGBP: 79.99,  priceUSD: 101.99 },
+  "36x24": { priceGBP: 89.99,  priceUSD: 114.99 },
+  "40x20": { priceGBP: 99.99,  priceUSD: 126.99 },
+  "40x30": { priceGBP: 119.99, priceUSD: 152.99 },
+  "48x16": { priceGBP: 99.99,  priceUSD: 126.99 },
+  "48x24": { priceGBP: 119.99, priceUSD: 152.99 },
+  "48x32": { priceGBP: 159.99, priceUSD: 203.99 },
+  "48x36": { priceGBP: 179.99, priceUSD: 228.99 },
+  "60x20": { priceGBP: 149.99, priceUSD: 190.99 },
+  "60x30": { priceGBP: 179.99, priceUSD: 228.99 },
+  "60x40": { priceGBP: 219.99, priceUSD: 279.99 },
+  // ── Vertical ────────────────────────────────────────────────────────────
+  "8x10":  { priceGBP: 29.99,  priceUSD: 38.99  },
+  "9x12":  { priceGBP: 34.99,  priceUSD: 44.99  },
+  "10x20": { priceGBP: 49.99,  priceUSD: 63.99  },
+  "11x14": { priceGBP: 39.99,  priceUSD: 50.99  },
+  "12x16": { priceGBP: 44.99,  priceUSD: 57.99  },
+  "12x18": { priceGBP: 49.99,  priceUSD: 63.99  },
+  "12x36": { priceGBP: 79.99,  priceUSD: 101.99 },
+  "15x30": { priceGBP: 74.99,  priceUSD: 95.99  },
+  "16x20": { priceGBP: 54.99,  priceUSD: 69.99  },
+  "16x24": { priceGBP: 59.99,  priceUSD: 76.99  },
+  "16x48": { priceGBP: 99.99,  priceUSD: 126.99 },
+  "18x24": { priceGBP: 64.99,  priceUSD: 82.99  },
+  "20x24": { priceGBP: 69.99,  priceUSD: 88.99  },
+  "20x30": { priceGBP: 74.99,  priceUSD: 95.99  },
+  "20x40": { priceGBP: 99.99,  priceUSD: 126.99 },
+  "20x60": { priceGBP: 149.99, priceUSD: 190.99 },
+  "24x30": { priceGBP: 84.99,  priceUSD: 107.99 },
+  "24x32": { priceGBP: 84.99,  priceUSD: 107.99 },
+  "24x36": { priceGBP: 89.99,  priceUSD: 114.99 },
+  "24x48": { priceGBP: 119.99, priceUSD: 152.99 },
+  "30x40": { priceGBP: 119.99, priceUSD: 152.99 },
+  "30x60": { priceGBP: 179.99, priceUSD: 228.99 },
+  "32x48": { priceGBP: 159.99, priceUSD: 203.99 },
+  "36x48": { priceGBP: 179.99, priceUSD: 228.99 },
+  "40x60": { priceGBP: 219.99, priceUSD: 279.99 },
+  // ── Square ──────────────────────────────────────────────────────────────
+  "6x6":   { priceGBP: 29.99,  priceUSD: 38.99  },
+  "10x10": { priceGBP: 34.99,  priceUSD: 44.99  },
+  "12x12": { priceGBP: 39.99,  priceUSD: 50.99  },
+  "14x14": { priceGBP: 44.99,  priceUSD: 57.99  },
+  "16x16": { priceGBP: 49.99,  priceUSD: 63.99  },
+  "20x20": { priceGBP: 69.99,  priceUSD: 88.99  },
+  "24x24": { priceGBP: 89.99,  priceUSD: 114.99 },
+  "30x30": { priceGBP: 109.99, priceUSD: 139.99 },
+  "32x32": { priceGBP: 119.99, priceUSD: 152.99 },
+  "36x36": { priceGBP: 159.99, priceUSD: 203.99 },
 };
 
 function getTier(w: number, h: number): CanvasTier {
@@ -40,16 +102,17 @@ function getOrientation(w: number, h: number): CanvasOrientation {
 }
 
 function makeSize(w: number, h: number): CanvasSize {
-  const tier = getTier(w, h);
-  const { priceGBP, catalogId } = TIER_PRICES[tier];
+  const code = `${w}x${h}`;
+  const { priceGBP, priceUSD } = PRICES[code] ?? { priceGBP: 29.99, priceUSD: 38.99 };
   return {
-    code: `${w}x${h}`,
+    code,
     width: w,
     height: h,
     orientation: getOrientation(w, h),
-    tier,
+    tier: getTier(w, h),
     priceGBP,
-    catalogId,
+    priceUSD,
+    catalogId: `canvas_${code}`,
   };
 }
 

@@ -813,10 +813,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setAddToCartConfirmation(null);
       return;
     }
-    // Canvas uses tier-based catalog ID; other products use fixed mapping
+    // Canvas uses per-size catalog ID; other products use fixed mapping
     const catalogId = isCanvasProduct ? selectedCanvasSize.catalogId : getCatalogId(selectedProduct);
     const canvasSizeCode = isCanvasProduct ? selectedCanvasSize.code : undefined;
-    const effectivePrice = isCanvasProduct ? selectedCanvasSize.priceGBP : selectedProduct.basePrice;
+    const effectivePrice = isCanvasProduct
+      ? (region === "US" ? selectedCanvasSize.priceUSD : selectedCanvasSize.priceGBP)
+      : selectedProduct.basePrice;
     const effectiveImageUrl = isCanvasProduct ? (croppedImageDataUrl ?? generatedImage) : generatedImage;
     const variantKey = `${catalogId}-${selectedColor}-${selectedSize ?? canvasSizeCode ?? "na"}-${Date.now()}`;
     const newItem: CartItem = {
@@ -885,7 +887,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
           imageUrl: croppedImageDataUrl,
           designUrl: createSession.currentDesignUrl ?? undefined,
           croppedImageUrl: croppedImageHttpsUrl ?? undefined,
-          unitPrice: selectedCanvasSize.priceGBP,
+          unitPrice: region === "US" ? selectedCanvasSize.priceUSD : selectedCanvasSize.priceGBP,
           quantity: 1,
         },
       ];
@@ -1320,6 +1322,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               setSelectedCanvasSize(size);
                             }}
                             formatPrice={fmt}
+                            region={region}
                           />
                           {generatedImage && !croppedImageDataUrl && (
                             <p className="mt-2 text-xs font-semibold text-terracotta">

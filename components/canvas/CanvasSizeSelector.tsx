@@ -9,14 +9,14 @@ import {
   type CanvasSize,
   type CanvasTier,
 } from "@/lib/canvas/sizes";
+import type { Region } from "@/lib/region";
 
 type Props = {
   selected: CanvasSize;
   onChange: (size: CanvasSize) => void;
   formatPrice: (n: number) => string;
+  region: Region;
 };
-
-const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
 const TIER_ORDER: CanvasTier[] = ["small", "medium", "large", "xlarge"];
 const ORIENTATIONS: CanvasOrientation[] = ["Horizontal", "Vertical", "Square"];
@@ -39,6 +39,7 @@ export const CanvasSizeSelector = memo(function CanvasSizeSelector({
   selected,
   onChange,
   formatPrice,
+  region,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<CanvasOrientation>(selected.orientation);
@@ -50,6 +51,9 @@ export const CanvasSizeSelector = memo(function CanvasSizeSelector({
     }
     return result;
   };
+
+  const getPrice = (size: CanvasSize) =>
+    region === "US" ? size.priceUSD : size.priceGBP;
 
   const handleSelect = (size: CanvasSize) => {
     onChange(size);
@@ -76,7 +80,7 @@ export const CanvasSizeSelector = memo(function CanvasSizeSelector({
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-sm font-black">{formatPrice(selected.priceGBP)}</span>
+          <span className="text-sm font-black">{formatPrice(getPrice(selected))}</span>
           <ChevronDown
             size={16}
             className={`text-charcoal/40 transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -118,7 +122,7 @@ export const CanvasSizeSelector = memo(function CanvasSizeSelector({
                 return (
                   <div key={tier}>
                     <p className="mb-1.5 px-1 text-[10px] font-extrabold uppercase tracking-widest text-charcoal/55">
-                      {TIER_LABEL[tier]} — {GBP.format(sizes[0].priceGBP)}
+                      {TIER_LABEL[tier]}
                     </p>
                     <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
                       {sizes.map((size) => {
@@ -135,9 +139,14 @@ export const CanvasSizeSelector = memo(function CanvasSizeSelector({
                             }`}
                           >
                             <AspectThumb w={size.width} h={size.height} />
-                            <span className={`text-xs font-bold ${isSelected ? "text-terracotta" : "text-charcoal"}`}>
-                              {size.width}×{size.height}
-                            </span>
+                            <div className="min-w-0">
+                              <div className={`text-xs font-bold ${isSelected ? "text-terracotta" : "text-charcoal"}`}>
+                                {size.width}×{size.height}
+                              </div>
+                              <div className="text-[10px] text-charcoal/50 font-semibold">
+                                {formatPrice(getPrice(size))}
+                              </div>
+                            </div>
                             {isSelected && <Check size={12} className="ml-auto text-terracotta shrink-0" />}
                           </button>
                         );

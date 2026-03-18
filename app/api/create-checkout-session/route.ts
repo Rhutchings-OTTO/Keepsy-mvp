@@ -103,12 +103,16 @@ export async function POST(req: Request) {
       });
     }
     const body = parsed.data;
+    const currency = body.currency ?? "gbp";
 
     const cart = body.cart;
     const cartSummary = cart.map((item) => {
       const catalogItem = PRODUCT_CATALOG[item.productId];
       if (!catalogItem) return null;
-      if (Math.abs(catalogItem.priceGBP - item.unitPrice) > 0.01) return null;
+      const expectedPrice = currency === "usd"
+        ? (catalogItem.priceUSD ?? catalogItem.priceGBP)
+        : catalogItem.priceGBP;
+      if (Math.abs(expectedPrice - item.unitPrice) > 0.01) return null;
       return {
         ...catalogItem,
         quantity: item.quantity,
@@ -151,7 +155,6 @@ export async function POST(req: Request) {
         { status: 500, headers: JSON_HEADERS }
       );
     }
-    const currency = body.currency ?? "gbp";
     const primaryProductName = safeCartSummary[0]?.name || "Keepsy order";
     const orderRef = `order_${globalThis.crypto.randomUUID()}`;
     const imageDataUrl = body.imageDataUrl ?? safeCartSummary[0]?.imageUrl ?? "";
@@ -232,7 +235,7 @@ export async function POST(req: Request) {
                 description: "Custom AI keepsake print",
                 metadata: meta,
               },
-              unit_amount: Math.round(item.priceGBP * 100),
+              unit_amount: Math.round((currency === "usd" ? (item.priceUSD ?? item.priceGBP) : item.priceGBP) * 100),
             },
             quantity: item.quantity,
           };

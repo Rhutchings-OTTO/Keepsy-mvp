@@ -15,7 +15,8 @@ import { getPrintifyVariantId } from "@/lib/printify-blueprints";
 import { notifyFounders } from "@/lib/notifications";
 import sharp from "sharp";
 import {
-  compositeCardImage,
+  compositePostcardImage,
+  compositeCardpackImage,
   compositeMugImage,
   computeContainScale,
   TEE_PRINT_W,
@@ -338,7 +339,7 @@ async function handleCheckoutCompleted(
         ? ((firstItem.price.product as Stripe.Product).metadata ?? {})
         : {};
 
-    const productId = (productMeta.productId ?? session.metadata?.product_type ?? "card")
+    const productId = (productMeta.productId ?? session.metadata?.product_type ?? "postcard")
       .toLowerCase()
       .replace(/\s+/g, "");
     const size = productMeta.size || undefined;
@@ -355,20 +356,26 @@ async function handleCheckoutCompleted(
 
     // ── Product-specific image preparation ───────────────────────────────────
     //
-    // Card  → white-bordered composite (3000×2102) uploaded as Buffer
-    // Mug   → dual front-face composite (2582×1120) uploaded as Buffer
-    // Tee   → original image, but scale computed dynamically (contain-fit)
-    // Hoodie→ original image, but scale computed dynamically (contain-fit)
-    // Canvas→ cropped image, scale:1.0 full-bleed (already handled above)
-    // Other → original image, default placement
+    // Postcard  → landscape white-bordered composite (1854×1264) uploaded as Buffer
+    // Cardpack  → folded card composite (2409×1819): front cover + inside branding
+    // Mug       → dual front-face composite (2582×1120) uploaded as Buffer
+    // Tee       → original image, scale computed dynamically (contain-fit)
+    // Hoodie    → original image, scale computed dynamically (contain-fit)
+    // Canvas    → cropped image, scale:1.0 full-bleed (already handled above)
+    // Other     → original image, default placement
 
     let printifyImageId: string;
     let scaleOverride: number | undefined;
     const pType = productId.toLowerCase();
 
-    if (pType.includes("card")) {
-      console.log("[printify] Compositing card with white border");
-      const buf = await compositeCardImage(printifySourceUrl);
+    if (pType === "postcard") {
+      console.log("[printify] Compositing fine art postcard with white border (1854×1264)");
+      const buf = await compositePostcardImage(printifySourceUrl);
+      printifyImageId = await uploadImageToPrintify(buf, `keepsy-${orderRef}.png`);
+
+    } else if (pType === "cardpack") {
+      console.log("[printify] Compositing greeting card bundle (2409×1819): front cover + inside branding");
+      const buf = await compositeCardpackImage(printifySourceUrl);
       printifyImageId = await uploadImageToPrintify(buf, `keepsy-${orderRef}.png`);
 
     } else if (pType.includes("mug")) {

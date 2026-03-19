@@ -4,15 +4,18 @@
  * Providers:
  *   1   = SPOKE Custom Products      (US — mugs)
  *   6   = T Shirt and Sons           (UK — mugs, hoodies)
- *   66  = Prima Printing             (US+UK — greeting cards)
  *   99  = Printify Choice            (US — hoodies, t-shirts; UK — t-shirts)
+ *   105 = Jondo                      (UK+US — canvas prints)
+ *   164 = Prodigi                    (UK+US — fine art postcards, BP 842)
+ *   149 = Print Pigeons              (UK+US — greeting card bundles, BP 524)
  *
  * Blueprints:
  *   68   = Generic Brand 11oz Mug (US)
  *   535  = Orca Coatings 11oz White Mug (UK)
  *   77   = Gildan 18000 Unisex Heavy Blend Hooded Sweatshirt
  *   706  = Comfort Colors Unisex Garment-Dyed T-Shirt
- *   962  = Generic Brand Greeting Cards
+ *   842  = Fine Art Postcards (Prodigi) — 6"×4" and 7"×5", landscape, 1854×1264 px print area
+ *   524  = Greeting Cards 7 pcs (Print Pigeons) — folded, 2409×1819 px print area
  */
 
 export type ProductRegionKey =
@@ -22,7 +25,8 @@ export type ProductRegionKey =
   | "hoodie_uk"
   | "tee_us"
   | "tee_uk"
-  | "card"
+  | "postcard"
+  | "cardpack"
   | "canvas";
 
 export type BlueprintConfig = {
@@ -56,17 +60,30 @@ const MUG_UK: BlueprintConfig = {
   fallbackVariantId: 69010,
 };
 
-/* ─── Greeting Cards (BP 962, provider 66) ───────────────────────────────── */
-// Variants: 78429 = Glossy, 78430 = Matte. Default: Glossy.
-const CARD: BlueprintConfig = {
-  blueprintId: 962,
-  printProviderId: 66,
+/* ─── Fine Art Postcard (BP 842, provider 164 — Prodigi) ─────────────────── */
+// Print area: 1854 × 1264 px (landscape). Sizes: 6"×4" and 7"×5".
+// TODO: replace variant IDs with real values from Printify dashboard / API.
+const POSTCARD: BlueprintConfig = {
+  blueprintId: 842,
+  printProviderId: 164,
   printPosition: "front",
   variants: {
-    Glossy: 78429,
-    Matte: 78430,
+    "6x4": 101100, // TODO: replace with actual variant ID
+    "7x5": 101101, // TODO: replace with actual variant ID
   },
-  fallbackVariantId: 78429,
+  fallbackVariantId: 101100, // TODO: replace with actual variant ID
+};
+
+/* ─── Greeting Cards 7 pcs (BP 524, provider 149 — Print Pigeons) ─────────── */
+// Print area: 2409 × 1819 px (landscape flat; portrait when folded).
+// All 7 cards carry the same design. Single variant.
+// TODO: replace variant ID with real value from Printify dashboard / API.
+const CARDPACK: BlueprintConfig = {
+  blueprintId: 524,
+  printProviderId: 149,
+  printPosition: "front",
+  variants: {},
+  fallbackVariantId: 101200, // TODO: replace with actual variant ID
 };
 
 /* ─── Hoodie US (BP 77, provider 99 — Printify Choice) ───────────────────── */
@@ -265,7 +282,8 @@ export const PRINTIFY_BLUEPRINTS: Record<ProductRegionKey, BlueprintConfig> = {
   hoodie_uk: HOODIE_UK,
   tee_us: TEE,
   tee_uk: TEE, // same provider serves both regions for Comfort Colors
-  card: CARD,
+  postcard: POSTCARD,
+  cardpack: CARDPACK,
   canvas: CANVAS,
 };
 
@@ -280,15 +298,16 @@ export function getProductRegionKey(
   region: "US" | "UK"
 ): ProductRegionKey {
   const p = productId.toLowerCase();
-  if (p === "card") return "card";
+  if (p === "postcard") return "postcard";
+  if (p === "cardpack") return "cardpack";
   if (p === "mug") return region === "UK" ? "mug_uk" : "mug_us";
   if (p === "hoodie") return region === "UK" ? "hoodie_uk" : "hoodie_us";
   if (p === "tee") return region === "UK" ? "tee_uk" : "tee_us";
   // canvas_small / canvas_medium / canvas_large / canvas_xlarge all map to one provider
   if (p.startsWith("canvas")) return "canvas";
   // fallback
-  console.error(`[printify] Unknown productId '${productId}' — falling back to card. Add blueprint mapping.`);
-  return "card";
+  console.error(`[printify] Unknown productId '${productId}' — falling back to postcard. Add blueprint mapping.`);
+  return "postcard";
 }
 
 /**

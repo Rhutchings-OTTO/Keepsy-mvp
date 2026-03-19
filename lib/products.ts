@@ -14,6 +14,8 @@ export interface Product {
   hasSize: boolean;
   /** True for the canvas product — uses CanvasSizeSelector instead of apparel sizes */
   hasCanvasSize?: boolean;
+  /** True for the card product — shows a postcard vs. card-pack sub-selector */
+  hasCardSubtype?: boolean;
   sizes?: ApparelSize[];
   colors?: Array<{ hex: string; name: string }>;
 }
@@ -57,10 +59,11 @@ export const PRODUCTS: Record<ProductType, Product> = {
   },
   card: {
     id: "card",
-    name: "Greeting Card",
-    description: "Premium cardstock + envelope.",
-    basePrice: 9.99,
+    name: "Card",
+    description: "Postcard or greeting card pack.",
+    basePrice: 9.99, // smallest subtype price — used only as display fallback
     hasSize: false,
+    hasCardSubtype: true,
   },
   canvas: {
     id: "canvas",

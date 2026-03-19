@@ -492,6 +492,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCT_LIST[2]); // default: card
   const [selectedColor, setSelectedColor] = useState(PRODUCT_LIST[2].colors?.[0]?.hex ?? "#FFFFFF");
   const [selectedSize, setSelectedSize] = useState<ApparelSize | null>(null);
+  // Card sub-type: "postcard" (£9.99) or "cardpack" — Greeting Cards 7 pack (£29.99)
+  const [selectedCardSubtype, setSelectedCardSubtype] = useState<"postcard" | "cardpack">("postcard");
   // Canvas-specific state
   const [selectedCanvasSize, setSelectedCanvasSize] = useState<CanvasSize>(DEFAULT_CANVAS_SIZE);
   const [croppedImageDataUrl, setCroppedImageDataUrl] = useState<string | null>(null);
@@ -520,10 +522,20 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   );
   const hasCartItems = cartItems.length > 0;
   const isCanvasProduct = selectedProduct.id === "canvas";
+  const isCardProduct   = selectedProduct.id === "card";
+
+  // Price for the selected card sub-type (or the canvas size), region-aware
+  const cardSubtypePrice =
+    selectedCardSubtype === "cardpack"
+      ? (region === "US" ? 39.99 : 29.99)
+      : (region === "US" ? 14.99 :  9.99);
+
   const checkoutTotal = hasCartItems
     ? cartSubtotal
     : isCanvasProduct
-    ? selectedCanvasSize.priceGBP
+    ? (region === "US" ? selectedCanvasSize.priceUSD : selectedCanvasSize.priceGBP)
+    : isCardProduct
+    ? cardSubtypePrice
     : selectedProduct.basePrice;
   const checkoutItemDescription = hasCartItems
     ? `${cartCount} item${cartCount === 1 ? "" : "s"}`
@@ -614,6 +626,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       "t-shirt": "tshirt",
       mug: "mug",
       card: "card",
+      postcard: "card",
+      cardpack: "card",
       hoodie: "hoodie",
     };
     const productType = normalizedProduct ? catalogToProduct[normalizedProduct] : null;
@@ -623,6 +637,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setSelectedProduct(mappedProduct);
       setSelectedColor(mappedProduct.colors?.[0]?.hex ?? "#FFFFFF");
     }
+    if (normalizedProduct === "postcard") setSelectedCardSubtype("postcard");
+    if (normalizedProduct === "cardpack") setSelectedCardSubtype("cardpack");
 
     const promptPrefill = initialQuery.prompt?.trim();
     const style = initialQuery.style?.trim();
@@ -824,21 +840,31 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setAddToCartConfirmation(null);
       return;
     }
-    // Canvas uses per-size catalog ID; other products use fixed mapping
-    const catalogId = isCanvasProduct ? selectedCanvasSize.catalogId : getCatalogId(selectedProduct);
+    // Determine catalog ID, price, and name based on product type
+    const isCard = isCardProduct;
+    const catalogId = isCanvasProduct
+      ? selectedCanvasSize.catalogId
+      : isCard
+      ? selectedCardSubtype
+      : getCatalogId(selectedProduct);
     const canvasSizeCode = isCanvasProduct ? selectedCanvasSize.code : undefined;
     const effectivePrice = isCanvasProduct
       ? (region === "US" ? selectedCanvasSize.priceUSD : selectedCanvasSize.priceGBP)
+      : isCard
+      ? cardSubtypePrice
       : selectedProduct.basePrice;
     const effectiveImageUrl = isCanvasProduct ? (croppedImageDataUrl ?? generatedImage) : generatedImage;
+    const itemName = isCanvasProduct
+      ? `Canvas Print (${selectedCanvasSize.width}×${selectedCanvasSize.height} in)`
+      : isCard
+      ? (selectedCardSubtype === "cardpack" ? "Greeting Cards (7 pack)" : "Fine Art Postcard")
+      : selectedProduct.name;
     const variantKey = `${catalogId}-${selectedColor}-${selectedSize ?? canvasSizeCode ?? "na"}-${Date.now()}`;
     const newItem: CartItem = {
       id: `item-${variantKey}`,
       productId: catalogId,
-      name: isCanvasProduct
-        ? `Canvas Print (${selectedCanvasSize.width}×${selectedCanvasSize.height} in)`
-        : selectedProduct.name,
-      color: selectedProduct.colors?.length ? colorName : undefined,
+      name: itemName,
+      color: (!isCard && selectedProduct.colors?.length) ? colorName : undefined,
       size: isCanvasProduct ? canvasSizeCode : (selectedProduct.hasSize ? selectedSize ?? undefined : undefined),
       imageUrl: effectiveImageUrl,
       designUrl: isCanvasProduct ? (croppedImageHttpsUrl ?? createSession.currentDesignUrl ?? undefined) : (createSession.currentDesignUrl ?? undefined),
@@ -903,6 +929,24 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         },
       ];
     }
+    // Card: use the selected sub-type catalog ID and price
+    if (isCardProduct) {
+      const cardName = selectedCardSubtype === "cardpack"
+        ? "Greeting Cards (7 pack)"
+        : "Fine Art Postcard";
+      return [
+        {
+          id: `single-${Date.now()}`,
+          productId: selectedCardSubtype,
+          name: cardName,
+          imageUrl: generatedImage,
+          designUrl: createSession.currentDesignUrl ?? undefined,
+          unitPrice: cardSubtypePrice,
+          quantity: 1,
+        },
+      ];
+    }
+
     if (selectedProduct.hasSize && !selectedSize) return null;
     const catalogId = getCatalogId(selectedProduct);
     const colorName = getColorName(selectedProduct, selectedColor);
@@ -1132,6 +1176,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   }}
                   fileInputRef={fileInputRef}
                   selectedProductType={selectedProduct.id === "canvas" ? "card" : selectedProduct.id as "tshirt" | "mug" | "card" | "hoodie"}
+                  selectedCardSubtype={selectedCardSubtype}
+                  onCardSubtypeSelect={setSelectedCardSubtype}
                 />
               )}
 

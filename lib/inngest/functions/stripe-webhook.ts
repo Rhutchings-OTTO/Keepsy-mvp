@@ -201,7 +201,7 @@ export const stripeWebhookProcess = inngest.createFunction(
             ? ((firstItem.price.product as Stripe.Product).metadata ?? {})
             : {};
 
-        const productId = (productMeta.productId ?? session.metadata?.product_type ?? "card")
+        const productId = (productMeta.productId ?? session.metadata?.product_type ?? "postcard")
           .toLowerCase()
           .replace(/\s+/g, "");
         const size = productMeta.size || undefined;

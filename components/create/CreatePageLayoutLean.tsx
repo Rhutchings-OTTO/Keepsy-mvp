@@ -77,6 +77,8 @@ export type CreatePageLayoutLeanProps = {
   onProductSelect: (type: "tshirt" | "mug" | "card" | "hoodie") => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   selectedProductType?: "tshirt" | "mug" | "card" | "hoodie";
+  selectedCardSubtype?: "postcard" | "cardpack";
+  onCardSubtypeSelect?: (subtype: "postcard" | "cardpack") => void;
 };
 
 const fadeInUp = {
@@ -107,6 +109,8 @@ export function CreatePageLayoutLean({
   onProductSelect,
   fileInputRef,
   selectedProductType,
+  selectedCardSubtype = "postcard",
+  onCardSubtypeSelect,
 }: CreatePageLayoutLeanProps) {
   const [createMode, setCreateMode] = useState<"describe" | "upload">("describe");
   const [pendingReplace, setPendingReplace] = useState<string | null>(null);
@@ -486,6 +490,69 @@ export function CreatePageLayoutLean({
               </motion.button>
             ))}
           </div>
+          {/* Card sub-type selector — shown when the Card product is selected */}
+          <AnimatePresence>
+            {selectedProductType === "card" && onCardSubtypeSelect && (
+              <motion.div
+                key="card-subtype"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2 }}
+                className="mt-4 rounded-xl border border-terracotta/20 bg-terracotta/5 p-4"
+              >
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-charcoal/50">
+                  Choose card type
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {(
+                    [
+                      {
+                        value: "postcard" as const,
+                        label: "Postcard",
+                        priceGBP: "£9.99",
+                        priceUSD: "$14.99",
+                        desc: "Premium fine art postcard on glossy giclée paper",
+                      },
+                      {
+                        value: "cardpack" as const,
+                        label: "Greeting Cards (7 pack)",
+                        priceGBP: "£29.99",
+                        priceUSD: "$39.99",
+                        desc: "7 cards with envelopes, matte finish",
+                      },
+                    ] as const
+                  ).map(({ value, label, priceGBP, priceUSD, desc }) => {
+                    const active = selectedCardSubtype === value;
+                    const price = region === "US" ? priceUSD : priceGBP;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => onCardSubtypeSelect(value)}
+                        className={`rounded-xl border p-3 text-left transition ${
+                          active
+                            ? "border-terracotta bg-terracotta text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
+                            : "border-charcoal/10 bg-white text-charcoal hover:border-terracotta/40"
+                        }`}
+                      >
+                        <p className={`text-sm font-semibold ${active ? "text-white" : "text-charcoal"}`}>
+                          {label}
+                        </p>
+                        <p className={`mt-0.5 text-xs font-medium ${active ? "text-white/80" : "text-terracotta"}`}>
+                          {price}
+                        </p>
+                        <p className={`mt-1 text-xs leading-5 ${active ? "text-white/70" : "text-charcoal/50"}`}>
+                          {desc}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <motion.div
             key={activeProduct.type}
             initial={{ opacity: 0, y: 8 }}

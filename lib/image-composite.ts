@@ -11,21 +11,32 @@ import sharp from "sharp";
 // ── Print area constants (pixels at 300 DPI) ──────────────────────────────────
 
 /**
- * Greeting card print area — landscape sheet that folds in half vertically.
- *
- *   Left half  [0–1500 px]:  inside-left panel (branding)
- *   Right half [1500–3000 px]: front cover (AI image)
- *
- * Content in both halves is rotated 90° CCW so it appears upright once the
- * card is folded and held in portrait orientation.
+ * Fine Art Postcard (Blueprint 842, Prodigi) — landscape, 1854 × 1264 px.
+ * AI image is placed in landscape orientation centred on a white canvas,
+ * contained within 80% of the full dimensions (safe zone).
  */
-const CARD_W      = 3000;
-const CARD_H      = 2102;
-const CARD_HALF_W = CARD_W / 2; // 1500 — width of each panel
+const POSTCARD_W      = 1854;
+const POSTCARD_H      = 1264;
+const POSTCARD_SAFE_W = Math.round(POSTCARD_W * 0.80); // 1483
+const POSTCARD_SAFE_H = Math.round(POSTCARD_H * 0.80); // 1011
 
-/** Front-cover safe zone: 80% of the right half. */
-const COVER_SAFE_W = Math.round(CARD_HALF_W * 0.8); // 1200
-const COVER_SAFE_H = Math.round(CARD_H       * 0.8); // 1682
+/**
+ * Greeting Card Bundle (Blueprint 524, Print Pigeons) — 2409 × 1819 px flat.
+ * The canvas is laid out with the FOLD LINE running vertically down the centre:
+ *
+ *   Left half  [0 – HALF_W):   inside-left panel (branding, portrait)
+ *   Right half [HALF_W – W):   front cover (AI image, portrait)
+ *
+ * Both halves are read top-to-bottom in portrait orientation — NO rotation needed.
+ */
+const CARDPACK_W      = 2409;
+const CARDPACK_H      = 1819;
+const CARDPACK_HALF_W = Math.round(CARDPACK_W / 2); // 1204 — each panel width
+const CARDPACK_PANEL_W = CARDPACK_W - CARDPACK_HALF_W; // 1205
+
+/** Front-cover safe zone: 80% of the right half */
+const COVER_SAFE_W = Math.round(CARDPACK_PANEL_W * 0.80); // 964
+const COVER_SAFE_H = Math.round(CARDPACK_H       * 0.80); // 1455
 
 /** 11 oz mug full-wrap print area */
 const MUG_W = 2582;
@@ -110,76 +121,105 @@ export async function getContainScaleFromUrl(
 }
 
 /**
- * Card: composite the AI image and branding onto a white 3000 × 2102 canvas.
+ * Fine Art Postcard (Blueprint 842, Prodigi): composite AI image onto a white
+ * 1854 × 1264 px landscape canvas with an 80% safe-zone border.
  *
- * The print area is a landscape sheet that folds in half vertically:
- *   • Right half [1500–3000 px] = front cover
- *     - AI image rotated 90° CCW, contain-fitted to 80% of the 1500×2102 panel,
- *       centred in the right half. Appears upright in portrait once folded.
- *   • Left half [0–1500 px] = inside-left panel
- *     - Subtle "made with / Keepsy.store" branding, also rotated 90° CCW.
- *
- * Returns a PNG Buffer for upload to Printify at scale:1.0 / position:0.5,0.5.
+ * The image is placed in landscape orientation (no rotation), centred, with
+ * a white border on all four sides. Upload to Printify at scale:1.0.
  */
-export async function compositeCardImage(imageUrl: string): Promise<Buffer> {
+export async function compositePostcardImage(imageUrl: string): Promise<Buffer> {
   const srcBuf = await fetchBuffer(imageUrl);
 
-  // ── Front cover: rotate 90° CCW then contain-fit within safe zone ────────────
-  const rotated = await sharp(srcBuf).rotate(-90).png().toBuffer();
+  // Contain-fit AI image within the safe zone
+  const resized = await sharp(srcBuf)
+    .resize(POSTCARD_SAFE_W, POSTCARD_SAFE_H, { fit: "inside", withoutEnlargement: false })
+    .png()
+    .toBuffer();
 
-  const resized = await sharp(rotated)
+  const { width: rw = POSTCARD_SAFE_W, height: rh = POSTCARD_SAFE_H } = await sharp(resized).metadata();
+
+  // Centre on full canvas
+  const left = Math.round((POSTCARD_W - rw) / 2);
+  const top  = Math.round((POSTCARD_H - rh) / 2);
+
+  return sharp({
+    create: {
+      width: POSTCARD_W,
+      height: POSTCARD_H,
+      channels: 3,
+      background: { r: 255, g: 255, b: 255 },
+    },
+  })
+    .composite([{ input: resized, left, top }])
+    .png()
+    .toBuffer();
+}
+
+/**
+ * Greeting Card Bundle (Blueprint 524, Print Pigeons): composite AI image and
+ * branding onto a white 2409 × 1819 px canvas (laid flat).
+ *
+ *   Right half [HALF_W – W]: front cover — AI image in portrait orientation,
+ *     contain-fitted to 80% of the 1205 × 1819 panel, centred.
+ *   Left half  [0 – HALF_W]: inside-left — "made with / Keepsy.store" branding,
+ *     centred in portrait orientation (reading top-to-bottom; no rotation needed).
+ *
+ * Both halves face the same direction. Upload to Printify at scale:1.0.
+ */
+export async function compositeCardpackImage(imageUrl: string): Promise<Buffer> {
+  const srcBuf = await fetchBuffer(imageUrl);
+
+  // ── Front cover (right half): contain-fit AI image within safe zone ──────────
+  const resized = await sharp(srcBuf)
     .resize(COVER_SAFE_W, COVER_SAFE_H, { fit: "inside", withoutEnlargement: false })
     .png()
     .toBuffer();
 
   const { width: rw = COVER_SAFE_W, height: rh = COVER_SAFE_H } = await sharp(resized).metadata();
 
-  // Centre within the right half (x: CARD_HALF_W → CARD_W, y: 0 → CARD_H)
-  const imageLeft = CARD_HALF_W + Math.round((CARD_HALF_W - rw) / 2);
-  const imageTop  = Math.round((CARD_H - rh) / 2);
+  // Centre within the right half
+  const imageLeft = CARDPACK_HALF_W + Math.round((CARDPACK_PANEL_W - rw) / 2);
+  const imageTop  = Math.round((CARDPACK_H - rh) / 2);
 
-  // ── Inside-left panel: branding SVG rotated 90° CCW ──────────────────────────
-  // "Georgia, serif" is used for Keepsy (serif brand font, reliable in librsvg).
-  // "Arial, sans-serif" for body text (matches site sans-serif).
-  const FONT_BODY  = 42;  // "made with" and ".store" (~10pt at 300 DPI)
-  const FONT_BRAND = 52;  // "Keepsy" — ~24% larger (~12.5pt at 300 DPI)
+  // ── Inside-left panel: "made with / Keepsy.store" branding ───────────────────
+  // Portrait orientation — no rotation. Text is centred in the left panel.
+  // "Georgia, serif" approximates the site's Fraunces serif; "Arial" for body text.
+  const FONT_BODY  = 42;  // "made with" and ".store"
+  const FONT_BRAND = 52;  // "Keepsy" — ~24% larger
   const TEXT_COLOR = "#AAAAAA";
-  const cx = CARD_HALF_W / 2; // 750 — horizontal centre of left half
-  const cy = CARD_H / 2;      // 1051 — vertical centre
+  const cx = Math.round(CARDPACK_HALF_W / 2); // horizontal centre of left half
+  const cy = Math.round(CARDPACK_H / 2);       // vertical centre
 
-  // Both lines centred around the rotated origin; baselines spaced ~90 px apart.
-  // After 90° CCW rotation these y-offsets become the x-spread, so spacing looks
-  // like comfortable leading when the card is held upright.
   const brandingSvg = Buffer.from(
-    `<svg width="${CARD_HALF_W}" height="${CARD_H}" xmlns="http://www.w3.org/2000/svg">
-      <g transform="translate(${cx},${cy}) rotate(-90)">
-        <text x="0" y="-45"
-          text-anchor="middle"
+    `<svg width="${CARDPACK_HALF_W}" height="${CARDPACK_H}" xmlns="http://www.w3.org/2000/svg">
+      <text
+        x="${cx}" y="${cy - 32}"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="${FONT_BODY}"
+        font-weight="400"
+        letter-spacing="3"
+        fill="${TEXT_COLOR}"
+      >made with</text>
+      <text
+        x="${cx}" y="${cy + 36}"
+        text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="${FONT_BRAND}"
+        font-weight="700"
+        fill="${TEXT_COLOR}"
+      >Keepsy<tspan
           font-family="Arial, Helvetica, sans-serif"
           font-size="${FONT_BODY}"
           font-weight="400"
-          letter-spacing="3"
-          fill="${TEXT_COLOR}"
-        >made with</text>
-        <text x="0" y="47"
-          text-anchor="middle"
-          font-family="Georgia, 'Times New Roman', serif"
-          font-size="${FONT_BRAND}"
-          font-weight="700"
-          fill="${TEXT_COLOR}"
-        >Keepsy<tspan
-            font-family="Arial, Helvetica, sans-serif"
-            font-size="${FONT_BODY}"
-            font-weight="400"
-          >.store</tspan></text>
-      </g>
+        >.store</tspan></text>
     </svg>`
   );
 
   return sharp({
     create: {
-      width: CARD_W,
-      height: CARD_H,
+      width: CARDPACK_W,
+      height: CARDPACK_H,
       channels: 3,
       background: { r: 255, g: 255, b: 255 },
     },

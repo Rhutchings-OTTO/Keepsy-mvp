@@ -1349,7 +1349,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           >
                             <div className="text-sm font-extrabold text-charcoal">{prod.name}</div>
                             <div className="text-xs mt-1 text-charcoal/55">
-                                {fmt(prod.basePrice)}
+                              {prod.id === "card" && selectedProduct.id === "card"
+                                ? fmt(cardSubtypePrice)
+                                : prod.id === "card"
+                                ? (region === "US" ? "from $14.99" : "from £9.99")
+                                : fmt(prod.basePrice)}
                             </div>
                           </motion.button>
                         ))}
@@ -1448,11 +1452,64 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         </section>
                       )}
 
+                      {/* Card sub-type selector */}
+                      {isCardProduct && (
+                        <section>
+                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">Card Type</h3>
+                          <div className="grid grid-cols-2 gap-3">
+                            {(
+                              [
+                                {
+                                  value: "postcard" as const,
+                                  label: "Postcard",
+                                  subtitle: "Single fine art postcard, glossy giclée paper",
+                                  priceGBP: "£9.99",
+                                  priceUSD: "$14.99",
+                                },
+                                {
+                                  value: "cardpack" as const,
+                                  label: "Greeting Card Pack",
+                                  subtitle: "7 cards with envelopes, matte finish",
+                                  priceGBP: "£29.99",
+                                  priceUSD: "$39.99",
+                                },
+                              ] as const
+                            ).map(({ value, label, subtitle, priceGBP, priceUSD }) => {
+                              const active = selectedCardSubtype === value;
+                              const price = region === "US" ? priceUSD : priceGBP;
+                              return (
+                                <motion.button
+                                  key={value}
+                                  type="button"
+                                  whileHover={{ y: -1 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  onClick={() => setSelectedCardSubtype(value)}
+                                  className={`rounded-xl border-2 p-3 text-left transition-all ${
+                                    active
+                                      ? "bg-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
+                                      : "border-charcoal/10 bg-[#F5EDE0]"
+                                  }`}
+                                  style={active ? { borderColor: "var(--color-terracotta)" } : undefined}
+                                >
+                                  <p className="text-sm font-extrabold text-charcoal">{label}</p>
+                                  <p className="mt-0.5 text-xs font-semibold" style={{ color: "var(--color-terracotta)" }}>{price}</p>
+                                  <p className="mt-1 text-xs leading-4 text-charcoal/50">{subtitle}</p>
+                                </motion.button>
+                              );
+                            })}
+                          </div>
+                        </section>
+                      )}
+
                       <section className="border-t border-charcoal/10 pt-4">
                         <div className="flex justify-between items-center mb-4">
                           <span className="text-charcoal/55 font-semibold">Subtotal</span>
                           <span className="text-2xl font-black">
-                            {fmt(isCanvasProduct ? selectedCanvasSize.priceGBP : selectedProduct.basePrice)}
+                            {fmt(isCanvasProduct
+                              ? (region === "US" ? selectedCanvasSize.priceUSD : selectedCanvasSize.priceGBP)
+                              : isCardProduct
+                              ? cardSubtypePrice
+                              : selectedProduct.basePrice)}
                           </span>
                         </div>
                         {FF.giftingFlow && generatedImage ? (

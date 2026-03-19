@@ -57,6 +57,7 @@ import {
   type ApparelSize,
 } from "@/lib/products";
 import { CanvasMockup } from "@/components/canvas/CanvasMockup";
+import { GreetingCardMockup } from "@/components/mockups/GreetingCardMockup";
 import { CanvasSizeSelector } from "@/components/canvas/CanvasSizeSelector";
 import { CanvasCropTool } from "@/components/canvas/CanvasCropTool";
 import {
@@ -1257,6 +1258,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               aspectRatio={selectedCanvasSize.width / selectedCanvasSize.height}
                               imageSrc={croppedImageDataUrl ?? generatedImage}
                             />
+                          </motion.div>
+                        ) : isCardProduct && selectedCardSubtype === "cardpack" ? (
+                          <motion.div
+                            key={`cardpack-${generatedImage ?? "empty"}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                          >
+                            <GreetingCardMockup imageSrc={generatedImage} />
                           </motion.div>
                         ) : (
                           <motion.div

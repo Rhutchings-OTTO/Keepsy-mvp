@@ -229,10 +229,10 @@ export function SiteFooter() {
         >
           <div className={CONTAINER}>
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-              <TrustBadge icon="✦" label="Premium Quality" />
-              <TrustBadge icon="↩" label="30-Day Returns" />
+              <TrustBadge icon="⭐" label="Premium Quality" />
+              <TrustBadge icon="↩️" label="30-Day Returns" />
               <TrustBadge icon="⚡" label="Fast Delivery" />
-              <TrustBadge icon="✈" label="US & UK Shipping" />
+              <TrustBadge icon="✈️" label="US & UK Shipping" />
             </div>
           </div>
         </div>

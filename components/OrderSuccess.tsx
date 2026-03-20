@@ -162,6 +162,15 @@ export function OrderSuccess({ productName, designUrl, orderRef }: OrderSuccessP
               Order ref: {orderRef}
             </motion.p>
           )}
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.15 }}
+            className="mt-6 text-xs text-white/35 max-w-xs mx-auto leading-6"
+          >
+            We&apos;ll send you order updates by email — if you don&apos;t see them, have a quick peek in your junk or spam folder. We promise it&apos;s us, not junk!
+          </motion.p>
         </div>
       </section>
 

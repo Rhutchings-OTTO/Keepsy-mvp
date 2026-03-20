@@ -134,6 +134,11 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
                 Your order is being prepared and will be on its way soon.
               </p>
             )}
+            {!isFailed && (
+              <p className="pt-1 text-xs" style={{ color: "rgba(45,41,38,0.42)" }}>
+                We&apos;ll send you order updates by email — if you don&apos;t see them, have a quick peek in your junk or spam folder. We promise it&apos;s us, not junk!
+              </p>
+            )}
           </div>
 
           {/* Total */}

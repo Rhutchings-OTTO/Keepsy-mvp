@@ -393,7 +393,8 @@ async function handleCheckoutCompleted(
       const imgBuf = Buffer.from(await res.arrayBuffer());
       const { width, height } = await sharp(imgBuf).metadata();
       if (width && height) {
-        scaleOverride = computeContainScale(width, height, TEE_PRINT_W, TEE_PRINT_H);
+        // Multiply by 0.8 so the printed image is 20% smaller, matching the mockup reduction.
+        scaleOverride = computeContainScale(width, height, TEE_PRINT_W, TEE_PRINT_H) * 0.8;
         console.log(`[printify] Tee contain scale: ${scaleOverride} (image ${width}×${height})`);
       }
       printifyImageId = await uploadImageToPrintify(imgBuf, `keepsy-${orderRef}.png`);

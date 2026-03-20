@@ -10,8 +10,8 @@
         "rect": {
           "xPct": 50,
           "yPct": 45,
-          "wPct": 21,
-          "hPct": 44,
+          "wPct": 16.8,
+          "hPct": 35.2,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         }
@@ -27,8 +27,8 @@
         "rect": {
           "xPct": 50,
           "yPct": 45,
-          "wPct": 21,
-          "hPct": 44,
+          "wPct": 16.8,
+          "hPct": 35.2,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         }
@@ -44,8 +44,8 @@
         "rect": {
           "xPct": 50,
           "yPct": 45,
-          "wPct": 21,
-          "hPct": 44,
+          "wPct": 16.8,
+          "hPct": 35.2,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         }
@@ -115,7 +115,7 @@
         "kind": "rect",
         "rect": {
           "xPct": 46.9,
-          "yPct": 53,
+          "yPct": 50,
           "wPct": 28,
           "hPct": 50,
           "rotateDeg": 0,

@@ -35,7 +35,7 @@ export function TrustSection() {
           className="text-center"
         >
           <h2 className="font-serif text-2xl font-bold tracking-[-0.03em] text-charcoal sm:text-4xl">
-            Why Thousands Choose Keepsy
+            Why Hundreds Choose Keepsy
           </h2>
         </motion.div>
 

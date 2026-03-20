@@ -106,7 +106,7 @@ function OriginStory() {
               Something she'd actually love.
             </p>
             <p>
-              Today, Keepsy has helped thousands of families turn their most
+              Today, Keepsy has helped hundreds of families turn their most
               cherished moments into keepsakes. Every mug, every card, every
               hoodie starts the same way: with a memory that deserved to be
               kept.
@@ -269,7 +269,7 @@ function ValuesSection() {
 /* ─── 5. By the Numbers ────────────────────────────────────────────────── */
 
 const STATS = [
-  { value: "Thousands", label: "Happy Customers" },
+  { value: "Hundreds", label: "Happy Customers" },
   { value: "98%", label: "Satisfaction Rate" },
   { value: "2 Countries", label: "US & UK Delivery" },
   { value: "0 Waste", label: "Print on Demand" },
@@ -418,7 +418,7 @@ function CTASection() {
             Ready to Create Something Beautiful?
           </h2>
           <p className="mb-10 text-base" style={{ color: "rgba(253,246,238,0.8)" }}>
-            Join thousands of families who've turned their favourite memories into
+            Join hundreds of families who've turned their favourite memories into
             keepsakes.
           </p>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

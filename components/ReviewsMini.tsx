@@ -3,12 +3,12 @@
 import { Star } from "lucide-react";
 
 const REVIEWS = [
-  { name: "Amelia", quote: "The print quality felt premium and personal." },
-  { name: "Noah", quote: "Super easy to create, and the mockup looked spot on." },
+  { name: "Clara", quote: "The print quality felt premium and personal." },
+  { name: "James", quote: "Super easy to create, and the mockup looked spot on." },
   { name: "Grace", quote: "Perfect last-minute gift idea that still felt thoughtful." },
   { name: "Leo", quote: "Simple flow and beautiful output from my prompt." },
   { name: "Maya", quote: "Loved how quickly I could preview different products." },
-  { name: "Ethan", quote: "Checkout felt safe and straightforward." },
+  { name: "Daniel", quote: "Checkout felt safe and straightforward." },
 ];
 
 export default function ReviewsMini() {

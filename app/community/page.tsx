@@ -7,14 +7,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Customer Reviews — Keepsy Personalised Gifts",
   description:
-    "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from thousands of happy customers.",
+    "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from hundreds of happy customers.",
   alternates: {
     canonical: "https://keepsy.store/community",
   },
   openGraph: {
     title: "Customer Reviews — Keepsy Personalised Gifts",
     description:
-      "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from thousands of happy customers.",
+      "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from hundreds of happy customers.",
     type: "website",
     url: "https://keepsy.store/community",
   },
@@ -22,24 +22,24 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Customer Reviews — Keepsy Personalised Gifts",
     description:
-      "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from thousands of happy customers.",
+      "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from hundreds of happy customers.",
   },
 };
 
 const PULL_QUOTES = [
   {
     quote: "She cried. Genuinely the most personal gift I've ever given.",
-    name: "Amelia R.",
+    name: "Fiona R.",
     occasion: "Birthday Card",
   },
   {
     quote: "Our dog is on a mug. That's it. That's the review.",
-    name: "Noah T.",
+    name: "Marcus T.",
     occasion: "Pet Portrait Mug",
   },
   {
     quote: "Ordered Thursday, arrived Saturday. Beautiful quality too.",
-    name: "Sophie M.",
+    name: "Becky M.",
     occasion: "Anniversary Print",
   },
 ];

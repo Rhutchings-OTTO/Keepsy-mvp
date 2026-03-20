@@ -326,7 +326,7 @@ export function CatalogClient() {
                 <p className="text-sm text-white/55">Products</p>
               </div>
               <div>
-                <p className="font-serif text-2xl font-bold text-white">Thousands</p>
+                <p className="font-serif text-2xl font-bold text-white">Hundreds</p>
                 <p className="text-sm text-white/55">of Reviews</p>
               </div>
             </motion.div>

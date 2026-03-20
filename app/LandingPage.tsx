@@ -82,7 +82,7 @@ const PRODUCT_IMAGES = [
 ];
 
 const SOCIAL_PROOF_ITEMS = [
-  "★★★★★  Thousands of Happy Customers",
+  "★★★★★  Hundreds of Happy Customers",
   "🚀  Free Fast Shipping",
   "🌍  Made & Shipped with Love",
   "↩️  30-Day Returns",
@@ -414,7 +414,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     {/* Social proof under headline */}
                     <div className="mt-6 flex items-center gap-2">
                       <span className="text-sm" style={{ color: "var(--color-gold)" }}>★★★★★</span>
-                      <span className="text-sm text-charcoal/55">Thousands of happy customers</span>
+                      <span className="text-sm text-charcoal/55">Hundreds of happy customers</span>
                     </div>
 
                     <p className="mt-4 max-w-sm text-base leading-7 text-charcoal/65 sm:mt-6 sm:leading-8">

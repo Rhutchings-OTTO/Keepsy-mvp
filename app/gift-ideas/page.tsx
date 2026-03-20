@@ -62,7 +62,7 @@ export default function GiftIdeasPage() {
             <Reveal variant="fadeUp" delay={0.15}>
               <div className="flex gap-8 lg:flex-col lg:text-right">
                 {[
-                  { value: "Thousands", label: "Happy customers" },
+                  { value: "Hundreds", label: "Happy customers" },
                   { value: "★★★★★", label: "Top rated" },
                 ].map((stat) => (
                   <div key={stat.label}>

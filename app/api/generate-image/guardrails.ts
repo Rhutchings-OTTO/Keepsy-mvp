@@ -38,7 +38,7 @@ async function getUserTierFromDb(clientKey: string, fallbackTier: UserTier): Pro
   return data?.tier === "paid" ? "paid" : fallbackTier;
 }
 
-function enforceUsageGuardsMemory(clientKey: string, tier: UserTier): GuardResult {
+function checkRequestAllowedMemory(clientKey: string, tier: UserTier): GuardResult {
   const now = Date.now();
   const dayKey = new Date().toISOString().slice(0, 10);
   const current = usageByKey.get(clientKey);
@@ -58,21 +58,30 @@ function enforceUsageGuardsMemory(clientKey: string, tier: UserTier): GuardResul
     return { ok: false, status: 429, error: `Daily generation limit reached. You've used your ${DAILY_CAP[tier]} free designs for today. Come back tomorrow or purchase a design to continue.` };
   }
 
+  // Update cooldown timestamp only — usedToday increments on success
   usage.lastRequestAtMs = now;
-  usage.usedToday += 1;
   usageByKey.set(clientKey, usage);
   return { ok: true, tier };
 }
 
-async function enforceUsageGuardsSupabase(clientKey: string, fallbackTier: UserTier): Promise<GuardResult> {
+function incrementUsedTodayMemory(clientKey: string): void {
+  const dayKey = new Date().toISOString().slice(0, 10);
+  const usage = usageByKey.get(clientKey);
+  if (usage && usage.dayKey === dayKey) {
+    usage.usedToday += 1;
+    usageByKey.set(clientKey, usage);
+  }
+}
+
+async function checkRequestAllowedSupabase(clientKey: string, fallbackTier: UserTier): Promise<GuardResult> {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     const tier = fallbackTier;
-    return enforceUsageGuardsMemory(clientKey, tier);
+    return checkRequestAllowedMemory(clientKey, tier);
   }
 
   const tier = await getUserTierFromDb(clientKey, fallbackTier);
-  const { data, error } = await supabase.rpc("check_and_increment_usage", {
+  const { data, error } = await supabase.rpc("check_request_allowed", {
     p_user_key: clientKey,
     p_tier: tier,
     p_min_interval_ms: MIN_INTERVAL_MS,
@@ -80,7 +89,7 @@ async function enforceUsageGuardsSupabase(clientKey: string, fallbackTier: UserT
   });
 
   if (error || !data || data.length === 0) {
-    return enforceUsageGuardsMemory(clientKey, tier);
+    return checkRequestAllowedMemory(clientKey, tier);
   }
 
   const row = data[0] as { allowed: boolean; error: string | null };
@@ -93,9 +102,27 @@ async function enforceUsageGuardsSupabase(clientKey: string, fallbackTier: UserT
   return { ok: true, tier };
 }
 
-export async function enforceUsageGuards(req: Request): Promise<GuardResult> {
+async function incrementUsedTodaySupabase(clientKey: string): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
+    incrementUsedTodayMemory(clientKey);
+    return;
+  }
+  const { error } = await supabase.rpc("increment_used_today", { p_user_key: clientKey });
+  if (error) {
+    // Fall back to in-memory increment so we don't silently drop the count
+    incrementUsedTodayMemory(clientKey);
+  }
+}
+
+export async function checkRequestAllowed(req: Request): Promise<GuardResult> {
   const clientKey = getClientKey(req);
-  return enforceUsageGuardsSupabase(clientKey, "free");
+  return checkRequestAllowedSupabase(clientKey, "free");
+}
+
+export async function incrementUsedToday(req: Request): Promise<void> {
+  const clientKey = getClientKey(req);
+  await incrementUsedTodaySupabase(clientKey);
 }
 
 export function sanitizePrompt(input: string): { ok: true; prompt: string } | { ok: false; error: string } {

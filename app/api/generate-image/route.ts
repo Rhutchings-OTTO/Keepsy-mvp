@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { sha256Hex } from "@/lib/crypto/sha256";
 import {
-  enforceUsageGuards,
+  checkRequestAllowed,
+  incrementUsedToday,
   getClientKey,
 } from "./guardrails";
 import { baselineGenerate, minimalSanitize } from "@/lib/gen/baselineGenerate";
@@ -129,7 +130,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing OPENAI_API_KEY" }, { status: 500 });
     }
     if (!body.isRefinement) {
-      const usageCheck = await enforceUsageGuards(req);
+      const usageCheck = await checkRequestAllowed(req);
       if (!usageCheck.ok) {
         return NextResponse.json({ error: usageCheck.error }, { status: usageCheck.status });
       }
@@ -151,6 +152,9 @@ export async function POST(req: Request) {
       recordGenerationMetric("cacheHits", 1);
       recordGenerationMetric("totalSuccess", 1);
       recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
+      if (!body.isRefinement) {
+        await incrementUsedToday(req);
+      }
       return NextResponse.json(
         {
           ok: true,
@@ -182,6 +186,9 @@ export async function POST(req: Request) {
       recordGenerationMetric("dedupedHits", 1);
       recordGenerationMetric("totalSuccess", 1);
       recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
+      if (!body.isRefinement) {
+        await incrementUsedToday(req);
+      }
       return NextResponse.json(
         {
           ok: true,
@@ -262,6 +269,9 @@ export async function POST(req: Request) {
 
     recordGenerationMetric("totalSuccess", 1);
     recordGenerationMetric("lastLatencyMs", Date.now() - startedAt);
+    if (!body.isRefinement) {
+      await incrementUsedToday(req);
+    }
     if (!genResult.designUrl) {
       console.error("[generate] Cloudinary upload failed — designUrl is empty. Printify fulfillment will be skipped for this order.");
     }

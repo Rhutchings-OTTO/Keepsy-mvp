@@ -6,7 +6,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
-  enforceUsageGuards,
+  checkRequestAllowed,
+  incrementUsedToday,
   getClientKey,
 } from "@/app/api/generate-image/guardrails";
 import { baselineGenerate, minimalSanitize } from "@/lib/gen/baselineGenerate";
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const usageCheck = await enforceUsageGuards(req);
+    const usageCheck = await checkRequestAllowed(req);
     if (!usageCheck.ok) {
       return NextResponse.json(
         { error: usageCheck.error },
@@ -102,6 +103,7 @@ export async function POST(req: Request) {
       );
     }
 
+    await incrementUsedToday(req);
     return NextResponse.json(
       {
         ok: true,

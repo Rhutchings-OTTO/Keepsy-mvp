@@ -3,6 +3,7 @@ import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/SiteChrome";
 import { AtelierModeProvider } from "@/context/AtelierModeContext";
+import { ScrollRestoreToTop } from "@/components/ScrollRestoreToTop";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -163,6 +164,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased font-sans">
         <AtelierModeProvider>
+          <ScrollRestoreToTop />
           <SiteChrome>{children}</SiteChrome>
         </AtelierModeProvider>
       </body>

@@ -449,10 +449,19 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const scrollToTop = useCallback(() => {
     if (lenis) {
       lenis.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo(0, 0);
     }
+    // Always reset natively too — covers iOS Safari and any non-Lenis path.
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, [lenis]);
+
+  // Scroll to top on every step transition — covers back buttons, forward
+  // steps, and any path that calls setStep() without calling scrollToTop().
+  useEffect(() => {
+    scrollToTop();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   const [prompt, setPromptState] = useState<string>("");
 
@@ -563,6 +572,15 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       generateAbortRef.current?.abort();
       generateAbortRef.current = null;
     };
+  }, []);
+
+  // Disable browser scroll restoration for this SPA — we control scroll position.
+  useEffect(() => {
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    // Ensure we start at the top on mount (belt-and-suspenders for iOS Safari).
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, []);
 
   useEffect(() => {

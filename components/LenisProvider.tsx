@@ -4,11 +4,14 @@ import React, { type PropsWithChildren } from "react";
 import { ReactLenis } from "lenis/react";
 import "lenis/dist/lenis.css";
 
-/** Ease-out-back: overshoots past 1 then settles – gives bounce when scroll stops */
-function easeOutBack(t: number): number {
-  const c1 = 1.70158;
-  const c3 = c1 + 1;
-  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+/**
+ * Ease-out-quart: smooth deceleration that stays strictly within [0, 1].
+ * Replaced easeOutBack (which overshoots past 1) because the overshoot was
+ * causing Lenis to briefly scroll to a negative position on iOS Safari,
+ * which manifested as the page loading scrolled to the bottom.
+ */
+function easeOutQuart(t: number): number {
+  return 1 - Math.pow(1 - t, 4);
 }
 
 /** Respect prefers-reduced-motion: disable smooth scroll for users who request it */
@@ -28,7 +31,7 @@ export function LenisProvider({ children }: PropsWithChildren) {
       options={{
         autoRaf: true,
         duration: reduced ? 0 : 1.2,
-        easing: easeOutBack,
+        easing: easeOutQuart,
         lerp: undefined,
         wheelMultiplier: 1,
         touchMultiplier: reduced ? 0 : 1.2,

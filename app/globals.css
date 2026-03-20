@@ -49,7 +49,9 @@ body.atelier-transitioning {
   transition: background-color 2s ease-out, color 2s ease-out;
 }
 
-html { scroll-behavior: smooth; }
+/* Use 'auto' (instant) scroll globally — programmatic scrollToTop must not animate.
+   Individual smooth-scroll elements opt in via Tailwind's scroll-smooth class. */
+html { scroll-behavior: auto; }
 
 ::selection {
   background: var(--color-terracotta);

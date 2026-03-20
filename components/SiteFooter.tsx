@@ -194,7 +194,7 @@ export function SiteFooter() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="your@email.com"
                       required
-                      className="flex-1 rounded-lg border px-4 py-3 text-sm outline-none transition focus:ring-2"
+                      className="flex-1 rounded-lg border px-4 py-3 text-sm outline-none transition focus:ring-2 placeholder:text-white/50"
                       style={{
                         backgroundColor: "rgba(255,255,255,0.08)",
                         borderColor: BORDER_COLOR,

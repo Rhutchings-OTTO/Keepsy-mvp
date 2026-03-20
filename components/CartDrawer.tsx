@@ -149,7 +149,7 @@ function CartItemRow({
         {/* Qty + remove */}
         <div className="mt-1.5 flex items-center justify-between">
           <div
-            className="flex items-center gap-0.5 rounded-lg border border-charcoal/12"
+            className="flex items-center gap-0.5 rounded-lg border border-charcoal/20"
             style={{ backgroundColor: "var(--color-cream)" }}
           >
             <button
@@ -444,16 +444,16 @@ export function CartDrawer() {
                 </div>
 
                 {/* ── Totals ── */}
-                <div className="border-t border-charcoal/8 px-6 pb-2 pt-4 space-y-2">
-                  <div className="flex items-center justify-between text-sm text-charcoal/60">
+                <div className="border-t-2 border-charcoal/12 bg-[#FDFAF6] px-6 pb-2 pt-4 space-y-2">
+                  <div className="flex items-center justify-between text-sm text-charcoal/75">
                     <span>Subtotal</span>
                     <span className="font-semibold text-charcoal">
                       £{subtotal.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-charcoal/60">
+                  <div className="flex items-center justify-between text-sm text-charcoal/75">
                     <span>Shipping</span>
-                    <span className="font-medium">
+                    <span className="font-medium text-charcoal/75">
                       {shippingFree ? (
                         <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free</span>
                       ) : (
@@ -461,21 +461,21 @@ export function CartDrawer() {
                       )}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between border-t border-charcoal/8 pt-3 text-base font-bold text-charcoal">
+                  <div className="flex items-center justify-between border-t border-charcoal/15 pt-3 text-base font-bold text-charcoal">
                     <span>Total</span>
                     <span>£{subtotal.toFixed(2)}</span>
                   </div>
                 </div>
 
                 {/* ── Delivery estimate ── */}
-                <div className="px-6 pb-1">
+                <div className="bg-[#FDFAF6] px-6 pb-1">
                   <p className="text-center text-[11px] text-charcoal/40 leading-relaxed">
                     Estimated delivery: {delivery.from} – {delivery.to}
                   </p>
                 </div>
 
                 {/* ── Checkout CTA ── */}
-                <div className="px-6 pb-6 pt-3">
+                <div className="bg-[#FDFAF6] px-6 pb-6 pt-3">
                   {checkoutError && (
                     <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
                       {checkoutError}

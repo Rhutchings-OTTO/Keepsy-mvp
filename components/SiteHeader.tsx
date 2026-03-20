@@ -279,7 +279,7 @@ export function SiteHeader() {
                   href={href}
                   className={`min-h-9 rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 ${
                     active
-                      ? "bg-charcoal text-white"
+                      ? "ring-2 ring-charcoal text-charcoal font-semibold"
                       : "text-charcoal/60 hover:text-charcoal"
                   }`}
                   data-active-nav={active ? "true" : undefined}

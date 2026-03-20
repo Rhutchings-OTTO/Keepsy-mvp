@@ -586,7 +586,7 @@ export function CreatePageLayoutLean({
         </div>
       </motion.section>
 
-      <motion.section variants={fadeInUp} className="rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-6">
+      <motion.section variants={fadeInUp} className="hidden md:block rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-6">
         <div className="flex flex-col gap-2 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Customer feedback</p>
           <h2 className="font-serif text-3xl tracking-[-0.03em] text-charcoal">Designed to feel reassuring, not confusing.</h2>

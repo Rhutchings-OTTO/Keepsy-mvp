@@ -1252,10 +1252,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       }}
                       className="self-start shrink-0"
                     />
-                    <div className="flex-1 min-w-0">
-                      <div className="rounded-2xl bg-white border border-charcoal/8 p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
+                    <div className="w-[68%] mx-auto min-w-0 md:w-auto md:mx-0 md:flex-1">
+                      <div className="rounded-2xl bg-[#FAF9F7] border border-charcoal/8 p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                         {/* Canvas: show crop tool or canvas mockup */}
+                        <AnimatePresence mode="sync" initial={false}>
                         {isCanvasProduct && isCropping && generatedImage ? (
+                          <motion.div
+                            key="crop-tool"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.18 }}
+                          >
                           <CanvasCropTool
                             imageSrc={generatedImage}
                             canvasSize={selectedCanvasSize}
@@ -1266,11 +1274,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             }}
                             onCancel={() => setIsCropping(false)}
                           />
+                          </motion.div>
                         ) : isCanvasProduct ? (
                           <motion.div
                             key={`canvas-${selectedCanvasSize.code}-${croppedImageDataUrl ?? "nocrop"}`}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.18 }}
                           >
                             <CanvasMockup
                               aspectRatio={selectedCanvasSize.width / selectedCanvasSize.height}
@@ -1282,6 +1293,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             key={`cardpack-${generatedImage ?? "empty"}`}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.18 }}
                           >
                             <GreetingCardMockup imageSrc={generatedImage} />
                           </motion.div>
@@ -1290,6 +1303,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             key={generatedImage ?? "empty-reveal"}
                             initial={FF.dynamicReveal ? "initial" : false}
                             animate={FF.dynamicReveal ? "animate" : false}
+                            exit={{ opacity: 0 }}
                             variants={FF.dynamicReveal ? softScaleIn : undefined}
                             transition={motionTransition("slow")}
                           >
@@ -1301,6 +1315,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             />
                           </motion.div>
                         )}
+                        </AnimatePresence>
                         {selectedProduct.id === "mug" && (
                           <p className="mt-2 text-center text-[11px] text-charcoal/45">
                             Your design will appear on both sides of the mug

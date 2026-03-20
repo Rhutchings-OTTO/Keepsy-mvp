@@ -713,7 +713,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     viewport={{ once: true, amount: 0.3 }}
                     transition={{ duration: 0.55, ease: "easeOut" }}
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/75">
                       Join the Keepsy Family
                     </p>
                     <h2 className="mt-3 text-balance font-serif text-3xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
@@ -760,7 +760,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                               onChange={(e) => setEmailValue(e.target.value)}
                               placeholder="Your email address"
                               aria-label="Email address for 10% discount"
-                              className="flex-1 rounded-xl border-0 bg-white/10 px-5 py-3.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                              className="flex-1 rounded-xl border-0 bg-white/10 px-5 py-3.5 text-white placeholder-white/65 focus:outline-none focus:ring-2 focus:ring-white/30"
                             />
                             <button
                               type="submit"
@@ -794,10 +794,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               {/* Brand info — always visible */}
               <div className="mb-6 sm:mb-0">
                 <p className="font-serif text-2xl font-bold text-white">Keepsy</p>
-                <p className="mt-2 text-sm text-white/50">
+                <p className="mt-2 text-sm text-white/80">
                   Beautiful personalised gifts, made simple.
                 </p>
-                <p className="mt-3 text-xs text-white/35">
+                <p className="mt-3 text-xs text-white/65">
                   🇬🇧 UK &amp; 🇺🇸 US shipping · Made with care
                 </p>
               </div>
@@ -811,7 +811,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     onClick={() => setFooterShopOpen(!footerShopOpen)}
                     className="flex w-full items-center justify-between sm:pointer-events-none"
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/60">Shop</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/90">Shop</p>
                     <span className="text-white/40 sm:hidden">{footerShopOpen ? "−" : "+"}</span>
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerShopOpen ? "flex" : "hidden"} sm:flex`}>
@@ -820,7 +820,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/gift-ideas", label: "Gift Ideas" },
                       { href: "/create", label: "Design a Gift" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/75 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm text-white/90 transition hover:text-white">
                         {label}
                       </Link>
                     ))}
@@ -833,7 +833,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     onClick={() => setFooterCompanyOpen(!footerCompanyOpen)}
                     className="flex w-full items-center justify-between sm:pointer-events-none"
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/60">Company</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/90">Company</p>
                     <span className="text-white/40 sm:hidden">{footerCompanyOpen ? "−" : "+"}</span>
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerCompanyOpen ? "flex" : "hidden"} sm:flex`}>
@@ -842,7 +842,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/terms", label: "Terms" },
                       { href: "/privacy", label: "Privacy" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/75 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm text-white/90 transition hover:text-white">
                         {label}
                       </Link>
                     ))}
@@ -855,7 +855,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     onClick={() => setFooterHelpOpen(!footerHelpOpen)}
                     className="flex w-full items-center justify-between sm:pointer-events-none"
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/60">Help</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/90">Help</p>
                     <span className="text-white/40 sm:hidden">{footerHelpOpen ? "−" : "+"}</span>
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerHelpOpen ? "flex" : "hidden"} sm:flex`}>
@@ -863,14 +863,14 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/shipping", label: "Shipping" },
                       { href: "/refunds", label: "Refunds" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/75 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm text-white/90 transition hover:text-white">
                         {label}
                       </Link>
                     ))}
                     <button
                       type="button"
                       onClick={() => setIsRegionSelectorOpen(true)}
-                      className="text-left text-sm text-white/75 transition hover:text-white"
+                      className="text-left text-sm text-white/90 transition hover:text-white"
                     >
                       {activeRegion} shipping ↗
                     </button>
@@ -882,10 +882,10 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                 className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t pt-6"
                 style={{ borderColor: "rgba(255,255,255,0.08)" }}
               >
-                <p className="text-xs text-white/30">
+                <p className="text-xs text-white/55">
                   © {new Date().getFullYear()} Keepsy Ltd. All rights reserved.
                 </p>
-                <p className="text-xs text-white/25">
+                <p className="text-xs text-white/50">
                   Payments by Stripe · Printing by Printify
                 </p>
               </div>

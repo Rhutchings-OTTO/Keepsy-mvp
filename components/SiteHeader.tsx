@@ -279,8 +279,8 @@ export function SiteHeader() {
                   href={href}
                   className={`min-h-9 rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 ${
                     active
-                      ? "ring-2 ring-charcoal text-charcoal font-semibold"
-                      : "text-charcoal/60 hover:text-charcoal"
+                      ? "bg-charcoal text-white font-semibold"
+                      : "text-charcoal/70 hover:text-charcoal hover:bg-black/5"
                   }`}
                   data-active-nav={active ? "true" : undefined}
                 >

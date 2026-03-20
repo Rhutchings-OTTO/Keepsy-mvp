@@ -20,10 +20,10 @@ import Link from "next/link";
 const CONTAINER = "mx-auto w-full max-w-6xl px-4 sm:px-6";
 
 // Dark footer colour tokens
-const LINK_COLOR = "rgba(255,255,255,0.65)";
-const LINK_HOVER = "rgba(255,255,255,0.95)";
-const HEADER_COLOR = "rgba(255,255,255,0.45)";
-const FAINT_COLOR = "rgba(255,255,255,0.35)";
+const LINK_COLOR = "#F0EDE8";
+const LINK_HOVER = "#FFFFFF";
+const HEADER_COLOR = "#D4A853";
+const FAINT_COLOR = "rgba(255,255,255,0.70)";
 const BORDER_COLOR = "rgba(255,255,255,0.1)";
 
 function InstagramIcon() {

@@ -27,7 +27,7 @@ export const PRODUCTS: Record<ProductType, Product> = {
   tshirt: {
     id: "tshirt",
     name: "Premium Tee",
-    description: "Soft, heavyweight premium tee.",
+    description: "Heavyweight 100% cotton tee with a relaxed, lived-in feel. Pre-shrunk so it stays true to size — a gift they'll actually wear.",
     basePrice: 29.99,
     hasSize: true,
     sizes: TSHIRT_SIZES,
@@ -40,7 +40,7 @@ export const PRODUCTS: Record<ProductType, Product> = {
   hoodie: {
     id: "hoodie",
     name: "Hoodie",
-    description: "Soft fleece hoodie, gift-ready print.",
+    description: "Soft, cosy hoodie with a classic fit. Double-lined hood, front pouch pocket, and a quality feel that makes it a go-to favourite.",
     basePrice: 44.99,
     hasSize: true,
     sizes: HOODIE_SIZES,
@@ -53,14 +53,14 @@ export const PRODUCTS: Record<ProductType, Product> = {
   mug: {
     id: "mug",
     name: "Mug",
-    description: "11oz ceramic mug with glossy finish.",
+    description: "Classic white ceramic mug with your design printed on both sides. Dishwasher safe, microwave friendly, and looks great next to the kettle.",
     basePrice: 18.99,
     hasSize: false,
   },
   card: {
     id: "card",
     name: "Card",
-    description: "Postcard or greeting card pack.",
+    description: "Fine art postcard or greeting card pack, printed on premium paper and ready to send to someone special.",
     basePrice: 9.99, // smallest subtype price — used only as display fallback
     hasSize: false,
     hasCardSubtype: true,
@@ -68,7 +68,7 @@ export const PRODUCTS: Record<ProductType, Product> = {
   canvas: {
     id: "canvas",
     name: "Canvas Print",
-    description: "Gallery-wrapped canvas, 1.25\" depth. From £29.99.",
+    description: "Gallery-quality stretched canvas on a solid pine wood frame. Ready to hang straight out of the box — no DIY required.",
     basePrice: 29.99, // starting price (small tier)
     hasSize: false,
     hasCanvasSize: true,

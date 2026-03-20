@@ -512,14 +512,14 @@ export function CreatePageLayoutLean({
                         label: "Postcard",
                         priceGBP: "£9.99",
                         priceUSD: "$14.99",
-                        desc: "Premium fine art postcard on glossy giclée paper",
+                        desc: "Premium fine art postcard on thick 280gsm giclée paper with a glossy finish.",
                       },
                       {
                         value: "cardpack" as const,
                         label: "Greeting Cards (7 pack)",
                         priceGBP: "£29.99",
                         priceUSD: "$39.99",
-                        desc: "7 cards with envelopes, matte finish",
+                        desc: "7 beautifully printed portrait cards on bright white matte paper. Each one comes with a craft paper envelope.",
                       },
                     ] as const
                   ).map(({ value, label, priceGBP, priceUSD, desc }) => {

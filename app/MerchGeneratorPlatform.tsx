@@ -1504,14 +1504,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                 {
                                   value: "postcard" as const,
                                   label: "Postcard",
-                                  subtitle: "Single fine art postcard, glossy giclée paper",
+                                  subtitle: "Premium fine art postcard on thick 280gsm giclée paper with a glossy finish.",
                                   priceGBP: "£9.99",
                                   priceUSD: "$14.99",
                                 },
                                 {
                                   value: "cardpack" as const,
                                   label: "Greeting Card Pack",
-                                  subtitle: "7 cards with envelopes, matte finish",
+                                  subtitle: "7 beautifully printed portrait cards on bright white matte paper. Each one comes with a craft paper envelope.",
                                   priceGBP: "£29.99",
                                   priceUSD: "$39.99",
                                 },

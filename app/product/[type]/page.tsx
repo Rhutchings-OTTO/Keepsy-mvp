@@ -160,7 +160,7 @@ function buildProductJsonLd(type: string, name: string, description: string, pri
 const PRODUCT_CONTENT = {
   hoodie: {
     aboutTitle: "About Our Personalised Hoodies",
-    about: "Our personalised hoodies combine premium soft fleece fabric with vivid, lasting prints that won't crack or fade. Every personalised hoodie is unique — created from your description or photo and previewed before you order, so you know exactly what you're getting. Whether it's a gift for Mum, a hen party keepsake, or a birthday surprise, a personalised hoodie from Keepsy makes gifting genuinely memorable. Available in a range of sizes from XS to 3XL, our custom printed hoodies ship to the UK and US.",
+    about: "Our personalised hoodies are soft, cosy, and built to last. Classic fit with a double-lined hood and front pouch pocket — the kind of hoodie that becomes a favourite from the first wear. Every design is unique — created from your description or photo and previewed before you order, so you know exactly what you're getting. Whether it's a gift for Mum, a hen party keepsake, or a birthday surprise, a personalised hoodie from Keepsy makes gifting genuinely memorable.",
     howItWorks: [
       { title: "Describe or upload", description: "Tell us what you'd like on your personalised hoodie, or upload a photo. Our AI creates a unique design in seconds." },
       { title: "Preview your design", description: "See exactly how your custom hoodie design will look before you commit to ordering. Refine it until it's perfect." },
@@ -177,7 +177,7 @@ const PRODUCT_CONTENT = {
   },
   mug: {
     aboutTitle: "About Our Personalised Mugs",
-    about: "Our personalised mugs are made from premium 11oz ceramic with a glossy finish that holds vivid colour beautifully. Every custom photo mug is unique — you describe your design or upload a photo, see it on the mug before ordering, and receive a one-of-a-kind gift that will make someone smile every morning. Personalised mugs from Keepsy are dishwasher safe and microwave safe, making them practical as well as meaningful. From personalised birthday mugs to Mother's Day photo mugs, they're one of the most popular personalised gifts in the UK and US.",
+    about: "Our personalised mugs are made from quality white ceramic with a glossy finish that holds vivid colour beautifully. Your design is printed on both sides, so it looks great from every angle. Every custom mug is unique — you describe your design or upload a photo, see it on the mug before ordering, and receive a one-of-a-kind gift that will make someone smile every morning. Personalised mugs from Keepsy are dishwasher safe and microwave friendly, making them practical as well as meaningful.",
     howItWorks: [
       { title: "Describe or upload", description: "Tell us what you'd like on your personalised mug — a pet portrait, a family photo, a meaningful design — or upload a photo directly." },
       { title: "Preview your design", description: "See how your custom mug design looks in real life before you order. Make changes until it's exactly right." },
@@ -194,7 +194,7 @@ const PRODUCT_CONTENT = {
   },
   tee: {
     aboutTitle: "About Our Personalised T-Shirts",
-    about: "Our personalised t-shirts are made from a soft, heavyweight premium cotton blend that holds vivid prints beautifully. Every custom printed tee starts with your description or photo — our AI creates a unique design, you preview it on the actual shirt, then we print and ship it. Unlike mass-produced graphic tees, a personalised t-shirt from Keepsy is a one-of-a-kind piece that exists nowhere else. Perfect as a birthday gift, hen party memento, or just a treat for someone who deserves something special. Our custom t-shirts ship to both the UK and US.",
+    about: "Our personalised t-shirts are made from heavyweight 100% cotton with a relaxed, lived-in feel that gets better with every wash. Pre-shrunk so it stays true to size. Every design starts with your description or photo — our AI creates a unique artwork, you preview it on the actual shirt, then we print and ship it. Unlike anything you'd find in a shop, a personalised tee from Keepsy is a one-of-a-kind piece that exists nowhere else in the world.",
     howItWorks: [
       { title: "Describe or upload", description: "Tell us the design you want on your personalised t-shirt, or upload a photo. Our AI generates a unique design in seconds." },
       { title: "Preview on the tee", description: "See your custom design on the actual t-shirt before ordering. Adjust it until you're completely happy." },
@@ -211,7 +211,7 @@ const PRODUCT_CONTENT = {
   },
   card: {
     aboutTitle: "About Our Personalised Greeting Cards",
-    about: "A personalised greeting card from Keepsy is far from an ordinary card from the shops. You describe your design or upload a photo, our AI creates a bespoke illustration, and you see it on the card before ordering — printed on premium heavyweight cardstock with a beautiful finish. Our personalised cards are perfect for birthdays, Mother's Day, Father's Day, weddings, anniversaries, baby showers, and any occasion where you want to say something truly meaningful. At just £9.99, a personalised greeting card is one of the most thoughtful and affordable personalised gifts available.",
+    about: "A personalised card from Keepsy is far from an ordinary card from the shops. Choose a fine art postcard on thick 280gsm giclée paper with a glossy finish, or a pack of 7 beautifully printed portrait cards on bright white matte paper — each with a craft envelope included. You describe your design or upload a photo, our AI creates a bespoke illustration, and you see it on the card before ordering. Perfect for birthdays, Mother's Day, Father's Day, weddings, anniversaries, and any occasion where you want to say something truly meaningful.",
     howItWorks: [
       { title: "Describe your card", description: "Tell us what you'd like on your personalised greeting card — an illustration, a portrait, a meaningful scene — or upload a photo." },
       { title: "See it before you send", description: "Preview your bespoke card design before ordering. Make it exactly right." },

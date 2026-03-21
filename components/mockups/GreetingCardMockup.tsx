@@ -45,21 +45,23 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
           priority={false}
         />
 
-        {/* Layer 1: Card face bounding box — covers exactly the front white card face in the photo.
-            UK: front card left ~7% → right ~88%, top ~4% → bottom ~92% of photo.
-            US: similar composition, front card left ~7% → right ~88%, top ~3% → bottom ~91%. */}
+        {/* Layer 1: Card face bounding box — measured from actual pixel data (1024×1536 photos).
+            UK:  left edge x=305 (30%), right x=843 (82%), top y=378 (25%), bottom y=1077 (70%).
+                 Outer box adds ~1% margin: left 29%, top 24%, right 83%, bottom 71%.
+            US:  left edge x=295 (29%), right x=843 (82%), top y=347 (23%), bottom y=1115 (72%).
+                 Outer box adds ~1% margin: left 28%, top 22%, right 83%, bottom 73%. */}
         <div
           className="absolute overflow-hidden"
           style={isUS ? {
-            left: "7%",
-            top: "3%",
-            width: "81%",
-            height: "88%",
+            left: "28%",
+            top: "22%",
+            width: "55%",
+            height: "51%",
           } : {
-            left: "7%",
-            top: "4%",
-            width: "81%",
-            height: "88%",
+            left: "29%",
+            top: "24%",
+            width: "54%",
+            height: "47%",
           }}
         >
           {/* Layer 2: 8% safe-zone inset on all 4 sides — image sits within an 84%×84% area.

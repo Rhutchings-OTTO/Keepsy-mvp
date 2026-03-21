@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useReducedMotionPref } from "@/lib/motion/useReducedMotionPref";
+import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { stagger } from "@/lib/motion/config";
 
 /** Kinetic letter animation: slides up + scale with stagger */
@@ -65,10 +66,11 @@ export function KineticHeading({
     return () => observer.disconnect();
   }, [reduceMotion]);
 
+  const isMobile = useIsMobile();
   const letters = children.split("");
   const staggered = stagger(0, staggerDelay);
 
-  if (reduceMotion) {
+  if (reduceMotion || isMobile) {
     return <Component className={className}>{children}</Component>;
   }
 

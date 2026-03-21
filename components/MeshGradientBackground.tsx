@@ -2,6 +2,7 @@
 
 import { MeshGradient } from "@paper-design/shaders-react";
 import { useEffect, useState } from "react";
+import { useIsMobile } from "@/lib/hooks/useIsMobile";
 
 const DEFAULT_COLORS = [
   "#f7f2eb",
@@ -35,6 +36,7 @@ export function MeshGradientBackground({
 }: MeshGradientBackgroundProps) {
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
   const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setMounted(true);
@@ -47,6 +49,18 @@ export function MeshGradientBackground({
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
+
+  // On mobile: skip the WebGL shader entirely — use a static cream background
+  // to avoid GPU overhead during image generation and mockup rendering.
+  if (isMobile) {
+    return (
+      <div
+        className={`fixed inset-0 w-full h-full ${className}`}
+        style={{ backgroundColor: "#F9F8F6" }}
+        aria-hidden
+      />
+    );
+  }
 
   return (
     <div className={`fixed inset-0 w-full h-full ${className}`}>

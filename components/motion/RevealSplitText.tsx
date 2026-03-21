@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { flipLetter } from "@/lib/motion/config";
 import { stagger } from "@/lib/motion/config";
 import { useReducedMotionPref } from "@/lib/motion/useReducedMotionPref";
+import { useIsMobile } from "@/lib/hooks/useIsMobile";
 
 type RevealSplitTextProps = {
   /** Text to animate letter-by-letter */
@@ -50,10 +51,11 @@ export function RevealSplitText({
     return () => observer.disconnect();
   }, [reduceMotion]);
 
+  const isMobile = useIsMobile();
   const letters = text.split("");
   const staggered = stagger(0, staggerDelay);
 
-  if (reduceMotion) {
+  if (reduceMotion || isMobile) {
     return <Component className={className}>{text}</Component>;
   }
 

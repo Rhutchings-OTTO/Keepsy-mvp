@@ -10,9 +10,9 @@ export type ProductCard = {
 };
 
 export const PRODUCT_CARDS: ProductCard[] = [
-  { type: "card", name: "Greeting Card", price: 9.99, image: "/product-tiles/plain-card.png", valueFrame: "Less than a bunch of flowers" },
+  { type: "card", name: "Greeting Card", price: 6.99, image: "/product-tiles/plain-card.png", valueFrame: "Less than a bunch of flowers" },
   { type: "hoodie", name: "Premium Hoodie", price: 44.99, image: "/product-tiles/hoodie-white.png", valueFrame: "A gift they'll wear every day" },
-  { type: "mug", name: "Ceramic Mug", price: 18.99, image: "/product-tiles/plain-mug-front.png", valueFrame: "They'll think of you every morning" },
+  { type: "mug", name: "Ceramic Mug", price: 14.99, image: "/product-tiles/plain-mug-front.png", valueFrame: "They'll think of you every morning" },
   { type: "tee", name: "Premium Tee", price: 29.99, image: "/product-tiles/tee-white.png", valueFrame: "Less than a dinner out" },
 ];
 

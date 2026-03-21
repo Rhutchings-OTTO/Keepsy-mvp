@@ -6,14 +6,14 @@ import { JsonLd } from "@/components/JsonLd";
 export const metadata: Metadata = {
   title: "Shop Personalised Gifts | Custom Hoodies, Mugs, T-Shirts, Cards & Canvas — Keepsy",
   description:
-    "Browse our collection of personalised gifts. Custom printed hoodies from £44.99, mugs from £18.99, t-shirts from £29.99, greeting cards from £9.99 and canvas prints from £29.99. Preview your design before you buy.",
+    "Browse our collection of personalised gifts. Custom printed hoodies from £44.99, mugs from £14.99, t-shirts from £29.99, greeting cards from £6.99 and canvas prints from £29.99. Preview your design before you buy.",
   alternates: {
     canonical: "https://keepsy.store/shop",
   },
   openGraph: {
     title: "Shop Personalised Gifts | Custom Hoodies, Mugs, T-Shirts, Cards & Canvas — Keepsy",
     description:
-      "Browse our collection of personalised gifts. Custom printed hoodies from £44.99, mugs from £18.99, t-shirts from £29.99, greeting cards from £9.99 and canvas prints from £29.99. Preview your design before you buy.",
+      "Browse our collection of personalised gifts. Custom printed hoodies from £44.99, mugs from £14.99, t-shirts from £29.99, greeting cards from £6.99 and canvas prints from £29.99. Preview your design before you buy.",
     type: "website",
     url: "https://keepsy.store/shop",
   },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Shop Personalised Gifts | Custom Hoodies, Mugs, T-Shirts, Cards & Canvas — Keepsy",
     description:
-      "Browse our collection of personalised gifts. Custom printed hoodies from £44.99, mugs from £18.99, t-shirts from £29.99, greeting cards from £9.99 and canvas prints from £29.99. Preview your design before you buy.",
+      "Browse our collection of personalised gifts. Custom printed hoodies from £44.99, mugs from £14.99, t-shirts from £29.99, greeting cards from £6.99 and canvas prints from £29.99. Preview your design before you buy.",
   },
 };
 

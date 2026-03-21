@@ -502,7 +502,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCT_LIST[2]); // default: card
   const [selectedColor, setSelectedColor] = useState(PRODUCT_LIST[2].colors?.[0]?.hex ?? "#FFFFFF");
   const [selectedSize, setSelectedSize] = useState<ApparelSize | null>(null);
-  // Card sub-type: "postcard" (£9.99) or "cardpack" — Greeting Cards 7 pack (£29.99)
+  // Card sub-type: "postcard" (£6.99) or "cardpack" — Greeting Cards 7 pack (£29.99)
   const [selectedCardSubtype, setSelectedCardSubtype] = useState<"postcard" | "cardpack">("postcard");
   // Canvas-specific state
   const [selectedCanvasSize, setSelectedCanvasSize] = useState<CanvasSize>(DEFAULT_CANVAS_SIZE);
@@ -543,7 +543,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const cardSubtypePrice =
     selectedCardSubtype === "cardpack"
       ? (region === "US" ? 39.99 : 29.99)
-      : (region === "US" ? 14.99 :  9.99);
+      : (region === "US" ? 9.99 :  6.99);
 
   const checkoutTotal = hasCartItems
     ? cartSubtotal
@@ -1402,7 +1402,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               {prod.id === "card" && selectedProduct.id === "card"
                                 ? fmt(cardSubtypePrice)
                                 : prod.id === "card"
-                                ? (region === "US" ? "from $14.99" : "from £9.99")
+                                ? (region === "US" ? "from $9.99" : "from £6.99")
                                 : fmt(prod.basePrice)}
                             </div>
                           </motion.button>
@@ -1513,8 +1513,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                   value: "postcard" as const,
                                   label: "Postcard",
                                   subtitle: "Premium fine art postcard on thick 280gsm giclée paper with a glossy finish.",
-                                  priceGBP: "£9.99",
-                                  priceUSD: "$14.99",
+                                  priceGBP: "£6.99",
+                                  priceUSD: "$9.99",
                                 },
                                 {
                                   value: "cardpack" as const,

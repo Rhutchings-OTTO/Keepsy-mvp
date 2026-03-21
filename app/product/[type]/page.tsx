@@ -19,9 +19,9 @@ const PRODUCT_TITLES: Record<string, string> = {
 const PRODUCT_DESCRIPTIONS: Record<string, string> = {
   hoodie:
     "Design a personalised hoodie from £44.99. Upload a photo or describe your idea — see it on the hoodie before you order. Soft fleece, vivid lasting print. Free UK & US shipping over £75.",
-  mug: "Create a personalised mug from £18.99. Upload a photo or describe your idea — preview it on a ceramic mug before ordering. Perfect gift for any occasion. Ships to UK and US.",
+  mug: "Create a personalised mug from £14.99. Upload a photo or describe your idea — preview it on a ceramic mug before ordering. Perfect gift for any occasion. Ships to UK and US.",
   tee: "Design a personalised t-shirt from £29.99. Upload a photo or describe your design — preview it on a premium tee before you order. Soft, vivid prints. Free UK & US shipping over £75.",
-  card: "Create a personalised greeting card from £9.99. Describe your design or upload a photo — see it on a premium card before ordering. Perfect for birthdays, Mother's Day, weddings and more.",
+  card: "Create a personalised greeting card from £6.99. Describe your design or upload a photo — see it on a premium card before ordering. Perfect for birthdays, Mother's Day, weddings and more.",
   canvas:
     "Design a personalised canvas print from £29.99. Upload a photo or describe your idea — preview it before ordering. Vivid gallery-quality print. Ships to UK and US.",
 };
@@ -65,7 +65,7 @@ const PRODUCT_META: Record<string, { name: string; price: string; image: string 
   },
   mug: {
     name: "Personalised Mug",
-    price: "18.99",
+    price: "14.99",
     image: "https://keepsy.store/images/mockups/mug-preview.jpg",
   },
   tee: {
@@ -75,7 +75,7 @@ const PRODUCT_META: Record<string, { name: string; price: string; image: string 
   },
   card: {
     name: "Personalised Greeting Card",
-    price: "9.99",
+    price: "6.99",
     image: "https://keepsy.store/images/mockups/card-preview.jpg",
   },
   canvas: {
@@ -223,7 +223,7 @@ const PRODUCT_CONTENT = {
       { q: "Do personalised cards come with envelopes?", a: "Yes, all our personalised greeting cards include a matching envelope." },
       { q: "How quickly can I get a personalised birthday card?", a: "UK orders typically arrive in 5–8 business days. For urgent orders, express shipping is available at checkout." },
       { q: "Can I write a message inside the card?", a: "The card is printed with your design on the front. The inside is blank so you can write your personal message by hand — making it even more special." },
-      { q: "Are personalised cards better than shop-bought cards?", a: "A personalised card from Keepsy features a completely unique design created just for the recipient — it's not something you could find in any shop. That makes it significantly more meaningful than a generic card, and at £9.99, it's still very affordable." },
+      { q: "Are personalised cards better than shop-bought cards?", a: "A personalised card from Keepsy features a completely unique design created just for the recipient — it's not something you could find in any shop. That makes it significantly more meaningful than a generic card, and at £6.99, it's still very affordable." },
     ],
   },
   canvas: {

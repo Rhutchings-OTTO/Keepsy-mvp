@@ -5,7 +5,7 @@ import type { Region } from "@/lib/region";
 
 export const metadata: Metadata = {
   title: "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
-  description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £9.99.",
+  description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £6.99.",
   alternates: {
     canonical: "https://keepsy.store",
     languages: {
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
-    description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £9.99.",
+    description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £6.99.",
     type: "website",
     url: "https://keepsy.store",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Keepsy personalised gifts" }],

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     default: "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
     template: "%s — Keepsy",
   },
-  description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £9.99.",
+  description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £6.99.",
   keywords: ["personalised gifts", "custom mugs", "custom hoodies", "keepsake gifts", "photo gifts", "personalised cards"],
   metadataBase: new URL("https://keepsy.store"),
   alternates: {
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://keepsy.store",
     title: "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
-    description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £9.99.",
+    description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £6.99.",
     siteName: "Keepsy",
     images: [
       {

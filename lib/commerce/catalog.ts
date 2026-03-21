@@ -9,9 +9,9 @@ export type CatalogProduct = {
 };
 
 export const PRODUCT_CATALOG: Record<string, CatalogProduct> = {
-  postcard: { id: "postcard", name: "Fine Art Postcard",          priceGBP: 9.99,  priceUSD: 14.99 },
+  postcard: { id: "postcard", name: "Fine Art Postcard",          priceGBP: 6.99,  priceUSD: 9.99  },
   cardpack: { id: "cardpack", name: "Greeting Cards (7 pack)",    priceGBP: 29.99, priceUSD: 39.99 },
-  mug:      { id: "mug",      name: "Mug",                        priceGBP: 18.99, priceUSD: 29.99 },
+  mug:      { id: "mug",      name: "Mug",                        priceGBP: 14.99, priceUSD: 19.99 },
   tee:    { id: "tee",    name: "Premium tee",     priceGBP: 29.99, priceUSD: 39.99 },
   hoodie: { id: "hoodie", name: "Hoodie",           priceGBP: 44.99, priceUSD: 59.99 },
   // Canvas — one entry per size; catalogId = "canvas_{W}x{H}"

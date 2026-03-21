@@ -53,13 +53,13 @@ const PRODUCT_IMAGES = [
     src: "/images/hero/mug-hero.jpg",
     alt: "Custom personalised mug",
     label: "Mugs",
-    tag: "From £18.99",
+    tag: "From £14.99",
   },
   {
     src: "/images/hero/cards-hero.jpg",
     alt: "Personalised greeting card",
     label: "Cards",
-    tag: "From £9.99",
+    tag: "From £6.99",
   },
   {
     src: "/images/hero/tee-hero.jpg",
@@ -93,8 +93,8 @@ const SOCIAL_PROOF_ITEMS = [
 const FEATURED_PRODUCTS = [
   {
     name: "Best Mom Ever Mug",
-    priceUS: "$23.99",
-    priceUK: "£18.99",
+    priceUS: "$19.99",
+    priceUK: "£14.99",
     rating: "★★★★★",
     reviews: 847,
     src: "/images/featured/mom-mug.jpg",
@@ -102,8 +102,8 @@ const FEATURED_PRODUCTS = [
   },
   {
     name: "Custom Photo Card Pack",
-    priceUS: "$12.99",
-    priceUK: "£9.99",
+    priceUS: "$9.99",
+    priceUK: "£6.99",
     rating: "★★★★★",
     reviews: 1203,
     src: "/images/featured/card-pack.jpg",

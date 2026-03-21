@@ -493,8 +493,8 @@ export function CreatePageLayoutLean({
                       {
                         value: "postcard" as const,
                         label: "Postcard",
-                        priceGBP: "£9.99",
-                        priceUSD: "$14.99",
+                        priceGBP: "£6.99",
+                        priceUSD: "$9.99",
                         desc: "Premium fine art postcard on thick 280gsm giclée paper with a glossy finish.",
                       },
                       {

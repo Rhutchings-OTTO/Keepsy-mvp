@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 
 const OPTIONS = [
-  { id: "matching-card", label: "Add a matching card", priceHint: "+ £9.99 · Most popular add-on" },
+  { id: "matching-card", label: "Add a matching card", priceHint: "+ £6.99 · Most popular add-on" },
   { id: "second-print", label: "Add a second print", priceHint: "+ same price · Perfect as a spare" },
   { id: "priority-print", label: "Priority print handling", priceHint: "+ £3.99 · Ships 2 days faster" },
 ];

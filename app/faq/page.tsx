@@ -39,7 +39,7 @@ const faqSchema = {
       name: "What is a good personalised gift for Mum?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Great personalised gifts for Mum include a custom photo mug (£18.99) she can use every morning, a personalised hoodie (£44.99) with a design meaningful to your family, a personalised greeting card (£9.99) with a bespoke illustration, or a canvas print (£29.99) of a favourite memory. All are designed and previewed before ordering at Keepsy.",
+        text: "Great personalised gifts for Mum include a custom photo mug (£14.99) she can use every morning, a personalised hoodie (£44.99) with a design meaningful to your family, a personalised greeting card (£6.99) with a bespoke illustration, or a canvas print (£29.99) of a favourite memory. All are designed and previewed before ordering at Keepsy.",
       },
     },
     {
@@ -47,7 +47,7 @@ const faqSchema = {
       name: "How do custom printed mugs work?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "At Keepsy, you describe your design idea or upload a photo, and our AI generates a personalised design. You see it previewed on an 11oz ceramic mug before ordering. Once you confirm, we print it on premium ceramic with a durable glossy finish and ship it to you in the UK or US. Personalised mugs start from £18.99.",
+        text: "At Keepsy, you describe your design idea or upload a photo, and our AI generates a personalised design. You see it previewed on an 11oz ceramic mug before ordering. Once you confirm, we print it on premium ceramic with a durable glossy finish and ship it to you in the UK or US. Personalised mugs start from £14.99.",
       },
     },
     {
@@ -79,7 +79,7 @@ const faqSchema = {
       name: "What products can I personalise at Keepsy?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Keepsy offers five personalised product types: hoodies (from £44.99), t-shirts (from £29.99), ceramic mugs (from £18.99), greeting cards (from £9.99), and canvas prints (from £29.99). All products can be customised with AI-generated designs based on your description or photo upload.",
+        text: "Keepsy offers five personalised product types: hoodies (from £44.99), t-shirts (from £29.99), ceramic mugs (from £14.99), greeting cards (from £6.99), and canvas prints (from £29.99). All products can be customised with AI-generated designs based on your description or photo upload.",
       },
     },
     {
@@ -143,7 +143,7 @@ const faqSchema = {
       name: "How much does personalised printing cost at Keepsy?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Keepsy's personalised products start from £9.99 for greeting cards, £18.99 for mugs, £29.99 for t-shirts, £29.99 for canvas prints, and £44.99 for hoodies. Free shipping is available on orders over £75 in the UK or $75 in the US.",
+        text: "Keepsy's personalised products start from £6.99 for greeting cards, £18.99 for mugs, £29.99 for t-shirts, £29.99 for canvas prints, and £44.99 for hoodies. Free shipping is available on orders over £75 in the UK or $75 in the US.",
       },
     },
     {

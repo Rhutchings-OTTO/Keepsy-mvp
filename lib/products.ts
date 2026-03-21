@@ -54,14 +54,14 @@ export const PRODUCTS: Record<ProductType, Product> = {
     id: "mug",
     name: "Mug",
     description: "Classic white ceramic mug with your design printed on both sides. Dishwasher safe, microwave friendly, and looks great next to the kettle.",
-    basePrice: 18.99,
+    basePrice: 14.99,
     hasSize: false,
   },
   card: {
     id: "card",
     name: "Card",
     description: "Fine art postcard or greeting card pack, printed on premium paper and ready to send to someone special.",
-    basePrice: 9.99, // smallest subtype price — used only as display fallback
+    basePrice: 6.99, // smallest subtype price — used only as display fallback
     hasSize: false,
     hasCardSubtype: true,
   },

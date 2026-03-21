@@ -46,8 +46,6 @@ const PRICES: Record<string, { priceGBP: number; priceUSD: number }> = {
   "48x32": { priceGBP: 159.99, priceUSD: 214.99 },
   "48x36": { priceGBP: 179.99, priceUSD: 239.99 },
   "60x20": { priceGBP: 149.99, priceUSD: 199.99 },
-  "60x30": { priceGBP: 179.99, priceUSD: 239.99 },
-  "60x40": { priceGBP: 219.99, priceUSD: 294.99 },
   // ── Vertical ────────────────────────────────────────────────────────────
   "8x10":  { priceGBP: 29.99,  priceUSD: 39.99  },
   "9x12":  { priceGBP: 34.99,  priceUSD: 49.99  },
@@ -70,10 +68,8 @@ const PRICES: Record<string, { priceGBP: number; priceUSD: number }> = {
   "24x36": { priceGBP: 89.99,  priceUSD: 119.99 },
   "24x48": { priceGBP: 119.99, priceUSD: 159.99 },
   "30x40": { priceGBP: 119.99, priceUSD: 159.99 },
-  "30x60": { priceGBP: 179.99, priceUSD: 239.99 },
   "32x48": { priceGBP: 159.99, priceUSD: 214.99 },
   "36x48": { priceGBP: 179.99, priceUSD: 239.99 },
-  "40x60": { priceGBP: 219.99, priceUSD: 294.99 },
   // ── Square ──────────────────────────────────────────────────────────────
   "6x6":   { priceGBP: 29.99,  priceUSD: 39.99  },
   "10x10": { priceGBP: 34.99,  priceUSD: 49.99  },
@@ -123,16 +119,14 @@ export const CANVAS_SIZES: CanvasSize[] = [
   makeSize(24, 18), makeSize(24, 20), makeSize(30, 15), makeSize(30, 20),
   makeSize(30, 24), makeSize(32, 24), makeSize(36, 12), makeSize(36, 24),
   makeSize(40, 20), makeSize(40, 30), makeSize(48, 16), makeSize(48, 24),
-  makeSize(48, 32), makeSize(48, 36), makeSize(60, 20), makeSize(60, 30),
-  makeSize(60, 40),
+  makeSize(48, 32), makeSize(48, 36), makeSize(60, 20),
   // ── Vertical ────────────────────────────────────────────────────────────
   makeSize(8, 10),  makeSize(9, 12),  makeSize(10, 20), makeSize(11, 14),
   makeSize(12, 16), makeSize(12, 18), makeSize(12, 36), makeSize(15, 30),
   makeSize(16, 20), makeSize(16, 24), makeSize(16, 48), makeSize(18, 24),
   makeSize(20, 24), makeSize(20, 30), makeSize(20, 40), makeSize(20, 60),
   makeSize(24, 30), makeSize(24, 32), makeSize(24, 36), makeSize(24, 48),
-  makeSize(30, 40), makeSize(30, 60), makeSize(32, 48), makeSize(36, 48),
-  makeSize(40, 60),
+  makeSize(30, 40), makeSize(32, 48), makeSize(36, 48),
   // ── Square ──────────────────────────────────────────────────────────────
   makeSize(6, 6),   makeSize(10, 10), makeSize(12, 12), makeSize(14, 14),
   makeSize(16, 16), makeSize(20, 20), makeSize(24, 24), makeSize(30, 30),

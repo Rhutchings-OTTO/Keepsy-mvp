@@ -5,7 +5,7 @@ import type { Region } from "@/lib/region";
 import { getUpcomingOccasion } from "@/lib/occasion";
 import { FF } from "@/lib/featureFlags";
 
-type ProductType = "tshirt" | "hoodie" | "mug" | "card";
+type ProductType = "tshirt" | "hoodie" | "mug" | "card" | "canvas";
 
 type PersonalisedStoryCopyProps = {
   region: Region;
@@ -13,14 +13,18 @@ type PersonalisedStoryCopyProps = {
 };
 
 const PRODUCT_COPY: Record<ProductType, string> = {
-  tshirt: "on a premium tee they'll wear proudly",
-  hoodie: "on a hoodie they'll reach for every day",
+  tshirt: "on a premium tee they’ll wear proudly",
+  hoodie: "on a hoodie they’ll reach for every day",
   mug: "on a mug they’ll smile at every morning",
   card: "on a keepsake card they can treasure",
+  canvas: "",
 };
 
 export default function PersonalisedStoryCopy({ region, productType }: PersonalisedStoryCopyProps) {
   const message = useMemo(() => {
+    if (productType === "canvas") {
+      return "A stunning piece of wall art they’ll treasure — ready to hang straight out of the box.";
+    }
     const occasion = getUpcomingOccasion();
     if (occasion) return `This will make a beautiful ${occasion.occasionName} gift ${PRODUCT_COPY[productType]}.`;
     return `A thoughtful ${region} keepsake ${PRODUCT_COPY[productType]}.`;

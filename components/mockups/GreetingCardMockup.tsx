@@ -7,7 +7,7 @@ type GreetingCardMockupProps = {
   /** AI-generated image to show on the front card face. null = placeholder. */
   imageSrc: string | null;
   className?: string;
-  /** "uk" = portrait 7-pack stack mockup (default); "us" = landscape single-card preview */
+  /** "uk" = portrait 7-pack stack mockup (default); "us" = portrait single-card stack mockup (BP 1094) */
   variant?: "uk" | "us";
 };
 
@@ -15,116 +15,29 @@ type GreetingCardMockupProps = {
  * Greeting card mockup.
  *
  * variant="uk" (default): portrait 7-pack stack using the real product photo.
- * variant="us": landscape single-card preview (BP 1094). AI image fills the
- *   right half of the card; left half shows "made with Keepsy" branding text
- *   — matching the server-side compositing layout.
+ * variant="us": portrait single-card stack with kraft envelopes (BP 1094).
+ *   AI image overlaid on the front white card face, inset ~12% on each
+ *   side to show the printed white border — matching server-side compositing.
  */
 export const GreetingCardMockup = memo(function GreetingCardMockup({
   imageSrc,
   className = "",
   variant = "uk",
 }: GreetingCardMockupProps) {
-  if (variant === "us") {
-    // Landscape card preview — aspect ratio matches 2175:1538 ≈ 1.414:1
-    return (
-      <div
-        className={`relative w-full overflow-hidden rounded-3xl border border-black/[0.06] bg-[#FAF9F7] shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_0_0_rgba(255,255,255,0.8)_inset] ${className}`}
-        style={{ aspectRatio: "1.414 / 1" }}
-      >
-        <div className="absolute inset-[1px] overflow-hidden rounded-[22px] bg-white flex">
-          {/* Left half — branding panel */}
-          <div
-            className="flex flex-1 flex-col items-center justify-center gap-0.5 border-r border-black/[0.06]"
-            style={{ backgroundColor: "#FAF9F7" }}
-          >
-            <p
-              style={{
-                fontFamily: "Arial, sans-serif",
-                fontSize: "0.5rem",
-                letterSpacing: "0.18em",
-                color: "#BBBBBB",
-                textTransform: "lowercase",
-              }}
-            >
-              made with
-            </p>
-            <p
-              style={{
-                fontFamily: "Georgia, serif",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                color: "#BBBBBB",
-              }}
-            >
-              Keepsy<span style={{ fontFamily: "Arial, sans-serif", fontWeight: 400, fontSize: "0.5rem" }}>.store</span>
-            </p>
-          </div>
+  const isUS = variant === "us";
 
-          {/* Right half — AI artwork */}
-          <div className="relative flex-1 overflow-hidden">
-            {imageSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imageSrc}
-                alt="Your design"
-                draggable={false}
-                style={{
-                  position: "absolute",
-                  top: "5%",
-                  left: "5%",
-                  width: "90%",
-                  height: "90%",
-                  objectFit: "contain",
-                  filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  position: "absolute",
-                  inset: "5%",
-                  background: "rgba(220, 210, 200, 0.25)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  gap: 4,
-                  borderRadius: 2,
-                }}
-              >
-                <div style={{ fontSize: "1.2rem", opacity: 0.3 }}>✉</div>
-                <p
-                  style={{
-                    fontSize: "0.42rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: "#5a4a40",
-                    opacity: 0.45,
-                    textAlign: "center",
-                  }}
-                >
-                  Your design here
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // UK default: portrait 7-pack stack
   return (
     <div
       className={`relative w-full overflow-hidden rounded-3xl border border-black/[0.06] bg-[#FAF9F7] shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_0_0_rgba(255,255,255,0.8)_inset] ${className}`}
       style={{ aspectRatio: "2 / 3" }}
     >
       <div className="absolute inset-[1px] overflow-hidden rounded-[22px] bg-[#F5F4F2]">
-        {/* Base mockup: stack of 7 cards */}
+        {/* Base mockup photo */}
         <Image
-          src="/product-tiles/greeting-card-pack-mockup.png"
-          alt="Greeting card pack"
+          src={isUS
+            ? "/product-tiles/us-greeting-card-mockup.png"
+            : "/product-tiles/greeting-card-pack-mockup.png"}
+          alt={isUS ? "US greeting card" : "Greeting card pack"}
           fill
           className="object-contain"
           quality={90}
@@ -133,11 +46,17 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
         />
 
         {/* AI artwork overlay on the front card face.
-            The front card spans approx left 38%→80%, top 8%→88% of the image.
-            9% inset gives the white border around the printed area. */}
+            US: front card face spans approx left 4%→87%, top 3%→90% of the image.
+            Overlay inset ~12% from each card-face edge gives the white printed border.
+            UK: front card spans approx left 38%→80%, top 8%→88% of the image. */}
         <div
           className="absolute"
-          style={{
+          style={isUS ? {
+            left: "11%",
+            top: "10%",
+            width: "65%",
+            height: "70%",
+          } : {
             left: "38%",
             top: "8%",
             width: "42%",
@@ -158,7 +77,7 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
                 height: "94%",
                 objectFit: "contain",
                 filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
-                mixBlendMode: "multiply",
+                mixBlendMode: isUS ? undefined : "multiply",
               }}
             />
           ) : (

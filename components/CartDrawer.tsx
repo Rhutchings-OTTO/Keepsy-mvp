@@ -388,7 +388,7 @@ export function CartDrawer() {
             {items.length === 0 ? (
               <EmptyState onClose={close} />
             ) : (
-              <>
+              <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
                 {/* ── Free shipping bar ── */}
                 <FreeShippingBar subtotal={subtotal} />
 
@@ -483,8 +483,8 @@ export function CartDrawer() {
                   <button
                     type="button"
                     disabled={isCheckingOut}
-                    className="flex w-full min-h-[52px] items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ backgroundColor: "var(--color-terracotta)" }}
+                    className="flex w-full items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: "red", color: "white", height: "60px", width: "100%", position: "relative", zIndex: 99999, fontSize: "24px" }}
                     onClick={() => void handleCheckout()}
                   >
                     {isCheckingOut ? "Taking you to checkout…" : "Go to Secure Checkout"}
@@ -493,7 +493,7 @@ export function CartDrawer() {
                     No account required · Secure checkout
                   </p>
                 </div>
-              </>
+              </div>
             )}
           </motion.aside>
         </>

@@ -447,11 +447,7 @@ export function CreatePageLayoutLean({
                 onClick={() => onProductSelect(type)}
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.985 }}
-                className={`rounded-xl border p-4 text-left transition sm:p-5 pointer-events-none md:pointer-events-auto ${
-                  selectedProductType === type
-                    ? "border-terracotta bg-terracotta text-white shadow-[0_16px_34px_-22px_rgba(196,113,74,0.5)]"
-                    : "border-charcoal/10 bg-[#F5EDE0] text-charcoal"
-                }`}
+                className="rounded-xl border border-charcoal/10 bg-[#F5EDE0] p-4 text-left text-charcoal transition sm:p-5 pointer-events-none md:pointer-events-auto"
               >
                 <div className="relative mb-4 overflow-hidden rounded-xl border border-charcoal/8 bg-white">
                   <Image
@@ -463,15 +459,15 @@ export function CreatePageLayoutLean({
                   />
                 </div>
                 <div
-                  className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${selectedProductType === type ? "bg-white/20 text-white" : ""}`}
-                  style={selectedProductType !== type ? { backgroundColor: "rgba(196,113,74,0.12)", color: "var(--color-terracotta)" } : {}}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: "rgba(196,113,74,0.12)", color: "var(--color-terracotta)" }}
                 >
                   <Icon size={20} />
                 </div>
-                <p className={`mt-4 text-lg font-semibold ${selectedProductType === type ? "text-white" : "text-charcoal"}`}>
+                <p className="mt-4 text-lg font-semibold text-charcoal">
                   {label}
                 </p>
-                <p className={`mt-2 text-xs leading-snug ${selectedProductType === type ? "text-white/75" : "text-charcoal/55"}`}>
+                <p className="mt-2 text-xs leading-snug text-charcoal/55">
                   {description}
                 </p>
               </motion.button>

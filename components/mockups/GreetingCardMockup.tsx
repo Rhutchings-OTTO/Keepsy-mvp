@@ -73,22 +73,38 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
             }}
           >
             {imageSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imageSrc}
-                alt="Your design"
-                draggable={false}
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                  objectPosition: "center center",
-                  filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
-                  mixBlendMode: isUS ? undefined : "multiply",
-                }}
-              />
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imageSrc}
+                  alt="Your design"
+                  draggable={false}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    objectPosition: "center center",
+                    filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
+                    mixBlendMode: isUS ? undefined : "multiply",
+                  }}
+                />
+                {/* Paper grain texture — identical to ArtworkLayer getTextureVeil("card").
+                    Sits on top of the AI image, clipped to the inner frame only (outer div
+                    overflow-hidden prevents it reaching the white printed border). */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    pointerEvents: "none",
+                    backgroundImage: "repeating-linear-gradient(47deg, rgba(255,255,255,0.09) 0px, rgba(255,255,255,0.09) 2px, rgba(0,0,0,0.045) 2px, rgba(0,0,0,0.045) 4px)",
+                    opacity: 0.28,
+                    mixBlendMode: "multiply",
+                  }}
+                />
+              </>
             ) : (
               <div
                 style={{

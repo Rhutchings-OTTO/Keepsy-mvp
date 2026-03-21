@@ -133,6 +133,14 @@ export async function POST(req: Request) {
     const safeCartSummary = cartSummary.filter((item): item is NonNullable<typeof item> => item !== null) as CartLine[];
     const totalGBP = safeCartSummary.reduce((sum, item) => sum + item.priceGBP * item.quantity, 0);
 
+    const FREE_SHIPPING_THRESHOLD = 75;
+    const cartSubtotalInCurrency = safeCartSummary.reduce(
+      (sum, item) => sum + (currency === "usd" ? (item.priceUSD ?? item.priceGBP) : item.priceGBP) * item.quantity,
+      0
+    );
+    const shippingFee = currency === "usd" ? 4.99 : 3.99;
+    const shippingRequired = cartSubtotalInCurrency < FREE_SHIPPING_THRESHOLD;
+
     if (totalGBP <= 0) {
       return new Response(JSON.stringify({ error: "Invalid cart total." }), {
         status: 400,
@@ -220,26 +228,36 @@ export async function POST(req: Request) {
         shipping_address_collection: {
           allowed_countries: ["US", "GB"],
         },
-        line_items: safeCartSummary.map((item) => {
-          const meta: Record<string, string> = {
-            productId: item.id,
-            color: item.color ?? "",
-          };
-          if (item.size) meta.size = item.size;
-          meta.imageUrl = item.imageUrl ? "1" : "0";
-          return {
+        line_items: [
+          ...safeCartSummary.map((item) => {
+            const meta: Record<string, string> = {
+              productId: item.id,
+              color: item.color ?? "",
+            };
+            if (item.size) meta.size = item.size;
+            meta.imageUrl = item.imageUrl ? "1" : "0";
+            return {
+              price_data: {
+                currency,
+                product_data: {
+                  name: [item.name, item.size, item.color].filter(Boolean).join(" · ") || item.name,
+                  description: "Custom AI keepsake print",
+                  metadata: meta,
+                },
+                unit_amount: Math.round((currency === "usd" ? (item.priceUSD ?? item.priceGBP) : item.priceGBP) * 100),
+              },
+              quantity: item.quantity,
+            };
+          }),
+          ...(shippingRequired ? [{
             price_data: {
               currency,
-              product_data: {
-                name: [item.name, item.size, item.color].filter(Boolean).join(" · ") || item.name,
-                description: "Custom AI keepsake print",
-                metadata: meta,
-              },
-              unit_amount: Math.round((currency === "usd" ? (item.priceUSD ?? item.priceGBP) : item.priceGBP) * 100),
+              product_data: { name: "Standard Shipping" },
+              unit_amount: Math.round(shippingFee * 100),
             },
-            quantity: item.quantity,
-          };
-        }),
+            quantity: 1 as const,
+          }] : []),
+        ],
         success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/create?canceled=1`,
         metadata: {

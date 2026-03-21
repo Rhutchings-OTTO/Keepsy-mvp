@@ -531,6 +531,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     [cartItems]
   );
   const hasCartItems = cartItems.length > 0;
+  const FREE_SHIPPING_THRESHOLD = 75;
+  const SHIPPING_FEE = region === "US" ? 4.99 : 3.99;
+  const cartShipping = cartSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const cartTotal = cartSubtotal + cartShipping;
+  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - cartSubtotal);
   const isCanvasProduct = selectedProduct.id === "canvas";
   const isCardProduct   = selectedProduct.id === "card";
 
@@ -547,6 +552,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     : isCardProduct
     ? cardSubtypePrice
     : selectedProduct.basePrice;
+  const checkoutShipping = checkoutTotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const checkoutGrandTotal = checkoutTotal + checkoutShipping;
   const checkoutItemDescription = hasCartItems
     ? `${cartCount} item${cartCount === 1 ? "" : "s"}`
     : selectedProduct.name;
@@ -1665,7 +1672,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </motion.div>
                         ) : (
                           <motion.div key="default" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-2">
-                            {isBusy ? "Securing your Masterpiece…" : `Pay ${fmt(checkoutTotal)}`} <ArrowRight />
+                            {isBusy ? "Securing your Masterpiece…" : `Pay ${fmt(checkoutGrandTotal)}`} <ArrowRight />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -1714,8 +1721,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     </div>
 
                     <div className="mt-6 pt-5 border-t border-charcoal/10 space-y-2 text-sm font-semibold text-charcoal/60">
-                      <div className="flex justify-between"><span>Shipping</span><span>Free</span></div>
-                      <div className="flex justify-between text-charcoal font-black text-base pt-2"><span>Total</span><span>{fmt(checkoutTotal)}</span></div>
+                      <div className="flex justify-between"><span>Shipping</span><span>{checkoutShipping === 0 ? "FREE" : fmt(checkoutShipping)}</span></div>
+                      <div className="flex justify-between text-charcoal font-black text-base pt-2"><span>Total</span><span>{fmt(checkoutGrandTotal)}</span></div>
                     </div>
 
                     <div className="mt-6 flex items-center gap-2 text-xs text-charcoal/45 font-semibold">
@@ -1922,9 +1929,24 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 )}
               </div>
               <div className="pt-4 border-t border-charcoal/10">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-charcoal/55 font-semibold">Subtotal</span>
-                  <span className="text-xl font-black">{fmt(cartSubtotal)}</span>
+                <div className="space-y-1 mb-3 text-sm font-semibold">
+                  <div className="flex items-center justify-between text-charcoal/55">
+                    <span>Subtotal</span>
+                    <span>{fmt(cartSubtotal)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-charcoal/55">
+                    <span>Shipping</span>
+                    <span className={cartShipping === 0 ? "text-green-600" : ""}>{cartShipping === 0 ? "FREE" : fmt(cartShipping)}</span>
+                  </div>
+                  {amountToFreeShipping > 0 && (
+                    <p className="text-xs text-charcoal/40 text-right">
+                      Spend {fmt(amountToFreeShipping)} more for free shipping
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between text-charcoal font-black text-base pt-1 border-t border-charcoal/10">
+                    <span>Total</span>
+                    <span>{fmt(cartTotal)}</span>
+                  </div>
                 </div>
                 <button
                   onClick={() => requestCheckout("cart")}

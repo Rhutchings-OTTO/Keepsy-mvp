@@ -12,7 +12,7 @@ type CheckoutSummaryEnhancerProps = {
 const FAQS = [
   {
     q: "Shipping",
-    a: "Shipping options are shown during checkout. Delivery windows vary by location and season.",
+    a: "Standard shipping is included in your order total. Free on orders over £75 / $75. Delivery windows vary by location.",
   },
   {
     q: "Print quality",

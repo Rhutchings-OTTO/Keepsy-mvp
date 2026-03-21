@@ -483,9 +483,21 @@ export function CartDrawer() {
                   <button
                     type="button"
                     disabled={isCheckingOut}
-                    className="flex w-full items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ backgroundColor: "red", color: "white", height: "60px", width: "100%", position: "relative", zIndex: 99999, fontSize: "24px" }}
                     onClick={() => void handleCheckout()}
+                    style={{
+                      backgroundColor: '#C4714A',
+                      color: '#FFFFFF',
+                      width: '100%',
+                      height: '56px',
+                      borderRadius: '12px',
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      border: 'none',
+                      cursor: isCheckingOut ? 'not-allowed' : 'pointer',
+                      display: 'block',
+                      marginTop: '12px',
+                      opacity: isCheckingOut ? 0.6 : 1,
+                    }}
                   >
                     {isCheckingOut ? "Taking you to checkout…" : "Go to Secure Checkout"}
                   </button>

@@ -62,10 +62,10 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
               draggable={false}
               style={{
                 position: "absolute",
-                top: "9%",
-                left: "9%",
-                width: "82%",
-                height: "82%",
+                top: "3%",
+                left: "3%",
+                width: "94%",
+                height: "94%",
                 objectFit: "contain",
                 // Matte card feel — match server-side compositing
                 filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
@@ -78,10 +78,10 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
             <div
               style={{
                 position: "absolute",
-                top: "9%",
-                left: "9%",
-                width: "82%",
-                height: "82%",
+                top: "3%",
+                left: "3%",
+                width: "94%",
+                height: "94%",
                 background: "rgba(220, 210, 200, 0.25)",
                 display: "flex",
                 alignItems: "center",

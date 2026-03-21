@@ -481,37 +481,36 @@ export function CartDrawer() {
                       {checkoutError}
                     </p>
                   )}
-                  {/* div instead of button to bypass Tailwind Preflight `background-color: transparent` reset on button elements */}
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    aria-disabled={isCheckingOut}
-                    onClick={() => { if (!isCheckingOut) void handleCheckout(); }}
-                    onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !isCheckingOut) void handleCheckout(); }}
+                  <a
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!isCheckingOut) void handleCheckout();
+                    }}
+                    href="#"
                     style={{
+                      display: 'block',
+                      width: '100%',
+                      padding: '16px 0',
+                      marginTop: '12px',
+                      marginBottom: '12px',
                       backgroundColor: '#C4714A',
                       color: '#FFFFFF',
-                      width: '100%',
-                      height: '56px',
-                      borderRadius: '12px',
                       fontSize: '18px',
                       fontWeight: '600',
-                      border: 'none',
-                      cursor: isCheckingOut ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginTop: '12px',
+                      textAlign: 'center',
+                      textDecoration: 'none',
+                      borderRadius: '12px',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      appearance: 'none',
                       opacity: isCheckingOut ? 0.6 : 1,
-                      userSelect: 'none',
-                      WebkitUserSelect: 'none',
-                      boxSizing: 'border-box',
+                      cursor: isCheckingOut ? 'not-allowed' : 'pointer',
                     }}
                   >
-                    {isCheckingOut ? "Taking you to checkout…" : "Go to Secure Checkout"}
-                  </div>
-                  <p className="mt-2 text-center text-[11px] text-charcoal/50 font-medium">
-                    No account required · Secure checkout
+                    {isCheckingOut ? "Taking you to checkout…" : "Checkout"}
+                  </a>
+                  <p style={{ color: '#C4714A', textAlign: 'center', marginTop: '8px', fontSize: '14px' }}>
+                    Tap above to checkout
                   </p>
                 </div>
               </div>

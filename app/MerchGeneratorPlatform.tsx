@@ -1253,7 +1253,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       }}
                       className="self-start shrink-0"
                     />
-                    <div className="w-[68%] mx-auto min-w-0 md:w-auto md:mx-0 md:flex-1">
+                    <div className="w-full min-w-0 md:w-auto md:mx-0 md:flex-1">
                       <div className="rounded-2xl bg-[#FAF9F7] border border-charcoal/8 p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                         {/* Canvas: show crop tool or canvas mockup */}
                         <AnimatePresence mode="sync" initial={false}>

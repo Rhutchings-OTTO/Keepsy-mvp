@@ -77,8 +77,8 @@ export type CreatePageLayoutLeanProps = {
   onProductSelect: (type: "tshirt" | "mug" | "card" | "hoodie") => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   selectedProductType?: "tshirt" | "mug" | "card" | "hoodie";
-  selectedCardSubtype?: "postcard" | "cardpack";
-  onCardSubtypeSelect?: (subtype: "postcard" | "cardpack") => void;
+  selectedCardSubtype?: string;
+  onCardSubtypeSelect?: (subtype: string) => void;
 };
 
 const fadeInUp = {
@@ -484,54 +484,95 @@ export function CreatePageLayoutLean({
                 transition={{ duration: 0.2 }}
                 className="mt-4 rounded-xl border border-terracotta/20 bg-terracotta/5 p-4"
               >
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-charcoal/50">
-                  Choose card type
-                </p>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {(
-                    [
-                      {
-                        value: "postcard" as const,
-                        label: "Postcard",
-                        priceGBP: "£6.99",
-                        priceUSD: "$9.99",
-                        desc: "Premium fine art postcard on thick 280gsm giclée paper with a glossy finish.",
-                      },
-                      {
-                        value: "cardpack" as const,
-                        label: "Greeting Cards (7 pack)",
-                        priceGBP: "£29.99",
-                        priceUSD: "$39.99",
-                        desc: "7 beautifully printed portrait cards on bright white matte paper. Each one comes with a craft paper envelope.",
-                      },
-                    ] as const
-                  ).map(({ value, label, priceGBP, priceUSD, desc }) => {
-                    const active = selectedCardSubtype === value;
-                    const price = region === "US" ? priceUSD : priceGBP;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => onCardSubtypeSelect(value)}
-                        className={`rounded-xl border p-3 text-left transition ${
-                          active
-                            ? "border-terracotta bg-terracotta text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
-                            : "border-charcoal/10 bg-white text-charcoal hover:border-terracotta/40"
-                        }`}
-                      >
-                        <p className={`text-sm font-semibold ${active ? "text-white" : "text-charcoal"}`}>
-                          {label}
-                        </p>
-                        <p className={`mt-0.5 text-xs font-medium ${active ? "text-white/80" : "text-terracotta"}`}>
-                          {price}
-                        </p>
-                        <p className={`mt-1 text-xs leading-5 ${active ? "text-white/70" : "text-charcoal/50"}`}>
-                          {desc}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
+                {region === "US" ? (
+                  <>
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-charcoal/50">
+                      How many cards?
+                    </p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {(
+                        [
+                          { value: "uscard_1",  label: "1 card",    price: "$9.99",  desc: "Perfect for sending to one special person." },
+                          { value: "uscard_10", label: "10 cards",  price: "$29.99", desc: "Great for sharing with close friends and family." },
+                          { value: "uscard_30", label: "30 cards",  price: "$59.99", desc: "Ideal for a larger celebration or event." },
+                          { value: "uscard_50", label: "50 cards",  price: "$89.99", desc: "Best value — perfect for big occasions." },
+                        ] as const
+                      ).map(({ value, label, price, desc }) => {
+                        const active = selectedCardSubtype === value;
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => onCardSubtypeSelect(value)}
+                            className={`rounded-xl border p-3 text-left transition ${
+                              active
+                                ? "border-terracotta bg-terracotta text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
+                                : "border-charcoal/10 bg-white text-charcoal hover:border-terracotta/40"
+                            }`}
+                          >
+                            <p className={`text-sm font-semibold ${active ? "text-white" : "text-charcoal"}`}>
+                              {label}
+                            </p>
+                            <p className={`mt-0.5 text-xs font-medium ${active ? "text-white/80" : "text-terracotta"}`}>
+                              {price}
+                            </p>
+                            <p className={`mt-1 text-xs leading-5 ${active ? "text-white/70" : "text-charcoal/50"}`}>
+                              {desc}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-charcoal/50">
+                      Choose card type
+                    </p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {(
+                        [
+                          {
+                            value: "postcard",
+                            label: "Postcard",
+                            price: "£6.99",
+                            desc: "Premium fine art postcard on thick 280gsm giclée paper with a glossy finish.",
+                          },
+                          {
+                            value: "cardpack",
+                            label: "Greeting Cards (7 pack)",
+                            price: "£29.99",
+                            desc: "7 beautifully printed portrait cards on bright white matte paper. Each one comes with a craft paper envelope.",
+                          },
+                        ] as const
+                      ).map(({ value, label, price, desc }) => {
+                        const active = selectedCardSubtype === value;
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => onCardSubtypeSelect(value)}
+                            className={`rounded-xl border p-3 text-left transition ${
+                              active
+                                ? "border-terracotta bg-terracotta text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
+                                : "border-charcoal/10 bg-white text-charcoal hover:border-terracotta/40"
+                            }`}
+                          >
+                            <p className={`text-sm font-semibold ${active ? "text-white" : "text-charcoal"}`}>
+                              {label}
+                            </p>
+                            <p className={`mt-0.5 text-xs font-medium ${active ? "text-white/80" : "text-terracotta"}`}>
+                              {price}
+                            </p>
+                            <p className={`mt-1 text-xs leading-5 ${active ? "text-white/70" : "text-charcoal/50"}`}>
+                              {desc}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

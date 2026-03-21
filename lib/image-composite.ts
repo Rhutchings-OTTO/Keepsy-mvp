@@ -38,6 +38,24 @@ const CARDPACK_PANEL_W = CARDPACK_W - CARDPACK_HALF_W; // 1205
 const COVER_SAFE_W = Math.round(CARDPACK_PANEL_W * 0.80); // 964
 const COVER_SAFE_H = Math.round(CARDPACK_H       * 0.80); // 1455
 
+/**
+ * US Greeting Card (Blueprint 1094) — 2175 × 1538 px landscape flat.
+ * Layout (same fold logic as cardpack):
+ *
+ *   Left half  [0 – HALF_W):   inside-left panel (Keepsy branding)
+ *   Right half [HALF_W – W):   front cover (AI image)
+ *
+ * Both halves read top-to-bottom. Upload to Printify at scale:1.0.
+ */
+const USCARD_W       = 2175;
+const USCARD_H       = 1538;
+const USCARD_HALF_W  = Math.round(USCARD_W / 2); // 1087
+const USCARD_PANEL_W = USCARD_W - USCARD_HALF_W; // 1088
+
+/** Front-cover safe zone: 80% of the right half */
+const USCARD_COVER_SAFE_W = Math.round(USCARD_PANEL_W * 0.80); // 870
+const USCARD_COVER_SAFE_H = Math.round(USCARD_H * 0.80);       // 1230
+
 /** 11 oz mug full-wrap print area */
 const MUG_W = 2582;
 const MUG_H = 1120;
@@ -220,6 +238,81 @@ export async function compositeCardpackImage(imageUrl: string): Promise<Buffer> 
     create: {
       width: CARDPACK_W,
       height: CARDPACK_H,
+      channels: 3,
+      background: { r: 255, g: 255, b: 255 },
+    },
+  })
+    .composite([
+      { input: resized,     left: imageLeft, top: imageTop },
+      { input: brandingSvg, left: 0,         top: 0        },
+    ])
+    .png()
+    .toBuffer();
+}
+
+/**
+ * US Greeting Card (Blueprint 1094): composite AI image and branding onto a
+ * white 2175 × 1538 px canvas (laid flat).
+ *
+ *   Right half [HALF_W – W]: front cover — AI image, contain-fitted to 80% of
+ *     the 1088 × 1538 panel, centred.
+ *   Left half  [0 – HALF_W]: inside-left — "made with / Keepsy.store" branding,
+ *     centred in portrait orientation.
+ *
+ * Upload to Printify at scale:1.0.
+ */
+export async function compositeUSCardImage(imageUrl: string): Promise<Buffer> {
+  const srcBuf = await fetchBuffer(imageUrl);
+
+  // ── Front cover (right half): contain-fit AI image within safe zone ──────────
+  const resized = await sharp(srcBuf)
+    .resize(USCARD_COVER_SAFE_W, USCARD_COVER_SAFE_H, { fit: "inside", withoutEnlargement: false })
+    .png()
+    .toBuffer();
+
+  const { width: rw = USCARD_COVER_SAFE_W, height: rh = USCARD_COVER_SAFE_H } = await sharp(resized).metadata();
+
+  // Centre within the right half
+  const imageLeft = USCARD_HALF_W + Math.round((USCARD_PANEL_W - rw) / 2);
+  const imageTop  = Math.round((USCARD_H - rh) / 2);
+
+  // ── Inside-left panel: "made with / Keepsy.store" branding ───────────────────
+  const FONT_BODY  = 36;
+  const FONT_BRAND = 44;
+  const TEXT_COLOR = "#AAAAAA";
+  const cx = Math.round(USCARD_HALF_W / 2);
+  const cy = Math.round(USCARD_H / 2);
+
+  const brandingSvg = Buffer.from(
+    `<svg width="${USCARD_HALF_W}" height="${USCARD_H}" xmlns="http://www.w3.org/2000/svg">
+      <text
+        x="${cx}" y="${cy - 26}"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="${FONT_BODY}"
+        font-weight="400"
+        letter-spacing="3"
+        fill="${TEXT_COLOR}"
+      >made with</text>
+      <text
+        x="${cx}" y="${cy + 30}"
+        text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="${FONT_BRAND}"
+        font-weight="700"
+        fill="${TEXT_COLOR}"
+      >Keepsy<tspan
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="${FONT_BODY}"
+          font-weight="400"
+        >.store</tspan></text>
+    </svg>`
+  );
+
+  return sharp({
+    create: {
+      width: USCARD_W,
+      height: USCARD_H,
       channels: 3,
       background: { r: 255, g: 255, b: 255 },
     },

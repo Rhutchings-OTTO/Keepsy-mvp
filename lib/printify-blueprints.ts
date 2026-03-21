@@ -27,6 +27,7 @@ export type ProductRegionKey =
   | "tee_uk"
   | "postcard"
   | "cardpack"
+  | "uscard"
   | "canvas";
 
 export type BlueprintConfig = {
@@ -84,6 +85,23 @@ const CARDPACK: BlueprintConfig = {
   printPosition: "front",
   variants: {},
   fallbackVariantId: 101200, // TODO: replace with actual variant ID
+};
+
+/* ─── US Greeting Cards (BP 1094, provider Taylor) ───────────────────────── */
+// Print area: 2175 × 1538 px (landscape flat; portrait when folded).
+// Quantity options: 1, 10, 30, 50 cards — each is a separate variant.
+// TODO: replace variant IDs with real values from Printify dashboard / API.
+const USCARD: BlueprintConfig = {
+  blueprintId: 1094,
+  printProviderId: 1,   // TODO: confirm provider ID from Printify dashboard
+  printPosition: "front",
+  variants: {
+    "1":  101300, // TODO: replace with actual variant ID for 1-card
+    "10": 101301, // TODO: replace with actual variant ID for 10-pack
+    "30": 101302, // TODO: replace with actual variant ID for 30-pack
+    "50": 101303, // TODO: replace with actual variant ID for 50-pack
+  },
+  fallbackVariantId: 101300, // TODO: replace with actual variant ID
 };
 
 /* ─── Hoodie US (BP 77, provider 99 — Printify Choice) ───────────────────── */
@@ -284,6 +302,7 @@ export const PRINTIFY_BLUEPRINTS: Record<ProductRegionKey, BlueprintConfig> = {
   tee_uk: TEE, // same provider serves both regions for Comfort Colors
   postcard: POSTCARD,
   cardpack: CARDPACK,
+  uscard: USCARD,
   canvas: CANVAS,
 };
 
@@ -300,6 +319,8 @@ export function getProductRegionKey(
   const p = productId.toLowerCase();
   if (p === "postcard") return "postcard";
   if (p === "cardpack") return "cardpack";
+  // US greeting cards: uscard_1, uscard_10, uscard_30, uscard_50 → all use uscard blueprint
+  if (p.startsWith("uscard")) return "uscard";
   if (p === "mug") return region === "UK" ? "mug_uk" : "mug_us";
   if (p === "hoodie") return region === "UK" ? "hoodie_uk" : "hoodie_us";
   if (p === "tee") return region === "UK" ? "tee_uk" : "tee_us";
@@ -344,6 +365,13 @@ export function getPrintifyVariantId(
 ): { config: BlueprintConfig; variantId: number } {
   const key = getProductRegionKey(productId, region);
   const config = PRINTIFY_BLUEPRINTS[key];
+
+  // US greeting cards: quantity is encoded in the productId suffix (uscard_1, uscard_10, etc.)
+  if (key === "uscard") {
+    const qty = productId.toLowerCase().replace("uscard_", "");
+    const variantId = config.variants[qty] ?? config.fallbackVariantId;
+    return { config, variantId };
+  }
 
   const c = normalizeColor(color);
   const s = normalizeSize(size);

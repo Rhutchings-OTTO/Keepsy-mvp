@@ -502,8 +502,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCT_LIST[2]); // default: card
   const [selectedColor, setSelectedColor] = useState(PRODUCT_LIST[2].colors?.[0]?.hex ?? "#FFFFFF");
   const [selectedSize, setSelectedSize] = useState<ApparelSize | null>(null);
-  // Card sub-type: "postcard" (£6.99) or "cardpack" — Greeting Cards 7 pack (£29.99)
-  const [selectedCardSubtype, setSelectedCardSubtype] = useState<"postcard" | "cardpack">("postcard");
+  // Card sub-type: UK = "postcard" | "cardpack"; US = "uscard_1" | "uscard_10" | "uscard_30" | "uscard_50"
+  type CardSubtype = "postcard" | "cardpack" | "uscard_1" | "uscard_10" | "uscard_30" | "uscard_50";
+  const [selectedCardSubtype, setSelectedCardSubtype] = useState<CardSubtype>(
+    region === "US" ? "uscard_1" : "postcard"
+  );
   // Canvas-specific state
   const [selectedCanvasSize, setSelectedCanvasSize] = useState<CanvasSize>(DEFAULT_CANVAS_SIZE);
   const [croppedImageDataUrl, setCroppedImageDataUrl] = useState<string | null>(null);
@@ -540,10 +543,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const isCardProduct   = selectedProduct.id === "card";
 
   // Price for the selected card sub-type (or the canvas size), region-aware
-  const cardSubtypePrice =
-    selectedCardSubtype === "cardpack"
-      ? (region === "US" ? 39.99 : 29.99)
-      : (region === "US" ? 9.99 :  6.99);
+  const US_CARD_QTY_PRICES: Record<string, number> = {
+    uscard_1: 9.99, uscard_10: 29.99, uscard_30: 59.99, uscard_50: 89.99,
+  };
+  const cardSubtypePrice = selectedCardSubtype.startsWith("uscard")
+    ? (US_CARD_QTY_PRICES[selectedCardSubtype] ?? 9.99)
+    : selectedCardSubtype === "cardpack"
+    ? (region === "US" ? 39.99 : 29.99)
+    : (region === "US" ? 9.99 : 6.99);
 
   const checkoutTotal = hasCartItems
     ? cartSubtotal
@@ -654,6 +661,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       card: "card",
       postcard: "card",
       cardpack: "card",
+      uscard_1: "card",
+      uscard_10: "card",
+      uscard_30: "card",
+      uscard_50: "card",
       hoodie: "hoodie",
     };
     const productType = normalizedProduct ? catalogToProduct[normalizedProduct] : null;
@@ -665,6 +676,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
     if (normalizedProduct === "postcard") setSelectedCardSubtype("postcard");
     if (normalizedProduct === "cardpack") setSelectedCardSubtype("cardpack");
+    if (normalizedProduct?.startsWith("uscard")) setSelectedCardSubtype(normalizedProduct as CardSubtype);
 
     const promptPrefill = initialQuery.prompt?.trim();
     const style = initialQuery.style?.trim();
@@ -881,10 +893,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       ? cardSubtypePrice
       : selectedProduct.basePrice;
     const effectiveImageUrl = isCanvasProduct ? (croppedImageDataUrl ?? generatedImage) : generatedImage;
+    const US_CARD_NAMES: Record<string, string> = {
+      uscard_1: "Greeting Card (1 card)", uscard_10: "Greeting Cards (10 pack)",
+      uscard_30: "Greeting Cards (30 pack)", uscard_50: "Greeting Cards (50 pack)",
+    };
     const itemName = isCanvasProduct
       ? `Canvas Print (${selectedCanvasSize.width}×${selectedCanvasSize.height} in)`
       : isCard
-      ? (selectedCardSubtype === "cardpack" ? "Greeting Cards (7 pack)" : "Fine Art Postcard")
+      ? (selectedCardSubtype.startsWith("uscard")
+          ? (US_CARD_NAMES[selectedCardSubtype] ?? "Greeting Card")
+          : selectedCardSubtype === "cardpack"
+          ? "Greeting Cards (7 pack)"
+          : "Fine Art Postcard")
       : selectedProduct.name;
     const variantKey = `${catalogId}-${selectedColor}-${selectedSize ?? canvasSizeCode ?? "na"}-${Date.now()}`;
     const newItem: CartItem = {
@@ -958,7 +978,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
     // Card: use the selected sub-type catalog ID and price
     if (isCardProduct) {
-      const cardName = selectedCardSubtype === "cardpack"
+      const US_CARD_NAMES_CHECKOUT: Record<string, string> = {
+        uscard_1: "Greeting Card (1 card)", uscard_10: "Greeting Cards (10 pack)",
+        uscard_30: "Greeting Cards (30 pack)", uscard_50: "Greeting Cards (50 pack)",
+      };
+      const cardName = selectedCardSubtype.startsWith("uscard")
+        ? (US_CARD_NAMES_CHECKOUT[selectedCardSubtype] ?? "Greeting Card")
+        : selectedCardSubtype === "cardpack"
         ? "Greeting Cards (7 pack)"
         : "Fine Art Postcard";
       return [
@@ -1204,7 +1230,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   fileInputRef={fileInputRef}
                   selectedProductType={selectedProduct.id === "canvas" ? "card" : selectedProduct.id as "tshirt" | "mug" | "card" | "hoodie"}
                   selectedCardSubtype={selectedCardSubtype}
-                  onCardSubtypeSelect={setSelectedCardSubtype}
+                  onCardSubtypeSelect={(v) => setSelectedCardSubtype(v as CardSubtype)}
                 />
               )}
 
@@ -1296,6 +1322,16 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               imageSrc={croppedImageDataUrl ?? generatedImage}
                             />
                           </motion.div>
+                        ) : isCardProduct && region === "US" ? (
+                          <motion.div
+                            key={`uscard-${selectedCardSubtype}-${generatedImage ?? "empty"}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.18 }}
+                          >
+                            <GreetingCardMockup imageSrc={generatedImage} variant="us" />
+                          </motion.div>
                         ) : isCardProduct && selectedCardSubtype === "cardpack" ? (
                           <motion.div
                             key={`cardpack-${generatedImage ?? "empty"}`}
@@ -1304,7 +1340,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.18 }}
                           >
-                            <GreetingCardMockup imageSrc={generatedImage} />
+                            <GreetingCardMockup imageSrc={generatedImage} variant="uk" />
                           </motion.div>
                         ) : (
                           <motion.div
@@ -1505,49 +1541,85 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       {/* Card sub-type selector */}
                       {isCardProduct && (
                         <section>
-                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">Card Type</h3>
-                          <div className="grid grid-cols-2 gap-3">
-                            {(
-                              [
-                                {
-                                  value: "postcard" as const,
-                                  label: "Postcard",
-                                  subtitle: "Premium fine art postcard on thick 280gsm giclée paper with a glossy finish.",
-                                  priceGBP: "£6.99",
-                                  priceUSD: "$9.99",
-                                },
-                                {
-                                  value: "cardpack" as const,
-                                  label: "Greeting Card Pack",
-                                  subtitle: "7 beautifully printed portrait cards on bright white matte paper. Each one comes with a craft paper envelope.",
-                                  priceGBP: "£29.99",
-                                  priceUSD: "$39.99",
-                                },
-                              ] as const
-                            ).map(({ value, label, subtitle, priceGBP, priceUSD }) => {
-                              const active = selectedCardSubtype === value;
-                              const price = region === "US" ? priceUSD : priceGBP;
-                              return (
-                                <motion.button
-                                  key={value}
-                                  type="button"
-                                  whileHover={{ y: -1 }}
-                                  whileTap={{ scale: 0.98 }}
-                                  onClick={() => setSelectedCardSubtype(value)}
-                                  className={`rounded-xl border-2 p-3 text-left transition-all ${
-                                    active
-                                      ? "bg-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
-                                      : "border-charcoal/10 bg-[#F5EDE0]"
-                                  }`}
-                                  style={active ? { borderColor: "var(--color-terracotta)" } : undefined}
-                                >
-                                  <p className="text-sm font-extrabold text-charcoal">{label}</p>
-                                  <p className="mt-0.5 text-xs font-semibold" style={{ color: "var(--color-terracotta)" }}>{price}</p>
-                                  <p className="mt-1 text-xs leading-4 text-charcoal/50">{subtitle}</p>
-                                </motion.button>
-                              );
-                            })}
-                          </div>
+                          {region === "US" ? (
+                            <>
+                              <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">How Many Cards?</h3>
+                              <div className="grid grid-cols-2 gap-3">
+                                {(
+                                  [
+                                    { value: "uscard_1",  label: "1 card",   price: "$9.99",  subtitle: "Perfect for sending to one special person." },
+                                    { value: "uscard_10", label: "10 cards", price: "$29.99", subtitle: "Great for sharing with close friends and family." },
+                                    { value: "uscard_30", label: "30 cards", price: "$59.99", subtitle: "Ideal for a larger celebration or event." },
+                                    { value: "uscard_50", label: "50 cards", price: "$89.99", subtitle: "Best value — perfect for big occasions." },
+                                  ] as const
+                                ).map(({ value, label, price, subtitle }) => {
+                                  const active = selectedCardSubtype === value;
+                                  return (
+                                    <motion.button
+                                      key={value}
+                                      type="button"
+                                      whileHover={{ y: -1 }}
+                                      whileTap={{ scale: 0.98 }}
+                                      onClick={() => setSelectedCardSubtype(value)}
+                                      className={`rounded-xl border-2 p-3 text-left transition-all ${
+                                        active
+                                          ? "bg-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
+                                          : "border-charcoal/10 bg-[#F5EDE0]"
+                                      }`}
+                                      style={active ? { borderColor: "var(--color-terracotta)" } : undefined}
+                                    >
+                                      <p className="text-sm font-extrabold text-charcoal">{label}</p>
+                                      <p className="mt-0.5 text-xs font-semibold" style={{ color: "var(--color-terracotta)" }}>{price}</p>
+                                      <p className="mt-1 text-xs leading-4 text-charcoal/50">{subtitle}</p>
+                                    </motion.button>
+                                  );
+                                })}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">Card Type</h3>
+                              <div className="grid grid-cols-2 gap-3">
+                                {(
+                                  [
+                                    {
+                                      value: "postcard" as const,
+                                      label: "Postcard",
+                                      subtitle: "Premium fine art postcard on thick 280gsm giclée paper with a glossy finish.",
+                                      price: "£6.99",
+                                    },
+                                    {
+                                      value: "cardpack" as const,
+                                      label: "Greeting Card Pack",
+                                      subtitle: "7 beautifully printed portrait cards on bright white matte paper. Each one comes with a craft paper envelope.",
+                                      price: "£29.99",
+                                    },
+                                  ] as const
+                                ).map(({ value, label, subtitle, price }) => {
+                                  const active = selectedCardSubtype === value;
+                                  return (
+                                    <motion.button
+                                      key={value}
+                                      type="button"
+                                      whileHover={{ y: -1 }}
+                                      whileTap={{ scale: 0.98 }}
+                                      onClick={() => setSelectedCardSubtype(value)}
+                                      className={`rounded-xl border-2 p-3 text-left transition-all ${
+                                        active
+                                          ? "bg-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
+                                          : "border-charcoal/10 bg-[#F5EDE0]"
+                                      }`}
+                                      style={active ? { borderColor: "var(--color-terracotta)" } : undefined}
+                                    >
+                                      <p className="text-sm font-extrabold text-charcoal">{label}</p>
+                                      <p className="mt-0.5 text-xs font-semibold" style={{ color: "var(--color-terracotta)" }}>{price}</p>
+                                      <p className="mt-1 text-xs leading-4 text-charcoal/50">{subtitle}</p>
+                                    </motion.button>
+                                  );
+                                })}
+                              </div>
+                            </>
+                          )}
                         </section>
                       )}
 

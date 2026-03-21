@@ -7,22 +7,114 @@ type GreetingCardMockupProps = {
   /** AI-generated image to show on the front card face. null = placeholder. */
   imageSrc: string | null;
   className?: string;
+  /** "uk" = portrait 7-pack stack mockup (default); "us" = landscape single-card preview */
+  variant?: "uk" | "us";
 };
 
 /**
- * Greeting card (7-pack) mockup.
- * Uses the real product photo as the base with the AI artwork overlaid
- * on the front card face (the rightmost card facing the viewer).
+ * Greeting card mockup.
  *
- * The front card occupies approximately:
- *   left: 55%–88%  top: 13%–84%  of the 1024×1536 base image.
- * The AI image is inset ~9% from each edge of the card face, matching
- * the white border that appears on the printed card.
+ * variant="uk" (default): portrait 7-pack stack using the real product photo.
+ * variant="us": landscape single-card preview (BP 1094). AI image fills the
+ *   right half of the card; left half shows "made with Keepsy" branding text
+ *   — matching the server-side compositing layout.
  */
 export const GreetingCardMockup = memo(function GreetingCardMockup({
   imageSrc,
   className = "",
+  variant = "uk",
 }: GreetingCardMockupProps) {
+  if (variant === "us") {
+    // Landscape card preview — aspect ratio matches 2175:1538 ≈ 1.414:1
+    return (
+      <div
+        className={`relative w-full overflow-hidden rounded-3xl border border-black/[0.06] bg-[#FAF9F7] shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_0_0_rgba(255,255,255,0.8)_inset] ${className}`}
+        style={{ aspectRatio: "1.414 / 1" }}
+      >
+        <div className="absolute inset-[1px] overflow-hidden rounded-[22px] bg-white flex">
+          {/* Left half — branding panel */}
+          <div
+            className="flex flex-1 flex-col items-center justify-center gap-0.5 border-r border-black/[0.06]"
+            style={{ backgroundColor: "#FAF9F7" }}
+          >
+            <p
+              style={{
+                fontFamily: "Arial, sans-serif",
+                fontSize: "0.5rem",
+                letterSpacing: "0.18em",
+                color: "#BBBBBB",
+                textTransform: "lowercase",
+              }}
+            >
+              made with
+            </p>
+            <p
+              style={{
+                fontFamily: "Georgia, serif",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                color: "#BBBBBB",
+              }}
+            >
+              Keepsy<span style={{ fontFamily: "Arial, sans-serif", fontWeight: 400, fontSize: "0.5rem" }}>.store</span>
+            </p>
+          </div>
+
+          {/* Right half — AI artwork */}
+          <div className="relative flex-1 overflow-hidden">
+            {imageSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageSrc}
+                alt="Your design"
+                draggable={false}
+                style={{
+                  position: "absolute",
+                  top: "5%",
+                  left: "5%",
+                  width: "90%",
+                  height: "90%",
+                  objectFit: "contain",
+                  filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: "5%",
+                  background: "rgba(220, 210, 200, 0.25)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  gap: 4,
+                  borderRadius: 2,
+                }}
+              >
+                <div style={{ fontSize: "1.2rem", opacity: 0.3 }}>✉</div>
+                <p
+                  style={{
+                    fontSize: "0.42rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "#5a4a40",
+                    opacity: 0.45,
+                    textAlign: "center",
+                  }}
+                >
+                  Your design here
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // UK default: portrait 7-pack stack
   return (
     <div
       className={`relative w-full overflow-hidden rounded-3xl border border-black/[0.06] bg-[#FAF9F7] shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_0_0_rgba(255,255,255,0.8)_inset] ${className}`}
@@ -50,8 +142,6 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
             top: "8%",
             width: "42%",
             height: "80%",
-            // The white card surface shows around the print — no bg needed,
-            // the mockup image provides it. The overlay is transparent.
           }}
         >
           {imageSrc ? (
@@ -67,14 +157,11 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
                 width: "94%",
                 height: "94%",
                 objectFit: "contain",
-                // Matte card feel — match server-side compositing
                 filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
-                // Slight mix-blend to let card texture show through
                 mixBlendMode: "multiply",
               }}
             />
           ) : (
-            // Placeholder when no image generated yet
             <div
               style={{
                 position: "absolute",

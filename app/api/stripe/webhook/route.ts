@@ -17,6 +17,7 @@ import sharp from "sharp";
 import {
   compositePostcardImage,
   compositeCardpackImage,
+  compositeUSCardImage,
   compositeMugImage,
   computeContainScale,
   TEE_PRINT_W,
@@ -376,6 +377,11 @@ async function handleCheckoutCompleted(
     } else if (pType === "cardpack") {
       console.log("[printify] Compositing greeting card bundle (2409×1819): front cover + inside branding");
       const buf = await compositeCardpackImage(printifySourceUrl);
+      printifyImageId = await uploadImageToPrintify(buf, `keepsy-${orderRef}.png`);
+
+    } else if (pType.startsWith("uscard")) {
+      console.log("[printify] Compositing US greeting card (2175×1538): front cover + inside branding");
+      const buf = await compositeUSCardImage(printifySourceUrl);
       printifyImageId = await uploadImageToPrintify(buf, `keepsy-${orderRef}.png`);
 
     } else if (pType.includes("mug")) {

@@ -12,6 +12,11 @@ export const PRODUCT_CATALOG: Record<string, CatalogProduct> = {
   postcard: { id: "postcard", name: "Fine Art Postcard",          priceGBP: 6.99,  priceUSD: 9.99  },
   cardpack: { id: "cardpack", name: "Greeting Cards (7 pack)",    priceGBP: 29.99, priceUSD: 39.99 },
   mug:      { id: "mug",      name: "Mug",                        priceGBP: 14.99, priceUSD: 19.99 },
+  // US Greeting Cards (BP 1094) — USD-only product; priceGBP set equal as placeholder
+  uscard_1:  { id: "uscard_1",  name: "Greeting Card (1 card)",   priceGBP: 9.99,  priceUSD: 9.99  },
+  uscard_10: { id: "uscard_10", name: "Greeting Cards (10 pack)",  priceGBP: 29.99, priceUSD: 29.99 },
+  uscard_30: { id: "uscard_30", name: "Greeting Cards (30 pack)",  priceGBP: 59.99, priceUSD: 59.99 },
+  uscard_50: { id: "uscard_50", name: "Greeting Cards (50 pack)",  priceGBP: 89.99, priceUSD: 89.99 },
   tee:    { id: "tee",    name: "Premium tee",     priceGBP: 29.99, priceUSD: 39.99 },
   hoodie: { id: "hoodie", name: "Hoodie",           priceGBP: 44.99, priceUSD: 59.99 },
   // Canvas — one entry per size; catalogId = "canvas_{W}x{H}"

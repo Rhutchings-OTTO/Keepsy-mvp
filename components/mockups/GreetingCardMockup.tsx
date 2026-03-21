@@ -41,15 +41,15 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
         />
 
         {/* AI artwork overlay on the front card face.
-            The front card spans left 55%→88%, top 13%→84% of the image.
+            The front card spans approx left 44%→84%, top 10%→87% of the image.
             9% inset gives the white border around the printed area. */}
         <div
           className="absolute"
           style={{
-            left: "55%",
-            top: "13%",
-            width: "33%",
-            height: "71%",
+            left: "44%",
+            top: "10%",
+            width: "40%",
+            height: "77%",
             // The white card surface shows around the print — no bg needed,
             // the mockup image provides it. The overlay is transparent.
           }}

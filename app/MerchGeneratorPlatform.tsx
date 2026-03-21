@@ -1252,7 +1252,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       }}
                       className="self-start shrink-0"
                     />
-                    <div className="w-[68%] mx-auto min-w-0 md:w-auto md:mx-0 md:flex-1">
+                    <div className="w-full min-w-0 md:flex-1">
                       <div className="rounded-2xl bg-[#FAF9F7] border border-charcoal/8 p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                         {/* Canvas: show crop tool or canvas mockup */}
                         <AnimatePresence mode="sync" initial={false}>
@@ -1382,7 +1382,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               setSelectedProduct(prod);
                                 setSelectedColor(prod.colors?.[0]?.hex ?? "#FFFFFF");
                             }}
-                            className={`rounded-xl border-2 p-4 text-left transition-all ${
+                            className={`rounded-xl border-2 p-4 text-left transition-all pointer-events-none md:pointer-events-auto ${
                               selectedProduct.id === prod.id
                                 ? "bg-white shadow-[0_16px_34px_-24px_rgba(196,113,74,0.5)]"
                                 : "border-charcoal/10 bg-[#F5EDE0]"

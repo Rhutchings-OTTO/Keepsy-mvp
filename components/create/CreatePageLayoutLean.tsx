@@ -114,7 +114,6 @@ export function CreatePageLayoutLean({
 }: CreatePageLayoutLeanProps) {
   const [createMode, setCreateMode] = useState<"describe" | "upload">("describe");
   const [pendingReplace, setPendingReplace] = useState<string | null>(null);
-  const [ideasOpen, setIdeasOpen] = useState(false);
 
   // Local textarea state — isolates keystrokes from parent re-renders.
   // The parent's `prompt` is only updated on blur or on generate.
@@ -416,18 +415,8 @@ export function CreatePageLayoutLean({
       </div>
 
       <motion.section variants={fadeInUp}>
-        {/* Mobile: collapsible toggle */}
-        <button
-          type="button"
-          onClick={() => setIdeasOpen(!ideasOpen)}
-          className="flex w-full items-center justify-between rounded-xl border border-charcoal/8 bg-white px-4 py-3.5 text-sm font-semibold text-charcoal/65 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:hidden"
-        >
-          <span>Need ideas? Browse prompts &amp; styles</span>
-          <span className="text-charcoal/40">{ideasOpen ? "−" : "+"}</span>
-        </button>
-
-        {/* Content: collapsible on mobile, always visible on sm+ */}
-        <div className={`gap-4 lg:grid-cols-[1fr_1fr] ${ideasOpen ? "mt-3 grid" : "hidden"} sm:mt-4 sm:grid`}>
+        {/* Gift ideas — always visible */}
+        <div className="mt-3 grid gap-4 sm:mt-4 lg:grid-cols-[1fr_1fr]">
           <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Need ideas?</p>
             <PromptHelperCollapsible onUsePrompt={handleUsePrompt} />

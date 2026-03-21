@@ -404,107 +404,110 @@ export function CartDrawer() {
                   ))}
                 </div>
 
-                {/* ── Gift note ── */}
-                <div className="border-t border-charcoal/8 px-6 py-3">
-                  <button
-                    type="button"
-                    onClick={() => setNoteExpanded((v) => !v)}
-                    className="flex w-full items-center justify-between py-1 text-xs font-semibold text-charcoal/60 transition hover:text-charcoal"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <Gift size={13} />
-                      Add Gift Note (optional)
-                    </span>
-                    {noteExpanded ? (
-                      <ChevronUp size={13} />
-                    ) : (
-                      <ChevronDown size={13} />
-                    )}
-                  </button>
-                  <AnimatePresence>
-                    {noteExpanded && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22 }}
-                        className="overflow-hidden"
-                      >
-                        <textarea
-                          value={giftNote}
-                          onChange={(e) => setGiftNote(e.target.value)}
-                          placeholder="Write a personal message for the recipient…"
-                          rows={3}
-                          className="mt-2 w-full resize-none rounded-xl border border-charcoal/10 p-3 text-sm text-charcoal placeholder:text-charcoal/50 focus:outline-none focus:ring-2 focus:ring-terracotta/20"
-                          style={{ backgroundColor: "var(--color-cream)", fontSize: "16px" }}
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* ── Totals ── */}
-                <div className="border-t-2 border-charcoal/12 bg-[#FDFAF6] px-6 pb-2 pt-4 space-y-2">
-                  <div className="flex items-center justify-between text-sm text-charcoal/75">
-                    <span>Subtotal</span>
-                    <span className="font-semibold text-charcoal">
-                      £{subtotal.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-charcoal/75">
-                    <span>Shipping</span>
-                    <span className="font-medium text-charcoal/75">
-                      {shippingFree ? (
-                        <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free</span>
+                {/* ── Sticky checkout footer ── */}
+                <div className="flex-shrink-0 border-t border-charcoal/10 bg-[#FDFAF6]">
+                  {/* Gift note */}
+                  <div className="border-b border-charcoal/8 px-6 py-3">
+                    <button
+                      type="button"
+                      onClick={() => setNoteExpanded((v) => !v)}
+                      className="flex w-full items-center justify-between py-1 text-xs font-semibold text-charcoal/60 transition hover:text-charcoal"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Gift size={13} />
+                        Add Gift Note (optional)
+                      </span>
+                      {noteExpanded ? (
+                        <ChevronUp size={13} />
                       ) : (
-                        <span>From {region === "US" ? "$3.99" : "£3.99"}</span>
+                        <ChevronDown size={13} />
                       )}
-                    </span>
+                    </button>
+                    <AnimatePresence>
+                      {noteExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.22 }}
+                          className="overflow-hidden"
+                        >
+                          <textarea
+                            value={giftNote}
+                            onChange={(e) => setGiftNote(e.target.value)}
+                            placeholder="Write a personal message for the recipient…"
+                            rows={3}
+                            className="mt-2 w-full resize-none rounded-xl border border-charcoal/10 p-3 text-sm text-charcoal placeholder:text-charcoal/50 focus:outline-none focus:ring-2 focus:ring-terracotta/20"
+                            style={{ backgroundColor: "var(--color-cream)", fontSize: "16px" }}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                  <div className="flex items-center justify-between border-t border-charcoal/15 pt-3 text-base font-bold text-charcoal">
-                    <span>Total</span>
-                    <span>£{subtotal.toFixed(2)}</span>
+
+                  {/* Totals */}
+                  <div className="px-6 pb-2 pt-4 space-y-2">
+                    <div className="flex items-center justify-between text-sm text-charcoal/75">
+                      <span>Subtotal</span>
+                      <span className="font-semibold text-charcoal">
+                        £{subtotal.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-charcoal/75">
+                      <span>Shipping</span>
+                      <span className="font-medium text-charcoal/75">
+                        {shippingFree ? (
+                          <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free</span>
+                        ) : (
+                          <span>From {region === "US" ? "$3.99" : "£3.99"}</span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between border-t border-charcoal/15 pt-3 text-base font-bold text-charcoal">
+                      <span>Total</span>
+                      <span>£{subtotal.toFixed(2)}</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* ── Delivery estimate ── */}
-                <div className="bg-[#FDFAF6] px-6 pb-1">
-                  <p className="text-center text-[11px] text-charcoal/40 leading-relaxed">
-                    Estimated delivery: {delivery.from} – {delivery.to}
-                  </p>
-                </div>
-
-                {/* ── Checkout CTA ── */}
-                <div className="bg-[#FDFAF6] px-6 pb-6 pt-3">
-                  {checkoutError && (
-                    <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
-                      {checkoutError}
+                  {/* Delivery estimate */}
+                  <div className="px-6 pb-1">
+                    <p className="text-center text-[11px] text-charcoal/40 leading-relaxed">
+                      Estimated delivery: {delivery.from} – {delivery.to}
                     </p>
-                  )}
-                  <button
-                    type="button"
-                    disabled={isCheckingOut}
-                    className="flex w-full min-h-[52px] items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ backgroundColor: "var(--color-terracotta)" }}
-                    onClick={() => void handleCheckout()}
-                  >
-                    {isCheckingOut ? "Taking you to checkout…" : "Go to Secure Checkout"}
-                  </button>
+                  </div>
 
-                  <p className="mt-2 text-center text-[11px] text-charcoal/50 leading-relaxed font-medium">
-                    No account required · Secure checkout
-                  </p>
+                  {/* Checkout CTA */}
+                  <div className="px-6 pb-6 pt-3">
+                    {checkoutError && (
+                      <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
+                        {checkoutError}
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      disabled={isCheckingOut}
+                      className="flex w-full min-h-[52px] items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                      style={{ backgroundColor: "var(--color-terracotta)" }}
+                      onClick={() => void handleCheckout()}
+                    >
+                      {isCheckingOut ? "Taking you to checkout…" : "Go to Secure Checkout"}
+                    </button>
 
-                  {/* Trust badges */}
-                  <p className="mt-2 text-center text-[11px] text-charcoal/55 leading-relaxed">
-                    Secure Checkout · Handmade With Care ·{" "}
-                    <Link href="/refunds" className="underline underline-offset-2 hover:text-charcoal/60">
-                      30-Day Returns
-                    </Link>
-                  </p>
-                  <p className="mt-1.5 text-center text-[11px] text-charcoal/55 leading-relaxed">
-                    Every design in your bag is one of a kind — made uniquely for you.
-                  </p>
+                    <p className="mt-2 text-center text-[11px] text-charcoal/50 leading-relaxed font-medium">
+                      No account required · Secure checkout
+                    </p>
+
+                    {/* Trust badges */}
+                    <p className="mt-2 text-center text-[11px] text-charcoal/55 leading-relaxed">
+                      Secure Checkout · Handmade With Care ·{" "}
+                      <Link href="/refunds" className="underline underline-offset-2 hover:text-charcoal/60">
+                        30-Day Returns
+                      </Link>
+                    </p>
+                    <p className="mt-1.5 text-center text-[11px] text-charcoal/55 leading-relaxed">
+                      Every design in your bag is one of a kind — made uniquely for you.
+                    </p>
+                  </div>
                 </div>
               </>
             )}

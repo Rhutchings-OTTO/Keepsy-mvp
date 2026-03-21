@@ -470,17 +470,13 @@ export function CartDrawer() {
                 {/* ── Sticky checkout footer — always visible ── */}
                 <div
                   className="flex-shrink-0 border-t-2 border-charcoal/12 bg-white px-6 pt-4"
-                  style={{ paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))" }}
+                  style={{
+                    paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))",
+                    overflow: "visible",
+                    minHeight: "140px",
+                  }}
                 >
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-base font-bold text-charcoal">Total</span>
-                    <span className="text-base font-bold text-charcoal">£{subtotal.toFixed(2)}</span>
-                  </div>
-                  {checkoutError && (
-                    <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
-                      {checkoutError}
-                    </p>
-                  )}
+                  {/* DIAGNOSTIC: moved above subtotal to test rendering position */}
                   <a
                     onClick={(e) => {
                       e.preventDefault();
@@ -491,7 +487,6 @@ export function CartDrawer() {
                       display: 'block',
                       width: '100%',
                       padding: '16px 0',
-                      marginTop: '12px',
                       marginBottom: '12px',
                       backgroundColor: '#C4714A',
                       color: '#FFFFFF',
@@ -509,9 +504,18 @@ export function CartDrawer() {
                   >
                     {isCheckingOut ? "Taking you to checkout…" : "Checkout"}
                   </a>
-                  <p style={{ color: '#C4714A', textAlign: 'center', marginTop: '8px', fontSize: '14px' }}>
+                  <p style={{ color: '#C4714A', textAlign: 'center', marginBottom: '8px', fontSize: '14px' }}>
                     Tap above to checkout
                   </p>
+                  {checkoutError && (
+                    <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
+                      {checkoutError}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-base font-bold text-charcoal">Total</span>
+                    <span className="text-base font-bold text-charcoal">£{subtotal.toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
             )}

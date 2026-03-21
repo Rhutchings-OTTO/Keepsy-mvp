@@ -736,6 +736,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
       if (!result) throw new Error("Failed to generate image");
       setDailyGensUsed(incrementDailyGens());
+      generationCtx?.markGenerated();
       setInitialGeneration({
         prompt: basePrompt,
         imageUrl: result.imageDataUrl,

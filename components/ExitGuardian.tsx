@@ -1,19 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MagneticButton } from "@/components/ui/MagneticButton";
+import { useGeneration } from "@/context/GenerationContext";
 
 export function ExitGuardian() {
   const [showExit, setShowExit] = useState(false);
+  const shownThisSession = useRef(false);
+  const generationCtx = useGeneration();
 
   useEffect(() => {
-    const handleMouseOut = (e: MouseEvent) => {
-      if (e.clientY < 5) setShowExit(true);
+    // No cursor on mobile — skip entirely
+    const isTouchDevice = window.matchMedia("(max-width: 767px)").matches || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) return;
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Only fire when cursor exits through the TOP edge
+      if (e.clientY > 0) return;
+      // Only if user has already generated an image
+      if (!generationCtx?.hasGenerated) return;
+      // Only once per session
+      if (shownThisSession.current) return;
+      shownThisSession.current = true;
+      setShowExit(true);
     };
-    document.addEventListener("mouseleave", handleMouseOut);
-    return () => document.removeEventListener("mouseleave", handleMouseOut);
-  }, []);
+
+    document.addEventListener("mouseleave", handleMouseLeave);
+    return () => document.removeEventListener("mouseleave", handleMouseLeave);
+  }, [generationCtx?.hasGenerated]);
 
   return (
     <AnimatePresence>

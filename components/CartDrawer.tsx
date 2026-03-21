@@ -467,7 +467,10 @@ export function CartDrawer() {
                 </div>
 
                 {/* ── Sticky checkout footer — always visible ── */}
-                <div className="flex-shrink-0 border-t-2 border-charcoal/12 bg-white px-6 pb-6 pt-4">
+                <div
+                  className="flex-shrink-0 border-t-2 border-charcoal/12 bg-white px-6 pt-4"
+                  style={{ paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))" }}
+                >
                   <div className="mb-3 flex items-center justify-between">
                     <span className="text-base font-bold text-charcoal">Total</span>
                     <span className="text-base font-bold text-charcoal">£{subtotal.toFixed(2)}</span>

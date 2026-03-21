@@ -128,8 +128,6 @@ export function CreatePageLayoutLean({
     setLocalPrompt(typeof prompt === "string" ? prompt : "");
   }, [prompt]);
 
-  const activeProduct = PRODUCTS.find((product) => product.type === (selectedProductType ?? "tshirt")) ?? PRODUCTS[0];
-  const ActiveProductIcon = activeProduct.Icon;
 
   // Flush local prompt to parent and pass it as override to onGenerate so
   // the parent handler always has the latest value even before the setState
@@ -542,36 +540,6 @@ export function CreatePageLayoutLean({
             )}
           </AnimatePresence>
 
-          <motion.div
-            key={activeProduct.type}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-            className="mt-5 grid gap-4 rounded-2xl border border-charcoal/8 bg-[#F5EDE0] p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5 md:grid-cols-[0.8fr_1.2fr]"
-          >
-            <div className="flex flex-col justify-center">
-              <div
-                className="inline-flex h-12 w-12 items-center justify-center rounded-xl"
-                style={{ backgroundColor: "rgba(196,113,74,0.12)", color: "var(--color-terracotta)" }}
-              >
-                <ActiveProductIcon size={20} />
-              </div>
-              <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-charcoal/45">Selected preview</p>
-              <h3 className="mt-2 text-2xl font-semibold text-charcoal">{activeProduct.label}</h3>
-              <p className="mt-3 max-w-md text-sm leading-7 text-charcoal/60">
-                Pick a different item above and the preview surface updates straight away.
-              </p>
-            </div>
-            <div className="relative overflow-hidden rounded-xl border border-charcoal/8 bg-white p-3 sm:p-4">
-              <Image
-                src={PRODUCT_PREVIEW_IMAGES[activeProduct.type]}
-                alt={`${activeProduct.label} large preview`}
-                width={560}
-                height={400}
-                className="relative z-10 h-48 w-full object-contain sm:h-60"
-              />
-            </div>
-          </motion.div>
         </div>
       </motion.section>
 

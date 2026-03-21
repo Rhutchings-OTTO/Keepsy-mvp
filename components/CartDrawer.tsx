@@ -355,6 +355,7 @@ export function CartDrawer() {
             exit={{ x: "100%" }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-y-0 right-0 z-[301] flex w-full flex-col bg-white shadow-[-24px_0_60px_-20px_rgba(45,41,38,0.18)] md:w-[420px]"
+            style={{ willChange: "transform", isolation: "isolate" }}
             aria-label="Shopping cart"
             role="dialog"
             aria-modal="true"
@@ -480,10 +481,13 @@ export function CartDrawer() {
                       {checkoutError}
                     </p>
                   )}
-                  <button
-                    type="button"
-                    disabled={isCheckingOut}
-                    onClick={() => void handleCheckout()}
+                  {/* div instead of button to bypass Tailwind Preflight `background-color: transparent` reset on button elements */}
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    aria-disabled={isCheckingOut}
+                    onClick={() => { if (!isCheckingOut) void handleCheckout(); }}
+                    onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !isCheckingOut) void handleCheckout(); }}
                     style={{
                       backgroundColor: '#C4714A',
                       color: '#FFFFFF',
@@ -494,13 +498,18 @@ export function CartDrawer() {
                       fontWeight: '600',
                       border: 'none',
                       cursor: isCheckingOut ? 'not-allowed' : 'pointer',
-                      display: 'block',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       marginTop: '12px',
                       opacity: isCheckingOut ? 0.6 : 1,
+                      userSelect: 'none',
+                      WebkitUserSelect: 'none',
+                      boxSizing: 'border-box',
                     }}
                   >
                     {isCheckingOut ? "Taking you to checkout…" : "Go to Secure Checkout"}
-                  </button>
+                  </div>
                   <p className="mt-2 text-center text-[11px] text-charcoal/50 font-medium">
                     No account required · Secure checkout
                   </p>

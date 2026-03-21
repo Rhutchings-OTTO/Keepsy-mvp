@@ -1925,13 +1925,24 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   <span className="text-charcoal/55 font-semibold">Subtotal</span>
                   <span className="text-xl font-black">{fmt(cartSubtotal)}</span>
                 </div>
-                <MagneticButton
+                <button
                   onClick={() => requestCheckout("cart")}
                   disabled={isBusy || cartItems.length === 0}
-                  className="w-full py-3 rounded-xl bg-terracotta !text-white font-extrabold disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    padding: "12px 0",
+                    borderRadius: "12px",
+                    backgroundColor: isBusy || cartItems.length === 0 ? "#d4957a" : "#C4714A",
+                    color: "#FFFFFF",
+                    fontSize: "16px",
+                    fontWeight: "800",
+                    cursor: isBusy || cartItems.length === 0 ? "not-allowed" : "pointer",
+                    border: "none",
+                  }}
                 >
                   {isBusy ? "Securing…" : "Checkout"}
-                </MagneticButton>
+                </button>
               </div>
             </motion.aside>
           </>

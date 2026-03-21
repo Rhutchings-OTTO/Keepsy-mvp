@@ -62,14 +62,12 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
             height: "88%",
           }}
         >
-          {/* Layer 2: Equal frame border on all 4 sides — image is always clipped to this box.
-              The inset creates the printed white card border. Overflow hidden ensures cover
-              never bleeds outside this frame, regardless of image aspect ratio. */}
+          {/* Layer 2: 8% safe-zone inset on all 4 sides — image sits within an 84%×84% area.
+              contain fit maximises within that zone without ever cropping or distorting. */}
           <div
             style={{
               position: "absolute",
-              inset: "9%",
-              overflow: "hidden",
+              inset: "8%",
             }}
           >
             {imageSrc ? (
@@ -83,7 +81,7 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
                   inset: 0,
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover",
+                  objectFit: "contain",
                   objectPosition: "center center",
                   filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
                   mixBlendMode: isUS ? undefined : "multiply",

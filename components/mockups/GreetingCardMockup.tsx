@@ -45,74 +45,80 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
           priority={false}
         />
 
-        {/* AI artwork overlay on the front card face.
-            US: front card face spans approx left 4%→87%, top 3%→90% of the image.
-            Overlay inset ~12% from each card-face edge gives the white printed border.
-            UK: front card spans approx left 38%→80%, top 8%→88% of the image. */}
+        {/* Layer 1: Card face bounding box — covers exactly the front white card face in the photo.
+            UK: front card left ~7% → right ~88%, top ~4% → bottom ~92% of photo.
+            US: similar composition, front card left ~7% → right ~88%, top ~3% → bottom ~91%. */}
         <div
-          className="absolute"
+          className="absolute overflow-hidden"
           style={isUS ? {
-            left: "11%",
-            top: "10%",
-            width: "65%",
-            height: "70%",
+            left: "7%",
+            top: "3%",
+            width: "81%",
+            height: "88%",
           } : {
-            left: "12%",
-            top: "8%",
-            width: "65%",
-            height: "78%",
+            left: "7%",
+            top: "4%",
+            width: "81%",
+            height: "88%",
           }}
         >
-          {imageSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageSrc}
-              alt="Your design"
-              draggable={false}
-              style={{
-                position: "absolute",
-                top: "3%",
-                left: "3%",
-                width: "94%",
-                height: "94%",
-                objectFit: "contain",
-                filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
-                mixBlendMode: isUS ? undefined : "multiply",
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                position: "absolute",
-                top: "3%",
-                left: "3%",
-                width: "94%",
-                height: "94%",
-                background: "rgba(220, 210, 200, 0.25)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-                gap: 4,
-                borderRadius: 2,
-              }}
-            >
-              <div style={{ fontSize: "1.2rem", opacity: 0.3 }}>✉</div>
-              <p
+          {/* Layer 2: Equal frame border on all 4 sides — image is always clipped to this box.
+              The inset creates the printed white card border. Overflow hidden ensures cover
+              never bleeds outside this frame, regardless of image aspect ratio. */}
+          <div
+            style={{
+              position: "absolute",
+              inset: "9%",
+              overflow: "hidden",
+            }}
+          >
+            {imageSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageSrc}
+                alt="Your design"
+                draggable={false}
                 style={{
-                  fontSize: "0.42rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color: "#5a4a40",
-                  opacity: 0.45,
-                  textAlign: "center",
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center center",
+                  filter: "saturate(0.94) contrast(1.01) brightness(0.99)",
+                  mixBlendMode: isUS ? undefined : "multiply",
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "rgba(220, 210, 200, 0.25)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                Your design here
-              </p>
-            </div>
-          )}
+                <div style={{ fontSize: "1.2rem", opacity: 0.3 }}>✉</div>
+                <p
+                  style={{
+                    fontSize: "0.42rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "#5a4a40",
+                    opacity: 0.45,
+                    textAlign: "center",
+                  }}
+                >
+                  Your design here
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Subtle bottom vignette for depth */}

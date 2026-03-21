@@ -392,8 +392,8 @@ export function CartDrawer() {
                 {/* ── Free shipping bar ── */}
                 <FreeShippingBar subtotal={subtotal} />
 
-                {/* ── Items list ── */}
-                <div className="flex-1 overflow-y-auto px-6">
+                {/* ── Items list (scrollable) ── */}
+                <div className="flex-1 min-h-0 overflow-y-auto px-6">
                   {items.map((item) => (
                     <CartItemRow
                       key={item.id}
@@ -402,12 +402,9 @@ export function CartDrawer() {
                       onRemove={handleRemove}
                     />
                   ))}
-                </div>
 
-                {/* ── Sticky checkout footer ── */}
-                <div className="flex-shrink-0 border-t border-charcoal/10 bg-[#FDFAF6]">
-                  {/* Gift note */}
-                  <div className="border-b border-charcoal/8 px-6 py-3">
+                  {/* Gift note — inside scrollable area */}
+                  <div className="border-t border-charcoal/8 py-3">
                     <button
                       type="button"
                       onClick={() => setNoteExpanded((v) => !v)}
@@ -445,17 +442,11 @@ export function CartDrawer() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Totals */}
-                  <div className="px-6 pb-2 pt-4 space-y-2">
-                    <div className="flex items-center justify-between text-sm text-charcoal/75">
-                      <span>Subtotal</span>
-                      <span className="font-semibold text-charcoal">
-                        £{subtotal.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm text-charcoal/75">
+                  {/* Shipping & delivery info — scrollable */}
+                  <div className="space-y-1.5 border-t border-charcoal/8 pb-4 pt-3">
+                    <div className="flex items-center justify-between text-sm text-charcoal/65">
                       <span>Shipping</span>
-                      <span className="font-medium text-charcoal/75">
+                      <span className="font-medium">
                         {shippingFree ? (
                           <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free</span>
                         ) : (
@@ -463,51 +454,41 @@ export function CartDrawer() {
                         )}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between border-t border-charcoal/15 pt-3 text-base font-bold text-charcoal">
-                      <span>Total</span>
-                      <span>£{subtotal.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  {/* Delivery estimate */}
-                  <div className="px-6 pb-1">
-                    <p className="text-center text-[11px] text-charcoal/40 leading-relaxed">
+                    <p className="text-[11px] text-charcoal/40 leading-relaxed">
                       Estimated delivery: {delivery.from} – {delivery.to}
                     </p>
-                  </div>
-
-                  {/* Checkout CTA */}
-                  <div className="px-6 pb-6 pt-3">
-                    {checkoutError && (
-                      <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
-                        {checkoutError}
-                      </p>
-                    )}
-                    <button
-                      type="button"
-                      disabled={isCheckingOut}
-                      className="flex w-full min-h-[52px] items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-                      style={{ backgroundColor: "var(--color-terracotta)" }}
-                      onClick={() => void handleCheckout()}
-                    >
-                      {isCheckingOut ? "Taking you to checkout…" : "Go to Secure Checkout"}
-                    </button>
-
-                    <p className="mt-2 text-center text-[11px] text-charcoal/50 leading-relaxed font-medium">
-                      No account required · Secure checkout
-                    </p>
-
-                    {/* Trust badges */}
-                    <p className="mt-2 text-center text-[11px] text-charcoal/55 leading-relaxed">
+                    <p className="text-[11px] text-charcoal/50 leading-relaxed">
                       Secure Checkout · Handmade With Care ·{" "}
-                      <Link href="/refunds" className="underline underline-offset-2 hover:text-charcoal/60">
+                      <Link href="/refunds" className="underline underline-offset-2">
                         30-Day Returns
                       </Link>
                     </p>
-                    <p className="mt-1.5 text-center text-[11px] text-charcoal/55 leading-relaxed">
-                      Every design in your bag is one of a kind — made uniquely for you.
-                    </p>
                   </div>
+                </div>
+
+                {/* ── Sticky checkout footer — always visible ── */}
+                <div className="flex-shrink-0 border-t-2 border-charcoal/12 bg-white px-6 pb-6 pt-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-base font-bold text-charcoal">Total</span>
+                    <span className="text-base font-bold text-charcoal">£{subtotal.toFixed(2)}</span>
+                  </div>
+                  {checkoutError && (
+                    <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
+                      {checkoutError}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    disabled={isCheckingOut}
+                    className="flex w-full min-h-[52px] items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: "var(--color-terracotta)" }}
+                    onClick={() => void handleCheckout()}
+                  >
+                    {isCheckingOut ? "Taking you to checkout…" : "Go to Secure Checkout"}
+                  </button>
+                  <p className="mt-2 text-center text-[11px] text-charcoal/50 font-medium">
+                    No account required · Secure checkout
+                  </p>
                 </div>
               </>
             )}

@@ -811,8 +811,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     onClick={() => setFooterShopOpen(!footerShopOpen)}
                     className="flex w-full items-center justify-between sm:pointer-events-none"
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/90">Shop</p>
-                    <span className="text-white/40 sm:hidden">{footerShopOpen ? "−" : "+"}</span>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#D4A853" }}>Shop</p>
+                    <span className="sm:hidden" style={{ color: "rgba(255,255,255,0.65)" }}>{footerShopOpen ? "−" : "+"}</span>
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerShopOpen ? "flex" : "hidden"} sm:flex`}>
                     {[
@@ -820,7 +820,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/gift-ideas", label: "Gift Ideas" },
                       { href: "/create", label: "Design a Gift" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/90 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm transition" style={{ color: "#F0EDE8" }}>
                         {label}
                       </Link>
                     ))}
@@ -833,8 +833,8 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     onClick={() => setFooterCompanyOpen(!footerCompanyOpen)}
                     className="flex w-full items-center justify-between sm:pointer-events-none"
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/90">Company</p>
-                    <span className="text-white/40 sm:hidden">{footerCompanyOpen ? "−" : "+"}</span>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#D4A853" }}>Company</p>
+                    <span className="sm:hidden" style={{ color: "rgba(255,255,255,0.65)" }}>{footerCompanyOpen ? "−" : "+"}</span>
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerCompanyOpen ? "flex" : "hidden"} sm:flex`}>
                     {[
@@ -842,7 +842,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                       { href: "/terms", label: "Terms" },
                       { href: "/privacy", label: "Privacy" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/90 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm transition" style={{ color: "#F0EDE8" }}>
                         {label}
                       </Link>
                     ))}
@@ -855,22 +855,22 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                     onClick={() => setFooterHelpOpen(!footerHelpOpen)}
                     className="flex w-full items-center justify-between sm:pointer-events-none"
                   >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/90">Help</p>
-                    <span className="text-white/40 sm:hidden">{footerHelpOpen ? "−" : "+"}</span>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#D4A853" }}>Help</p>
+                    <span className="sm:hidden" style={{ color: "rgba(255,255,255,0.65)" }}>{footerHelpOpen ? "−" : "+"}</span>
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerHelpOpen ? "flex" : "hidden"} sm:flex`}>
                     {[
                       { href: "/shipping", label: "Shipping" },
                       { href: "/refunds", label: "Refunds" },
                     ].map(({ href, label }) => (
-                      <Link key={href} href={href} className="text-sm text-white/90 transition hover:text-white">
+                      <Link key={href} href={href} className="text-sm transition" style={{ color: "#F0EDE8" }}>
                         {label}
                       </Link>
                     ))}
                     <button
                       type="button"
                       onClick={() => setIsRegionSelectorOpen(true)}
-                      className="text-left text-sm text-white/90 transition hover:text-white"
+                      className="text-left text-sm transition" style={{ color: "#F0EDE8" }}
                     >
                       {activeRegion} shipping ↗
                     </button>

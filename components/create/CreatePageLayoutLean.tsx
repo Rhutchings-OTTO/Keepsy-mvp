@@ -25,10 +25,10 @@ import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNoti
 import type { Region } from "@/lib/region";
 
 const PRODUCTS = [
-  { type: "tshirt" as const, Icon: Shirt, label: "T-shirt" },
-  { type: "mug" as const, Icon: Coffee, label: "Mug" },
-  { type: "card" as const, Icon: CreditCard, label: "Card" },
-  { type: "hoodie" as const, Icon: Layout, label: "Hoodie" },
+  { type: "tshirt" as const, Icon: Shirt, label: "T-shirt", description: "Heavyweight cotton tee with a relaxed fit. Pre-shrunk and built to last — a gift they'll actually wear." },
+  { type: "mug" as const, Icon: Coffee, label: "Mug", description: "Classic ceramic mug with your design on both sides. Dishwasher safe and microwave friendly." },
+  { type: "card" as const, Icon: CreditCard, label: "Card", description: "Fine art postcard or greeting card pack, printed on premium paper and ready to send." },
+  { type: "hoodie" as const, Icon: Layout, label: "Hoodie", description: "Soft, cosy hoodie with a classic fit. A quality feel that makes it a go-to favourite." },
 ];
 
 const PRODUCT_PREVIEW_IMAGES: Record<(typeof PRODUCTS)[number]["type"], string> = {
@@ -442,14 +442,14 @@ export function CreatePageLayoutLean({
         <div className="rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-6">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Choose your product</p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {PRODUCTS.map(({ type, Icon, label }) => (
+            {PRODUCTS.map(({ type, Icon, label, description }) => (
               <motion.button
                 key={type}
                 type="button"
                 onClick={() => onProductSelect(type)}
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.985 }}
-                className={`rounded-xl border p-4 text-left transition sm:p-5 ${
+                className={`rounded-xl border p-4 text-left transition sm:p-5 pointer-events-none md:pointer-events-auto ${
                   selectedProductType === type
                     ? "border-terracotta bg-terracotta text-white shadow-[0_16px_34px_-22px_rgba(196,113,74,0.5)]"
                     : "border-charcoal/10 bg-[#F5EDE0] text-charcoal"
@@ -473,8 +473,8 @@ export function CreatePageLayoutLean({
                 <p className={`mt-4 text-lg font-semibold ${selectedProductType === type ? "text-white" : "text-charcoal"}`}>
                   {label}
                 </p>
-                <p className={`mt-1 text-sm ${selectedProductType === type ? "text-white/75" : "text-charcoal/55"}`}>
-                  {selectedProductType === type ? "Selected for your preview" : "Choose this product for your preview"}
+                <p className={`mt-2 text-xs leading-snug ${selectedProductType === type ? "text-white/75" : "text-charcoal/55"}`}>
+                  {description}
                 </p>
               </motion.button>
             ))}

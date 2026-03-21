@@ -1634,20 +1634,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               : selectedProduct.basePrice)}
                           </span>
                         </div>
-                        {FF.giftingFlow && generatedImage ? (
-                          <div className="mb-4">
-                            <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">
-                              Optional Gifting Details
-                            </h3>
-                            <GiftingStep
-                              value={conversionFlow}
-                              hidden={isGiftingSkipped}
-                              onChange={(patch) => updateConversionFlow(patch)}
-                              onSkip={() => setIsGiftingSkipped(true)}
-                              onReopen={() => setIsGiftingSkipped(false)}
-                            />
-                          </div>
-                        ) : null}
                         <section>
                           <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">
                             Add to Cart

@@ -36,8 +36,8 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
         <Image
           src={isUS
             ? "/product-tiles/us-greeting-card-mockup.png"
-            : "/product-tiles/greeting-card-pack-mockup.png"}
-          alt={isUS ? "US greeting card" : "Greeting card pack"}
+            : "/product-tiles/uk-greeting-card-mockup.png"}
+          alt={isUS ? "US greeting card" : "UK greeting card pack"}
           fill
           className="object-contain"
           quality={90}
@@ -57,10 +57,10 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
             width: "65%",
             height: "70%",
           } : {
-            left: "38%",
+            left: "12%",
             top: "8%",
-            width: "42%",
-            height: "80%",
+            width: "65%",
+            height: "78%",
           }}
         >
           {imageSrc ? (

@@ -357,7 +357,6 @@ button[class*="bg-[#1f2937]"],
 button[class*="bg-black"]:not([class*="bg-black/"]),
 a[class*="bg-[#1f2937]"],
 a[class*="bg-black"]:not([class*="bg-black/"]) { color: white !important; }
-nav a[data-active-nav="true"] { color: white !important; }
 
 /* ===== Fade-up scroll animation ===== */
 .fade-up {

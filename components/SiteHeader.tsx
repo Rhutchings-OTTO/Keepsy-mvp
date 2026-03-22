@@ -277,10 +277,10 @@ export function SiteHeader() {
                 <Link
                   key={href}
                   href={href}
-                  className={`min-h-9 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 ${
+                  className={`min-h-9 rounded-full border px-3 py-1.5 text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 ${
                     active
-                      ? "font-semibold text-charcoal"
-                      : "border-transparent text-charcoal/70 hover:text-charcoal hover:bg-black/5"
+                      ? "bg-transparent"
+                      : "border-transparent hover:bg-black/5"
                   }`}
                   style={active ? { borderColor: "var(--color-terracotta)" } : undefined}
                   data-active-nav={active ? "true" : undefined}

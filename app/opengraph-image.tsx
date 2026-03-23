@@ -47,13 +47,13 @@ export default function OpenGraphImage() {
             Turn it into a gift.
           </div>
           <div style={{ fontSize: 30, opacity: 0.82 }}>
-            AI-powered keepsakes on premium tees, mugs, cards, and hoodies
+            Personalised keepsakes on premium tees, mugs, cards, and hoodies
           </div>
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 26, opacity: 0.8 }}>
           <span>keepsy.store</span>
-          <span>Made with love + AI</span>
+          <span>Made with love</span>
         </div>
       </div>
     ),

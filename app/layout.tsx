@@ -106,7 +106,7 @@ const organizationJsonLd = {
       "url": "https://keepsy.store",
       "name": "Keepsy",
       "description":
-        "AI-powered personalised gifts — custom hoodies, mugs, t-shirts and greeting cards printed just for you.",
+        "Personalised gifts they'll never forget — custom hoodies, mugs, t-shirts, greeting cards and canvas prints made just for you.",
       "publisher": { "@id": "https://keepsy.store/#organization" },
       "potentialAction": {
         "@type": "SearchAction",

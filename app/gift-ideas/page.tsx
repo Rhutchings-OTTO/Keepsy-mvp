@@ -8,14 +8,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Personalised Gift Ideas | Gift Guides by Occasion — Keepsy",
   description:
-    "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do merchandise and more — all custom printed and previewed before you order.",
+    "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do gifts and more — all custom printed and previewed before you order.",
   alternates: {
     canonical: "https://keepsy.store/gift-ideas",
   },
   openGraph: {
     title: "Personalised Gift Ideas | Gift Guides by Occasion — Keepsy",
     description:
-      "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do merchandise and more — all custom printed and previewed before you order.",
+      "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do gifts and more — all custom printed and previewed before you order.",
     type: "website",
     url: "https://keepsy.store/gift-ideas",
   },
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Personalised Gift Ideas | Gift Guides by Occasion — Keepsy",
     description:
-      "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do merchandise and more — all custom printed and previewed before you order.",
+      "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do gifts and more — all custom printed and previewed before you order.",
   },
 };
 

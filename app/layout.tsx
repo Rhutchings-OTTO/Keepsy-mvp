@@ -62,6 +62,9 @@ export const metadata: Metadata = {
     description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy.",
     images: ["/twitter-image"],
   },
+  verification: {
+    google: "r5u1S_rFTREoqBt8k7HBgKNEvbxgZHG0_65-N0-ItNw",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

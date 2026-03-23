@@ -312,6 +312,7 @@ export function SiteFooter() {
                 {[
                   { href: "/shop", label: "All Products" },
                   { href: "/gift-ideas", label: "Gift Ideas" },
+                  { href: "/community", label: "Community" },
                   { href: "/create", label: "Create a Gift" },
                   { href: "/product/mug", label: "Personalised Mugs" },
                   { href: "/product/tee", label: "Custom Tees" },

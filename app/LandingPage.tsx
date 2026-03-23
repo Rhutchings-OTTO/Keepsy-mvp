@@ -838,6 +838,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   </button>
                   <div className={`mt-3 flex-col gap-2.5 ${footerCompanyOpen ? "flex" : "hidden"} sm:flex`}>
                     {[
+                      { href: "/community", label: "Customer Stories" },
                       { href: "/terms", label: "Terms" },
                       { href: "/privacy", label: "Privacy" },
                     ].map(({ href, label }) => (

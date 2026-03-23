@@ -13,6 +13,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 
 const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-8";
 
@@ -127,6 +128,21 @@ export function ReviewsSection() {
           ))}
         </div>
 
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-10 text-center"
+        >
+          <Link
+            href="/community"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/65 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20 hover:border-white"
+            style={{ color: "white" }}
+          >
+            Read all stories <ArrowRight size={14} />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

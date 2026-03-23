@@ -42,7 +42,7 @@ export function SiteChromeLayout({ children }: SiteChromeLayoutProps) {
   return (
     <div className="relative z-10 min-h-screen flex flex-col">
       <SiteHeader />
-      <main className="flex-1 pb-16 md:pb-0" id="main-content">{children}</main>
+      <main className="flex-1 overflow-x-hidden pb-16 md:pb-0" id="main-content">{children}</main>
       <SiteFooter />
       <BottomSheetNav />
     </div>

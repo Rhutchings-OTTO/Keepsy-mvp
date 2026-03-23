@@ -2,12 +2,10 @@
 
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useLenis } from "lenis/react";
-import useSWR from "swr";
 import { flushSync } from "react-dom";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { MagneticCard } from "@/components/ui/MagneticCard";
 import { MockupRenderer } from "@/components/MockupRenderer";
 import dynamic from "next/dynamic";
 import { GenerationLoadingOverlay } from "@/components/GenerationLoadingOverlay";
@@ -144,14 +142,6 @@ type InitialCreateQuery = {
 
 type DesignShape = "square" | "portrait" | "landscape";
 
-const COMMUNITY_DESIGNS_FALLBACK = [
-  "/occasion-tiles/christmas-scene.png",
-  "/occasion-tiles/thanksgiving-cartoon.png",
-  "/occasion-tiles/fourth-july-photo.png",
-  "/occasion-tiles/anniversary-watercolor.png",
-];
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 const GBP_FORMATTER = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -441,7 +431,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const generatedImage = createSession.currentImageUrl;
   const lastGenerationPrompt = createSession.currentPrompt;
 
-  const [view, setView] = useState<"home" | "catalog" | "community" | "legal">("home");
+  const [view, setView] = useState<"home" | "catalog" | "legal">("home");
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [region] = useState<Region>(() => getRegion() ?? "UK");
   const fmt = (n: number) => region === "US" ? USD_FORMATTER.format(n) : GBP_FORMATTER.format(n);
@@ -573,13 +563,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const selectedMockupProductType = getMockupProductType(selectedProduct.id);
   const selectedMockupColor = getMockupColor(selectedColor);
   const isMagicpathSkin = FF.magicpathSkin;
-
-  const { data: communityData } = useSWR<{ designs: string[] }>(
-    "/api/community-designs",
-    fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 3600_000 }
-  );
-  const communityDesigns = communityData?.designs ?? COMMUNITY_DESIGNS_FALLBACK;
 
   useEffect(() => {
     return () => {
@@ -1176,12 +1159,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${currentView === "catalog" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
                     >
                       Catalog
-                    </button>
-                    <button
-                      onClick={() => setView("community")}
-                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${currentView === "community" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
-                    >
-                      Community
                     </button>
                   </div>
                 );
@@ -1861,29 +1838,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
             </motion.div>
           )}
 
-          {view === "community" && (
-            <motion.div key="community" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-10">
-              <div className="text-center max-w-2xl mx-auto">
-                <KineticHeading className="text-5xl font-black mb-3">Community Showcase</KineticHeading>
-                <p className="text-charcoal/55 font-semibold">
-                  See what other creators are making and get inspiration for your next keepsake.
-                </p>
-              </div>
-              <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-                {communityDesigns.map((img, idx) => (
-                  <MagneticCard
-                    key={`${img}-${idx}`}
-                    maxTilt={8}
-                    hoverScale={1.02}
-                    className="break-inside-avoid rounded-2xl overflow-hidden border border-charcoal/8 bg-white shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]"
-                  >
-                    <Image src={img} alt="Community design" width={400} height={500} className="w-full h-auto" />
-                    <div className="p-3 text-sm font-semibold text-charcoal/55">@creator_{idx + 1}</div>
-                  </MagneticCard>
-                ))}
-              </div>
-            </motion.div>
-          )}
 
           {view === "legal" && (
             <motion.div key="legal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto space-y-6">

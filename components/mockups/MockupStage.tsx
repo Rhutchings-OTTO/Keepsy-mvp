@@ -14,7 +14,6 @@ import {
 } from "@/lib/mockups/placements";
 import { BaseMockupLayer } from "./BaseMockupLayer";
 import { ArtworkLayer } from "./ArtworkLayer";
-import { PrintAreaGlassOverlay } from "./PrintAreaGlassOverlay";
 import { TopLayer } from "./TopLayer";
 
 const DEBUG_PLACEMENT = process.env.NODE_ENV === "development";
@@ -247,13 +246,6 @@ export function MockupStage({
             )}
           </div>
         )}
-
-        {/* Glass overlay when no artwork */}
-        <PrintAreaGlassOverlay
-          productType={productType}
-          isActive={true}
-          hasArtwork={artworkPresent}
-        />
 
         {/* LAYER 3 (Top): Drawstrings, mug reflections, shadows - FIXED, never re-renders on prompt change */}
         <TopLayer productType={productType} color={color} baseMockupSrc={entry.baseMockupSrc} />

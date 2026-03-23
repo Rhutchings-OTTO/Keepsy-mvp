@@ -13,7 +13,6 @@ const NAV_ITEMS = [
   { href: "/shop", label: "Shop" },
   { href: "/gift-ideas", label: "Gift Ideas" },
   { href: "/create", label: "Personalise" },
-  { href: "/community", label: "Reviews" },
 ];
 
 function useCartCount() {

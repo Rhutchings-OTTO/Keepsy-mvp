@@ -187,46 +187,6 @@ const REVIEWS: Record<
   ],
 };
 
-// ─── Related products ─────────────────────────────────────────────────────────
-
-const RELATED_META: Record<
-  ProductType,
-  Array<{ type: ProductType; label: string; price: number }>
-> = {
-  mug: [
-    { type: "tshirt", label: "Premium Tee", price: 29.99 },
-    { type: "hoodie", label: "Hoodie", price: 44.99 },
-    { type: "card", label: "Greeting Card", price: 6.99 },
-  ],
-  tshirt: [
-    { type: "mug", label: "Mug", price: 14.99 },
-    { type: "hoodie", label: "Hoodie", price: 44.99 },
-    { type: "card", label: "Greeting Card", price: 6.99 },
-  ],
-  hoodie: [
-    { type: "mug", label: "Mug", price: 14.99 },
-    { type: "tshirt", label: "Premium Tee", price: 29.99 },
-    { type: "card", label: "Greeting Card", price: 6.99 },
-  ],
-  card: [
-    { type: "mug", label: "Mug", price: 14.99 },
-    { type: "tshirt", label: "Premium Tee", price: 29.99 },
-    { type: "hoodie", label: "Hoodie", price: 44.99 },
-  ],
-  canvas: [
-    { type: "mug", label: "Mug", price: 14.99 },
-    { type: "card", label: "Greeting Card", price: 6.99 },
-    { type: "hoodie", label: "Hoodie", price: 44.99 },
-  ],
-};
-
-const PRODUCT_UNSPLASH: Record<ProductType, string> = {
-  mug: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=300",
-  tshirt: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300",
-  hoodie: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300",
-  card: "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=300",
-  canvas: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300",
-};
 
 // ─── Trust badges ─────────────────────────────────────────────────────────────
 
@@ -267,7 +227,6 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
 
   const createHref = `/create?product=${selectedProduct.id === "tshirt" ? "tee" : selectedProduct.id}`;
   const reviews = REVIEWS[selectedProduct.id];
-  const related = RELATED_META[selectedProduct.id];
 
   const isApparel = selectedProduct.id === "tshirt" || selectedProduct.id === "hoodie";
 
@@ -276,7 +235,7 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 
         {/* ── Left: Mockup ── */}
-        <div className="lg:col-span-6 sticky top-24">
+        <div className="lg:col-span-6 lg:sticky lg:top-24">
           <motion.div
             key={`${mockupProductType}-${mockupColor}`}
             initial={{ opacity: 0.92, scale: 0.99 }}
@@ -484,33 +443,6 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
             </div>
           </div>
 
-          {/* You May Also Like */}
-          <div className="pt-4 border-t border-charcoal/8">
-            <h2 className="font-serif text-xl text-charcoal font-semibold mb-4">
-              You May Also Like
-            </h2>
-            <div className="grid grid-cols-3 gap-3">
-              {related.map(({ type, label, price }) => (
-                <Link
-                  key={type}
-                  href={`/product/${type === "tshirt" ? "tee" : type}`}
-                  className="group rounded-2xl bg-white/75 border border-charcoal/8
-                             overflow-hidden hover:shadow-warm-md transition-all hover:-translate-y-0.5"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={PRODUCT_UNSPLASH[type]}
-                    alt={label}
-                    className="w-full aspect-square object-cover group-hover:scale-[1.03] transition-transform duration-400"
-                  />
-                  <div className="p-2.5">
-                    <p className="text-xs font-semibold text-charcoal leading-snug">{label}</p>
-                    <p className="text-xs text-charcoal/50 mt-0.5">{fmt(price)}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
 
         </div>
       </div>

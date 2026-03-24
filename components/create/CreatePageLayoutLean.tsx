@@ -328,7 +328,7 @@ export function CreatePageLayoutLean({
                         <span className="text-sm text-charcoal/55">PNG, JPG or WebP — up to 25MB</span>
                       </label>
                     ) : (
-                      <div className="flex items-center gap-3 rounded-xl bg-white p-3">
+                      <div className="flex items-center gap-3 overflow-hidden rounded-xl bg-white p-3">
                         <div className="relative h-16 w-16 overflow-hidden rounded-xl">
                           <Image src={uploadedImage} alt="Uploaded" fill className="object-cover" unoptimized sizes="64px" />
                         </div>

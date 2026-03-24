@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Sparkles, Package, RotateCcw, Gift } from "lucide-react";
 import { MockupRenderer } from "@/components/MockupRenderer";
@@ -37,6 +38,7 @@ function slugToProduct(slug: string): Product | null {
     hoodie: "hoodie",
     mug: "mug",
     card: "card",
+    canvas: "canvas",
   };
   const type = map[slug?.toLowerCase() ?? ""];
   return type ? PRODUCT_LIST.find((p) => p.id === type) ?? null : null;
@@ -242,7 +244,18 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.25 }}
           >
-            {mockupProductType === "mug" ? (
+            {selectedProduct.id === "canvas" ? (
+              <div className="relative w-full overflow-hidden rounded-2xl border border-black/[0.06] shadow-[0_4px_24px_rgba(0,0,0,0.06)]" style={{ aspectRatio: "3 / 2" }}>
+                <Image
+                  src="/product-tiles/plain-canvas.png"
+                  alt="Personalised canvas print"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 600px"
+                  priority
+                />
+              </div>
+            ) : mockupProductType === "mug" ? (
               <MugInspector>
                 <MockupRenderer
                   productType={mockupProductType}

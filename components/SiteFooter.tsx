@@ -318,6 +318,7 @@ export function SiteFooter() {
                   { href: "/product/tee", label: "Custom Tees" },
                   { href: "/product/hoodie", label: "Hoodies" },
                   { href: "/product/card", label: "Greeting Cards" },
+                  { href: "/product/canvas", label: "Canvas Prints" },
                 ].map(({ href, label }) => (
                   <Link
                     key={href}

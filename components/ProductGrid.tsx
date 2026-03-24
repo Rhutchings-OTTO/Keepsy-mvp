@@ -14,6 +14,7 @@ export const PRODUCT_CARDS: ProductCard[] = [
   { type: "hoodie", name: "Premium Hoodie", price: 44.99, image: "/product-tiles/hoodie-white.png", valueFrame: "A gift they'll wear every day" },
   { type: "mug", name: "Ceramic Mug", price: 14.99, image: "/product-tiles/plain-mug-front.png", valueFrame: "They'll think of you every morning" },
   { type: "tee", name: "Premium Tee", price: 29.99, image: "/product-tiles/tee-white.png", valueFrame: "Less than a dinner out" },
+  { type: "canvas", name: "Canvas Print", price: 29.99, image: "/product-tiles/plain-canvas.png", valueFrame: "Wall art they'll love for a lifetime" },
 ];
 
 type ProductGridProps = {

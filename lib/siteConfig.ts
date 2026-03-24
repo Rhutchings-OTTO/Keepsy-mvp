@@ -7,7 +7,7 @@ export type OccasionId =
   | "anniversaries"
   | "pet-gifts";
 
-export type ProductType = "card" | "hoodie" | "mug" | "tee";
+export type ProductType = "card" | "hoodie" | "mug" | "tee" | "canvas";
 
 export type StyleOption =
   | "Watercolor portrait"

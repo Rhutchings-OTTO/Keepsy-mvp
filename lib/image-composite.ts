@@ -61,19 +61,27 @@ const MUG_W = 2582;
 const MUG_H = 1120;
 
 /**
- * Mug layout — three equal-ish vertical zones:
- *   Left  [0       … 860)    ← design here
- *   Handle[860     … 1722)   ← blank
- *   Right [1722    … 2582)   ← design here (mirrored)
+ * Mug layout — four equal quarters (645.5 px each).
+ * The Printify template has three vertical dotted guides dividing the wrap
+ * into quarters; the handle occupies the middle two (Q2 + Q3).
+ *
+ *   Q1 [0       … 645)    ← 9 o'clock  — design here
+ *   Q2 [645     … 1291)   ← handle zone (blank)
+ *   Q3 [1291    … 1937)   ← handle zone (blank)
+ *   Q4 [1937    … 2582)   ← 3 o'clock  — design here
+ *
+ * Centre of Q1 = 323 px  (25% of 2582)
+ * Centre of Q4 = 2259 px (75% of 2582)
  */
-const MUG_SIDE_W = 860;
-const MUG_RIGHT_START = MUG_W - MUG_SIDE_W; // 1722
+const MUG_QUARTER = Math.round(MUG_W / 4); // 646
+const MUG_Q1_CENTER = Math.round(MUG_W * 0.25); // 646 → center of Q1
+const MUG_Q4_CENTER = Math.round(MUG_W * 0.75); // 1937 → center of Q4
 
 /**
- * Each design slot is 760 × 1020 px, giving ~50 px breathing room
- * on every side within the 860 × 1120 zone.
+ * Each design slot fits within one quarter (646 × 1120 px) with ~50 px
+ * breathing room on every side: max 546 × 1020 px.
  */
-const MUG_IMG_MAX_W = 760;
+const MUG_IMG_MAX_W = MUG_QUARTER - 100; // 546
 const MUG_IMG_MAX_H = 1020;
 
 // ── T-shirt / Hoodie Printify print area dimensions ───────────────────────────
@@ -328,11 +336,11 @@ export async function compositeUSCardImage(imageUrl: string): Promise<Buffer> {
 /**
  * Mug: composite the AI image TWICE on a white 2582 × 1120 full-wrap canvas.
  *
- * The mug handle sits in the centre zone (860–1722 px). The design is placed
- * once in the left zone and once in the right zone so it appears on both
- * sides of the handle.
+ * The Printify template divides the wrap into four equal quarters (~646 px).
+ * The handle occupies Q2 + Q3 (645–1937 px). The design is placed once in
+ * Q1 (9 o'clock) and once in Q4 (3 o'clock), each copy centred in its quarter.
  *
- * Each slot: 760 × 1020 px (≈50 px margin on all sides within 860 × 1120).
+ * Each slot: 546 × 1020 px (≈50 px margin on all sides within 646 × 1120).
  *
  * Returns a PNG Buffer for upload to Printify at scale:1.0 / position:0.5,0.5.
  */
@@ -346,10 +354,10 @@ export async function compositeMugImage(imageUrl: string): Promise<Buffer> {
 
   const { width: rw = MUG_IMG_MAX_W, height: rh = MUG_IMG_MAX_H } = await sharp(resized).metadata();
 
-  // Centre image within left zone  [0, 860)
-  const leftX  = Math.round((MUG_SIDE_W - rw) / 2);
-  // Centre image within right zone [1722, 2582)
-  const rightX = MUG_RIGHT_START + Math.round((MUG_SIDE_W - rw) / 2);
+  // Centre image on Q1 centre (25% = ~646 px)
+  const leftX  = Math.round(MUG_Q1_CENTER - rw / 2);
+  // Centre image on Q4 centre (75% = ~1937 px)
+  const rightX = Math.round(MUG_Q4_CENTER - rw / 2);
   // Vertical centre across full 1120 px strip
   const posY   = Math.round((MUG_H - rh) / 2);
 

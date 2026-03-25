@@ -16,7 +16,6 @@ import {
   Coffee,
 } from "lucide-react";
 import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
-import { PromptHelperCollapsible } from "./PromptHelperCollapsible";
 import { IdeasForYou } from "./IdeasForYou";
 import BeforeAfterCarousel from "@/components/BeforeAfterCarousel";
 import { Carousel } from "@/components/ui/Carousel";
@@ -414,11 +413,7 @@ export function CreatePageLayoutLean({
 
       <motion.section variants={fadeInUp}>
         {/* Gift ideas — always visible */}
-        <div className="mt-3 grid gap-4 sm:mt-4 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">Need ideas?</p>
-            <PromptHelperCollapsible onUsePrompt={handleUsePrompt} />
-          </div>
+        <div className="mt-3 sm:mt-4">
           <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
             <IdeasForYou
               region={region}

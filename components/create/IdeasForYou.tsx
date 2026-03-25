@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import type { Region } from "@/lib/region";
 import { KineticHeading } from "@/components/motion/KineticHeading";
 import { REGION_CONTENT } from "@/content/regionContent";
+import { PromptHelperCollapsible } from "@/components/create/PromptHelperCollapsible";
 
 const MAX_CHIPS = 6;
 const MAX_PROMPTS_VISIBLE = 4;
@@ -100,6 +101,10 @@ export const IdeasForYou = React.memo(function IdeasForYou({
             {style}
           </button>
         ))}
+      </div>
+
+      <div className="mt-5 border-t border-charcoal/8 pt-1">
+        <PromptHelperCollapsible onUsePrompt={onUsePrompt} />
       </div>
 
       {pendingReplace ? (

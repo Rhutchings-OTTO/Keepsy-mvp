@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     siteName: "Keepsy",
     images: [
       {
-        url: "/opengraph-image",
+        url: "https://keepsy.store/og-image.png",
         width: 1200,
         height: 630,
         alt: "Keepsy social preview image",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Keepsy — Personalised Gifts",
     description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy.",
-    images: ["/twitter-image"],
+    images: ["https://keepsy.store/og-image.png"],
   },
   verification: {
     google: "r5u1S_rFTREoqBt8k7HBgKNEvbxgZHG0_65-N0-ItNw",

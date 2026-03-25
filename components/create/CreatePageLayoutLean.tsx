@@ -412,18 +412,15 @@ export function CreatePageLayoutLean({
       </div>
 
       <motion.section variants={fadeInUp}>
-        {/* Gift ideas — always visible */}
-        <div className="mt-3 sm:mt-4">
-          <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
-            <IdeasForYou
-              region={region}
-              onUsePrompt={handleChipPrompt}
-              onAppendStyle={handleAppendStyle}
-              onReplaceConfirm={handleReplaceConfirm}
-              onReplaceCancel={() => setPendingReplace(null)}
-              pendingReplace={pendingReplace}
-            />
-          </div>
+        <div className="rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-5">
+          <IdeasForYou
+            region={region}
+            onUsePrompt={handleChipPrompt}
+            onAppendStyle={handleAppendStyle}
+            onReplaceConfirm={handleReplaceConfirm}
+            onReplaceCancel={() => setPendingReplace(null)}
+            pendingReplace={pendingReplace}
+          />
         </div>
       </motion.section>
 

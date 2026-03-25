@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import type { Region } from "@/lib/region";
 import { KineticHeading } from "@/components/motion/KineticHeading";
 import { REGION_CONTENT } from "@/content/regionContent";
 import { PromptHelperCollapsible } from "@/components/create/PromptHelperCollapsible";
 
 const MAX_CHIPS = 6;
-const MAX_PROMPTS_VISIBLE = 4;
 
 const STYLE_PILLS = [
   "Watercolour",
@@ -39,12 +38,9 @@ export const IdeasForYou = React.memo(function IdeasForYou({
   onReplaceCancel,
   pendingReplace,
 }: IdeasForYouProps) {
-  const [showMore, setShowMore] = useState(false);
   const content = REGION_CONTENT[region];
   const holidayChips = content.holidayBadges.slice(0, 7);
   const promptChips = content.promptChips;
-  const visiblePrompts = showMore ? promptChips : promptChips.slice(0, MAX_PROMPTS_VISIBLE);
-  const hasMorePrompts = promptChips.length > MAX_PROMPTS_VISIBLE;
 
   const handleChipClick = (prompt: string) => {
     onUsePrompt(prompt);
@@ -68,7 +64,7 @@ export const IdeasForYou = React.memo(function IdeasForYou({
 
       <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-charcoal/45">Picture ideas — click to use</p>
       <div className="mt-2 flex flex-wrap gap-2">
-        {visiblePrompts.map((chip) => (
+        {promptChips.map((chip) => (
           <button
             key={chip}
             type="button"
@@ -79,15 +75,6 @@ export const IdeasForYou = React.memo(function IdeasForYou({
           </button>
         ))}
       </div>
-      {hasMorePrompts && (
-        <button
-          type="button"
-          onClick={() => setShowMore((prev) => !prev)}
-          className="mt-2 text-xs font-bold text-charcoal/60 underline hover:text-charcoal"
-        >
-          {showMore ? "Show less" : "Show more"}
-        </button>
-      )}
 
       <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-charcoal/45">Styles to try</p>
       <div className="mt-2 flex flex-wrap gap-2">

@@ -580,7 +580,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                   >
                     <Image
                       src="/images/our-story-hero.png"
-                      alt="Two women laughing together outdoors in warm golden light"
+                      alt="Mother and daughter laughing together outdoors in warm golden light"
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"

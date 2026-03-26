@@ -4,10 +4,11 @@
  * Providers:
  *   1   = SPOKE Custom Products      (US — mugs)
  *   6   = T Shirt and Sons           (UK — mugs, hoodies)
+ *   36  = Print Pigeons              (UK+US — greeting card bundles, BP 524)
+ *   69  = Prodigi                    (UK+US — fine art postcards, BP 842)
  *   99  = Printify Choice            (US — hoodies, t-shirts; UK — t-shirts)
  *   105 = Jondo                      (UK+US — canvas prints)
- *   164 = Prodigi                    (UK+US — fine art postcards, BP 842)
- *   149 = Print Pigeons              (UK+US — greeting card bundles, BP 524)
+ *   228 = Taylor                     (US — greeting cards, BP 1094)
  *
  * Blueprints:
  *   68   = Generic Brand 11oz Mug (US)
@@ -61,47 +62,48 @@ const MUG_UK: BlueprintConfig = {
   fallbackVariantId: 69010,
 };
 
-/* ─── Fine Art Postcard (BP 842, provider 164 — Prodigi) ─────────────────── */
+/* ─── Fine Art Postcard (BP 842, provider 69 — Prodigi) ──────────────────── */
 // Print area: 1854 × 1264 px (landscape). Sizes: 6"×4" and 7"×5".
-// TODO: replace variant IDs with real values from Printify dashboard / API.
+// Variant IDs verified via Printify catalog API 2026-03-26.
 const POSTCARD: BlueprintConfig = {
   blueprintId: 842,
-  printProviderId: 164,
+  printProviderId: 69,
   printPosition: "front",
   variants: {
-    "6x4": 101100, // TODO: replace with actual variant ID
-    "7x5": 101101, // TODO: replace with actual variant ID
+    "6x4": 76317, // 6" x 4" / 1 pc / Glossy
+    "7x5": 76318, // 7" x 5" (Horizontal) / 1 pc / Glossy
   },
-  fallbackVariantId: 101100, // TODO: replace with actual variant ID
+  fallbackVariantId: 76317, // 6" x 4" / 1 pc / Glossy
 };
 
-/* ─── Greeting Cards 7 pcs (BP 524, provider 149 — Print Pigeons) ─────────── */
+/* ─── Greeting Cards 7 pcs (BP 524, provider 36 — Print Pigeons) ─────────── */
 // Print area: 2409 × 1819 px (landscape flat; portrait when folded).
 // All 7 cards carry the same design. Single variant.
-// TODO: replace variant ID with real value from Printify dashboard / API.
+// Variant ID verified via Printify catalog API 2026-03-26.
 const CARDPACK: BlueprintConfig = {
   blueprintId: 524,
-  printProviderId: 149,
+  printProviderId: 36,
   printPosition: "front",
   variants: {},
-  fallbackVariantId: 101200, // TODO: replace with actual variant ID
+  fallbackVariantId: 68326, // One size
 };
 
-/* ─── US Greeting Cards (BP 1094, provider Taylor) ───────────────────────── */
+/* ─── US Greeting Cards (BP 1094, provider 228 — Taylor) ─────────────────── */
 // Print area: 2175 × 1538 px (landscape flat; portrait when folded).
 // Quantity options: 1, 10, 30, 50 cards — each is a separate variant.
-// TODO: replace variant IDs with real values from Printify dashboard / API.
+// Using 5" × 7" Coated (both sides) — standard US greeting card size.
+// Variant IDs verified via Printify catalog API 2026-03-26.
 const USCARD: BlueprintConfig = {
   blueprintId: 1094,
-  printProviderId: 1,   // TODO: confirm provider ID from Printify dashboard
+  printProviderId: 228,
   printPosition: "front",
   variants: {
-    "1":  101300, // TODO: replace with actual variant ID for 1-card
-    "10": 101301, // TODO: replace with actual variant ID for 10-pack
-    "30": 101302, // TODO: replace with actual variant ID for 30-pack
-    "50": 101303, // TODO: replace with actual variant ID for 50-pack
+    "1":  81858, // 5" x 7" (Vertical) / Coated (both sides) / 1 pc
+    "10": 81859, // 5" x 7" (Vertical) / Coated (both sides) / 10 pcs
+    "30": 81860, // 5" x 7" (Vertical) / Coated (both sides) / 30 pcs
+    "50": 81861, // 5" x 7" (Vertical) / Coated (both sides) / 50 pcs
   },
-  fallbackVariantId: 101300, // TODO: replace with actual variant ID
+  fallbackVariantId: 81858, // 5" x 7" (Vertical) / Coated (both sides) / 1 pc
 };
 
 /* ─── Hoodie US (BP 77, provider 99 — Printify Choice) ───────────────────── */
@@ -311,9 +313,11 @@ export function getProductRegionKey(
   productId: string,
   region: "US" | "UK"
 ): ProductRegionKey {
-  const p = productId.toLowerCase();
-  if (p === "postcard") return "postcard";
-  if (p === "cardpack") return "cardpack";
+  const p = productId.toLowerCase().replace(/\s+/g, "");
+  // Postcard aliases — covers catalog id "postcard" and session.metadata fallback "fineartpostcard"
+  if (p === "postcard" || p === "fineartpostcard" || p === "fine-art-postcard") return "postcard";
+  // Card pack aliases
+  if (p === "cardpack" || p === "greetingcards(7pack)" || p === "greetingcardpack") return "cardpack";
   // US greeting cards: uscard_1, uscard_10, uscard_30, uscard_50 → all use uscard blueprint
   if (p.startsWith("uscard")) return "uscard";
   if (p === "mug") return region === "UK" ? "mug_uk" : "mug_us";

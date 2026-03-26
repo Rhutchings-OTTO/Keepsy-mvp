@@ -158,8 +158,92 @@ export const reconcileOrders = inngest.createFunction(
       });
     }
 
+    // Step 4: Find and retry orders stuck in needs_manual_review
+    const manualReviewOrders = await step.run("fetch-manual-review-orders", async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("id, order_ref, stripe_session_id, customer_email, created_at")
+        .eq("status", "paid")
+        .eq("printify_status", "needs_manual_review")
+        .order("created_at", { ascending: true })
+        .limit(20);
+
+      if (error) {
+        throw new Error("[reconcile] Failed to query manual review orders: " + error.message);
+      }
+
+      console.log(`[reconcile] Found ${data?.length ?? 0} needs_manual_review orders`);
+      return data ?? [];
+    });
+
+    const retriedRefs: string[] = [];
+
+    for (const order of manualReviewOrders) {
+      if (!order.stripe_session_id) continue;
+
+      await step.run(`retry-manual-review-${order.order_ref}`, async () => {
+        let session: Stripe.Checkout.Session;
+        try {
+          session = await stripe.checkout.sessions.retrieve(order.stripe_session_id, {
+            expand: ["line_items.data.price.product"],
+          });
+        } catch (err) {
+          console.warn(
+            `[reconcile] Could not retrieve Stripe session ${order.stripe_session_id} for order ${order.order_ref}:`,
+            err instanceof Error ? err.message : String(err)
+          );
+          return;
+        }
+
+        if (session.payment_status !== "paid") {
+          console.warn(
+            `[reconcile] Order ${order.order_ref} has needs_manual_review but Stripe session payment_status=${session.payment_status} — skipping`
+          );
+          return;
+        }
+
+        console.warn(
+          `[reconcile] Retrying Printify fulfilment for needs_manual_review order ${order.order_ref}`
+        );
+
+        // Use a unique eventId each time so the stripe_events dedup table doesn't block re-processing
+        await inngest.send({
+          name: "stripe/webhook.received",
+          data: {
+            eventId: `reconcile_retry_${order.order_ref}_${Date.now()}`,
+            eventType: "checkout.session.completed",
+            payload: {
+              id: `reconcile_retry_${order.order_ref}`,
+              type: "checkout.session.completed",
+              data: { object: session },
+            } as unknown as Stripe.Event,
+          },
+        });
+
+        retriedRefs.push(order.order_ref);
+      });
+    }
+
+    if (retriedRefs.length > 0) {
+      await step.run("notify-founders-manual-review-retried", async () => {
+        await notifyFounders(
+          `Reconciliation: ${retriedRefs.length} needs_manual_review order(s) retried`,
+          [
+            `The reconciliation job found ${retriedRefs.length} order(s) stuck in needs_manual_review`,
+            `and has re-triggered their Printify fulfilment pipeline.`,
+            ``,
+            `Orders retried:`,
+            ...retriedRefs.map((ref) => `  • ${ref}`),
+            ``,
+            `Check the Inngest dashboard for processing status.`,
+          ].join("\n"),
+          "warning"
+        );
+      });
+    }
+
     console.log(
-      `[reconcile] Done. Checked: ${stalePendingOrders.length}, Replayed: ${reconciled.length}, Skipped (no session_id): ${skipped.length}`
+      `[reconcile] Done. Checked: ${stalePendingOrders.length}, Replayed: ${reconciled.length}, Skipped (no session_id): ${skipped.length}, Manual review retried: ${retriedRefs.length}`
     );
 
     return {
@@ -167,6 +251,8 @@ export const reconcileOrders = inngest.createFunction(
       reconciled: reconciled.length,
       skipped: skipped.length,
       reconciledRefs: reconciled,
+      manualReviewRetried: retriedRefs.length,
+      retriedRefs,
     };
   }
 );

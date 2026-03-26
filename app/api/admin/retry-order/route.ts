@@ -69,14 +69,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Supabase not configured." }, { status: 500 });
   }
 
-  const query = supabase
-    .from("orders")
-    .select("id, order_ref, stripe_session_id, status, printify_status, customer_email")
-    .maybeSingle();
-
   const { data: order, error: lookupErr } = body.order_ref
-    ? await query.eq("order_ref", body.order_ref)
-    : await query.eq("id", body.id as number);
+    ? await supabase
+        .from("orders")
+        .select("id, order_ref, stripe_session_id, status, printify_status, customer_email")
+        .eq("order_ref", body.order_ref)
+        .maybeSingle()
+    : await supabase
+        .from("orders")
+        .select("id, order_ref, stripe_session_id, status, printify_status, customer_email")
+        .eq("id", body.id as number)
+        .maybeSingle();
 
   if (lookupErr) {
     return NextResponse.json({ error: "Database error: " + lookupErr.message }, { status: 500 });

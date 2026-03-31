@@ -38,7 +38,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 412,
     soldThisWeek: 18,
     badge: "Bestseller",
-    image: "/images/collections/collection-wedding-hoodie.png",
+    image: "/product-tiles/hoodie-white.png",
   },
   {
     id: "hoodie-black",
@@ -50,7 +50,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 347,
     soldThisWeek: 14,
     badge: null,
-    image: "/images/collections/collection-pet-hoodie.png",
+    image: "/product-tiles/hoodie-black.png",
   },
   {
     id: "hoodie-blue",
@@ -62,7 +62,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 198,
     soldThisWeek: 9,
     badge: "New",
-    image: "/images/collections/collection-newbaby-hoodie.png",
+    image: "/product-tiles/hoodie-blue.png",
   },
   {
     id: "tee-white",
@@ -74,7 +74,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 856,
     soldThisWeek: 34,
     badge: "Bestseller",
-    image: "/images/collections/collection-hobby-tshirt.png",
+    image: "/product-tiles/tee-white.png",
   },
   {
     id: "tee-black",
@@ -86,7 +86,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 621,
     soldThisWeek: 27,
     badge: null,
-    image: "/images/collections/collection-friends-tshirt.png",
+    image: "/product-tiles/tee-black.png",
   },
   {
     id: "tee-blue",
@@ -98,7 +98,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 289,
     soldThisWeek: 11,
     badge: "New",
-    image: "/images/collections/collection-hobby-tshirt.png",
+    image: "/product-tiles/tee-blue.png",
   },
   {
     id: "mug-white",

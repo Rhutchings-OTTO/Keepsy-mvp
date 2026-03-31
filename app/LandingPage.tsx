@@ -50,26 +50,26 @@ const HERO_BULLETS = [
 
 const PRODUCT_IMAGES = [
   {
-    src: "/images/hero/mug-hero.jpg",
-    alt: "Custom personalised mug",
+    src: "/images/collections/collection-pet-mug.png",
+    alt: "Custom personalised mug with a ginger cat portrait",
     label: "Mugs",
     tag: "From £14.99",
   },
   {
-    src: "/images/hero/cards-hero.jpg",
-    alt: "Personalised greeting card",
+    src: "/images/collections/collection-newbaby-card.png",
+    alt: "Personalised greeting card for a new baby",
     label: "Cards",
     tag: "From £6.99",
   },
   {
-    src: "/images/hero/tee-hero.jpg",
-    alt: "Custom printed tee",
+    src: "/images/collections/collection-friends-tshirt.png",
+    alt: "Custom printed t-shirt for friends",
     label: "Tees",
     tag: "From £29.99",
   },
   {
-    src: "/images/collections/collection-pet-hoodie.png",
-    alt: "Custom personalised hoodie with a cockapoo portrait design",
+    src: "/images/collections/collection-newbaby-hoodie.png",
+    alt: "Custom personalised hoodie with a Mummy Est. 2026 design",
     label: "Hoodies",
     tag: "From £44.99",
   },

@@ -38,7 +38,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 412,
     soldThisWeek: 18,
     badge: "Bestseller",
-    image: "/images/products/hoodie-white.jpg",
+    image: "/images/collections/collection-wedding-hoodie.png",
   },
   {
     id: "hoodie-black",
@@ -50,7 +50,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 347,
     soldThisWeek: 14,
     badge: null,
-    image: "/images/products/hoodie-black.jpg",
+    image: "/images/collections/collection-pet-hoodie.png",
   },
   {
     id: "hoodie-blue",
@@ -62,7 +62,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 198,
     soldThisWeek: 9,
     badge: "New",
-    image: "/images/products/hoodie-blue.jpg",
+    image: "/images/collections/collection-newbaby-hoodie.png",
   },
   {
     id: "tee-white",
@@ -74,7 +74,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 856,
     soldThisWeek: 34,
     badge: "Bestseller",
-    image: "/images/products/tshirt-white.jpg",
+    image: "/images/collections/collection-hobby-tshirt.png",
   },
   {
     id: "tee-black",
@@ -86,7 +86,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 621,
     soldThisWeek: 27,
     badge: null,
-    image: "/images/products/tshirt-black.jpg",
+    image: "/images/collections/collection-friends-tshirt.png",
   },
   {
     id: "tee-blue",
@@ -98,7 +98,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 289,
     soldThisWeek: 11,
     badge: "New",
-    image: "/images/products/tshirt-blue.jpg",
+    image: "/images/collections/collection-hobby-tshirt.png",
   },
   {
     id: "mug-white",
@@ -110,7 +110,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 1847,
     soldThisWeek: 72,
     badge: "Bestseller",
-    image: "/images/products/mug.jpg",
+    image: "/images/collections/collection-pet-mug.png",
   },
   {
     id: "card-white",
@@ -122,7 +122,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 2341,
     soldThisWeek: 98,
     badge: "Bestseller",
-    image: "/images/products/greeting-card.jpg",
+    image: "/images/collections/collection-newbaby-card.png",
   },
   {
     id: "canvas-family",
@@ -133,7 +133,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 64,
     soldThisWeek: 12,
     badge: "New",
-    image: "/images/canvas/canvas-family.png",
+    image: "/images/collections/collection-family-canvas.png",
   },
   {
     id: "canvas-pet",
@@ -144,7 +144,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 41,
     soldThisWeek: 8,
     badge: "New",
-    image: "/images/canvas/canvas-pet.png",
+    image: "/images/collections/collection-pet-canvas.png",
   },
   {
     id: "canvas-house",
@@ -155,7 +155,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 29,
     soldThisWeek: 6,
     badge: "New",
-    image: "/images/canvas/canvas-house.png",
+    image: "/images/collections/collection-newhome-canvas.png",
   },
 ];
 

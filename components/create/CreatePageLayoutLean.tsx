@@ -219,7 +219,7 @@ export function CreatePageLayoutLean({
           </div>
         </motion.section>
 
-        <motion.section variants={fadeInUp} className="w-full">
+        <motion.section variants={fadeInUp} className="w-full min-w-0">
           <MagicpathFrame enabled={isMagicpathSkin}>
             <div className="overflow-hidden rounded-2xl border border-charcoal/8 bg-white p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)] sm:p-5">
               <div className="inline-flex rounded-lg border border-charcoal/10 bg-[#F5EDE0] p-1">

@@ -70,12 +70,12 @@ const MUG_H = 1120;
  *   Q3 [1291    … 1937)   ← handle zone (blank)
  *   Q4 [1937    … 2582)   ← 3 o'clock  — design here
  *
- * Centre of Q1 = 323 px  (25% of 2582)
- * Centre of Q4 = 2259 px (75% of 2582)
+ * Centre of Q1 = 323 px  (12.5% of 2582)
+ * Centre of Q4 = 2259 px (87.5% of 2582)
  */
 const MUG_QUARTER = Math.round(MUG_W / 4); // 646
-const MUG_Q1_CENTER = Math.round(MUG_W * 0.25); // 646 → center of Q1
-const MUG_Q4_CENTER = Math.round(MUG_W * 0.75); // 1937 → center of Q4
+const MUG_Q1_CENTER = Math.round(MUG_QUARTER / 2);          // 323 → centre of Q1 [0..645]
+const MUG_Q4_CENTER = MUG_W - Math.round(MUG_QUARTER / 2); // 2259 → centre of Q4 [1936..2581]
 
 /**
  * Each design slot fits within one quarter (646 × 1120 px) with ~50 px

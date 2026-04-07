@@ -21,7 +21,6 @@ const CONTAINER = "mx-auto w-full max-w-6xl px-4 sm:px-6";
 
 // Dark footer colour tokens
 const LINK_COLOR = "#F0EDE8";
-const LINK_HOVER = "#FFFFFF";
 const HEADER_COLOR = "#D4A853";
 const FAINT_COLOR = "rgba(255,255,255,0.70)";
 const BORDER_COLOR = "rgba(255,255,255,0.1)";
@@ -207,7 +206,7 @@ export function SiteFooter() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="shrink-0 rounded-lg px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+                      className="shrink-0 rounded-lg px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50"
                       style={{ backgroundColor: "var(--color-terracotta)" }}
                     >
                       {loading ? "…" : "Get 10% Off"}
@@ -274,18 +273,10 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border transition-colors duration-150"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border transition-colors duration-150 hover:text-white hover:border-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 focus-visible:rounded-full"
                   style={{
                     borderColor: BORDER_COLOR,
                     color: LINK_COLOR,
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.color = LINK_HOVER;
-                    (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.4)";
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.color = LINK_COLOR;
-                    (e.currentTarget as HTMLAnchorElement).style.borderColor = BORDER_COLOR;
                   }}
                 >
                   <Icon />
@@ -301,36 +292,38 @@ export function SiteFooter() {
               <button
                 type="button"
                 onClick={() => setShopOpen(!shopOpen)}
-                className="flex w-full items-center justify-between sm:pointer-events-none"
+                className="flex w-full items-center justify-between sm:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 focus-visible:rounded"
               >
                 <p className="text-xs font-bold uppercase tracking-widest" style={{ color: HEADER_COLOR }}>
                   Shop
                 </p>
                 <span className="text-sm sm:hidden" style={{ color: FAINT_COLOR }}>{shopOpen ? "−" : "+"}</span>
               </button>
-              <div className={`mt-3 flex-col gap-2.5 ${shopOpen ? "flex" : "hidden"} sm:flex`}>
-                {[
-                  { href: "/shop", label: "All Products" },
-                  { href: "/gift-ideas", label: "Gift Ideas" },
-                  { href: "/community", label: "Community" },
-                  { href: "/create", label: "Create a Gift" },
-                  { href: "/product/mug", label: "Personalised Mugs" },
-                  { href: "/product/tee", label: "Custom Tees" },
-                  { href: "/product/hoodie", label: "Hoodies" },
-                  { href: "/product/card", label: "Greeting Cards" },
-                  { href: "/product/canvas", label: "Canvas Prints" },
-                ].map(({ href, label }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="text-sm transition-colors duration-150"
-                    style={{ color: LINK_COLOR }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = LINK_HOVER; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = LINK_COLOR; }}
-                  >
-                    {label}
-                  </Link>
-                ))}
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out sm:!max-h-none sm:!opacity-100 ${shopOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
+              >
+                <div className="mt-3 flex flex-col gap-2.5">
+                  {[
+                    { href: "/shop", label: "All Products" },
+                    { href: "/gift-ideas", label: "Gift Ideas" },
+                    { href: "/community", label: "Community" },
+                    { href: "/create", label: "Create a Gift" },
+                    { href: "/product/mug", label: "Personalised Mugs" },
+                    { href: "/product/tee", label: "Custom Tees" },
+                    { href: "/product/hoodie", label: "Hoodies" },
+                    { href: "/product/card", label: "Greeting Cards" },
+                    { href: "/product/canvas", label: "Canvas Prints" },
+                  ].map(({ href, label }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="text-sm transition-colors duration-150 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 focus-visible:rounded"
+                      style={{ color: LINK_COLOR }}
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -339,33 +332,35 @@ export function SiteFooter() {
               <button
                 type="button"
                 onClick={() => setCompanyOpen(!companyOpen)}
-                className="flex w-full items-center justify-between sm:pointer-events-none"
+                className="flex w-full items-center justify-between sm:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 focus-visible:rounded"
               >
                 <p className="text-xs font-bold uppercase tracking-widest" style={{ color: HEADER_COLOR }}>
                   Company
                 </p>
                 <span className="text-sm sm:hidden" style={{ color: FAINT_COLOR }}>{companyOpen ? "−" : "+"}</span>
               </button>
-              <div className={`mt-3 flex-col gap-2.5 ${companyOpen ? "flex" : "hidden"} sm:flex`}>
-                {[
-                  { href: "/about", label: "About Us" },
-                  { href: "/terms", label: "Terms & Conditions" },
-                  { href: "/privacy", label: "Privacy Policy" },
-                  { href: "/cookies", label: "Cookie Policy" },
-                  { href: "/refunds", label: "Refund Policy" },
-                  { href: "/shipping", label: "Shipping Info" },
-                ].map(({ href, label }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="text-sm transition-colors duration-150"
-                    style={{ color: LINK_COLOR }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = LINK_HOVER; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = LINK_COLOR; }}
-                  >
-                    {label}
-                  </Link>
-                ))}
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out sm:!max-h-none sm:!opacity-100 ${companyOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
+              >
+                <div className="mt-3 flex flex-col gap-2.5">
+                  {[
+                    { href: "/about", label: "About Us" },
+                    { href: "/terms", label: "Terms & Conditions" },
+                    { href: "/privacy", label: "Privacy Policy" },
+                    { href: "/cookies", label: "Cookie Policy" },
+                    { href: "/refunds", label: "Refund Policy" },
+                    { href: "/shipping", label: "Shipping Info" },
+                  ].map(({ href, label }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="text-sm transition-colors duration-150 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 focus-visible:rounded"
+                      style={{ color: LINK_COLOR }}
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -374,27 +369,28 @@ export function SiteFooter() {
               <button
                 type="button"
                 onClick={() => setHelpOpen(!helpOpen)}
-                className="flex w-full items-center justify-between sm:pointer-events-none"
+                className="flex w-full items-center justify-between sm:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 focus-visible:rounded"
               >
                 <p className="text-xs font-bold uppercase tracking-widest" style={{ color: HEADER_COLOR }}>
                   Help
                 </p>
                 <span className="text-sm sm:hidden" style={{ color: FAINT_COLOR }}>{helpOpen ? "−" : "+"}</span>
               </button>
-              <div className={`mt-3 flex-col gap-2.5 ${helpOpen ? "flex" : "hidden"} sm:flex`}>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out sm:!max-h-none sm:!opacity-100 ${helpOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
+              >
+                <div className="mt-3 flex flex-col gap-2.5">
                 <a
                   href="mailto:support@keepsy.store"
-                  className="text-sm transition hover:underline"
+                  className="text-sm transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 focus-visible:rounded"
                   style={{ color: "var(--color-terracotta)" }}
                 >
                   support@keepsy.store
                 </a>
                 <Link
                   href="/faq"
-                  className="text-sm transition-colors duration-150"
+                  className="text-sm transition-colors duration-150 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 focus-visible:rounded"
                   style={{ color: LINK_COLOR }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = LINK_HOVER; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = LINK_COLOR; }}
                 >
                   FAQ
                 </Link>
@@ -411,6 +407,7 @@ export function SiteFooter() {
                     <PaymentBadge label="AMEX" />
                     <PaymentBadge label="PayPal" />
                   </div>
+                </div>
                 </div>
               </div>
             </div>

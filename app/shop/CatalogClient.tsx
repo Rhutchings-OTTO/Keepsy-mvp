@@ -188,7 +188,7 @@ function ProductCard({ product, index, region }: { product: CatalogProduct; inde
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(45,41,38,0.04),_0_4px_12px_rgba(45,41,38,0.05)] transition-all duration-200 ease-out hover:shadow-[0_2px_8px_rgba(45,41,38,0.07),_0_12px_28px_rgba(45,41,38,0.08)] hover:-translate-y-0.5"
+      className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(45,41,38,0.04),_0_4px_12px_rgba(45,41,38,0.05)] transition-all duration-300 ease-out hover:shadow-[0_2px_8px_rgba(45,41,38,0.07),_0_12px_28px_rgba(45,41,38,0.08)] hover:-translate-y-0.5 cursor-pointer"
     >
       {/* Badge */}
       {product.badge && (

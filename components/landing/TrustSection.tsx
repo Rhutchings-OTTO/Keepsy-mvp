@@ -40,16 +40,28 @@ export function TrustSection() {
         </motion.div>
 
         {/* Mobile: horizontal scroll strip */}
-        <div className="mt-6 flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory sm:hidden">
-          {TRUST_BADGES.map(({ icon: Icon, label }) => (
-            <div
-              key={label}
-              className="flex w-[38vw] flex-shrink-0 snap-start flex-col items-center gap-2 rounded-xl border border-charcoal/8 bg-white px-3 py-4 text-center"
-            >
-              <Icon size={22} style={{ color: "var(--color-terracotta)" }} />
-              <p className="text-[11px] font-semibold leading-snug text-charcoal">{label}</p>
-            </div>
-          ))}
+        <div className="relative mt-6 -mx-5 sm:hidden">
+          {/* Right-edge gradient fade to signal scrollable content */}
+          <div
+            className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-10"
+            style={{
+              background:
+                "linear-gradient(to right, transparent, var(--color-cream))",
+            }}
+          />
+          <div className="flex gap-3 overflow-x-auto px-5 pb-2 snap-x snap-mandatory">
+            {TRUST_BADGES.map(({ icon: Icon, label }) => (
+              <div
+                key={label}
+                className="flex w-[38vw] flex-shrink-0 snap-start flex-col items-center gap-2 rounded-xl border border-charcoal/8 bg-white px-3 py-4 text-center"
+              >
+                <Icon size={22} style={{ color: "var(--color-terracotta)" }} />
+                <p className="text-[11px] font-semibold leading-snug text-charcoal">{label}</p>
+              </div>
+            ))}
+            {/* Spacer to ensure trailing padding after last card */}
+            <div className="w-px flex-shrink-0" />
+          </div>
         </div>
 
         {/* sm+: grid */}

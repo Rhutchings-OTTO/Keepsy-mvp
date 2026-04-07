@@ -9,14 +9,14 @@ const STEPS = [
 
 export function Explainer() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12">
+    <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
       <Reveal variant="fadeUp">
         <h2 className="font-serif text-3xl font-bold text-charcoal sm:text-4xl">How it works</h2>
       </Reveal>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {STEPS.map((step, index) => (
-          <Reveal key={step.label} variant="fadeUp" delay={index * 0.07}>
-            <article className="rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
+          <Reveal key={step.label} variant="fadeUp" delay={index * 0.07} className="h-full">
+            <article className="h-full rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.12)]">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Step {index + 1}</p>
               <p className="mt-2 font-serif text-lg font-bold text-charcoal">{step.label}</p>
               <p className="mt-1 text-sm leading-6 text-charcoal/60">{step.detail}</p>

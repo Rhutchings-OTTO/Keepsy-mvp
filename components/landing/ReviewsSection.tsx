@@ -11,9 +11,10 @@
 // (whileInView, motion.div). A future migration to CSS scroll-driven animations
 // would allow converting this to a Server Component.
 
+import { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 
 const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-8";
 
@@ -62,10 +63,133 @@ const REVIEWS = [
   },
 ];
 
+function StarRating() {
+  return (
+    <span className="flex gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star
+          key={i}
+          size={14}
+          fill="currentColor"
+          strokeWidth={0}
+          style={{ color: "var(--color-gold, #C9A84C)" }}
+        />
+      ))}
+    </span>
+  );
+}
+
+function ReviewCard({ review, className }: { review: (typeof REVIEWS)[number]; className?: string }) {
+  return (
+    <div
+      className={`flex flex-col rounded-2xl border border-white/8 bg-white/5 p-6 ${className ?? ""}`}
+    >
+      {/* Stars */}
+      <StarRating />
+
+      {/* Big quotation mark */}
+      <div
+        className="mt-2 font-serif text-6xl font-bold leading-none"
+        style={{ color: "rgba(196,113,74,0.35)" }}
+      >
+        &ldquo;
+      </div>
+
+      {/* Quote */}
+      <p className="mt-1 flex-1 text-[15px] leading-7 text-white/75">
+        {review.quote}
+      </p>
+
+      {/* Attribution */}
+      <div className="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
+        <div
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold"
+          style={{ backgroundColor: "rgba(196,113,74,0.2)", color: "var(--color-terra-light)" }}
+        >
+          {review.name.charAt(0)}
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-white">
+            {review.name}, {review.state}
+          </p>
+          <p className="text-xs text-white/40">{review.occasion}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileCarousel() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Each card is ~85vw + gap. Determine which card is most visible.
+    const cardWidth = el.scrollWidth / REVIEWS.length;
+    const index = Math.round(el.scrollLeft / cardWidth);
+    setActiveIndex(Math.min(index, REVIEWS.length - 1));
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  return (
+    <div>
+      <div
+        ref={scrollRef}
+        className="scrollbar-hide flex gap-4 overflow-x-auto px-5"
+        style={{
+          scrollSnapType: "x mandatory",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {REVIEWS.map((review) => (
+          <div
+            key={review.name}
+            className="w-[85vw] flex-shrink-0"
+            style={{ scrollSnapAlign: "start" }}
+          >
+            <ReviewCard review={review} className="h-full" />
+          </div>
+        ))}
+        {/* End spacer so last card can snap to start */}
+        <div className="w-1 flex-shrink-0" />
+      </div>
+
+      {/* Dot indicators */}
+      <div className="mt-5 flex justify-center gap-2">
+        {REVIEWS.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`Go to review ${i + 1}`}
+            onClick={() => {
+              const el = scrollRef.current;
+              if (!el) return;
+              const cardWidth = el.scrollWidth / REVIEWS.length;
+              el.scrollTo({ left: cardWidth * i, behavior: "smooth" });
+            }}
+            className={`h-2 rounded-full transition-all duration-300 ${
+              i === activeIndex
+                ? "w-5 bg-white/70"
+                : "w-2 bg-white/25"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ReviewsSection() {
   return (
     <section
-      className="hidden md:block py-12 sm:py-20"
+      className="py-12 sm:py-20"
       style={{ backgroundColor: "var(--color-charcoal)" }}
     >
       <div className={CONTAINER}>
@@ -82,8 +206,16 @@ export function ReviewsSection() {
             What Our Customers Say
           </h2>
         </motion.div>
+      </div>
 
-        <div className="mt-8 grid gap-6 sm:mt-14 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
+      {/* Mobile: swipeable carousel (below md) */}
+      <div className="mt-8 md:hidden">
+        <MobileCarousel />
+      </div>
+
+      {/* Desktop: grid layout (md+) */}
+      <div className={CONTAINER}>
+        <div className="mt-8 hidden gap-6 sm:mt-14 md:grid md:grid-cols-2 md:gap-8 lg:grid-cols-3">
           {REVIEWS.map((review, index) => (
             <motion.div
               key={review.name}
@@ -91,39 +223,8 @@ export function ReviewsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
-              className={`flex flex-col rounded-2xl border border-white/8 bg-white/5 p-6 ${index > 0 ? "hidden sm:flex" : ""}`}
             >
-              {/* Stars */}
-              <span className="text-sm" style={{ color: "var(--color-gold)" }}>★★★★★</span>
-
-              {/* Big quotation mark */}
-              <div
-                className="mt-2 font-serif text-6xl font-bold leading-none"
-                style={{ color: "rgba(196,113,74,0.35)" }}
-              >
-                &ldquo;
-              </div>
-
-              {/* Quote */}
-              <p className="mt-1 flex-1 text-[15px] leading-7 text-white/75">
-                {review.quote}
-              </p>
-
-              {/* Attribution */}
-              <div className="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
-                <div
-                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold"
-                  style={{ backgroundColor: "rgba(196,113,74,0.2)", color: "var(--color-terra-light)" }}
-                >
-                  {review.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">
-                    {review.name}, {review.state}
-                  </p>
-                  <p className="text-xs text-white/40">{review.occasion}</p>
-                </div>
-              </div>
+              <ReviewCard review={review} className="h-full" />
             </motion.div>
           ))}
         </div>

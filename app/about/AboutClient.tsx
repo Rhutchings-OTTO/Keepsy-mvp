@@ -5,6 +5,19 @@ import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { Star, Sparkles, Heart, Leaf, ShieldCheck, Package, Truck, RefreshCcw, Lock } from "lucide-react";
 
+/* ─── decorative divider ──────────────────────────────────────────────── */
+
+function SectionDivider() {
+  return (
+    <div className="mx-auto max-w-6xl px-6">
+      <hr
+        className="border-t"
+        style={{ borderColor: "rgba(196,113,74,0.18)" }}
+      />
+    </div>
+  );
+}
+
 /* ─── helpers ─────────────────────────────────────────────────────────── */
 
 function FadeIn({
@@ -87,7 +100,7 @@ function OriginStory() {
           <h2 className="mb-7 font-serif text-3xl font-bold leading-tight text-charcoal md:text-4xl">
             We started with a simple question
           </h2>
-          <div className="space-y-5 text-charcoal/70 leading-relaxed">
+          <div className="space-y-7 text-charcoal/70 leading-relaxed">
             <p>
               Keepsy was born out of a very ordinary moment. Dan was looking
               for a birthday gift for his mum — something personal, something
@@ -113,17 +126,17 @@ function OriginStory() {
             </p>
           </div>
 
-          {/* Dan's quote */}
+          {/* Pull-quote */}
           <blockquote
-            className="mt-8 border-l-2 pl-5"
+            className="mt-10 border-l-[3px] pl-6 py-2"
             style={{ borderColor: "var(--color-terracotta)" }}
           >
-            <p className="serif-italic text-base leading-relaxed text-charcoal/80">
+            <p className="font-serif text-xl italic leading-snug text-charcoal/85 md:text-2xl">
               "We just wanted to make our mums smile. Turns out, a lot of
               people feel the same way."
             </p>
             <footer
-              className="mt-2 text-sm font-medium"
+              className="mt-3 text-sm font-medium"
               style={{ color: "var(--color-terracotta)" }}
             >
               — Rory, Co-Founder of Keepsy
@@ -303,20 +316,22 @@ function StatItem({ value, label }: { value: string; label: string }) {
 
 function ByTheNumbers() {
   return (
-    <section
-      className="py-20 md:py-28"
-      style={{ backgroundColor: "#F5EDE0" }}
-    >
+    <section className="py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-6">
         <FadeIn className="mb-12 text-center">
           <h2 className="font-serif text-3xl font-bold text-charcoal md:text-4xl">
             The Keepsy Promise
           </h2>
         </FadeIn>
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
-          {STATS.map(({ value, label }) => (
-            <StatItem key={label} value={value} label={label} />
-          ))}
+        <div
+          className="rounded-2xl border border-charcoal/8 px-6 py-12 md:px-12 md:py-16"
+          style={{ backgroundColor: "#F5EDE0" }}
+        >
+          <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
+            {STATS.map(({ value, label }) => (
+              <StatItem key={label} value={value} label={label} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -451,8 +466,11 @@ export function AboutClient() {
       <Hero />
       <OriginStory />
       <MissionStatement />
+      <SectionDivider />
       <ValuesSection />
+      <SectionDivider />
       <ByTheNumbers />
+      <SectionDivider />
       <OurPromise />
       <CTASection />
     </div>

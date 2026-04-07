@@ -424,10 +424,10 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
                   whileHover={{ y: -1 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => handleProductChange(prod)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all border ${
+                  className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 border ${
                     selectedProduct.id === prod.id
                       ? "bg-terracotta border-terracotta text-white shadow-warm-sm"
-                      : "bg-cream border-charcoal/20 text-charcoal hover:border-terracotta/40"
+                      : "bg-cream border-charcoal/15 text-charcoal hover:bg-[#F5EDE0] hover:border-terracotta/40"
                   }`}
                 >
                   {prod.name}

@@ -1,36 +1,84 @@
-import Link from "next/link";
+"use client";
+
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { MagneticLink } from "@/components/ui/MagneticLink";
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const fadeIn = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  transition: { duration: 0.4, ease: "easeOut" },
+};
+
+const slideUp = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: "easeOut" },
+};
 
 export function Hero() {
   return (
-    <section className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-2 md:items-center md:py-20">
+    <motion.section
+      className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-2 md:items-center md:py-20"
+      variants={staggerContainer}
+      initial="initial"
+      animate="animate"
+    >
       <div className="max-w-2xl">
-        <p className="mb-4 inline-block rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-black/60">
+        <motion.p
+          className="mb-4 inline-block rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-black/60"
+          variants={fadeIn}
+        >
           Made for meaningful gifting
-        </p>
-        <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl md:text-6xl">
+        </motion.p>
+        <motion.h1
+          className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl md:text-6xl"
+          variants={slideUp}
+        >
           Turn your favourite memories into beautiful gifts in minutes.
-        </h1>
-        <p className="mt-5 max-w-xl text-base leading-relaxed text-black/65 sm:text-lg">
+        </motion.h1>
+        <motion.p
+          className="mt-5 max-w-xl text-base leading-relaxed text-black/65 sm:text-lg"
+          variants={fadeIn}
+        >
           Upload a photo, choose a style, and we help you create gift-ready cards, mugs, tees, and hoodies for the people you love.
-        </p>
-        <div className="mt-7 flex flex-wrap items-center gap-3">
-          <MagneticLink href="/create" className="min-h-11 rounded-2xl bg-black px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-black/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 inline-block">
+        </motion.p>
+        <motion.div
+          className="mt-7 flex flex-wrap items-center gap-3"
+          variants={fadeIn}
+        >
+          <MagneticLink
+            href="/create"
+            className="inline-block min-h-11 rounded-2xl bg-terracotta px-6 py-3 text-sm font-bold text-white shadow-terra-glow hover:bg-terracotta-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/30"
+          >
             Create your gift
           </MagneticLink>
-          <Link href="/gift-ideas" className="text-sm font-semibold text-black/65 underline-offset-4 hover:text-black hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20">
+          <MagneticLink
+            href="/gift-ideas"
+            className="inline-block min-h-11 rounded-2xl border border-charcoal/20 bg-transparent px-6 py-3 text-sm font-bold text-charcoal hover:border-charcoal/40 hover:bg-charcoal/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-charcoal/20"
+          >
             See gift ideas
-          </Link>
-        </div>
+          </MagneticLink>
+        </motion.div>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <motion.div
+        className="grid grid-cols-2 gap-3 sm:gap-4"
+        variants={slideUp}
+      >
         {/* Plain realistic product mockups */}
         <Image src="/product-tiles/plain-card.png" alt="Family card gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
         <Image src="/product-tiles/plain-mug-front.png" alt="Pet mug gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
         <Image src="/product-tiles/tee-white.png" alt="Premium tee gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
         <Image src="/product-tiles/hoodie-white.png" alt="Anniversary hoodie gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }

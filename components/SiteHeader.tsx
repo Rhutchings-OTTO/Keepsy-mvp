@@ -62,24 +62,35 @@ function AnnouncementBar() {
     setDismissed(true);
   }
 
-  if (dismissed) return null;
-
   return (
-    <div
-      className="relative flex items-center justify-center gap-2 px-10 py-1.5 text-xs font-medium text-white"
-      style={{ backgroundColor: "var(--color-terracotta)" }}
-    >
-      <span className="truncate sm:hidden">⚡ Free shipping over £75 / $75</span>
-      <span className="hidden truncate sm:inline">⚡ Fast shipping on every order · Free shipping over £75 (UK) / $75 (US)</span>
-      <button
-        type="button"
-        onClick={dismiss}
-        aria-label="Dismiss announcement"
-        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2.5 hover:bg-white/20 transition"
-      >
-        <X size={12} />
-      </button>
-    </div>
+    <AnimatePresence>
+      {!dismissed && (
+        <motion.div
+          key="announcement-bar"
+          initial={{ height: "auto", opacity: 1 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className="overflow-hidden"
+        >
+          <div
+            className="relative flex items-center justify-center gap-2 px-10 py-1.5 text-xs font-medium text-white"
+            style={{ backgroundColor: "var(--color-terracotta)" }}
+          >
+            <span className="truncate sm:hidden">⚡ Free shipping over £75 / $75</span>
+            <span className="hidden truncate sm:inline">⚡ Fast shipping on every order · Free shipping over £75 (UK) / $75 (US)</span>
+            <button
+              type="button"
+              onClick={dismiss}
+              aria-label="Dismiss announcement"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2.5 hover:bg-white/20 transition"
+            >
+              <X size={12} />
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -310,7 +321,7 @@ export function SiteHeader() {
               />
               {cartCount > 0 && (
                 <span
-                  className="absolute -right-0.5 -top-0.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full px-0.5 text-[10px] font-bold text-white"
+                  className="absolute -right-0.5 -top-0.5 flex min-w-[20px] h-[20px] items-center justify-center rounded-full px-1 text-[10px] leading-none font-bold text-white"
                   style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
                   {cartCount > 99 ? "99+" : cartCount}

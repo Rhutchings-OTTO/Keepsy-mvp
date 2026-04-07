@@ -61,28 +61,23 @@ const MUG_W = 2582;
 const MUG_H = 1120;
 
 /**
- * Mug layout — four equal quarters (645.5 px each).
- * The Printify template has three vertical dotted guides dividing the wrap
- * into quarters; the handle occupies the middle two (Q2 + Q3).
+ * Mug layout — face centres from the Printify template guide lines.
+ * The handle occupies the middle of the wrap; the two printable faces sit
+ * either side of it.
  *
- *   Q1 [0       … 645)    ← 9 o'clock  — design here
- *   Q2 [645     … 1291)   ← handle zone (blank)
- *   Q3 [1291    … 1937)   ← handle zone (blank)
- *   Q4 [1937    … 2582)   ← 3 o'clock  — design here
+ *   Front face centre: x = 525  (face spans roughly 0 – 1050 px)
+ *   Handle zone:       x ≈ 1050 – 1532 px
+ *   Back face centre:  x = 2057 (face spans roughly 1532 – 2582 px)
  *
- * Centre of Q1 = 323 px  (12.5% of 2582)
- * Centre of Q4 = 2259 px (87.5% of 2582)
+ * Each face is ~1050 px wide. Images are sized to fill ≈95% of the wrap
+ * height (1064 px) and ≈80% of the face width (840 px), with the taller
+ * dimension acting as the primary constraint for most image aspect ratios.
  */
-const MUG_QUARTER = Math.round(MUG_W / 4); // 646
-const MUG_Q1_CENTER = Math.round(MUG_QUARTER / 2);          // 323 → centre of Q1 [0..645]
-const MUG_Q4_CENTER = MUG_W - Math.round(MUG_QUARTER / 2); // 2259 → centre of Q4 [1936..2581]
+const MUG_Q1_CENTER = 525;   // front face centre (px from left)
+const MUG_Q4_CENTER = 2057;  // back face centre  (px from left)
 
-/**
- * Each design slot fits within one quarter (646 × 1120 px) with ~50 px
- * breathing room on every side: max 546 × 1020 px.
- */
-const MUG_IMG_MAX_W = MUG_QUARTER - 100; // 546
-const MUG_IMG_MAX_H = 1020;
+const MUG_IMG_MAX_W = 840;   // 80% of ~1050 px face width
+const MUG_IMG_MAX_H = 1064;  // 95% of 1120 px wrap height (~28 px margin top/bottom)
 
 /**
  * Canvas gallery-wrap constants.

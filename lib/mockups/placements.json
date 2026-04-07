@@ -114,10 +114,10 @@
       "placement": {
         "kind": "rect",
         "rect": {
-          "xPct": 50,
+          "xPct": 46.9,
           "yPct": 50,
           "wPct": 28,
-          "hPct": 83.3,
+          "hPct": 50,
           "rotateDeg": 0,
           "borderRadiusPct": 2
         }

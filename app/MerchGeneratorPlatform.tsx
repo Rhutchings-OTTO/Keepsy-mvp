@@ -505,7 +505,16 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [isCompressingImage, setIsCompressingImage] = useState(false);
   const [addToCartConfirmation, setAddToCartConfirmation] = useState<string | null>(null);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+      if (!raw) return [];
+      return fromPersistedCart(raw);
+    } catch {
+      return [];
+    }
+  });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isGiftingSkipped, setIsGiftingSkipped] = useState(false);
   const [isUpsellOpen, setIsUpsellOpen] = useState(false);
@@ -578,19 +587,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-  }, []);
-
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(CART_STORAGE_KEY);
-      if (!raw) return;
-      const restored = fromPersistedCart(raw);
-      if (restored.length > 0) {
-        setCartItems(restored);
-      }
-    } catch {
-      // ignore malformed local cart snapshots
-    }
   }, []);
 
   useEffect(() => {

@@ -39,7 +39,11 @@ function useCartCount() {
     }
     readCart();
     window.addEventListener("storage", readCart);
-    return () => window.removeEventListener("storage", readCart);
+    window.addEventListener("cart-updated", readCart);
+    return () => {
+      window.removeEventListener("storage", readCart);
+      window.removeEventListener("cart-updated", readCart);
+    };
   }, []);
 
   return count;

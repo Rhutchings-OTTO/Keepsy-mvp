@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const buf = await compositeCanvasImage(url, size);
-    return new NextResponse(buf, {
+    return new NextResponse(new Uint8Array(buf), {
       status: 200,
       headers: {
         "Content-Type": "image/png",

@@ -419,29 +419,18 @@ export async function compositeCanvasImage(
   imageUrl: string,
   sizeCode = "20x16",
 ): Promise<Buffer> {
-  const parts = sizeCode.split("x");
-  const wIn = parseFloat(parts[0] ?? "");
-  const hIn = parseFloat(parts[1] ?? "");
-  if (!wIn || !hIn) {
-    throw new Error(`[image-composite] Invalid canvas sizeCode: "${sizeCode}"`);
-  }
-
-  const faceW = Math.round(wIn * CANVAS_DPI);
-  const faceH = Math.round(hIn * CANVAS_DPI);
+  // sizeCode is kept as a parameter for API compatibility but is no longer used
+  // for resizing — the frontend crop is trusted as-is.
+  void sizeCode;
 
   const srcBuf = await fetchBuffer(imageUrl);
 
-  // Scale to exact face dimensions (user has already cropped to the right ratio;
-  // cover ensures any minor rounding difference is trimmed from the centre)
-  const face = await sharp(srcBuf)
-    .resize(faceW, faceH, { fit: "cover", position: "centre" })
-    .png()
-    .toBuffer();
-
+  // The user has already cropped the image on the frontend — trust that crop
+  // and do not resize further. Extend directly from the source dimensions.
   // Extend all four sides by copying edge pixels outward — Sharp 'copy' mode
   // replicates the outermost row/column across the full 375 px wrap depth.
   // Corner areas are filled with the nearest corner pixel automatically.
-  return sharp(face)
+  return sharp(srcBuf)
     .extend({
       top:    CANVAS_WRAP_PX,
       bottom: CANVAS_WRAP_PX,

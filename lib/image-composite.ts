@@ -84,6 +84,20 @@ const MUG_Q4_CENTER = MUG_W - Math.round(MUG_QUARTER / 2); // 2259 → centre of
 const MUG_IMG_MAX_W = MUG_QUARTER - 100; // 546
 const MUG_IMG_MAX_H = 1020;
 
+/**
+ * Canvas gallery-wrap constants.
+ *
+ * All Keepsy canvas products use a 1.25" gallery-wrap depth (Jondo provider).
+ * At 300 DPI: 1.25 × 300 = 375 px of wrap on each side.
+ *
+ * The compositeCanvasImage function resizes the face image to the exact print
+ * face dimensions, then uses Sharp's 'copy' extension to bleed the edge pixels
+ * outward into the wrap area — one pixel wide strip repeated across 375 px,
+ * producing a smooth, colour-matched gallery wrap on all four sides.
+ */
+const CANVAS_DPI     = 300;
+const CANVAS_WRAP_PX = Math.round(1.25 * CANVAS_DPI); // 375 px per side
+
 // ── T-shirt / Hoodie Printify print area dimensions ───────────────────────────
 
 export const TEE_PRINT_W    = 4500;
@@ -373,6 +387,68 @@ export async function compositeMugImage(imageUrl: string): Promise<Buffer> {
       { input: resized, left: leftX,  top: posY },
       { input: resized, left: rightX, top: posY },
     ])
+    .png()
+    .toBuffer();
+}
+
+/**
+ * Canvas gallery wrap (Jondo blueprint 1159): resize the AI image to the exact
+ * canvas face dimensions and extend all four edges outward by 375 px (1.25" at
+ * 300 DPI) using Sharp's 'copy' extension, which replicates a 1 px strip from
+ * each edge across the full wrap depth.
+ *
+ * Layout of the output file:
+ *
+ *   ┌──────────────────────────────────┐
+ *   │   375 px top wrap  (edge bleed)  │
+ *   ├──────────────────────────────────┤
+ *   │ 375│                        │375 │
+ *   │ px │    face (W×H inches    │ px │
+ *   │    │     at 300 DPI)        │    │
+ *   ├──────────────────────────────────┤
+ *   │  375 px bottom wrap (edge bleed) │
+ *   └──────────────────────────────────┘
+ *
+ * sizeCode: canvas face dimensions in inches, e.g. "20x16". The function
+ * resizes (cover-fit) the source to faceW × faceH before extending, so the
+ * output always has the correct print-area pixel count regardless of input size.
+ *
+ * Returns a PNG Buffer for upload to Printify at scale:1.0, position:0.5,0.5.
+ */
+export async function compositeCanvasImage(
+  imageUrl: string,
+  sizeCode = "20x16",
+): Promise<Buffer> {
+  const parts = sizeCode.split("x");
+  const wIn = parseFloat(parts[0] ?? "");
+  const hIn = parseFloat(parts[1] ?? "");
+  if (!wIn || !hIn) {
+    throw new Error(`[image-composite] Invalid canvas sizeCode: "${sizeCode}"`);
+  }
+
+  const faceW = Math.round(wIn * CANVAS_DPI);
+  const faceH = Math.round(hIn * CANVAS_DPI);
+
+  const srcBuf = await fetchBuffer(imageUrl);
+
+  // Scale to exact face dimensions (user has already cropped to the right ratio;
+  // cover ensures any minor rounding difference is trimmed from the centre)
+  const face = await sharp(srcBuf)
+    .resize(faceW, faceH, { fit: "cover", position: "centre" })
+    .png()
+    .toBuffer();
+
+  // Extend all four sides by copying edge pixels outward — Sharp 'copy' mode
+  // replicates the outermost row/column across the full 375 px wrap depth.
+  // Corner areas are filled with the nearest corner pixel automatically.
+  return sharp(face)
+    .extend({
+      top:    CANVAS_WRAP_PX,
+      bottom: CANVAS_WRAP_PX,
+      left:   CANVAS_WRAP_PX,
+      right:  CANVAS_WRAP_PX,
+      extendWith: "copy",
+    })
     .png()
     .toBuffer();
 }

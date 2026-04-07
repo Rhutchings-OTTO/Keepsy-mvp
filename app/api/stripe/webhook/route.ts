@@ -19,6 +19,7 @@ import {
   compositeCardpackImage,
   compositeUSCardImage,
   compositeMugImage,
+  compositeCanvasImage,
   computeContainScale,
   TEE_PRINT_W,
   TEE_PRINT_H,
@@ -362,7 +363,7 @@ async function handleCheckoutCompleted(
     // Mug       → dual front-face composite (2582×1120) uploaded as Buffer
     // Tee       → original image, scale computed dynamically (contain-fit)
     // Hoodie    → original image, scale computed dynamically (contain-fit)
-    // Canvas    → cropped image, scale:1.0 full-bleed (already handled above)
+    // Canvas    → gallery-wrap composite: face + 375 px edge-bleed on all sides
     // Other     → original image, default placement
 
     let printifyImageId: string;
@@ -414,6 +415,13 @@ async function handleCheckoutCompleted(
         console.log(`[printify] Hoodie contain scale: ${scaleOverride} (image ${width}×${height})`);
       }
       printifyImageId = await uploadImageToPrintify(imgBuf, `keepsy-${orderRef}.png`);
+
+    } else if (pType.includes("canvas")) {
+      // size = "WxH" e.g. "20x16"; fall back to parsing from pType ("canvas_20x16") or default
+      const canvasSizeCode = size || pType.replace(/^canvas_?/, "") || "20x16";
+      console.log(`[printify] Compositing canvas gallery wrap — size ${canvasSizeCode}`);
+      const buf = await compositeCanvasImage(printifySourceUrl, canvasSizeCode);
+      printifyImageId = await uploadImageToPrintify(buf, `keepsy-${orderRef}.png`);
 
     } else {
       printifyImageId = await uploadImageToPrintify(printifySourceUrl, `keepsy-${orderRef}.png`);

@@ -419,27 +419,28 @@ export async function compositeCanvasImage(
   imageUrl: string,
   sizeCode = "20x16",
 ): Promise<Buffer> {
-  // sizeCode is kept as a parameter for API compatibility but is no longer used
-  // for resizing — the frontend crop is trusted as-is.
-  void sizeCode;
+  const parts = sizeCode.split("x");
+  const faceWIn = parseFloat(parts[0] ?? "20");
+  const faceHIn = parseFloat(parts[1] ?? "16");
 
   const srcBuf = await fetchBuffer(imageUrl);
 
-  // Scale the bleed proportionally to the source image width.
-  // 375px on a 6000px-wide image (20" × 300 DPI) = 6.25% — this preserves the
-  // correct 1.25" physical wrap depth regardless of the image's actual pixel count.
-  const { width: srcW = 6000 } = await sharp(srcBuf).metadata();
-  const bleedPx = Math.round(srcW * (CANVAS_WRAP_PX / (20 * CANVAS_DPI)));
+  // Bleed as a proportion of the face: 1.25" / faceInches × imagePixels.
+  // This keeps the physical 1.25" wrap depth correct for all canvas sizes —
+  // square, landscape, and portrait — at any source pixel count.
+  const { width: srcW = 6000, height: srcH = 4800 } = await sharp(srcBuf).metadata();
+  const hBleed = Math.round((1.25 / faceWIn) * srcW);
+  const vBleed = Math.round((1.25 / faceHIn) * srcH);
 
   // Extend all four sides by copying edge pixels outward — Sharp 'copy' mode
   // replicates the outermost row/column across the full bleed depth.
   // Corner areas are filled with the nearest corner pixel automatically.
   return sharp(srcBuf)
     .extend({
-      top:    bleedPx,
-      bottom: bleedPx,
-      left:   bleedPx,
-      right:  bleedPx,
+      top:    vBleed,
+      bottom: vBleed,
+      left:   hBleed,
+      right:  hBleed,
       extendWith: "copy",
     })
     .png()

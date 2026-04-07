@@ -56,28 +56,51 @@ const USCARD_PANEL_W = USCARD_W - USCARD_HALF_W; // 1088
 const USCARD_COVER_SAFE_W = Math.round(USCARD_PANEL_W * 0.80); // 870
 const USCARD_COVER_SAFE_H = Math.round(USCARD_H * 0.80);       // 1230
 
-/** 11 oz mug full-wrap print area */
-const MUG_W = 2582;
-const MUG_H = 1120;
-
 /**
- * Mug layout — face centres from the Printify template guide lines.
- * The handle occupies the middle of the wrap; the two printable faces sit
- * either side of it.
+ * Mug print area — 11 oz mug full-wrap (Blueprint 167, Printify).
  *
+ * !! LOCKED VALUES — derived from the Printify template guide lines. !!
+ * !! Do NOT change without re-measuring the template.                 !!
+ *
+ * Full wrap: 2582 × 1120 px at 300 DPI.
+ *
+ * Face layout:
  *   Front face centre: x = 525  (face spans roughly 0 – 1050 px)
- *   Handle zone:       x ≈ 1050 – 1532 px
+ *   Handle zone:       x ≈ 1050 – 1532 px (no design placed here)
  *   Back face centre:  x = 2057 (face spans roughly 1532 – 2582 px)
  *
- * Each face is ~1050 px wide. Images are sized to fill ≈95% of the wrap
- * height (1064 px) and ≈80% of the face width (840 px), with the taller
- * dimension acting as the primary constraint for most image aspect ratios.
+ * Vertical safe zone: 28 px margin top and bottom → images must stay within
+ *   y = 28 (MUG_TOP_LIMIT) to y = 1092 (MUG_BOTTOM_LIMIT).
+ *   Maximum image height: 1064 px (MUG_MAX_HEIGHT).
+ *
+ * Images are sized to fill ≈80% of the face width (840 px) and up to
+ * 100% of the max height (1064 px); the taller constraint wins for most
+ * landscape images, the wider for portrait/square images.
  */
-const MUG_Q1_CENTER = 525;   // front face centre (px from left)
-const MUG_Q4_CENTER = 2057;  // back face centre  (px from left)
 
-const MUG_IMG_MAX_W = 840;   // 80% of ~1050 px face width
-const MUG_IMG_MAX_H = 1064;  // 95% of 1120 px wrap height (~28 px margin top/bottom)
+// ── Print area (locked) ──────────────────────────────────────────────────────
+const MUG_WRAP_W = 2582;
+const MUG_WRAP_H = 1120;
+
+// ── Face centres (locked — from Printify template guide lines) ───────────────
+const MUG_FRONT_CENTER_X = 525;   // front face centre, px from left
+const MUG_BACK_CENTER_X  = 2057;  // back face centre,  px from left
+const MUG_CENTER_Y       = Math.round(MUG_WRAP_H / 2); // 560 — vertical midpoint
+
+// ── Vertical hard limits (locked) ────────────────────────────────────────────
+const MUG_TOP_LIMIT    = 28;                                  // no design above this row
+const MUG_BOTTOM_LIMIT = MUG_WRAP_H - 28;                    // no design below this row (1092)
+const MUG_MAX_HEIGHT   = MUG_BOTTOM_LIMIT - MUG_TOP_LIMIT;   // 1064 px
+
+// ── Image size limits (locked) ────────────────────────────────────────────────
+const MUG_IMG_MAX_W = 840;          // ≈80% of ~1050 px face width
+const MUG_IMG_MAX_H = MUG_MAX_HEIGHT; // hard vertical limit (1064 px)
+
+// Legacy aliases kept so nothing else in this file needs renaming
+const MUG_W = MUG_WRAP_W;
+const MUG_H = MUG_WRAP_H;
+const MUG_Q1_CENTER = MUG_FRONT_CENTER_X;
+const MUG_Q4_CENTER = MUG_BACK_CENTER_X;
 
 /**
  * Canvas gallery-wrap constants.
@@ -345,11 +368,13 @@ export async function compositeUSCardImage(imageUrl: string): Promise<Buffer> {
 /**
  * Mug: composite the AI image TWICE on a white 2582 × 1120 full-wrap canvas.
  *
- * The Printify template divides the wrap into four equal quarters (~646 px).
- * The handle occupies Q2 + Q3 (645–1937 px). The design is placed once in
- * Q1 (9 o'clock) and once in Q4 (3 o'clock), each copy centred in its quarter.
+ * One copy is centred on the front face (MUG_FRONT_CENTER_X = 525) and one on
+ * the back face (MUG_BACK_CENTER_X = 2057). Both copies share the same vertical
+ * centre (MUG_CENTER_Y = 560).
  *
- * Each slot: 546 × 1020 px (≈50 px margin on all sides within 646 × 1120).
+ * The image is contain-fitted within MUG_IMG_MAX_W × MUG_IMG_MAX_H (840 × 1064).
+ * The vertical clamp guarantees no image pixel falls above MUG_TOP_LIMIT (28 px)
+ * or below MUG_BOTTOM_LIMIT (1092 px), regardless of source aspect ratio.
  *
  * Returns a PNG Buffer for upload to Printify at scale:1.0 / position:0.5,0.5.
  */
@@ -363,17 +388,20 @@ export async function compositeMugImage(imageUrl: string): Promise<Buffer> {
 
   const { width: rw = MUG_IMG_MAX_W, height: rh = MUG_IMG_MAX_H } = await sharp(resized).metadata();
 
-  // Centre image on Q1 centre (25% = ~646 px)
-  const leftX  = Math.round(MUG_Q1_CENTER - rw / 2);
-  // Centre image on Q4 centre (75% = ~1937 px)
-  const rightX = Math.round(MUG_Q4_CENTER - rw / 2);
-  // Vertical centre across full 1120 px strip
-  const posY   = Math.round((MUG_H - rh) / 2);
+  // Horizontal: centre on each face
+  const leftX  = Math.round(MUG_FRONT_CENTER_X - rw / 2);
+  const rightX = Math.round(MUG_BACK_CENTER_X  - rw / 2);
+
+  // Vertical: centre on MUG_CENTER_Y, then clamp to hard limits
+  const posY = Math.max(
+    MUG_TOP_LIMIT,
+    Math.min(MUG_BOTTOM_LIMIT - rh, Math.round(MUG_CENTER_Y - rh / 2)),
+  );
 
   return sharp({
     create: {
-      width: MUG_W,
-      height: MUG_H,
+      width:    MUG_WRAP_W,
+      height:   MUG_WRAP_H,
       channels: 3,
       background: { r: 255, g: 255, b: 255 },
     },

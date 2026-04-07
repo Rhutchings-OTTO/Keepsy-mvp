@@ -425,17 +425,21 @@ export async function compositeCanvasImage(
 
   const srcBuf = await fetchBuffer(imageUrl);
 
-  // The user has already cropped the image on the frontend — trust that crop
-  // and do not resize further. Extend directly from the source dimensions.
+  // Scale the bleed proportionally to the source image width.
+  // 375px on a 6000px-wide image (20" × 300 DPI) = 6.25% — this preserves the
+  // correct 1.25" physical wrap depth regardless of the image's actual pixel count.
+  const { width: srcW = 6000 } = await sharp(srcBuf).metadata();
+  const bleedPx = Math.round(srcW * (CANVAS_WRAP_PX / (20 * CANVAS_DPI)));
+
   // Extend all four sides by copying edge pixels outward — Sharp 'copy' mode
-  // replicates the outermost row/column across the full 375 px wrap depth.
+  // replicates the outermost row/column across the full bleed depth.
   // Corner areas are filled with the nearest corner pixel automatically.
   return sharp(srcBuf)
     .extend({
-      top:    CANVAS_WRAP_PX,
-      bottom: CANVAS_WRAP_PX,
-      left:   CANVAS_WRAP_PX,
-      right:  CANVAS_WRAP_PX,
+      top:    bleedPx,
+      bottom: bleedPx,
+      left:   bleedPx,
+      right:  bleedPx,
       extendWith: "copy",
     })
     .png()

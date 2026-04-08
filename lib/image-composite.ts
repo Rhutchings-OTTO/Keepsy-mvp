@@ -102,20 +102,6 @@ const MUG_H = MUG_WRAP_H;
 const MUG_Q1_CENTER = MUG_FRONT_CENTER_X;
 const MUG_Q4_CENTER = MUG_BACK_CENTER_X;
 
-/**
- * Canvas gallery-wrap constants.
- *
- * All Keepsy canvas products use a 1.25" gallery-wrap depth (Jondo provider).
- * At 300 DPI: 1.25 × 300 = 375 px of wrap on each side.
- *
- * The compositeCanvasImage function resizes the face image to the exact print
- * face dimensions, then uses Sharp's 'copy' extension to bleed the edge pixels
- * outward into the wrap area — one pixel wide strip repeated across 375 px,
- * producing a smooth, colour-matched gallery wrap on all four sides.
- */
-const CANVAS_DPI     = 300;
-const CANVAS_WRAP_PX = Math.round(1.25 * CANVAS_DPI); // 375 px per side
-
 // ── T-shirt / Hoodie Printify print area dimensions ───────────────────────────
 
 export const TEE_PRINT_W    = 4500;
@@ -414,58 +400,3 @@ export async function compositeMugImage(imageUrl: string): Promise<Buffer> {
     .toBuffer();
 }
 
-/**
- * Canvas gallery wrap (Jondo blueprint 1159): resize the AI image to the exact
- * canvas face dimensions and extend all four edges outward by 375 px (1.25" at
- * 300 DPI) using Sharp's 'copy' extension, which replicates a 1 px strip from
- * each edge across the full wrap depth.
- *
- * Layout of the output file:
- *
- *   ┌──────────────────────────────────┐
- *   │   375 px top wrap  (edge bleed)  │
- *   ├──────────────────────────────────┤
- *   │ 375│                        │375 │
- *   │ px │    face (W×H inches    │ px │
- *   │    │     at 300 DPI)        │    │
- *   ├──────────────────────────────────┤
- *   │  375 px bottom wrap (edge bleed) │
- *   └──────────────────────────────────┘
- *
- * sizeCode: canvas face dimensions in inches, e.g. "20x16". The function
- * resizes (cover-fit) the source to faceW × faceH before extending, so the
- * output always has the correct print-area pixel count regardless of input size.
- *
- * Returns a PNG Buffer for upload to Printify at scale:1.0, position:0.5,0.5.
- */
-export async function compositeCanvasImage(
-  imageUrl: string,
-  sizeCode = "20x16",
-): Promise<Buffer> {
-  const parts = sizeCode.split("x");
-  const faceWIn = parseFloat(parts[0] ?? "20");
-  const faceHIn = parseFloat(parts[1] ?? "16");
-
-  const srcBuf = await fetchBuffer(imageUrl);
-
-  // Bleed as a proportion of the face: 1.25" / faceInches × imagePixels.
-  // This keeps the physical 1.25" wrap depth correct for all canvas sizes —
-  // square, landscape, and portrait — at any source pixel count.
-  const { width: srcW = 6000, height: srcH = 4800 } = await sharp(srcBuf).metadata();
-  const hBleed = Math.round((1.25 / faceWIn) * srcW);
-  const vBleed = Math.round((1.25 / faceHIn) * srcH);
-
-  // Extend all four sides by copying edge pixels outward — Sharp 'copy' mode
-  // replicates the outermost row/column across the full bleed depth.
-  // Corner areas are filled with the nearest corner pixel automatically.
-  return sharp(srcBuf)
-    .extend({
-      top:    vBleed,
-      bottom: vBleed,
-      left:   hBleed,
-      right:  hBleed,
-      extendWith: "copy",
-    })
-    .png()
-    .toBuffer();
-}

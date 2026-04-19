@@ -351,7 +351,7 @@ function normalizeColor(color?: string): string {
  * Uppercasing naively turns these into "30X30" which never matches the variant map.
  * After uppercasing we restore lowercase 'x' wherever it sits between two digits.
  */
-function normalizeSize(size?: string): string {
+export function normalizeSize(size?: string): string {
   if (!size) return "";
   const upper = size.trim().toUpperCase();
   // Restore lowercase 'x' for canvas dimension codes like "30x30", "20x16".

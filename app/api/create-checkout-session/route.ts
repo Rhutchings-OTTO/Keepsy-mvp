@@ -148,6 +148,21 @@ export async function POST(req: Request) {
       });
     }
 
+    // Canvas orders MUST include a size — otherwise the Printify variant
+    // lookup falls back to 12×12 (causing wrong-size fulfilment).
+    const canvasMissingSize = safeCartSummary.find(
+      (item) => item.id.startsWith("canvas") && !(item.size && item.size.trim())
+    );
+    if (canvasMissingSize) {
+      return new Response(
+        JSON.stringify({
+          error: "MISSING_CANVAS_SIZE",
+          message: `Canvas orders require a size selection (${canvasMissingSize.name}).`,
+        }),
+        { status: 400, headers: JSON_HEADERS }
+      );
+    }
+
     let baseUrl: string;
     try {
       baseUrl = getBaseUrl();

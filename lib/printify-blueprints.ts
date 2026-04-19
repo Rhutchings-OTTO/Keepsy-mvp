@@ -345,11 +345,18 @@ function normalizeColor(color?: string): string {
 
 /**
  * Normalise an incoming size string.
- * e.g. "xl" → "XL", "2xl" → "2XL"
+ * e.g. "xl" → "XL", "2xl" → "2XL", "30x30" → "30x30" (canvas — lowercase x preserved)
+ *
+ * Canvas dimension sizes use a lowercase 'x' separator (e.g. "30x30", "20x16").
+ * Uppercasing naively turns these into "30X30" which never matches the variant map.
+ * After uppercasing we restore lowercase 'x' wherever it sits between two digits.
  */
 function normalizeSize(size?: string): string {
   if (!size) return "";
-  return size.trim().toUpperCase();
+  const upper = size.trim().toUpperCase();
+  // Restore lowercase 'x' for canvas dimension codes like "30x30", "20x16".
+  // The pattern only matches digit–X–digit, so clothing sizes ("XL", "2XL") are unaffected.
+  return upper.replace(/(\d)X(\d)/g, "$1x$2");
 }
 
 /**
@@ -393,6 +400,17 @@ export function getPrintifyVariantId(
     return { config, variantId: config.variants[s] };
   }
 
-  // Fallback
+  // Canvas orders MUST resolve to a size-specific variant. Silently falling
+  // back to the default (12x12) previously caused customers who ordered
+  // larger canvases to receive 12x12 prints. Throw instead so the webhook
+  // catches this, halts the Printify submission, and marks the order for
+  // manual review.
+  if (key === "canvas") {
+    throw new Error(
+      `[printify] No canvas variant found for size='${size ?? ""}' (productId='${productId}'). Refusing to fall back to default variant — order requires manual review.`
+    );
+  }
+
+  // Fallback (non-canvas products only)
   return { config, variantId: config.fallbackVariantId };
 }

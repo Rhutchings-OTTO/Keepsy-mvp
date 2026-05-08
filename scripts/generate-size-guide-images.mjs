@@ -43,7 +43,27 @@ const IMAGES = [
 
 async function generateImage(prompt, outFile) {
   const label = path.basename(outFile);
-  console.log(`Generating ${label}…`);
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating ${label} with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt,
+        size: "1024x1024",
+        quality: "standard",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt,
+        size: "1024x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -51,15 +71,7 @@ async function generateImage(prompt, outFile) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt,
-      size: "1024x1024",
-      quality: "standard",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = await resp.json();

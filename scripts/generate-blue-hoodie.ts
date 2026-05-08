@@ -33,7 +33,27 @@ const PROMPT =
 const OUT_FILE = path.join(ROOT, "public", "images", "products", "hoodie-blue.jpg");
 
 async function main() {
-  console.log("Generating blue hoodie image with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating blue hoodie image with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1024x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1024x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -41,15 +61,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1024x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = (await resp.json()) as {

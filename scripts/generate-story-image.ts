@@ -34,7 +34,27 @@ const PROMPT =
   "A hyperrealistic candid photograph of two women in their late 30s laughing together outdoors in warm golden hour sunlight. One has her arm around the other's shoulder. They look genuinely happy and natural — not posed. Soft blurred background of a park or garden. Shot on a professional camera with shallow depth of field. Warm, inviting colour tones matching a cream and terracotta colour palette. High definition, sharp focus on faces, magazine quality lifestyle photography.";
 
 async function main() {
-  console.log("Generating Our Story hero image with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating Our Story hero image with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1792x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1536x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -42,15 +62,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1792x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = await resp.json() as { data?: Array<{ b64_json?: string }>; error?: { message?: string } };

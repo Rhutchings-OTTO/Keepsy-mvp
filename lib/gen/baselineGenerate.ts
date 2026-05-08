@@ -72,21 +72,20 @@ function mapSizeToDalle3(size: Size): "1024x1024" | "1024x1792" | "1792x1024" {
 }
 
 async function callGenerate(prompt: string, size: Size): Promise<string> {
-  const useDalle3 = Boolean(process.env.OPENAI_USE_DALLE3);
-  const model = useDalle3 ? "dall-e-3" : "gpt-image-1";
-  const requestSize = useDalle3 ? mapSizeToDalle3(size) : size;
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  const requestSize = isDalle ? mapSizeToDalle3(size) : size;
 
-  const body: Record<string, unknown> =
-    model === "dall-e-3"
-      ? {
-          model: "dall-e-3",
-          prompt,
-          size: requestSize,
-          quality: "standard",
-          style: "vivid",
-          response_format: "b64_json",
-        }
-      : { model: "gpt-image-1", prompt, size: requestSize };
+  const body: Record<string, unknown> = isDalle
+    ? {
+        model,
+        prompt,
+        size: requestSize,
+        quality: "standard",
+        style: "vivid",
+        response_format: "b64_json",
+      }
+    : { model, prompt, size: requestSize, quality: "high" };
 
   const resp = await fetchWithBackoff(
     "https://api.openai.com/v1/images/generations",
@@ -131,7 +130,7 @@ async function callEdit(
   }
   const extension = parsed.mimeType === "image/png" ? "png" : "jpg";
   const formData = new FormData();
-  formData.set("model", "gpt-image-1");
+  formData.set("model", process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1");
   formData.set("prompt", prompt);
   formData.set("size", size);
   formData.set("image", new Blob([parsed.imageBuffer], { type: parsed.mimeType }), `upload.${extension}`);

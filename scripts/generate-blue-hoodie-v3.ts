@@ -33,7 +33,27 @@ const PROMPT =
   "A hyperrealistic photograph of a light blue pullover hoodie lying casually on a cream linen sofa. The hoodie is unfolded and relaxed with natural fabric wrinkles and creases. On the upper chest area there is a small cute cartoon illustration of a bride and groom holding hands with the text 'Jay's Wedding Party 2026' printed in a clean white handwritten font beneath the illustration. The print is small and centered on the chest, well above the kangaroo pocket. The print looks like it is part of the fabric — you can see the cotton texture through the ink, not like a digital overlay. The kangaroo pouch pocket is fully visible and unobstructed below. A couple of scatter cushions are visible on the sofa behind the hoodie. Soft warm natural daylight from a nearby window. The scene looks like someone just took the hoodie off and laid it on the sofa. Shot on a 50mm lens, shallow depth of field, professional lifestyle product photography.";
 
 async function main() {
-  console.log("Generating blue hoodie image (wedding party lifestyle) with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating blue hoodie image (wedding party lifestyle) with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1024x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1024x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -41,15 +61,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1024x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = (await resp.json()) as {

@@ -33,7 +33,27 @@ const PROMPT =
   "Editorial photograph taken on a Canon EOS R5 with an 85mm f/1.4 lens. Three young women aged 25 walking side by side through a sunny open park on a summer afternoon. The woman on the left has blonde hair, the woman in the middle has light mousey blonde hair, and the woman on the right has straight dark brown hair. The middle woman has her arms around the shoulders of the other two. All three are laughing with their mouths open, completely natural and unposed. They are wearing casual summer clothes in neutral tones — white t-shirts, beige linen trousers, light denim. Bright natural daylight, no harsh shadows, open grassy park with soft blurred green trees far in the background. The photo is bright, warm, and airy with a shallow depth of field. It looks exactly like a real candid photo from a lifestyle magazine editorial shoot. ISO 200, f/1.8, natural skin tones, no retouching, no CGI, no illustration, no 3D rendering. This must be indistinguishable from a real photograph.";
 
 async function main() {
-  console.log("Generating Our Story hero image (v6) with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating Our Story hero image (v6) with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1792x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1536x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -41,15 +61,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1792x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = (await resp.json()) as {

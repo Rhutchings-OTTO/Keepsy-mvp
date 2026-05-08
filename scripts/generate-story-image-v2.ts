@@ -33,7 +33,27 @@ const PROMPT =
   "A hyperrealistic photograph of two women in their mid 30s walking together and laughing on a tree-lined path in a park during golden hour. Full body shot from the waist up, showing them walking side by side with one woman's arm linked through the other's. They are dressed casually in warm autumn tones — cream, terracotta, soft brown. Both laughing naturally, not looking at camera. Soft golden sunlight filtering through trees behind them, slightly blurred background with warm bokeh. Shot on a 50mm lens, natural and candid feel. Professional lifestyle photography, magazine editorial quality. Warm colour palette matching cream and terracotta tones.";
 
 async function main() {
-  console.log("Generating Our Story hero image (v2) with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating Our Story hero image (v2) with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1792x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1536x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -41,15 +61,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1792x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = (await resp.json()) as {

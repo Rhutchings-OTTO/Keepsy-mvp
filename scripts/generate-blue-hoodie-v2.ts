@@ -33,7 +33,27 @@ const PROMPT =
   "A hyperrealistic photograph of a light blue hoodie hanging on a wooden hanger against a warm wooden wall background. The hoodie has a fun hen party design screen-printed on the chest — the print says 'Sarah's Hen Do 2026' in a stylish handwritten script font with small floral illustrations around the text. The print looks naturally embedded into the fabric with realistic fabric texture visible through the ink — not like a sticker placed on top. The kangaroo pouch pocket is clearly visible below the print, completely unobstructed. The hoodie fabric has natural creases and folds. Warm natural side lighting creating soft shadows. Styled with eucalyptus sprigs nearby. High-end e-commerce product photography, shot on a DSLR with shallow depth of field.";
 
 async function main() {
-  console.log("Generating blue hoodie image (v2) with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating blue hoodie image (v2) with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1024x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1024x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -41,15 +61,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1024x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = (await resp.json()) as {

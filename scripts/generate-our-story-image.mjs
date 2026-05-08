@@ -1,6 +1,4 @@
 import OpenAI from "openai";
-import https from "https";
-import http from "http";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -20,34 +18,38 @@ const PROMPT =
 
 const OUTPUT_PATH = path.join(__dirname, "../public/images/our-story-hero.png");
 
-function download(url, dest) {
-  return new Promise((resolve, reject) => {
-    const proto = url.startsWith("https") ? https : http;
-    const file = fs.createWriteStream(dest);
-    proto.get(url, (res) => {
-      res.pipe(file);
-      file.on("finish", () => file.close(resolve));
-    }).on("error", (err) => {
-      fs.unlink(dest, () => {});
-      reject(err);
-    });
-  });
-}
-
 async function main() {
-  console.log("Generating image with DALL-E 3...");
-  const response = await client.images.generate({
-    model: "dall-e-3",
-    prompt: PROMPT,
-    size: "1792x1024",
-    quality: "hd",
-    style: "natural",
-    n: 1,
-  });
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating image with ${model}...`);
 
-  const url = response.data[0].url;
-  console.log("Image generated. Downloading...");
-  await download(url, OUTPUT_PATH);
+  const params = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1792x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1536x1024",
+        quality: "high",
+        n: 1,
+      };
+
+  const response = await client.images.generate(params);
+
+  const b64 = response.data?.[0]?.b64_json;
+  if (!b64) {
+    console.error("No image data returned");
+    process.exit(1);
+  }
+
+  await fs.promises.writeFile(OUTPUT_PATH, Buffer.from(b64, "base64"));
   console.log(`Saved to ${OUTPUT_PATH}`);
 }
 

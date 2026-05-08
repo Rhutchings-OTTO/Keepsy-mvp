@@ -152,7 +152,7 @@ async function generateImage(prompt, outputPath, id) {
       "Authorization": `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: "gpt-image-1",
+      model: process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1",
       prompt: prompt,
       n: 1,
       size: "1024x1024",
@@ -213,6 +213,10 @@ async function generateWithDalle3(prompt, outputPath, id) {
       "Authorization": `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
+      // Hardcoded: this is the explicit dall-e-3 fallback path called when
+      // the primary model errors. Do NOT replace with OPENAI_IMAGE_MODEL —
+      // that env var controls the primary model only; this branch must
+      // remain a different model so the fallback ladder still has a step.
       model: "dall-e-3",
       prompt: prompt.slice(0, 4000),
       n: 1,

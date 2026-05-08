@@ -33,7 +33,27 @@ const PROMPT =
   "A hyperrealistic candid photograph of three young women in their mid twenties walking together through an open wildflower meadow during golden hour. They are laughing naturally with the middle woman's arms around the other two. Bright open sky above them, no trees or shade — just warm golden sunlight flooding the scene. The meadow has tall grass and soft wildflowers around them. All three are dressed casually in warm light tones — cream, white, soft beige. They are mid-stride walking diagonally towards the camera, relaxed and genuine, not posed. Warm golden light from a low sun creating long soft shadows on the grass. Wide open airy composition with lots of sky and light. Shot on an 85mm lens at f/2.8 with shallow depth of field, sharp focus on faces, soft blurred meadow background. Professional lifestyle editorial photography, bright and airy feel, warm colour palette.";
 
 async function main() {
-  console.log("Generating Our Story hero image (v5) with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating Our Story hero image (v5) with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1792x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1536x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -41,15 +61,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1792x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = (await resp.json()) as {

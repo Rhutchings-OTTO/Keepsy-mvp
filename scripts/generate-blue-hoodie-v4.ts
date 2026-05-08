@@ -33,7 +33,27 @@ const PROMPT =
   "A photograph taken on a Canon EOS R5 of a real light blue cotton hoodie lying casually on a cream linen sofa. The hoodie is a standard pullover with a kangaroo pocket. On the upper chest area, well above the kangaroo pocket, there is simple white text that reads 'Jamie & Saida's Wedding 2026' in an elegant serif font, with a small crescent moon and star motif above the text and delicate geometric Islamic pattern border framing the words. No cartoon figures, no illustrations of people — just elegant typography and geometric patterns. The text and design look screen-printed into the cotton fabric with visible fabric texture through the ink. The hoodie has natural cotton creases and wrinkles, it is not perfectly smooth or glossy. The kangaroo pocket is completely clear and unobstructed. Soft natural window light from the left, cream cushions visible in the background. The photo must look like a real product photo taken by a professional photographer, not a digital rendering. Natural cotton fabric texture, matte finish, no shine or gloss on the fabric. ISO 400, 50mm lens, f/2.8, shallow depth of field.";
 
 async function main() {
-  console.log("Generating blue hoodie image (v4 — Muslim wedding typography) with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating blue hoodie image (v4 — Muslim wedding typography) with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1024x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1024x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -41,15 +61,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1024x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = (await resp.json()) as {

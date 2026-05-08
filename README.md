@@ -26,11 +26,13 @@ SITE_URL=http://localhost:3000
 
 **Checkout not working?** See [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md) for step-by-step Stripe configuration.
 
-3. Optional variables (for DALL-E 3 + permanent image hosting):
+3. Optional variables (for image-model selection + permanent image hosting):
 
 ```bash
-# Use DALL-E 3 instead of gpt-image-1 (set to "1" or "true")
-OPENAI_USE_DALLE3=1
+# Override the OpenAI image model (defaults to gpt-image-1).
+# Supported: gpt-image-1, gpt-image-1.5, gpt-image-2, dall-e-3.
+# Code auto-detects DALL-E vs gpt-image family from the prefix.
+OPENAI_IMAGE_MODEL=gpt-image-1
 
 # Cloudinary for permanent design URLs (OpenAI URLs expire after ~1 hour)
 CLOUDINARY_CLOUD_NAME=...

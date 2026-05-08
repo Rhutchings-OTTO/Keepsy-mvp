@@ -33,7 +33,27 @@ const PROMPT =
   "A hyperrealistic candid photograph of three young women in their mid twenties walking diagonally towards the camera on a tree-lined path during golden hour. They are laughing and smiling naturally. The woman in the middle has her arms around the shoulders of the other two. All three are dressed casually in warm earthy tones — cream, soft brown, terracotta, beige. They are mid-stride, relaxed and natural, not posed. Warm golden sunlight from behind creating a beautiful backlit glow and soft lens flare. Blurred bokeh background of green trees and golden light. Shot on an 85mm lens at f/2.8, shallow depth of field with sharp focus on their faces. Professional lifestyle editorial photography, Vogue magazine quality. Warm colour palette.";
 
 async function main() {
-  console.log("Generating Our Story hero image (v3) with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating Our Story hero image (v3) with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1792x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1536x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -41,15 +61,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1792x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = (await resp.json()) as {

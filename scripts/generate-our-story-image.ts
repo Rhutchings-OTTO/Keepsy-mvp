@@ -31,7 +31,27 @@ const PROMPT =
   "A blonde mother and her young daughter walking through a sunlit park, laughing together, candid and natural, photographed from a medium distance showing full bodies with surrounding park scenery, warm golden hour lighting, soft bokeh background with green trees, cream and warm tones, shallow depth of field, lifestyle photography style, hyper realistic, shot on 85mm lens, no posing, genuine joy and connection between them";
 
 async function main() {
-  console.log("Generating Our Story hero image with DALL-E 3…");
+  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const isDalle = model.startsWith("dall-e");
+  console.log(`Generating Our Story hero image with ${model}…`);
+
+  const body = isDalle
+    ? {
+        model,
+        prompt: PROMPT,
+        size: "1792x1024",
+        quality: "hd",
+        style: "natural",
+        response_format: "b64_json",
+        n: 1,
+      }
+    : {
+        model,
+        prompt: PROMPT,
+        size: "1536x1024",
+        quality: "high",
+        n: 1,
+      };
 
   const resp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -39,15 +59,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: PROMPT,
-      size: "1792x1024",
-      quality: "hd",
-      style: "natural",
-      response_format: "b64_json",
-      n: 1,
-    }),
+    body: JSON.stringify(body),
   });
 
   const data = await resp.json() as { data?: Array<{ b64_json?: string }>; error?: { message?: string } };

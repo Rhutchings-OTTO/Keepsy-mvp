@@ -7,12 +7,12 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
-  Check,
   Gift,
   ImageIcon,
   Sparkles,
   ShoppingBag,
 } from "lucide-react";
+import { HeroPromptVisual } from "@/components/landing/HeroPromptVisual";
 // Package, Printer, BadgeCheck, Truck, RotateCcw, Lock moved to TrustSection
 import { DynamicLogo } from "@/components/DynamicLogo";
 const RegionSelector = dynamic(
@@ -42,47 +42,12 @@ const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-8";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const HERO_BULLETS = [
-  "See it on the product before you buy",
-  "Handmade with care, every single order",
-  "Shipped to US & UK",
-];
-
-const PRODUCT_IMAGES = [
-  {
-    src: "/images/collections/collection-pet-mug.png",
-    alt: "Custom personalised mug with a ginger cat portrait",
-    label: "Mugs",
-    tag: "From £14.99",
-  },
-  {
-    src: "/images/collections/collection-newbaby-card.png",
-    alt: "Personalised greeting card for a new baby",
-    label: "Cards",
-    tag: "From £6.99",
-  },
-  {
-    src: "/images/collections/collection-friends-tshirt.png",
-    alt: "Custom printed t-shirt for friends",
-    label: "Tees",
-    tag: "From £29.99",
-  },
-  {
-    src: "/images/collections/collection-newbaby-hoodie.png",
-    alt: "Custom personalised hoodie with a Mummy Est. 2026 design",
-    label: "Hoodies",
-    tag: "From £44.99",
-  },
-  {
-    src: "/images/collections/collection-wedding-canvas.png",
-    alt: "Personalised canvas print of a couple in a wildflower meadow",
-    label: "Canvas",
-    tag: "From £29.99",
-  },
-];
-
+// PLACEHOLDER COUNT: "Over 500 thoughtful gift-givers" is a holding phrase
+// awaiting real customer-count data. The exact wording must remain identical
+// here and in the TrustSection heading — they reference the same number.
+// Update both places together when real data is wired up.
 const SOCIAL_PROOF_ITEMS = [
-  "★★★★★  Hundreds of Happy Customers",
+  "★★★★★  Over 500 thoughtful gift-givers",
   "🚀  Free Fast Shipping",
   "🌍  Made & Shipped with Love",
   "↩️  30-Day Returns",
@@ -90,13 +55,19 @@ const SOCIAL_PROOF_ITEMS = [
   "⚡  Fast US & UK Delivery",
 ];
 
+// PLACEHOLDER REVIEW COUNTS: `displayReviews` are stand-in values until the
+// real review feed is wired up. Update when real data is available.
+// `isBestseller` flags the single best-selling product — only one item across
+// this list should be true at a time. Currently set on the Personalised
+// Greeting Card (highest review count of the four).
 const FEATURED_PRODUCTS = [
   {
     name: "Custom Pet Portrait Mug",
     priceUS: "$19.99",
     priceUK: "£14.99",
     rating: "★★★★★",
-    reviews: 847,
+    displayReviews: 47,
+    isBestseller: false,
     src: "/images/collections/collection-pet-mug.png",
     alt: "Custom mug with a ginger cat portrait surrounded by flowers",
   },
@@ -105,7 +76,8 @@ const FEATURED_PRODUCTS = [
     priceUS: "$9.99",
     priceUK: "£6.99",
     rating: "★★★★★",
-    reviews: 1203,
+    displayReviews: 89,
+    isBestseller: true,
     src: "/images/collections/collection-newbaby-card.png",
     alt: "Best Dad Already personalised greeting card for a new baby",
   },
@@ -114,7 +86,8 @@ const FEATURED_PRODUCTS = [
     priceUS: "$56.99",
     priceUK: "£44.99",
     rating: "★★★★★",
-    reviews: 276,
+    displayReviews: 23,
+    isBestseller: false,
     src: "/images/collections/collection-wedding-hoodie.png",
     alt: "Custom wedding hoodie personalised with Jamie and Saida's names",
   },
@@ -123,7 +96,8 @@ const FEATURED_PRODUCTS = [
     priceUS: "$37.99",
     priceUK: "£29.99",
     rating: "★★★★★",
-    reviews: 328,
+    displayReviews: 12,
+    isBestseller: false,
     src: "/images/collections/collection-friends-tshirt.png",
     alt: "Personalised t-shirt featuring four friends together",
   },
@@ -156,52 +130,6 @@ const HOW_IT_WORKS_STEPS = [
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function ProductCollectionCard({
-  src,
-  alt,
-  label,
-  tag,
-  index,
-  priority,
-}: {
-  src: string;
-  alt: string;
-  label: string;
-  tag: string;
-  index: number;
-  priority?: boolean;
-}) {
-  const [visible, setVisible] = useState(true);
-  if (!visible) return null;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative overflow-hidden rounded-2xl bg-[#EDE6DD]"
-      style={{ aspectRatio: index === 0 ? "3/4" : "3/4" }}
-    >
-      {visible && (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          priority={priority}
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          sizes="(max-width: 768px) 50vw, 25vw"
-          onError={() => setVisible(false)}
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-4">
-        <p className="font-serif text-xl font-bold text-white">{label}</p>
-        <p className="mt-0.5 text-sm text-white/65">{tag}</p>
-      </div>
-    </motion.div>
-  );
-}
-
 function FeaturedProductCard({
   product,
   index,
@@ -220,13 +148,15 @@ function FeaturedProductCard({
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-charcoal/8 bg-white"
     >
-      {/* Bestseller badge */}
-      <div
-        className="absolute left-3 top-3 z-10 rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm"
-        style={{ backgroundColor: "var(--color-gold)" }}
-      >
-        Bestseller
-      </div>
+      {/* Bestseller badge — only on the single bestseller */}
+      {product.isBestseller && (
+        <div
+          className="absolute left-3 top-3 z-10 rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm"
+          style={{ backgroundColor: "var(--color-gold)" }}
+        >
+          Bestseller
+        </div>
+      )}
 
       {/* Image */}
       <div className="relative overflow-hidden bg-[#F5EDE0]" style={{ aspectRatio: "4/5" }}>
@@ -253,7 +183,7 @@ function FeaturedProductCard({
         </p>
         <div className="mt-1.5 hidden items-center gap-1.5 sm:flex">
           <span className="text-sm" style={{ color: "var(--color-gold)" }}>{product.rating}</span>
-          <span className="text-xs text-charcoal/45">(100+)</span>
+          <span className="text-xs text-charcoal/45">({product.displayReviews})</span>
         </div>
         <div className="mt-auto pt-3">
           <span className="block text-base font-bold text-charcoal sm:text-lg">
@@ -381,11 +311,11 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
           </header>
 
           <main>
-            {/* ── 1. HERO — editorial split layout ── */}
+            {/* ── 1. HERO — personalisation-led split layout ── */}
             <section className="overflow-hidden">
               <div className={CONTAINER}>
-                <div className="grid items-center gap-8 py-10 lg:min-h-[90vh] lg:grid-cols-[3fr_2fr] lg:gap-16 lg:py-24">
-                  {/* Left: Editorial headline */}
+                <div className="grid items-center gap-10 py-10 lg:min-h-[88vh] lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:py-24">
+                  {/* Left: Headline + sub-head + CTAs */}
                   <motion.div
                     initial={shouldReduceMotion ? {} : { opacity: 0, x: -28 }}
                     animate={shouldReduceMotion ? {} : { opacity: 1, x: 0 }}
@@ -399,81 +329,57 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         className="text-[11px] font-bold uppercase tracking-[0.22em]"
                         style={{ color: "var(--color-terracotta)" }}
                       >
-                        Keepsy
+                        AI-Designed, Made With Care
                       </span>
                     </div>
 
                     {/* Main headline */}
                     <h1
-                      className="mt-5 text-balance font-serif font-black leading-[0.95] tracking-[-0.05em] text-charcoal"
-                      style={{ fontSize: "clamp(2.4rem, 7vw, 6.5rem)" }}
+                      className="mt-5 text-balance font-serif font-black leading-[0.97] tracking-[-0.04em] text-charcoal"
+                      style={{ fontSize: "clamp(2.2rem, 5.6vw, 4.6rem)" }}
                     >
-                      Gifts<br />They&apos;ll<br />Never<br />Forget.
+                      Describe the gift.<br />
+                      We&apos;ll make it real.
                     </h1>
 
-                    {/* Social proof under headline */}
-                    <div className="mt-6 flex items-center gap-2">
-                      <span className="text-sm" style={{ color: "var(--color-gold)" }}>★★★★★</span>
-                      <span className="text-sm text-charcoal/55">Hundreds of happy customers</span>
-                    </div>
-
-                    <p className="mt-4 max-w-sm text-base leading-7 text-charcoal/65 sm:mt-6 sm:leading-8">
-                      Turn your favourite photos and memories into beautiful, personalised keepsakes — mugs, cards, tees, hoodies.
+                    <p className="mt-5 max-w-md text-base leading-7 text-charcoal/65 sm:text-[17px] sm:leading-8">
+                      Type your idea, see it on a hoodie, mug, or canvas, then order the one you love. No design skills needed.
                     </p>
 
-                    {/* Trust bullets — hidden on mobile to keep hero tight */}
-                    <ul className="mt-4 hidden space-y-2 sm:block">
-                      {HERO_BULLETS.map((item) => (
-                        <li key={item} className="flex items-center gap-3 text-sm text-charcoal/65">
-                          <span
-                            className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
-                            style={{ backgroundColor: "rgba(196,113,74,0.14)" }}
-                          >
-                            <Check size={11} strokeWidth={3} style={{ color: "var(--color-terracotta)" }} />
-                          </span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* CTAs — secondary hidden on mobile to keep hero tight */}
-                    <div className="mt-6 flex flex-wrap gap-3">
+                    {/* CTAs — primary CREATE, secondary BROWSE */}
+                    <div className="mt-7 flex flex-wrap gap-3">
                       <Link
-                        href="/shop"
+                        href="/create"
                         className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl px-8 text-base font-semibold text-white shadow-[0_12px_28px_-12px_rgba(196,113,74,0.55)] transition-all hover:shadow-[0_16px_36px_-14px_rgba(196,113,74,0.65)] hover:-translate-y-0.5"
                         style={{ backgroundColor: "var(--color-terracotta)" }}
                       >
-                        Shop the Collection
-                        <ShoppingBag size={17} />
+                        Start creating
+                        <ArrowRight size={17} />
                       </Link>
                       <Link
-                        href="/create"
-                        className="hidden min-h-[52px] items-center justify-center rounded-xl border-2 px-8 text-base font-semibold text-charcoal transition-all hover:-translate-y-0.5 sm:inline-flex"
+                        href="/shop"
+                        className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl border-2 px-7 text-base font-semibold text-charcoal transition-all hover:-translate-y-0.5"
                         style={{ borderColor: "var(--color-charcoal)" }}
                       >
-                        Design a Personal Gift
+                        Browse the shop
+                        <ShoppingBag size={16} />
                       </Link>
                     </div>
+
+                    {/* Trust microcopy below CTAs */}
+                    <p className="mt-5 flex items-center gap-2 text-sm text-charcoal/60">
+                      <span style={{ color: "var(--color-gold)" }}>★★★★★</span>
+                      Real reviews from real gift-givers
+                    </p>
                   </motion.div>
 
-                  {/* Right: Product gallery — horizontal scroll on mobile, 2-col grid on desktop */}
+                  {/* Right: Visual prompt-input hook (routes to /create) */}
                   <motion.div
                     initial={shouldReduceMotion ? {} : { opacity: 0, x: 28 }}
                     animate={shouldReduceMotion ? {} : { opacity: 1, x: 0 }}
                     transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    {/* Mobile/tablet: 2-col grid — no horizontal scroll */}
-                    <div className="grid grid-cols-2 gap-3 lg:hidden">
-                      {PRODUCT_IMAGES.map((img, i) => (
-                        <ProductCollectionCard key={img.label} {...img} index={i} priority={i < 2} />
-                      ))}
-                    </div>
-                    {/* Desktop: 2-col grid */}
-                    <div className="hidden grid-cols-2 gap-3 lg:grid">
-                      {PRODUCT_IMAGES.map((img, i) => (
-                        <ProductCollectionCard key={img.label} {...img} index={i} priority={i < 2} />
-                      ))}
-                    </div>
+                    <HeroPromptVisual />
                   </motion.div>
                 </div>
               </div>
@@ -562,75 +468,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               </div>
             </section>
 
-            {/* ── 4. Emotional storytelling — editorial split ── */}
-            <section
-              className="py-16 sm:py-24"
-              style={{ backgroundColor: "#F5EDE0" }}
-            >
-              <div className={CONTAINER}>
-                <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-                  {/* Image first on desktop */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="relative hidden overflow-hidden rounded-2xl bg-[#E8DDD0] lg:order-2 lg:block"
-                    style={{ aspectRatio: "4/5" }}
-                  >
-                    <Image
-                      src="/images/our-story-hero.png"
-                      alt="Two women laughing together outdoors in warm golden light"
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      quality={85}
-                    />
-                    <div
-                      className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t"
-                      style={{ backgroundImage: "linear-gradient(to top, rgba(45,41,38,0.4), transparent)" }}
-                    />
-                  </motion.div>
-
-                  {/* Text */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.55, delay: 0.1, ease: "easeOut" }}
-                    className="lg:order-1"
-                  >
-                    <p
-                      className="text-[11px] font-bold uppercase tracking-[0.22em]"
-                      style={{ color: "var(--color-terracotta)" }}
-                    >
-                      Our Story
-                    </p>
-                    <h2 className="mt-4 text-balance font-serif text-3xl font-bold leading-[1.05] tracking-[-0.04em] text-charcoal sm:text-5xl lg:text-6xl">
-                      Every Keepsake<br />Tells a Story
-                    </h2>
-                    <div className="mt-6 h-px w-12" style={{ backgroundColor: "var(--color-terracotta)" }} />
-                    <p className="mt-6 text-base leading-8 text-charcoal/65">
-                      We built Keepsy because the most meaningful gifts aren&apos;t expensive —
-                      they&apos;re personal. A photo turned into art. A memory preserved on
-                      something beautiful. Something she&apos;ll look at every day and think of you.
-                    </p>
-                    <div className="mt-8">
-                      <Link
-                        href="/create"
-                        className="inline-flex min-h-[44px] items-center gap-2 rounded-xl px-7 py-3.5 text-base font-semibold text-white shadow-[0_12px_28px_-14px_rgba(196,113,74,0.55)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-14px_rgba(196,113,74,0.65)]"
-                        style={{ backgroundColor: "var(--color-terracotta)" }}
-                      >
-                        Create Your First Keepsake
-                        <ArrowRight size={17} />
-                      </Link>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-            </section>
-
-            {/* ── 5. How It Works — editorial numbered list ── */}
+            {/* ── 4. How It Works — editorial numbered list ── */}
             <section className="py-16 sm:py-24">
               <div className={CONTAINER}>
                 <motion.div
@@ -694,13 +532,13 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
               </div>
             </section>
 
-            {/* ── 6. Reviews — lazy-loaded (Phase 3 fix 3.7) ── */}
+            {/* ── 5. Reviews — lazy-loaded (Phase 3 fix 3.7) ── */}
             <ReviewsSection />
 
-            {/* ── 7. Trust Grid — lazy-loaded (Phase 3 fix 3.7) ── */}
+            {/* ── 6. Trust Grid — lazy-loaded (Phase 3 fix 3.7) ── */}
             <TrustSection />
 
-            {/* ── 8. Email capture — forest green ── */}
+            {/* ── 7. Email capture — forest green ── */}
             <section
               className="py-16 sm:py-24"
               style={{ backgroundColor: "var(--color-forest)" }}

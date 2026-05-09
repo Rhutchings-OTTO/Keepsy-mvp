@@ -34,8 +34,13 @@ export function TrustSection() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="text-center"
         >
+          {/* PLACEHOLDER COUNT: "Over 500 thoughtful gift-givers" is a holding
+              phrase awaiting real customer-count data. The exact wording must
+              remain identical here and in the SOCIAL_PROOF_ITEMS marquee in
+              app/LandingPage.tsx — they reference the same number. Update
+              both places together when real data is wired up. */}
           <h2 className="font-serif text-2xl font-bold tracking-[-0.03em] text-charcoal sm:text-4xl">
-            Why Hundreds Choose Keepsy
+            Over 500 thoughtful gift-givers
           </h2>
         </motion.div>
 

@@ -82,7 +82,8 @@ function StarRating() {
 function ReviewCard({ review, className }: { review: (typeof REVIEWS)[number]; className?: string }) {
   return (
     <div
-      className={`flex flex-col rounded-2xl border border-white/8 bg-white/5 p-6 ${className ?? ""}`}
+      className={`flex flex-col rounded-2xl border border-charcoal/8 p-6 ${className ?? ""}`}
+      style={{ backgroundColor: "var(--color-cream-dark)" }}
     >
       {/* Stars */}
       <StarRating />
@@ -90,29 +91,29 @@ function ReviewCard({ review, className }: { review: (typeof REVIEWS)[number]; c
       {/* Big quotation mark */}
       <div
         className="mt-2 font-serif text-6xl font-bold leading-none"
-        style={{ color: "rgba(196,113,74,0.35)" }}
+        style={{ color: "rgba(196,113,74,0.4)" }}
       >
         &ldquo;
       </div>
 
       {/* Quote */}
-      <p className="mt-1 flex-1 text-[15px] leading-7 text-white/75">
+      <p className="mt-1 flex-1 text-[15px] leading-7 text-charcoal/75">
         {review.quote}
       </p>
 
       {/* Attribution */}
-      <div className="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
+      <div className="mt-5 flex items-center gap-3 border-t border-charcoal/10 pt-4">
         <div
           className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold"
-          style={{ backgroundColor: "rgba(196,113,74,0.2)", color: "var(--color-terra-light)" }}
+          style={{ backgroundColor: "rgba(196,113,74,0.15)", color: "var(--color-terracotta)" }}
         >
           {review.name.charAt(0)}
         </div>
         <div>
-          <p className="text-sm font-semibold text-white">
+          <p className="text-sm font-semibold text-charcoal">
             {review.name}, {review.state}
           </p>
-          <p className="text-xs text-white/40">{review.occasion}</p>
+          <p className="text-xs text-charcoal/45">{review.occasion}</p>
         </div>
       </div>
     </div>
@@ -146,6 +147,9 @@ function MobileCarousel() {
         className="scrollbar-hide flex gap-4 overflow-x-auto px-5"
         style={{
           scrollSnapType: "x mandatory",
+          // Match px-5 (1.25rem) so cards 2+ snap with the same left
+          // breathing room as card 1, not flush against the viewport edge.
+          scrollPaddingInlineStart: "1.25rem",
           WebkitOverflowScrolling: "touch",
         }}
       >
@@ -176,8 +180,8 @@ function MobileCarousel() {
             }}
             className={`h-2 rounded-full transition-all duration-300 ${
               i === activeIndex
-                ? "w-5 bg-white/70"
-                : "w-2 bg-white/25"
+                ? "w-5 bg-charcoal/55"
+                : "w-2 bg-charcoal/20"
             }`}
           />
         ))}
@@ -190,7 +194,7 @@ export function ReviewsSection() {
   return (
     <section
       className="py-12 sm:py-20"
-      style={{ backgroundColor: "var(--color-charcoal)" }}
+      style={{ backgroundColor: "var(--color-cream)" }}
     >
       <div className={CONTAINER}>
         <motion.div
@@ -199,10 +203,13 @@ export function ReviewsSection() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
+          <p
+            className="text-[11px] font-bold uppercase tracking-[0.22em]"
+            style={{ color: "var(--color-terracotta)" }}
+          >
             Customer Love
           </p>
-          <h2 className="mt-3 font-serif text-3xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="mt-3 font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
             What Our Customers Say
           </h2>
         </motion.div>
@@ -238,8 +245,8 @@ export function ReviewsSection() {
         >
           <Link
             href="/community"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/65 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20 hover:border-white"
-            style={{ color: "white" }}
+            className="inline-flex items-center gap-2 rounded-xl border-2 px-6 py-3 text-sm font-semibold text-charcoal transition hover:-translate-y-0.5"
+            style={{ borderColor: "var(--color-charcoal)" }}
           >
             Read all stories <ArrowRight size={14} />
           </Link>

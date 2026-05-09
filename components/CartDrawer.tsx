@@ -56,13 +56,6 @@ function productEmoji(productId: string): string {
   return "🎁";
 }
 
-/* price might be in dollars or cents — normalise to dollars for display */
-function priceDollars(unitPrice: number): number {
-
-  // If value looks like cents (>= 100 for a reasonable product), treat as cents
-  return unitPrice >= 100 ? unitPrice / 100 : unitPrice;
-}
-
 /* ─── Sub-components ────────────────────────────────────────────────────── */
 
 function FreeShippingBar({ subtotal }: { subtotal: number }) {
@@ -108,7 +101,7 @@ function CartItemRow({
   onQuantityChange: (id: string, qty: number) => void;
   onRemove: (id: string) => void;
 }) {
-  const price = priceDollars(item.unitPrice);
+  const price = item.unitPrice;
   const thumb = item.imageUrl || item.designUrl;
 
   return (
@@ -296,7 +289,7 @@ export function CartDrawer() {
         color: item.color,
         size: item.size,
         imageUrl: item.imageUrl || item.designUrl,
-        unitPrice: priceDollars(item.unitPrice),
+        unitPrice: item.unitPrice,
         quantity: item.quantity,
       }));
       const primaryItem = items[0];
@@ -325,7 +318,7 @@ export function CartDrawer() {
 
   /* Derived totals */
   const subtotal = items.reduce(
-    (sum, item) => sum + priceDollars(item.unitPrice) * item.quantity,
+    (sum, item) => sum + item.unitPrice * item.quantity,
     0
   );
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);

@@ -329,7 +329,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                         className="text-[11px] font-bold uppercase tracking-[0.22em]"
                         style={{ color: "var(--color-terracotta)" }}
                       >
-                        AI-Designed, Made With Care
+                        One-of-a-Kind, Made With Care
                       </span>
                     </div>
 

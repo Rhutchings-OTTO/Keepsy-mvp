@@ -146,7 +146,8 @@ function FeaturedProductCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-charcoal/8 bg-white"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border bg-white"
+      style={{ borderColor: "var(--color-cream-dark)" }}
     >
       {/* Bestseller badge — only on the single bestseller */}
       {product.isBestseller && (
@@ -186,7 +187,10 @@ function FeaturedProductCard({
           <span className="text-xs text-charcoal/45">({product.displayReviews})</span>
         </div>
         <div className="mt-auto pt-3">
-          <span className="block text-base font-bold text-charcoal sm:text-lg">
+          <span
+            className="block text-base font-bold sm:text-lg"
+            style={{ color: "var(--color-terra-dark)" }}
+          >
             {region === "UK" ? product.priceUK : product.priceUS}
           </span>
           <Link

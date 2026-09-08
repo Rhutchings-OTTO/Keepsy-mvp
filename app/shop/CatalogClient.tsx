@@ -308,7 +308,7 @@ export function CatalogClient() {
                 Our Collection
               </h1>
               <p className="mt-2 text-sm text-white/70 sm:text-base sm:mt-3">
-                Personalised gifts she&apos;ll treasure forever
+                Personalised gifts they&apos;ll treasure forever
               </p>
             </motion.div>
 
@@ -337,9 +337,9 @@ export function CatalogClient() {
         style={{ backgroundColor: "var(--color-cream)" }}
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex items-center justify-between gap-4 py-4">
+          <div className="flex flex-col items-stretch justify-between gap-3 py-4 sm:flex-row sm:items-center sm:gap-4">
             {/* Category pills — horizontally scrollable on mobile */}
-            <div className="-mx-4 flex flex-1 items-center gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 sm:pb-0">
+            <div className="flex w-full min-w-0 items-center gap-2 overflow-x-auto pb-1 sm:w-auto sm:flex-1 sm:pb-0">
               {CATEGORIES.map(({ key, label }) => (
                 <button
                   key={key}
@@ -362,7 +362,7 @@ export function CatalogClient() {
             </div>
 
             {/* Sort dropdown */}
-            <div className="relative flex flex-shrink-0 items-center gap-1.5">
+            <div className="relative flex flex-shrink-0 items-center gap-1.5 self-end sm:self-auto">
               <SlidersHorizontal size={14} className="text-charcoal/40" />
               <select
                 value={sortKey}

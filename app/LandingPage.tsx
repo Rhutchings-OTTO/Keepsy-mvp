@@ -68,8 +68,8 @@ const FEATURED_PRODUCTS = [
     rating: "★★★★★",
     displayReviews: 47,
     isBestseller: false,
-    src: "/images/collections/collection-pet-mug.png",
-    alt: "Custom mug with a ginger cat portrait surrounded by flowers",
+    src: "/images/refresh/pet-mug.webp",
+    alt: "White ceramic mug printed with a ginger tabby cat portrait framed by a wreath of daisies, lavender and wildflowers",
   },
   {
     name: "Personalised Greeting Card",
@@ -78,8 +78,8 @@ const FEATURED_PRODUCTS = [
     rating: "★★★★★",
     displayReviews: 89,
     isBestseller: true,
-    src: "/images/collections/collection-newbaby-card.png",
-    alt: "Best Dad Already personalised greeting card for a new baby",
+    src: "/images/refresh/newbaby-card.webp",
+    alt: "Cream greeting card with gold foil stars, a photo of a father kissing his sleeping newborn and the words Best Dad Already",
   },
   {
     name: "The Cozy Custom Hoodie",
@@ -88,8 +88,8 @@ const FEATURED_PRODUCTS = [
     rating: "★★★★★",
     displayReviews: 23,
     isBestseller: false,
-    src: "/images/collections/collection-wedding-hoodie.png",
-    alt: "Custom wedding hoodie personalised with Jamie and Saida's names",
+    src: "/images/refresh/wedding-hoodie.webp",
+    alt: "Cream hoodie printed with a small terracotta heart, a couple's names in script lettering and the words Just married",
   },
   {
     name: "Personalised Friends T-Shirt",
@@ -98,8 +98,8 @@ const FEATURED_PRODUCTS = [
     rating: "★★★★★",
     displayReviews: 12,
     isBestseller: false,
-    src: "/images/collections/collection-friends-tshirt.png",
-    alt: "Personalised t-shirt featuring four friends together",
+    src: "/images/refresh/friends-tee.webp",
+    alt: "White t-shirt printed with a photo of four friends laughing together on a beach at golden hour, with a small sun motif",
   },
 ];
 
@@ -186,7 +186,10 @@ function FeaturedProductCard({
           <span className="text-xs text-charcoal/45">({product.displayReviews})</span>
         </div>
         <div className="mt-auto pt-3">
-          <span className="block text-base font-bold text-charcoal sm:text-lg">
+          <span
+            className="block text-base font-bold sm:text-lg"
+            style={{ color: "var(--color-terra-dark)" }}
+          >
             {region === "UK" ? product.priceUK : product.priceUS}
           </span>
           <Link

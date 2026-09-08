@@ -7,6 +7,7 @@
  */
 
 import sharp from "sharp";
+import { fetchPrintSourceBuffer } from "@/lib/fulfilment/fetchPrintSource";
 
 // ── Print area constants (pixels at 300 DPI) ──────────────────────────────────
 
@@ -112,11 +113,8 @@ export const HOODIE_PRINT_H = 3000;
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function fetchBuffer(url: string): Promise<Buffer> {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`[image-composite] Failed to fetch image (${res.status}): ${url}`);
-  }
-  return Buffer.from(await res.arrayBuffer());
+  // Keepsy-hosted URLs only, with timeout/size caps (see lib/fulfilment/fetchPrintSource.ts).
+  return fetchPrintSourceBuffer(url);
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────

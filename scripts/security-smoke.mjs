@@ -5,12 +5,14 @@
  */
 const BASE = process.env.BASE_URL || "http://localhost:3000";
 
+let failures = 0;
 async function test(name, fn) {
   try {
     await fn();
     console.log(`  OK ${name}`);
     return true;
   } catch (e) {
+    failures += 1;
     console.error(`  FAIL ${name}:`, e.message);
     return false;
   }
@@ -59,7 +61,7 @@ async function main() {
     const r = await fetch(`${BASE}/api/orders/status`);
     if (r.status !== 400) throw new Error(`expected 400, got ${r.status}`);
   });
-  ok++;
+  if (failures) process.exitCode = 1;
 
   console.log("\nDone. Run a real rate limit test manually (hit endpoint >30 times/min).");
 }

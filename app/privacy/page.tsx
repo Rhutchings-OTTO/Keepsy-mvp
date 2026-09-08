@@ -32,7 +32,7 @@ export default function PrivacyPage() {
           Last updated: {LAST_UPDATED}
         </p>
         <p className="mt-4 text-base leading-8" style={{ color: "rgba(45,41,38,0.65)" }}>
-          This policy explains how Keepsy ("we", "us", "our") collects, uses, and protects your personal data when you use our website and purchase products. We are committed to handling your information transparently and in accordance with UK GDPR and the Data Protection Act 2018.
+          This policy explains how Keepsy (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) collects, uses, and protects your personal data when you use our website and purchase products. We are committed to handling your information transparently and in accordance with UK GDPR and the Data Protection Act 2018.
         </p>
 
         <div className="mt-10 space-y-10 border-t pt-10" style={{ borderColor: "rgba(45,41,38,0.10)" }}>

@@ -14,6 +14,8 @@ import {
   Upload,
   X,
   Coffee,
+  Printer,
+  Sparkles,
 } from "lucide-react";
 import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { IdeasForYou } from "./IdeasForYou";
@@ -73,6 +75,9 @@ export type CreatePageLayoutLeanProps = {
   onGenerate: (promptOverride?: string) => void;
   onUploadFile: (file: File) => void;
   onClearUploadedImage: (e: React.MouseEvent) => void;
+  /** Print the uploaded photo exactly as it is — never calls the AI. */
+  onPrintOriginal?: () => void;
+  originalUpload?: { status: "idle" | "uploading" | "error"; progress: number; error: string | null };
   onProductSelect: (type: "tshirt" | "mug" | "card" | "hoodie") => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   selectedProductType?: "tshirt" | "mug" | "card" | "hoodie";
@@ -105,6 +110,8 @@ export function CreatePageLayoutLean({
   onGenerate,
   onUploadFile,
   onClearUploadedImage,
+  onPrintOriginal,
+  originalUpload = { status: "idle", progress: 0, error: null },
   onProductSelect,
   fileInputRef,
   selectedProductType,
@@ -120,12 +127,16 @@ export function CreatePageLayoutLean({
     typeof prompt === "string" ? prompt : ""
   );
   const localPromptRef = useRef(localPrompt);
-  localPromptRef.current = localPrompt;
+  useEffect(() => {
+    localPromptRef.current = localPrompt;
+  }, [localPrompt]);
 
   // Sync inbound prop changes (chips, suggestions, initial query) into local state.
-  useEffect(() => {
+  const [lastIncomingPrompt, setLastIncomingPrompt] = useState(prompt);
+  if (prompt !== lastIncomingPrompt) {
+    setLastIncomingPrompt(prompt);
     setLocalPrompt(typeof prompt === "string" ? prompt : "");
-  }, [prompt]);
+  }
 
 
   // Flush local prompt to parent and pass it as override to onGenerate so
@@ -242,7 +253,7 @@ export function CreatePageLayoutLean({
               <div className="mt-4 space-y-4">
                 <label className="block">
                   <span className="mb-1 block text-sm font-medium text-charcoal/60">
-                    {createMode === "upload" ? "Describe how you want the photo changed" : "Describe the picture you'd like on your gift"}
+                    {createMode === "upload" ? "Describe how you want the photo changed (optional if you're printing it as it is)" : "Describe the picture you'd like on your gift"}
                   </span>
                   {createMode !== "upload" && (
                     <>
@@ -250,7 +261,7 @@ export function CreatePageLayoutLean({
                         This will be the image printed on your hoodie, mug, t-shirt or card. Describe the picture, not the product.
                       </span>
                       <span className="mb-2 block text-xs text-charcoal/45">
-                        Add as much or as little detail as you'd like — even a few words is enough to get started.
+                        Add as much or as little detail as you&apos;d like — even a few words is enough to get started.
                       </span>
                     </>
                   )}
@@ -304,7 +315,7 @@ export function CreatePageLayoutLean({
                       ref={fileInputRef}
                       id="create-upload-input"
                       type="file"
-                      accept="image/png,image/jpeg,image/webp"
+                      accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
                       onChange={handleFileUpload}
                       className="hidden"
                     />
@@ -333,7 +344,7 @@ export function CreatePageLayoutLean({
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium text-charcoal">{uploadedFileName || "Photo selected"}</p>
-                          <p className="mt-1 text-xs text-charcoal/55">Ready to transform</p>
+                          <p className="mt-1 text-xs text-charcoal/55">Transform it with AI, or print it exactly as it is</p>
                         </div>
                         <button
                           type="button"
@@ -350,7 +361,7 @@ export function CreatePageLayoutLean({
 
                 <MagneticButton
                   onClick={handleGenerate}
-                  disabled={(!localPrompt.trim() && !uploadedImage) || isBusy}
+                  disabled={(!localPrompt.trim() && !uploadedImage) || isBusy || originalUpload.status === "uploading"}
                   className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-xl px-6 text-base font-semibold text-white shadow-[0_16px_32px_-20px_rgba(196,113,74,0.45)] disabled:cursor-not-allowed disabled:opacity-45"
                   style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
@@ -359,6 +370,11 @@ export function CreatePageLayoutLean({
                       <RefreshCcw className="animate-spin" size={18} />
                       Creating your design...
                     </>
+                  ) : createMode === "upload" && uploadedImage ? (
+                    <>
+                      <Sparkles size={18} />
+                      Transform my photo with AI
+                    </>
                   ) : (
                     <>
                       Create my design
@@ -366,6 +382,36 @@ export function CreatePageLayoutLean({
                     </>
                   )}
                 </MagneticButton>
+
+                {createMode === "upload" && uploadedImage && onPrintOriginal ? (
+                  <div className="space-y-2" data-print-original>
+                    <button
+                      type="button"
+                      onClick={onPrintOriginal}
+                      disabled={isBusy || originalUpload.status === "uploading"}
+                      className="inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-xl border-2 px-6 text-base font-semibold text-charcoal transition hover:bg-[#FDF6EE] disabled:cursor-not-allowed disabled:opacity-60"
+                      style={{ borderColor: "var(--color-forest)", color: "var(--color-forest)" }}
+                    >
+                      <Printer size={18} />
+                      {originalUpload.status === "uploading"
+                        ? `Uploading your photo… ${Math.round(originalUpload.progress * 100)}%`
+                        : "Print my photo as it is (no AI)"}
+                    </button>
+                    <p className="text-xs leading-5 text-charcoal/55">
+                      Your full-resolution photo goes straight to print — no changes, no AI. We&apos;ll tell you honestly how sharp it will look on each product.
+                    </p>
+                    {originalUpload.status === "uploading" ? (
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-charcoal/10" aria-hidden>
+                        <div className="h-full rounded-full transition-[width]" style={{ width: `${Math.round(originalUpload.progress * 100)}%`, backgroundColor: "var(--color-forest)" }} />
+                      </div>
+                    ) : null}
+                    {originalUpload.status === "error" && originalUpload.error ? (
+                      <p role="alert" className="rounded-xl px-4 py-3 text-sm font-semibold" style={{ backgroundColor: "rgba(196,113,74,0.10)", color: "var(--color-terra-dark)" }}>
+                        {originalUpload.error}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
 
                 <p className="text-sm text-charcoal/55">
                   {dailyGenerationsLeft !== undefined

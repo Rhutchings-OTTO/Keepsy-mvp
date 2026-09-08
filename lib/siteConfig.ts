@@ -51,7 +51,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Heartfelt portrait gifts moms keep forever.",
     defaultStyle: "Watercolor portrait",
     defaultProduct: "card",
-    image: "/occasion-tiles/mothers-day-floral.png",
+    image: "/images/refresh/occasion-mothers-day.webp",
   },
   {
     id: "christmas",
@@ -59,7 +59,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Warm festive cards and family keepsakes.",
     defaultStyle: "Classic Christmas card",
     defaultProduct: "card",
-    image: "/occasion-tiles/christmas-scene.png",
+    image: "/images/refresh/occasion-christmas.webp",
   },
   {
     id: "thanksgiving",
@@ -67,7 +67,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Family gratitude moments turned into gifts.",
     defaultStyle: "Vintage oil painting",
     defaultProduct: "mug",
-    image: "/occasion-tiles/thanksgiving-cartoon.png",
+    image: "/images/refresh/occasion-thanksgiving.webp",
   },
   {
     id: "fourth-of-july",
@@ -75,7 +75,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Celebrate with bold patriotic artwork.",
     defaultStyle: "Kids as superheroes",
     defaultProduct: "tee",
-    image: "/occasion-tiles/fourth-july-photo.png",
+    image: "/images/refresh/occasion-fourth-of-july.webp",
   },
   {
     id: "birthdays",
@@ -83,7 +83,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Personalized gifts ready in minutes.",
     defaultStyle: "Minimal line art",
     defaultProduct: "hoodie",
-    image: "/occasion-tiles/birthday-confetti.png",
+    image: "/images/refresh/occasion-birthday.webp",
   },
   {
     id: "anniversaries",
@@ -91,7 +91,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Romantic custom art for meaningful milestones.",
     defaultStyle: "Watercolor portrait",
     defaultProduct: "card",
-    image: "/occasion-tiles/anniversary-watercolor.png",
+    image: "/images/refresh/occasion-anniversary.webp",
   },
   {
     id: "pet-gifts",
@@ -99,7 +99,7 @@ export const OCCASIONS: OccasionConfig[] = [
     description: "Turn pet photos into adorable keepsakes.",
     defaultStyle: "Pet portrait",
     defaultProduct: "mug",
-    image: "/occasion-tiles/pet-gifts-portrait.png",
+    image: "/images/refresh/occasion-pet-gifts.webp",
   },
 ];
 

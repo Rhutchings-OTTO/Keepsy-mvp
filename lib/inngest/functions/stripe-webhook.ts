@@ -3,15 +3,15 @@ import { inngest } from "../client";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { sendAtelierCreationEmail } from "@/lib/emails/sendAtelierEmail";
 import { clearDesignCacheForOrder } from "@/lib/cache/designCache";
-import {
-  uploadImageToPrintify,
-  createPrintifyProduct,
-  submitPrintifyOrder,
-  splitName,
-  type PrintifyAddress,
-} from "@/lib/printify";
-import { getPrintifyVariantId } from "@/lib/printify-blueprints";
+import { splitName, type PrintifyAddress } from "@/lib/printify";
 import { notifyFounders } from "@/lib/notifications";
+import { fulfilOrderLines, SubmitUncertainError } from "@/lib/fulfilment/printifyFulfilment";
+import {
+  linesFromOrderItems,
+  linesFromStripeLineItems,
+  orderItemRowsFromStripeLineItems,
+  type OrderItemRow,
+} from "@/lib/fulfilment/orderLines";
 
 // ─── Stripe singleton ─────────────────────────────────────────────────────
 
@@ -109,10 +109,15 @@ export const stripeWebhookProcess = inngest.createFunction(
     if (alreadyProcessed) return { skipped: "duplicate" };
 
     // ── checkout.session.completed ─────────────────────────────────────────
-    if (eventType === "checkout.session.completed") {
+    if (eventType === "checkout.session.completed" || eventType === "checkout.session.async_payment_succeeded") {
       const session = payload.data.object as Stripe.Checkout.Session;
       const stripe = getStripe();
       if (!stripe) throw new Error("STRIPE_SECRET_KEY not set");
+
+      if (session.payment_status && session.payment_status !== "paid" && session.payment_status !== "no_payment_required") {
+        console.log("[stripe-webhook] Session not paid yet — not fulfilling:", session.id, session.payment_status);
+        return { skipped: "unpaid" };
+      }
 
       // Expand price.product so we can access per-item metadata (productId, size, color)
       const [lineItems] = await Promise.all([
@@ -161,17 +166,17 @@ export const stripeWebhookProcess = inngest.createFunction(
       });
 
       await step.run("upsert-order-items", async () => {
+        const { data: existingRows } = await supabase
+          .from("order_items")
+          .select("product_id")
+          .eq("order_ref", orderRef);
+        const hasRichRows = (existingRows ?? []).some((r) => (r as { product_id?: string | null }).product_id);
+        if (hasRichRows) return; // keep the per-line print sources written at checkout
         await supabase.from("order_items").delete().eq("order_ref", orderRef);
         if (lineItems.data.length > 0) {
-          const { error: itemsErr } = await supabase.from("order_items").insert(
-            lineItems.data.map((item) => ({
-              order_ref: orderRef,
-              product_name: item.description || "Keepsy item",
-              quantity: item.quantity || 1,
-              unit_price_gbp: (item.price?.unit_amount ?? 0) / 100,
-              line_total_gbp: (item.amount_total ?? 0) / 100,
-            }))
-          );
+          const { error: itemsErr } = await supabase
+            .from("order_items")
+            .insert(orderItemRowsFromStripeLineItems(orderRef, lineItems.data));
           if (itemsErr) throw new Error("Failed to insert order items: " + itemsErr.message);
         }
       });
@@ -186,120 +191,64 @@ export const stripeWebhookProcess = inngest.createFunction(
         }
       });
 
-      // ── Printify fulfilment — 4 retryable steps ──────────────────────────
-
-      // Skip Printify if no design URL or API token not configured
-      if (!designUrl || !process.env.PRINTIFY_API_TOKEN) {
-        console.warn(
-          "[printify] Skipping fulfilment — missing designUrl or PRINTIFY_API_TOKEN"
-        );
+      // ── Printify fulfilment — shared pipeline, every paid line ────────────
+      if (!process.env.PRINTIFY_API_TOKEN) {
+        console.warn("[printify] Skipping fulfilment — PRINTIFY_API_TOKEN not set");
       } else {
-        // Extract product details from first line item metadata
-        const firstItem = lineItems.data[0];
-        const productMeta =
-          typeof firstItem?.price?.product === "object" && firstItem.price.product !== null
-            ? ((firstItem.price.product as Stripe.Product).metadata ?? {})
-            : {};
-
-        const productId = (productMeta.productId ?? session.metadata?.product_type ?? "postcard")
-          .toLowerCase()
-          .replace(/\s+/g, "");
-        const size = productMeta.size || undefined;
-        const color = productMeta.color || undefined;
-        const quantity = firstItem?.quantity ?? 1;
-
-        // Determine region from shipping address country
         const shippingCountry =
           session.collected_information?.shipping_details?.address?.country ??
           session.customer_details?.address?.country;
         const region = regionFromCountry(shippingCountry);
 
-        // Step: Upload design image to Printify
-        const printifyImageId = await step.run("printify-upload-image", async () => {
-          const imageId = await uploadImageToPrintify(
-            designUrl,
-            `keepsy-${orderRef}.png`
-          );
-
-          await supabase
+        await step.run("printify-fulfil-all-lines", async () => {
+          const { data: orderRow } = await supabase
             .from("orders")
-            .update({ printify_image_id: imageId, printify_status: "image_uploaded" })
+            .select("cropped_image_url, generated_image_url")
+            .eq("order_ref", orderRef)
+            .maybeSingle();
+          const fallback = {
+            designUrl: (orderRow?.generated_image_url as string | null) ?? designUrl,
+            croppedImageUrl: (orderRow?.cropped_image_url as string | null) ?? null,
+          };
+          const { data: rows } = await supabase
+            .from("order_items")
+            .select("product_id, size, color, quantity, design_url, cropped_image_url, source_kind")
             .eq("order_ref", orderRef);
+          const richRows = ((rows ?? []) as OrderItemRow[]).filter((r) => r.product_id);
+          const lines =
+            richRows.length > 0
+              ? linesFromOrderItems(richRows, fallback)
+              : linesFromStripeLineItems(lineItems.data, fallback);
 
-          return imageId;
-        });
-
-        // Step: Create Printify product
-        const printifyProductId = await step.run("printify-create-product", async () => {
-          const { config, variantId } = getPrintifyVariantId(productId, region, color, size);
-
-          const productTitle = `Keepsy ${productId} — ${orderRef}`;
-          const pid = await createPrintifyProduct({
-            title: productTitle,
-            blueprintId: config.blueprintId,
-            printProviderId: config.printProviderId,
-            variantId,
-            printImageId: printifyImageId,
-            printPosition: config.printPosition,
-            productType: productId,
-          });
-
-          await supabase
-            .from("orders")
-            .update({
-              printify_product_id: pid,
-              printify_status: "product_created",
-              product_type: productId,
-              variant_size: size ?? null,
-              variant_color: color ?? null,
-              region,
-            })
-            .eq("order_ref", orderRef);
-
-          return { productId: pid, variantId };
-        });
-
-        // Step: Submit Printify order
-        await step.run("printify-submit-order", async () => {
-          try {
-            const { variantId } = printifyProductId;
-            const address = buildPrintifyAddress(session);
-
-            const printifyOrderId = await submitPrintifyOrder({
-              externalId: orderRef,
-              productId: printifyProductId.productId,
-              variantId,
-              quantity,
-              shippingAddress: address,
-            });
-
-            await supabase
-              .from("orders")
-              .update({
-                printify_order_id: printifyOrderId,
-                printify_status: "sent_to_printify",
-                status: "in_production",
-              })
-              .eq("order_ref", orderRef);
-          } catch (err) {
-            // Mark for manual review — do NOT auto-refund
-            const msg = err instanceof Error ? err.message : String(err);
-            console.error("[printify] Failed to submit order:", msg);
-
+          if (lines.length === 0 || lines.some((l) => !l.designUrl)) {
             await supabase
               .from("orders")
               .update({ printify_status: "needs_manual_review" })
               .eq("order_ref", orderRef);
+            return { skipped: "no_fulfilable_lines" };
+          }
 
-            // Notify founders — fire and forget, don't await
+          try {
+            const address = buildPrintifyAddress(session);
+            const result = await fulfilOrderLines({ orderRef, region, lines, address, supabase });
+            return { printifyOrderId: result.printifyOrderId, lines: result.lines.length, alreadyFulfilled: result.alreadyFulfilled ?? false };
+          } catch (err) {
+            // Mark for manual review — do NOT auto-refund and do NOT let Inngest retry the step:
+            // a retry could create a duplicate physical order. Operators use /api/admin/retry-order.
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error("[printify] Failed to fulfil order:", msg);
+            if (!(err instanceof SubmitUncertainError)) {
+              await supabase
+                .from("orders")
+                .update({ printify_status: "needs_manual_review" })
+                .eq("order_ref", orderRef);
+            }
             notifyFounders(
-              `Printify fulfilment failed for order ${orderRef}`,
-              `Order: ${orderRef}\nError: ${msg}\nCustomer email: ${customerEmail ?? "unknown"}\nAction needed: manually process this order at https://app.printify.com`,
+              `Printify fulfilment ${err instanceof SubmitUncertainError ? "UNCERTAIN" : "failed"} for order ${orderRef}`,
+              `Order: ${orderRef}\nError: ${msg}\nCustomer email: ${customerEmail ?? "unknown"}\nAction needed: check https://app.printify.com for external_id=${orderRef} before re-submitting.`,
               "critical"
-            ).catch(() => {}); // swallow any notification errors
-
-            // Re-throw so Inngest retries this step
-            throw err;
+            ).catch(() => {});
+            return { failed: true, reason: msg };
           }
         });
       }

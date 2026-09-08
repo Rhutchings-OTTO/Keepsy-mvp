@@ -260,6 +260,7 @@ function DebugOverlay({
     const heroEl = heroRef?.current;
     const safeEl = safeZoneRef?.current;
     if (!heroEl || !safeEl) return;
+    const measure = () => {
     const heroRect = heroEl.getBoundingClientRect();
     const safeRect = safeEl.getBoundingClientRect();
     setRects({
@@ -268,6 +269,11 @@ function DebugOverlay({
       safeW: safeRect.width + 56,
       safeH: safeRect.height + 56,
     });
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(heroEl);
+    observer.observe(safeEl);
+    return () => observer.disconnect();
   }, [heroRef, safeZoneRef, placedCount]);
 
   if (!rects) return null;

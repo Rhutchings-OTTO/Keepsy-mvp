@@ -2,7 +2,13 @@
  * Canonical product schema with variants (size, color).
  */
 
-export type ApparelSize = "S" | "M" | "L" | "XL" | "2XL" | "3XL" | "4XL" | "5XL";
+/**
+ * Apparel sizes we can genuinely fulfil. Printify blueprint 706 (tee) and 77
+ * (hoodie) are mapped S–3XL for every colour we sell (see
+ * lib/printify-blueprints.ts and lib/commerce/variants.ts). 4XL/5XL used to be
+ * offered here but silently fell back to Black / M at fulfilment.
+ */
+export type ApparelSize = "S" | "M" | "L" | "XL" | "2XL" | "3XL";
 
 export type ProductType = "hoodie" | "tshirt" | "mug" | "card" | "canvas";
 
@@ -20,8 +26,8 @@ export interface Product {
   colors?: Array<{ hex: string; name: string }>;
 }
 
-const TSHIRT_SIZES: ApparelSize[] = ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
-const HOODIE_SIZES: ApparelSize[] = ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
+const TSHIRT_SIZES: ApparelSize[] = ["S", "M", "L", "XL", "2XL", "3XL"];
+const HOODIE_SIZES: ApparelSize[] = ["S", "M", "L", "XL", "2XL", "3XL"];
 
 export const PRODUCTS: Record<ProductType, Product> = {
   tshirt: {
@@ -95,9 +101,12 @@ export const PRODUCT_CATALOG_IDS: Record<ProductType, string> = {
 };
 
 export function getProductByCatalogId(catalogId: string): Product | null {
+  const id = catalogId.toLowerCase();
   // Canvas per-size IDs all start with "canvas_"
-  if (catalogId.startsWith("canvas")) return PRODUCTS.canvas;
-  const entry = Object.entries(PRODUCT_CATALOG_IDS).find(([, id]) => id === catalogId);
+  if (id.startsWith("canvas")) return PRODUCTS.canvas;
+  // Card sub-types (postcard, cardpack, uscard_1 …) all belong to the card product.
+  if (id === "postcard" || id === "cardpack" || id.startsWith("uscard")) return PRODUCTS.card;
+  const entry = Object.entries(PRODUCT_CATALOG_IDS).find(([, cid]) => cid === id);
   return entry ? PRODUCTS[entry[0] as ProductType] : null;
 }
 

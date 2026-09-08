@@ -14,6 +14,7 @@ import {
 } from "./metrics";
 import { guardOrigin, guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
 import { parseAndValidate, Constraints } from "@/lib/http/validate";
+import { resolveSourceImage } from "@/lib/gen/sourceImage";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -27,6 +28,8 @@ const generateBodySchema = z
   .object({
     prompt: z.string().max(Constraints.PROMPT_MAX_LEN),
     sourceImageDataUrl: z.string().max(MAX_SOURCE_IMAGE_DATA_URL_CHARS).optional().nullable(),
+    /** https URL of a Keepsy-hosted image (a persisted history node) to edit from. */
+    sourceImageUrl: z.string().url().max(2048).optional().nullable(),
     designShape: z.enum(["square", "portrait", "landscape"]).optional(),
     isRefinement: z.boolean().optional(),
   })
@@ -122,7 +125,17 @@ export async function POST(req: Request) {
     }
     const body = parsed.data;
     const prompt = body.prompt;
-    const sourceImageDataUrl = body.sourceImageDataUrl ?? null;
+    let sourceImageDataUrl: string | null = null;
+    if (body.sourceImageDataUrl || body.sourceImageUrl) {
+      const resolved = await resolveSourceImage({ dataUrl: body.sourceImageDataUrl, url: body.sourceImageUrl });
+      if (!resolved.ok) {
+        return NextResponse.json(
+          { ok: false, error: resolved.error },
+          { status: 400, headers: { ...noStoreHeaders, ...rateLimitResult.headers } }
+        );
+      }
+      sourceImageDataUrl = resolved.dataUrl;
+    }
     const designShape: DesignShape = body.designShape ?? "square";
     const generationSize = getImageSizeForShape(designShape);
 
@@ -144,7 +157,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const promptKey = await getPromptKey(`${sanitized.prompt}::${generationSize}`);
+    // Key on the source image too: two different photos with the same prompt must not collide.
+    const sourceKey = sourceImageDataUrl ? (await sha256Hex(sourceImageDataUrl)).slice(0, 16) : "none";
+    const promptKey = await getPromptKey(`${sanitized.prompt}::${generationSize}::${sourceKey}`);
     const startedAt = Date.now();
     const cached = readCachedGeneration(promptKey);
 
@@ -161,6 +176,8 @@ export async function POST(req: Request) {
           imageDataUrl: cached.imageDataUrl,
           designUrl: cached.designUrl || cached.imageDataUrl,
           cached: true,
+          width: Number(generationSize.split("x")[0]),
+          height: Number(generationSize.split("x")[1]),
           latencyMs: Date.now() - startedAt,
         },
         { headers: noStoreHeaders }
@@ -195,6 +212,8 @@ export async function POST(req: Request) {
           imageDataUrl: dedupResult.imageDataUrl,
           designUrl: dedupResult.designUrl || dedupResult.imageDataUrl,
           deduped: true,
+          width: Number(generationSize.split("x")[0]),
+          height: Number(generationSize.split("x")[1]),
           latencyMs: Date.now() - startedAt,
         },
         { headers: noStoreHeaders }
@@ -236,7 +255,7 @@ export async function POST(req: Request) {
         }
 
         const { imageDataUrl, designUrl, promptUsed } = result;
-        const cacheKey = await getPromptKey(`${promptUsed}::${generationSize}`);
+        const cacheKey = await getPromptKey(`${promptUsed}::${generationSize}::${sourceKey}`);
         generationCache.set(cacheKey, {
           imageDataUrl,
           designUrl,
@@ -275,6 +294,7 @@ export async function POST(req: Request) {
     if (!genResult.designUrl) {
       console.error("[generate] Cloudinary upload failed — designUrl is empty. Printify fulfillment will be skipped for this order.");
     }
+    const [genW, genH] = generationSize.split("x").map((n) => Number(n));
     return NextResponse.json(
       {
         ok: true,
@@ -283,6 +303,8 @@ export async function POST(req: Request) {
         designUploadFailed: !genResult.designUrl,
         edited: mode === "upload",
         cached: false,
+        width: genW,
+        height: genH,
         latencyMs: Date.now() - startedAt,
       },
       { headers: noStoreHeaders }

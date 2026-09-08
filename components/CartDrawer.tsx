@@ -3,80 +3,30 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Trash2, Gift, ShoppingBag, ChevronDown, ChevronUp } from "lucide-react";
-import { getRegion } from "@/lib/region";
+import { X, Trash2, Gift, ShoppingBag } from "lucide-react";
+import { getRegion, type Region } from "@/lib/region";
 import { getEstimatedDelivery, type DeliveryRegion } from "@/lib/deliveryEstimate";
-
-/* ─── Types ────────────────────────────────────────────────────────────── */
-
-type CartItem = {
-  id: string;
-  productId: string;
-  name: string;
-  color?: string;
-  size?: string;
-  imageUrl: string;
-  designUrl?: string;
-  unitPrice: number;
-  quantity: number;
-};
-
-/* ─── Constants ────────────────────────────────────────────────────────── */
-
-const CART_KEY = "keepsy_cart_v2";
-const FREE_SHIPPING_THRESHOLD = 60;
-
-/* ─── Helpers ──────────────────────────────────────────────────────────── */
-
-function readCart(): CartItem[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(CART_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeCart(items: CartItem[]) {
-  localStorage.setItem(CART_KEY, JSON.stringify(items));
-  window.dispatchEvent(new Event("cart-updated"));
-  // Also trigger storage event for cross-tab awareness
-  window.dispatchEvent(new StorageEvent("storage", { key: CART_KEY }));
-}
-
-function productEmoji(productId: string): string {
-  const id = productId.toLowerCase();
-  if (id.includes("mug") || id.includes("cup")) return "☕";
-  if (id.includes("card")) return "💌";
-  if (id.includes("hoodie") || id.includes("sweat")) return "👕";
-  if (id.includes("hat") || id.includes("cap")) return "🧢";
-  return "🎁";
-}
+import { useCart } from "@/lib/cart/useCart";
+import { computeTotals, linePrice, removeFromCart, updateQuantity, type CartLine } from "@/lib/cart/store";
+import { currencyForRegion, formatMoney, FREE_SHIPPING_THRESHOLD } from "@/lib/commerce/pricing";
+import { startCheckout } from "@/lib/cart/checkoutClient";
+import { PrintQualityBadge } from "@/components/create/PrintQualityBadge";
 
 /* ─── Sub-components ────────────────────────────────────────────────────── */
 
-function FreeShippingBar({ subtotal }: { subtotal: number }) {
+function FreeShippingBar({ subtotal, currency }: { subtotal: number; currency: "gbp" | "usd" }) {
   const pct = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
   const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
   return (
-    <div className="px-6 py-4 border-b border-charcoal/8">
+    <div className="border-b border-charcoal/8 px-6 py-4">
       <p className="mb-2.5 text-xs text-charcoal/55">
         {remaining > 0 ? (
           <>
-            Add{" "}
-            <span className="font-semibold text-charcoal/80">
-              £{remaining.toFixed(2)}
-            </span>{" "}
-            more for free shipping
+            Add <span className="font-semibold text-charcoal/80">{formatMoney(remaining, currency)}</span> more for free shipping
           </>
         ) : (
-          <span className="font-semibold" style={{ color: "var(--color-forest)" }}>
-            Free shipping unlocked!
-          </span>
+          <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free shipping unlocked!</span>
         )}
       </p>
       <div className="h-1 w-full overflow-hidden rounded-sm bg-charcoal/8">
@@ -92,88 +42,60 @@ function FreeShippingBar({ subtotal }: { subtotal: number }) {
   );
 }
 
-function CartItemRow({
-  item,
-  onQuantityChange,
-  onRemove,
-}: {
-  item: CartItem;
-  onQuantityChange: (id: string, qty: number) => void;
-  onRemove: (id: string) => void;
-}) {
-  const price = item.unitPrice;
+function CartItemRow({ item, currency }: { item: CartLine; currency: "gbp" | "usd" }) {
+  const price = linePrice(item, currency);
   const thumb = item.imageUrl || item.designUrl;
 
   return (
-    <div
-      className="flex gap-4 py-5 border-b border-charcoal/8 last:border-b-0"
-      style={{ borderLeftWidth: 0 }}
-    >
-      {/* Thumbnail */}
-      <div
-        className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl flex items-center justify-center text-2xl"
-        style={{ backgroundColor: "#F5EDE0" }}
-      >
+    <div className="flex gap-4 border-b border-charcoal/8 py-5 last:border-b-0" data-cart-line={item.id}>
+      <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl" style={{ backgroundColor: "#F5EDE0" }}>
         {thumb ? (
-          <img
-            src={thumb}
-            alt={item.name}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span>{productEmoji(item.productId)}</span>
-        )}
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={thumb} alt={item.name} className="h-full w-full object-cover" />
+        ) : null}
       </div>
 
-      {/* Details */}
-      <div className="flex flex-1 flex-col gap-1 min-w-0">
-        <p className="font-serif text-sm font-bold text-charcoal leading-snug truncate">
-          {item.name}
-        </p>
-        {(item.color || item.size) && (
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <p className="truncate font-serif text-sm font-bold leading-snug text-charcoal">{item.name}</p>
+        {(item.color || item.size || item.addonId || item.sourceKind === "original") && (
           <p className="text-xs text-charcoal/45">
-            {[item.color, item.size].filter(Boolean).join(" · ")}
+            {[item.size, item.color, item.sourceKind === "original" ? "Your photo" : null, item.addonId ? "Add-on" : null]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
         )}
-        <p className="text-xs text-charcoal/55">
-          £{price.toFixed(2)} each
-        </p>
+        <p className="text-xs text-charcoal/55">{formatMoney(price, currency)} each</p>
+        {item.sourceKind === "original" && item.sourceWidth && item.sourceHeight ? (
+          <PrintQualityBadge productId={item.productId} size={item.size} width={item.sourceWidth} height={item.sourceHeight} compact />
+        ) : null}
 
-        {/* Qty + remove */}
         <div className="mt-1.5 flex items-center justify-between">
-          <div
-            className="flex items-center gap-0.5 rounded-lg border border-charcoal/20"
-            style={{ backgroundColor: "var(--color-cream)" }}
-          >
+          <div className="flex items-center gap-0.5 rounded-lg border border-charcoal/20" style={{ backgroundColor: "var(--color-cream)" }}>
             <button
               type="button"
               aria-label="Decrease quantity"
-              onClick={() => onQuantityChange(item.id, item.quantity - 1)}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-charcoal transition hover:bg-black/5 text-sm font-bold"
+              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-sm font-bold text-charcoal transition hover:bg-black/5"
             >
               −
             </button>
-            <span className="w-5 text-center text-xs font-semibold text-charcoal">
-              {item.quantity}
-            </span>
+            <span className="w-5 text-center text-xs font-semibold text-charcoal">{item.quantity}</span>
             <button
               type="button"
               aria-label="Increase quantity"
-              onClick={() => onQuantityChange(item.id, item.quantity + 1)}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-charcoal transition hover:bg-black/5 text-sm font-bold"
+              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-sm font-bold text-charcoal transition hover:bg-black/5"
             >
               +
             </button>
           </div>
 
           <div className="flex items-center gap-3">
-            <p className="text-sm font-bold text-charcoal">
-              £{(price * item.quantity).toFixed(2)}
-            </p>
+            <p className="text-sm font-bold text-charcoal">{formatMoney(price * item.quantity, currency)}</p>
             <button
               type="button"
               aria-label="Remove item"
-              onClick={() => onRemove(item.id)}
+              onClick={() => removeFromCart(item.id)}
               className="flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-black/5"
             >
               <Trash2 size={13} className="text-charcoal/55" />
@@ -188,27 +110,20 @@ function CartItemRow({
 function EmptyState({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6 px-8 py-16 text-center">
-      <div
-        className="flex h-20 w-20 items-center justify-center rounded-2xl"
-        style={{ backgroundColor: "#F5EDE0" }}
-      >
+      <div className="flex h-20 w-20 items-center justify-center rounded-2xl" style={{ backgroundColor: "#F5EDE0" }}>
         <Gift size={32} style={{ color: "var(--color-terracotta)" }} />
       </div>
       <div>
-        <p className="font-serif text-xl font-bold text-charcoal">
-          Your bag is empty
-        </p>
-        <p className="mt-1 text-sm leading-6 text-charcoal/50">
-          Start creating something beautiful for the people you love.
-        </p>
+        <p className="font-serif text-xl font-bold text-charcoal">Your bag is empty</p>
+        <p className="mt-1 text-sm leading-6 text-charcoal/50">Start creating something beautiful for the people you love.</p>
       </div>
       <Link
-        href="/shop"
+        href="/create"
         onClick={onClose}
         className="inline-flex min-h-[48px] items-center justify-center rounded-xl px-8 text-sm font-semibold text-white transition hover:opacity-90"
         style={{ backgroundColor: "var(--color-terracotta)" }}
       >
-        Start Shopping
+        Make a gift
       </Link>
     </div>
   );
@@ -218,117 +133,57 @@ function EmptyState({ onClose }: { onClose: () => void }) {
 
 export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [giftNote, setGiftNote] = useState("");
-  const [noteExpanded, setNoteExpanded] = useState(false);
+  const items = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [region, setRegionState] = useState<Region>("UK");
 
-  const region = getRegion() ?? "UK";
+  useEffect(() => {
+    const sync = () => setRegionState(getRegion() ?? "UK");
+    sync();
+    window.addEventListener("keepsy-region-set", sync);
+    return () => window.removeEventListener("keepsy-region-set", sync);
+  }, []);
+
+  const currency = currencyForRegion(region);
   const deliveryRegion: DeliveryRegion = region === "US" ? "us" : "uk";
   const delivery = getEstimatedDelivery(deliveryRegion);
+  const totals = computeTotals(items, currency);
 
-  /* Listen for open-cart-drawer event */
   useEffect(() => {
     function handleOpen() {
-      setItems(readCart());
       setIsOpen(true);
     }
     window.addEventListener("open-cart-drawer", handleOpen);
     return () => window.removeEventListener("open-cart-drawer", handleOpen);
   }, []);
 
-  /* Sync cart when storage changes */
   useEffect(() => {
-    function handleUpdate() {
-      setItems(readCart());
-    }
-    window.addEventListener("cart-updated", handleUpdate);
-    window.addEventListener("storage", handleUpdate);
+    document.body.style.overflow = isOpen ? "hidden" : "";
     return () => {
-      window.removeEventListener("cart-updated", handleUpdate);
-      window.removeEventListener("storage", handleUpdate);
-    };
-  }, []);
-
-  /* Lock body scroll when open */
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
       document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
+    };
   }, [isOpen]);
 
   const close = useCallback(() => setIsOpen(false), []);
-
-  function handleQuantityChange(id: string, qty: number) {
-    const next =
-      qty <= 0
-        ? items.filter((i) => i.id !== id)
-        : items.map((i) => (i.id === id ? { ...i, quantity: qty } : i));
-    setItems(next);
-    writeCart(next);
-  }
-
-  function handleRemove(id: string) {
-    const next = items.filter((i) => i.id !== id);
-    setItems(next);
-    writeCart(next);
-  }
 
   async function handleCheckout() {
     if (isCheckingOut || items.length === 0) return;
     setIsCheckingOut(true);
     setCheckoutError(null);
     try {
-      const cart = items.map((item) => ({
-        productId: item.productId,
-        name: item.name,
-        color: item.color,
-        size: item.size,
-        imageUrl: item.imageUrl || item.designUrl,
-        unitPrice: item.unitPrice,
-        quantity: item.quantity,
-      }));
-      const primaryItem = items[0];
-      const currency = region === "US" ? "usd" : "gbp";
-      const response = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cart,
-          currency,
-          designUrl: primaryItem.designUrl ?? primaryItem.imageUrl ?? "",
-          imageDataUrl: primaryItem.imageUrl ? "1" : undefined,
-          productType: primaryItem.productId,
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || data?.error || "Checkout failed.");
-      }
-      window.location.href = data.url as string;
+      const { url } = await startCheckout(items, region);
+      window.location.href = url;
     } catch (e) {
       setCheckoutError(e instanceof Error ? e.message : "Checkout failed. Please try again.");
       setIsCheckingOut(false);
     }
   }
 
-  /* Derived totals */
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.unitPrice * item.quantity,
-    0
-  );
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const shippingFree = subtotal >= FREE_SHIPPING_THRESHOLD;
-
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="cart-backdrop"
             initial={{ opacity: 0 }}
@@ -340,7 +195,6 @@ export function CartDrawer() {
             aria-hidden
           />
 
-          {/* Drawer panel */}
           <motion.aside
             key="cart-panel"
             initial={{ x: "100%" }}
@@ -353,19 +207,13 @@ export function CartDrawer() {
             role="dialog"
             aria-modal="true"
           >
-            {/* ── Header ── */}
             <div className="flex items-center justify-between border-b border-charcoal/8 px-6 py-5">
               <div className="flex items-center gap-2.5">
                 <ShoppingBag size={18} style={{ color: "var(--color-forest)" }} />
-                <h2 className="font-serif text-xl font-bold text-charcoal">
-                  Your Bag
-                </h2>
-                {itemCount > 0 && (
-                  <span
-                    className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold text-white"
-                    style={{ backgroundColor: "var(--color-terracotta)" }}
-                  >
-                    {itemCount > 99 ? "99+" : itemCount}
+                <h2 className="font-serif text-xl font-bold text-charcoal">Your Bag</h2>
+                {totals.itemCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold text-white" style={{ backgroundColor: "var(--color-terracotta)" }}>
+                    {totals.itemCount > 99 ? "99+" : totals.itemCount}
                   </span>
                 )}
               </div>
@@ -382,133 +230,61 @@ export function CartDrawer() {
             {items.length === 0 ? (
               <EmptyState onClose={close} />
             ) : (
-              <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-                {/* ── Free shipping bar ── */}
-                <FreeShippingBar subtotal={subtotal} />
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <FreeShippingBar subtotal={totals.subtotal} currency={currency} />
 
-                {/* ── Items list (scrollable) ── */}
-                <div className="flex-1 min-h-0 overflow-y-auto px-6">
+                <div className="min-h-0 flex-1 overflow-y-auto px-6">
                   {items.map((item) => (
-                    <CartItemRow
-                      key={item.id}
-                      item={item}
-                      onQuantityChange={handleQuantityChange}
-                      onRemove={handleRemove}
-                    />
+                    <CartItemRow key={item.id} item={item} currency={currency} />
                   ))}
 
-                  {/* Gift note — inside scrollable area */}
-                  <div className="border-t border-charcoal/8 py-3">
-                    <button
-                      type="button"
-                      onClick={() => setNoteExpanded((v) => !v)}
-                      className="flex w-full items-center justify-between py-1 text-xs font-semibold text-charcoal/60 transition hover:text-charcoal"
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <Gift size={13} />
-                        Add Gift Note (optional)
-                      </span>
-                      {noteExpanded ? (
-                        <ChevronUp size={13} />
-                      ) : (
-                        <ChevronDown size={13} />
-                      )}
-                    </button>
-                    <AnimatePresence>
-                      {noteExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.22 }}
-                          className="overflow-hidden"
-                        >
-                          <textarea
-                            value={giftNote}
-                            onChange={(e) => setGiftNote(e.target.value)}
-                            placeholder="Write a personal message for the recipient…"
-                            rows={3}
-                            className="mt-2 w-full resize-none rounded-xl border border-charcoal/10 p-3 text-sm text-charcoal placeholder:text-charcoal/50 focus:outline-none focus:ring-2 focus:ring-terracotta/20"
-                            style={{ backgroundColor: "var(--color-cream)", fontSize: "16px" }}
-                          />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Shipping & delivery info — scrollable */}
                   <div className="space-y-1.5 border-t border-charcoal/8 pb-4 pt-3">
+                    <div className="flex items-center justify-between text-sm text-charcoal/65">
+                      <span>Subtotal</span>
+                      <span className="font-medium">{formatMoney(totals.subtotal, currency)}</span>
+                    </div>
                     <div className="flex items-center justify-between text-sm text-charcoal/65">
                       <span>Shipping</span>
                       <span className="font-medium">
-                        {shippingFree ? (
+                        {totals.shipping === 0 ? (
                           <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free</span>
                         ) : (
-                          <span>From {region === "US" ? "$3.99" : "£3.99"}</span>
+                          formatMoney(totals.shipping, currency)
                         )}
                       </span>
                     </div>
-                    <p className="text-[11px] text-charcoal/40 leading-relaxed">
+                    <p className="text-[11px] leading-relaxed text-charcoal/40">
                       Estimated delivery: {delivery.from} – {delivery.to}
                     </p>
-                    <p className="text-[11px] text-charcoal/50 leading-relaxed">
+                    <p className="text-[11px] leading-relaxed text-charcoal/50">
                       Secure Checkout · Handmade With Care ·{" "}
-                      <Link href="/refunds" className="underline underline-offset-2">
-                        30-Day Returns
-                      </Link>
+                      <Link href="/refunds" className="underline underline-offset-2">30-Day Returns</Link>
                     </p>
                   </div>
                 </div>
 
-                {/* ── Sticky checkout footer — always visible ── */}
                 <div
                   className="flex-shrink-0 border-t-2 border-charcoal/12 bg-white px-6 pt-4"
-                  style={{
-                    paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))",
-                    overflow: "visible",
-                    minHeight: "140px",
-                  }}
+                  style={{ paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))" }}
                 >
-                  {/* DIAGNOSTIC: moved above subtotal to test rendering position */}
-                  <a
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (!isCheckingOut) void handleCheckout();
-                    }}
-                    href="#"
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      padding: '16px 0',
-                      marginBottom: '12px',
-                      backgroundColor: '#C4714A',
-                      color: '#FFFFFF',
-                      fontSize: '18px',
-                      fontWeight: '600',
-                      textAlign: 'center',
-                      textDecoration: 'none',
-                      borderRadius: '12px',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none',
-                      appearance: 'none',
-                      opacity: isCheckingOut ? 0.6 : 1,
-                      cursor: isCheckingOut ? 'not-allowed' : 'pointer',
-                    }}
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-base font-bold text-charcoal">Total</span>
+                    <span className="text-base font-bold text-charcoal">{formatMoney(totals.total, currency)}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void handleCheckout()}
+                    disabled={isCheckingOut}
+                    className="flex min-h-[52px] w-full items-center justify-center rounded-xl text-base font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                    style={{ backgroundColor: "var(--color-terracotta)" }}
                   >
                     {isCheckingOut ? "Taking you to checkout…" : "Checkout"}
-                  </a>
-                  <p style={{ color: '#C4714A', textAlign: 'center', marginBottom: '8px', fontSize: '14px' }}>
-                    Tap above to checkout
-                  </p>
+                  </button>
                   {checkoutError && (
-                    <p className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
+                    <p role="alert" className="mt-3 rounded-lg px-3 py-2 text-center text-xs font-semibold" style={{ backgroundColor: "rgba(196,113,74,0.10)", color: "var(--color-terra-dark)" }}>
                       {checkoutError}
                     </p>
                   )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-base font-bold text-charcoal">Total</span>
-                    <span className="text-base font-bold text-charcoal">£{subtotal.toFixed(2)}</span>
-                  </div>
                 </div>
               </div>
             )}

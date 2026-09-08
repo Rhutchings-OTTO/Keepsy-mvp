@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FolderOpen, ChevronRight, ChevronLeft } from "lucide-react";
 import {
@@ -20,14 +20,9 @@ export function DesignVaultSidebar({
   onSelectDesign,
   className = "",
 }: DesignVaultSidebarProps) {
-  const [entries, setEntries] = useState<DesignVaultEntry[]>([]);
+  const snapshot = useSyncExternalStore(subscribeDesignVault, () => JSON.stringify(getDesignVault()), () => "[]");
+  const entries = useMemo(() => JSON.parse(snapshot) as DesignVaultEntry[], [snapshot]);
   const [collapsed, setCollapsed] = useState(false);
-
-  useEffect(() => {
-    setEntries(getDesignVault());
-    const unsub = subscribeDesignVault(() => setEntries(getDesignVault()));
-    return unsub;
-  }, []);
 
   if (entries.length === 0) return null;
 

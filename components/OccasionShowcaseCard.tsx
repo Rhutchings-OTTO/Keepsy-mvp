@@ -22,24 +22,24 @@ type OccasionShowcaseCardProps = {
 
 // Map occasion IDs to warm lifestyle images
 const OCCASION_IMAGES: Record<string, string> = {
-  "mothers-day": "/images/occasions/mothers-day.jpg",
-  "birthday": "/images/occasions/birthday.jpg",
-  "birthdays": "/images/occasions/birthday.jpg",
-  "anniversary": "/images/occasions/anniversary.jpg",
-  "anniversaries": "/images/occasions/anniversary.jpg",
-  "christmas": "/images/occasions/christmas.jpg",
-  "thanksgiving": "/images/occasions/thanksgiving.jpg",
-  "fourth-of-july": "/images/occasions/fourth-of-july.jpg",
-  "pet-gifts": "/images/occasions/pet-gifts.jpg",
-  "sympathy": "https://images.unsplash.com/photo-1490750967868-88df5691cc2c?w=600",
-  "friendship": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600",
-  "just-because": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600",
-  "graduation": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600",
-  "fathers-day": "https://images.unsplash.com/photo-1604948501466-4e9c339b9c24?w=600",
-  "valentines": "https://images.unsplash.com/photo-1518893883800-45cd0954574b?w=600",
+  "mothers-day": "/images/refresh/occasion-mothers-day.webp",
+  "birthday": "/images/refresh/occasion-birthday.webp",
+  "birthdays": "/images/refresh/occasion-birthday.webp",
+  "anniversary": "/images/refresh/occasion-anniversary.webp",
+  "anniversaries": "/images/refresh/occasion-anniversary.webp",
+  "christmas": "/images/refresh/occasion-christmas.webp",
+  "thanksgiving": "/images/refresh/occasion-thanksgiving.webp",
+  "fourth-of-july": "/images/refresh/occasion-fourth-of-july.webp",
+  "pet-gifts": "/images/refresh/occasion-pet-gifts.webp",
+  "sympathy": "/images/refresh/occasion-sympathy.webp",
+  "friendship": "/images/refresh/occasion-friendship.webp",
+  "just-because": "/images/refresh/occasion-just-because.webp",
+  "graduation": "/images/refresh/occasion-graduation.webp",
+  "fathers-day": "/images/refresh/occasion-fathers-day.webp",
+  "valentines": "/images/refresh/occasion-valentines.webp",
 };
 
-const FALLBACK_IMAGE = "/images/occasions/birthday.jpg";
+const FALLBACK_IMAGE = "/images/refresh/occasion-birthday.webp";
 
 export function OccasionShowcaseCard({
   href,

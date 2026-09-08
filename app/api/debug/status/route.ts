@@ -38,7 +38,7 @@ export async function GET(req: Request) {
   if (denied) return denied;
 
   const openaiKey = process.env.OPENAI_API_KEY;
-  let openaiStatus: {
+  const openaiStatus: {
     configured: boolean;
     pingMs: number | null;
     error?: string;
@@ -81,7 +81,7 @@ export async function GET(req: Request) {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const cloudKey = process.env.CLOUDINARY_API_KEY;
   const cloudSecret = process.env.CLOUDINARY_API_SECRET;
-  let imageHostStatus: {
+  const imageHostStatus: {
     provider: "Cloudinary" | "None";
     configured: boolean;
     testUploadOk: boolean | null;

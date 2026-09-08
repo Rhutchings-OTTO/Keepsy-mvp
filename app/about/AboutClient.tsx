@@ -51,10 +51,10 @@ function Hero() {
   const shouldReduceMotion = useReducedMotion();
   return (
     <section className="relative h-[480px] md:h-[600px] overflow-hidden">
-      {/* Background image — high resolution, warm friendship energy */}
+      {/* Background image — warm gift-wrapping scene */}
       <img
-        src="https://images.unsplash.com/photo-1536010305525-f7aa0834e2c7?w=1600&q=90"
-        alt="Women laughing together, warm friendship"
+        src="/images/refresh/about-gifting.webp"
+        alt="Hands tying a terracotta ribbon on a kraft gift box on a wooden table, beside a mug printed with a golden retriever photo and a floral greeting card"
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
       {/* Warm dark gradient overlay */}
@@ -104,19 +104,19 @@ function OriginStory() {
             <p>
               Keepsy was born out of a very ordinary moment. Dan was looking
               for a birthday gift for his mum — something personal, something
-              that said "I really see you." Everything he found was either too
+              that said &quot;I really see you.&quot; Everything he found was either too
               generic or too complicated. The custom options required design
-              software he didn't have. The nice things were too expensive. The
+              software he didn&apos;t have. The nice things were too expensive. The
               affordable things looked cheap.
             </p>
             <p>
               He told his mate Rory about it. Rory had the exact same problem —
-              he'd been trying to find something meaningful for his mum for
-              Mother's Day. So together, they built the thing they both wished
+              he&apos;d been trying to find something meaningful for his mum for
+              Mother&apos;s Day. So together, they built the thing they both wished
               existed. A place where you could describe a memory in plain
               English — or just upload a photo — and see it transformed into
-              something genuinely beautiful. Something you'd be proud to give.
-              Something she'd actually love.
+              something genuinely beautiful. Something you&apos;d be proud to give.
+              Something she&apos;d actually love.
             </p>
             <p>
               Today, Keepsy has helped hundreds of families turn their most
@@ -132,8 +132,8 @@ function OriginStory() {
             style={{ borderColor: "var(--color-terracotta)" }}
           >
             <p className="font-serif text-xl italic leading-snug text-charcoal/85 md:text-2xl">
-              "We just wanted to make our mums smile. Turns out, a lot of
-              people feel the same way."
+              &quot;We just wanted to make our mums smile. Turns out, a lot of
+              people feel the same way.&quot;
             </p>
             <footer
               className="mt-3 text-sm font-medium"
@@ -195,10 +195,10 @@ function MissionStatement() {
             className="font-serif text-2xl font-bold leading-snug md:text-4xl md:leading-[1.3]"
             style={{ color: "var(--color-cream)" }}
           >
-            "The best gift isn't the most expensive one.{" "}
+            &quot;The best gift isn&apos;t the most expensive one.{" "}
             <br className="hidden md:block" />
-            It's the one that says:{" "}
-            <em>I remembered.</em>"
+            It&apos;s the one that says:{" "}
+            <em>I remembered.</em>&quot;
           </p>
           <p
             className="mt-6 text-sm font-medium"
@@ -433,7 +433,7 @@ function CTASection() {
             Ready to Create Something Beautiful?
           </h2>
           <p className="mb-10 text-base" style={{ color: "rgba(253,246,238,0.8)" }}>
-            Join hundreds of families who've turned their favourite memories into
+            Join hundreds of families who&apos;ve turned their favourite memories into
             keepsakes.
           </p>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

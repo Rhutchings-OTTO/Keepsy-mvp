@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { Reveal } from "@/components/motion/Reveal";
 import { OrderSuccess } from "@/components/OrderSuccess";
 import { SuccessPoller } from "@/components/SuccessPoller";
+import { refreshSignedUrl } from "@/lib/storage/supabaseStorage";
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +50,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
         status = order.status;
         orderRef = order.order_ref;
         totalGBP = Number(order.total_gbp);
-        generatedImageUrl = order.generated_image_url ?? null;
+        generatedImageUrl = await refreshSignedUrl(order.generated_image_url ?? null);
         const { data: orderItems } = await supabase
           .from("order_items")
           .select("product_name, quantity, line_total_gbp")

@@ -1,5 +1,7 @@
 /**
  * Canvas size catalogue — all sizes available from Printify blueprint 1159 (Jondo provider 105).
+ * Every code here MUST exist in lib/commerce/catalog.ts and in the CANVAS variant map
+ * (lib/printify-blueprints.ts); lib/commerce/variants.test.ts enforces this.
  * Sizes are width × height in inches. Depth is always 1.25".
  * USD prices = ceil((GBP × 1.33 + 0.01) / 5) × 5 − 0.01
  */
@@ -62,7 +64,6 @@ const PRICES: Record<string, { priceGBP: number; priceUSD: number }> = {
   "20x24": { priceGBP: 69.99,  priceUSD: 94.99  },
   "20x30": { priceGBP: 74.99,  priceUSD: 99.99  },
   "20x40": { priceGBP: 99.99,  priceUSD: 134.99 },
-  "20x60": { priceGBP: 149.99, priceUSD: 199.99 },
   "24x30": { priceGBP: 84.99,  priceUSD: 114.99 },
   "24x32": { priceGBP: 84.99,  priceUSD: 114.99 },
   "24x36": { priceGBP: 89.99,  priceUSD: 119.99 },
@@ -124,7 +125,7 @@ export const CANVAS_SIZES: CanvasSize[] = [
   makeSize(8, 10),  makeSize(9, 12),  makeSize(10, 20), makeSize(11, 14),
   makeSize(12, 16), makeSize(12, 18), makeSize(12, 36), makeSize(15, 30),
   makeSize(16, 20), makeSize(16, 24), makeSize(16, 48), makeSize(18, 24),
-  makeSize(20, 24), makeSize(20, 30), makeSize(20, 40), makeSize(20, 60),
+  makeSize(20, 24), makeSize(20, 30), makeSize(20, 40),
   makeSize(24, 30), makeSize(24, 32), makeSize(24, 36), makeSize(24, 48),
   makeSize(30, 40), makeSize(32, 48), makeSize(36, 48),
   // ── Square ──────────────────────────────────────────────────────────────

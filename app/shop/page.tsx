@@ -33,11 +33,11 @@ const shopItemListJsonLd = {
   url: "https://keepsy.store/shop",
   numberOfItems: 5,
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Personalised Hoodie", url: "https://keepsy.store/product/hoodie", image: "https://keepsy.store/images/mockups/hoodie-preview.jpg" },
-    { "@type": "ListItem", position: 2, name: "Personalised T-Shirt", url: "https://keepsy.store/product/tee", image: "https://keepsy.store/images/mockups/tee-preview.jpg" },
-    { "@type": "ListItem", position: 3, name: "Personalised Mug", url: "https://keepsy.store/product/mug", image: "https://keepsy.store/images/mockups/mug-preview.jpg" },
-    { "@type": "ListItem", position: 4, name: "Personalised Greeting Card", url: "https://keepsy.store/product/card", image: "https://keepsy.store/images/mockups/card-preview.jpg" },
-    { "@type": "ListItem", position: 5, name: "Personalised Canvas Print", url: "https://keepsy.store/product/canvas", image: "https://keepsy.store/images/mockups/canvas-preview.jpg" },
+    { "@type": "ListItem", position: 1, name: "Personalised Hoodie", url: "https://keepsy.store/product/hoodie", image: "https://keepsy.store/product-tiles/hoodie-white.png" },
+    { "@type": "ListItem", position: 2, name: "Personalised T-Shirt", url: "https://keepsy.store/product/tee", image: "https://keepsy.store/product-tiles/tee-white.png" },
+    { "@type": "ListItem", position: 3, name: "Personalised Mug", url: "https://keepsy.store/product/mug", image: "https://keepsy.store/product-tiles/plain-mug-front.png" },
+    { "@type": "ListItem", position: 4, name: "Personalised Greeting Card", url: "https://keepsy.store/product/card", image: "https://keepsy.store/product-tiles/plain-card.png" },
+    { "@type": "ListItem", position: 5, name: "Personalised Canvas Print", url: "https://keepsy.store/product/canvas", image: "https://keepsy.store/product-tiles/plain-canvas.png" },
   ],
 };
 

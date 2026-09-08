@@ -11,6 +11,7 @@ import {
   ImageIcon,
   Sparkles,
   ShoppingBag,
+  UserRound,
 } from "lucide-react";
 import { HeroPromptVisual } from "@/components/landing/HeroPromptVisual";
 // Package, Printer, BadgeCheck, Truck, RotateCcw, Lock moved to TrustSection
@@ -294,7 +295,7 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
           <header className="relative z-30 border-b border-charcoal/8">
             <div className={`${CONTAINER} flex items-center justify-between py-4`}>
               <DynamicLogo href="/" width={140} className="text-charcoal" />
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 sm:gap-3">
                 <button
                   type="button"
                   onClick={() => setIsRegionSelectorOpen(true)}
@@ -302,12 +303,18 @@ export default function LandingPage({ initialRegion = null }: LandingPageProps) 
                 >
                   {activeRegion} shipping
                 </button>
+                <Link href="/account" aria-label="Your account" className="inline-flex h-11 w-11 items-center justify-center rounded-full text-charcoal/75 transition hover:bg-charcoal/5">
+                  <UserRound size={21} aria-hidden="true" />
+                </Link>
+                <button type="button" aria-label="Cart" onClick={() => window.dispatchEvent(new Event("open-cart-drawer"))} className="inline-flex h-11 w-11 items-center justify-center rounded-full text-charcoal/75 transition hover:bg-charcoal/5">
+                  <ShoppingBag size={21} aria-hidden="true" />
+                </button>
                 <Link
                   href="/shop"
-                  className="inline-flex min-h-[44px] items-center rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="inline-flex min-h-[44px] items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:px-5"
                   style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
-                  Shop Now
+                  <span className="sm:hidden">Shop</span><span className="hidden sm:inline">Shop Now</span>
                 </Link>
               </div>
             </div>

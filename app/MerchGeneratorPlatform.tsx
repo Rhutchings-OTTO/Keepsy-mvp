@@ -38,6 +38,7 @@ import {
   canRefine,
   getRefinementsLeft,
   hasActiveSession,
+  getCreateSessionSnapshot,
 } from "@/lib/store/createSession";
 import { addToDesignVault } from "@/lib/store/designVault";
 import { useCreateSession } from "@/lib/store/useCreateSession";
@@ -465,7 +466,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   useEffect(() => {
     if (typeof window === "undefined" || didRestoreSession.current) return;
     didRestoreSession.current = true;
-    if (hasActiveSession()) setStep(2);
+    if (hasActiveSession()) setStep(getCreateSessionSnapshot().currentNode?.kind === "original" ? 3 : 2);
   }, []);
 
   useEffect(() => {
@@ -941,6 +942,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       void runCheckout();
       return;
     }
+    setIsCartOpen(false);
     setIsUpsellOpen(true);
   };
 
@@ -1096,6 +1098,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   <div className="min-w-0 flex-1">
                     <DesignConfirmation
                       generatedImage={generatedImage}
+                      isOriginal={currentSourceKind === "original"}
                       region={region}
                       onContinue={() => { setStep(3); scrollToTop(); }}
                       onRefine={handleRefine}
@@ -1517,7 +1520,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             {sizeMode === "multi" && selectedProduct.hasSize ? `Subtotal (${multiTotal} ${multiTotal === 1 ? "item" : "items"})` : "Subtotal"}
                           </span>
                           <span className="text-2xl font-black">
-                            {fmt(sizeMode === "multi" && selectedProduct.hasSize ? currentUnitPrice * Math.max(multiTotal, 1) : currentUnitPrice)}
+                            {fmt(sizeMode === "multi" && selectedProduct.hasSize ? currentUnitPrice * multiTotal : currentUnitPrice)}
                           </span>
                         </div>
                         <section>
@@ -1577,7 +1580,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-bold text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)] transition disabled:cursor-not-allowed disabled:opacity-60"
                       style={{ backgroundColor: "var(--color-terracotta)" }}
                     >
-                      Add to Cart — {fmt(sizeMode === "multi" && selectedProduct.hasSize ? currentUnitPrice * Math.max(multiTotal, 1) : currentUnitPrice)}
+                      Add to Cart — {fmt(sizeMode === "multi" && selectedProduct.hasSize ? currentUnitPrice * multiTotal : currentUnitPrice)}
                       <Plus size={18} />
                     </motion.button>
                   </div>
@@ -1907,6 +1910,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         <UpsellDrawer
           open={isUpsellOpen}
           region={region}
+          onClose={() => {
+            setIsUpsellOpen(false);
+            setIsCartOpen(true);
+          }}
           onNoThanks={() => {
             setIsUpsellOpen(false);
             void runCheckout();

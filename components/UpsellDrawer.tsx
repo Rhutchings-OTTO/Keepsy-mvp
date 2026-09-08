@@ -12,6 +12,7 @@ import type { Region } from "@/lib/region";
 type UpsellDrawerProps = {
   open: boolean;
   region: Region;
+  onClose: () => void;
   onNoThanks: () => void;
   onContinue: () => void;
 };
@@ -21,7 +22,7 @@ type UpsellDrawerProps = {
  * (server-priced SKU + fulfilment mapping): ticking adds it, unticking removes
  * it, and because the basket is the state it survives close/reopen/reload.
  */
-export default function UpsellDrawer({ open, region, onNoThanks, onContinue }: UpsellDrawerProps) {
+export default function UpsellDrawer({ open, region, onClose, onNoThanks, onContinue }: UpsellDrawerProps) {
   const lines = useCart();
   const currency = currencyForRegion(region);
   const offers = useMemo(() => getAddonOffers(lines, region), [lines, region]);
@@ -72,7 +73,7 @@ export default function UpsellDrawer({ open, region, onNoThanks, onContinue }: U
             type="button"
             aria-label="Close add-ons"
             className="fixed inset-0 z-[70] bg-black/35"
-            onClick={onNoThanks}
+            onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

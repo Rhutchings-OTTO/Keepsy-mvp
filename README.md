@@ -64,12 +64,28 @@ npm run dev
 
 ## Database Migrations (Supabase)
 
-Apply both SQL files in `supabase/migrations`:
+Apply the SQL files in `supabase/migrations` in date order:
 
-- `20260226_gatekeeper.sql`
-- `20260228_orders_and_perf.sql`
+- `20260226_gatekeeper.sql` — guardrail tables
+- `20260228_orders_and_perf.sql` — orders, order_items, stripe_events, perf_metrics
+- `20260308_add_rls_policies.sql`, `20260308_performance_indexes.sql`, `20260320_decouple_usage_increment.sql`
+- `202609080001_multi_line_orders.sql` — per-line variant/print-source columns on `order_items`, `orders.user_id`, `orders.fulfilment`, `saved_designs`, and the real `status` set (additive, idempotent)
+- `202609080002_account_rls.sql` — replaces the anon `USING (true)` read policy on `orders` with owner-only policies for signed-in customers. Apply before adding `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
-These create guardrail, order, webhook idempotency, and metrics tables.
+## Customer accounts (optional)
+
+Accounts use Supabase Auth (email + password with email confirmation). They switch on when
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` is set; until then `/account` shows a notice and guest checkout is unaffected.
+In the Supabase dashboard set Authentication → URL Configuration → Site URL to your origin and add
+`https://<origin>/auth/callback` (and `http://localhost:3000/auth/callback`) to the redirect allow-list.
+
+## Tests
+
+```bash
+npm test            # vitest (unit + route integration tests with mocked Stripe/Supabase/Printify)
+npm run typecheck   # tsc --noEmit
+npm run lint
+```
 
 ## Production Readiness Status
 

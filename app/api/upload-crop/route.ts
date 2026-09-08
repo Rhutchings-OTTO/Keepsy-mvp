@@ -3,11 +3,17 @@
  * Called from CanvasCropTool after the user confirms their crop.
  */
 import { uploadImageToCloudinary } from "@/lib/uploadImage";
+import { guardOrigin, guardRateLimit, getRequestId } from "@/lib/security/withSecurity";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const JSON_HEADERS = { "Content-Type": "application/json" };
+  const requestId = getRequestId(req);
+  const originDeny = guardOrigin(req, "/api/upload-crop", requestId);
+  if (originDeny) return originDeny;
+  const rateLimitResult = await guardRateLimit(req, "/api/upload-crop", "POST", requestId);
+  if ("response" in rateLimitResult) return rateLimitResult.response;
 
   let body: { imageDataUrl?: string };
   try {

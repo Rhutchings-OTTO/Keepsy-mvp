@@ -1,32 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useStoredFlag, storeFlag } from "@/lib/hooks/useStoredFlag";
 import Link from "next/link";
 
 const STORAGE_KEY = "cookie_notice_dismissed";
 
 export function CookieBanner() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    try {
-      const dismissed = localStorage.getItem(STORAGE_KEY);
-      if (!dismissed) {
-        setVisible(true);
-      }
-    } catch {
-      // localStorage unavailable (e.g., private browsing with blocked storage)
-    }
-  }, []);
-
-  function handleDismiss() {
-    try {
-      localStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      // ignore
-    }
-    setVisible(false);
-  }
+  const dismissed = useStoredFlag(STORAGE_KEY);
+  const visible = !dismissed;
+  function handleDismiss() { storeFlag(STORAGE_KEY, true); }
 
   if (!visible) return null;
 

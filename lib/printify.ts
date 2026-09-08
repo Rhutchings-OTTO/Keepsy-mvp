@@ -260,36 +260,32 @@ export async function createPrintifyProduct(params: {
 
 /* ─── 3. Submit order ─────────────────────────────────────────────────────── */
 
+export type PrintifyLineItem = {
+  product_id: string;
+  variant_id: number;
+  quantity: number;
+};
+
 /**
- * Submit a fulfilment order to Printify.
+ * Submit a fulfilment order to Printify containing one or more line items.
  * Returns the Printify order ID.
  */
-export async function submitPrintifyOrder(params: {
+export async function submitPrintifyOrderLines(params: {
   externalId: string;
-  productId: string;
-  variantId: number;
-  quantity: number;
+  lineItems: PrintifyLineItem[];
   shippingAddress: PrintifyAddress;
   sendShippingNotification?: boolean;
 }): Promise<string> {
-  const {
-    externalId,
-    productId,
-    variantId,
-    quantity,
-    shippingAddress,
-    sendShippingNotification = false,
-  } = params;
+  const { externalId, lineItems, shippingAddress, sendShippingNotification = false } = params;
+  if (lineItems.length === 0) throw new Error("Printify order requires at least one line item");
 
   const body = {
     external_id: externalId,
-    line_items: [
-      {
-        product_id: productId,
-        variant_id: variantId,
-        quantity,
-      },
-    ],
+    line_items: lineItems.map((li) => ({
+      product_id: li.product_id,
+      variant_id: li.variant_id,
+      quantity: li.quantity,
+    })),
     shipping_method: 1,
     send_shipping_notification: sendShippingNotification,
     address_to: shippingAddress,
@@ -304,6 +300,25 @@ export async function submitPrintifyOrder(params: {
   );
 
   return order.id;
+}
+
+/**
+ * Single-line convenience wrapper (kept for the admin retry path and tests).
+ */
+export async function submitPrintifyOrder(params: {
+  externalId: string;
+  productId: string;
+  variantId: number;
+  quantity: number;
+  shippingAddress: PrintifyAddress;
+  sendShippingNotification?: boolean;
+}): Promise<string> {
+  return submitPrintifyOrderLines({
+    externalId: params.externalId,
+    lineItems: [{ product_id: params.productId, variant_id: params.variantId, quantity: params.quantity }],
+    shippingAddress: params.shippingAddress,
+    sendShippingNotification: params.sendShippingNotification,
+  });
 }
 
 /* ─── 4. Get order ─────────────────────────────────────────────────────────── */

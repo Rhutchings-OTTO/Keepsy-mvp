@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const KONAMI_SEQUENCE = [
   "ArrowUp",
@@ -21,7 +21,7 @@ const KONAMI_SEQUENCE = [
  */
 export function useKonami(onTrigger: () => void): void {
   const onTriggerRef = useRef(onTrigger);
-  onTriggerRef.current = onTrigger;
+  useEffect(() => { onTriggerRef.current = onTrigger; }, [onTrigger]);
   const sequenceIndex = useRef(0);
 
   useEffect(() => {

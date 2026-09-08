@@ -28,6 +28,7 @@ const PLACEHOLDERS = [
 
 export type DesignConfirmationProps = {
   generatedImage: string;
+  isOriginal?: boolean;
   region?: "UK" | "US";
   onContinue: () => void;
   onRefine: (refinementText: string) => Promise<void>;
@@ -49,6 +50,7 @@ export type DesignConfirmationProps = {
 
 export function DesignConfirmation({
   generatedImage,
+  isOriginal = false,
   onContinue,
   onRefine,
   onBackToPrompt,
@@ -123,7 +125,7 @@ export function DesignConfirmation({
         <div className="relative mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-charcoal/8 bg-white p-2 shadow-[0_30px_72px_-40px_rgba(45,41,38,0.20)] sm:p-3">
           {/* One-of-a-kind badge */}
           <div className="absolute left-4 top-4 z-30 flex items-center gap-1.5 rounded-full border border-white/30 bg-charcoal/80 px-3 py-1.5 backdrop-blur-sm sm:left-5 sm:top-5">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-white/90">✦ One of a kind</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/90">{isOriginal ? "Your original photo" : "✦ Made for you"}</span>
           </div>
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-charcoal/8 bg-white sm:aspect-[16/10]">
           {isRefining ? (
@@ -140,14 +142,14 @@ export function DesignConfirmation({
               <Image
                 key={generatedImage}
                 src={generatedImage}
-                alt="Your generated design"
+                alt={isOriginal ? "Your original photo" : "Your generated design"}
                 fill
                 className="object-contain"
                 sizes="(max-width: 640px) 100vw, 672px"
                 priority
                 unoptimized={generatedImage.startsWith("data:")}
               />
-              <WatermarkOverlay />
+              {!isOriginal && <WatermarkOverlay />}
             </>
           )}
           </div>
@@ -171,7 +173,7 @@ export function DesignConfirmation({
 
       {/* Design uniqueness nudge */}
       <p className="mb-4 text-center text-xs font-semibold text-charcoal/45">
-        This design exists nowhere else in the world — it was made uniquely for you.
+        {isOriginal ? "Your photo is unchanged. Only choose an AI refinement if you want to edit it." : "Created from your idea, ready to make their day."}
       </p>
 
       {/* Section 3 — Two choice buttons */}

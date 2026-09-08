@@ -12,6 +12,9 @@ export type DesignVaultEntry = {
   imageUrl: string;
   designUrl?: string;
   prompt?: string;
+  sourceKind?: "original" | "ai";
+  width?: number;
+  height?: number;
   createdAt: number;
 };
 

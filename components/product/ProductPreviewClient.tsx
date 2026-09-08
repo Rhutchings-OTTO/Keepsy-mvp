@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -13,7 +13,7 @@ import {
   type Product,
   type ProductType,
 } from "@/lib/products";
-import { getRegion, type Region } from "@/lib/region";
+import { useRegion } from "@/lib/hooks/useRegion";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -209,7 +209,7 @@ const PRODUCT_CONTENT: Record<string, {
     ],
     perfectFor: ["Mother's Day", "Father's Day", "Birthdays", "Hen parties", "Christmas gifts", "Anniversaries", "Just because"],
     faqs: [
-      { q: "What sizes are personalised hoodies available in?", a: "Our personalised hoodies come in sizes XS through to 3XL. Full size measurements are available on the product page." },
+      { q: "What sizes are personalised hoodies available in?", a: "Our personalised hoodies come in sizes S through to 3XL, in white, navy or black. Full size measurements are available on the product page." },
       { q: "How do I wash my personalised hoodie?", a: "Turn inside out and machine wash on a gentle cool cycle (30°C or below). Tumble dry on low or air dry. Do not iron directly on the print." },
       { q: "How long does a personalised hoodie take to arrive?", a: "UK orders typically arrive in 5–8 business days. US orders take 7–12 business days. Express options are available at checkout." },
       { q: "Can I see the hoodie design before I pay?", a: "Yes — that's what makes Keepsy different. You see your personalised design applied to the hoodie before you place your order." },
@@ -244,7 +244,7 @@ const PRODUCT_CONTENT: Record<string, {
     perfectFor: ["Birthdays", "Hen parties", "Stag dos", "Sports teams", "Christmas gifts", "Father's Day", "Family reunions"],
     faqs: [
       { q: "How do I wash a personalised t-shirt?", a: "Wash inside out on a gentle cool cycle (30°C). Avoid tumble drying at high heat. This preserves the print and keeps colours vivid." },
-      { q: "What sizes do personalised t-shirts come in?", a: "Our personalised t-shirts are available in sizes XS to 3XL. Size guides are available on the product page." },
+      { q: "What sizes do personalised t-shirts come in?", a: "Our personalised t-shirts are available in sizes S to 3XL, in white, navy or black. Size guides are available on the product page." },
       { q: "How long does a personalised t-shirt take to arrive?", a: "UK orders arrive in 5–8 business days. US orders take 7–12 business days. Express shipping is available at checkout." },
       { q: "Is the print on personalised t-shirts long lasting?", a: "Yes — we use premium direct-to-garment (DTG) printing which produces soft, breathable prints that are designed to last for years with proper care." },
       { q: "Can I get matching personalised t-shirts for a group?", a: "Yes — you can order multiple sizes of the same design for hen parties, stag dos, sports teams, or family events. Each person can get the same custom design in their size." },
@@ -296,7 +296,7 @@ const TRUST_BADGES = [
 
 // ─── Sizes (for apparel) ──────────────────────────────────────────────────────
 
-const APPAREL_SIZES = ["S", "M", "L", "XL", "2XL"] as const;
+const APPAREL_SIZES = ["S", "M", "L", "XL", "2XL", "3XL"] as const;
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -307,11 +307,7 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
     initialProduct.colors?.[0]?.hex ?? "#FFFFFF"
   );
   const [selectedSize, setSelectedSize] = useState<string>("M");
-  const [region, setRegion] = useState<Region | null>(null);
-
-  useEffect(() => {
-    setRegion(getRegion());
-  }, []);
+  const region = useRegion();
 
   const fmt = (n: number) => region === "UK" ? GBP_FMT.format(n) : USD_FMT.format(n);
 

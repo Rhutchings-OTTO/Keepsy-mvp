@@ -5,15 +5,15 @@ import { MagneticLink } from "@/components/ui/MagneticLink";
 
 /** Pre-generated design previews to inspire when user has no designs yet */
 const GALLERY_ITEMS = [
-  "/occasion-tiles/christmas-scene.png",
-  "/occasion-tiles/pet-gifts-portrait.png",
-  "/occasion-tiles/anniversary-watercolor.png",
-  "/occasion-tiles/birthday-confetti.png",
-  "/occasion-tiles/mothers-day-floral.png",
-  "/mockup-previews/preview-tee-blue.png",
-  "/mockup-previews/preview-hoodie-black.png",
-  "/mockup-previews/preview-plain-mug-front.png",
-  "/mockup-previews/preview-plain-card.png",
+  "/images/refresh/occasion-christmas.webp",
+  "/images/refresh/occasion-pet-gifts.webp",
+  "/images/refresh/occasion-anniversary.webp",
+  "/images/refresh/occasion-birthday.webp",
+  "/images/refresh/occasion-mothers-day.webp",
+  "/images/refresh/friends-tee.webp",
+  "/images/refresh/pet-hoodie.webp",
+  "/images/refresh/pet-mug.webp",
+  "/images/refresh/newbaby-card.webp",
 ];
 
 type GalleryOfThePossibleProps = {

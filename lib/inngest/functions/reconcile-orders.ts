@@ -158,7 +158,40 @@ export const reconcileOrders = inngest.createFunction(
       });
     }
 
+    // Step 3b: Paid orders whose fulfilment never finished (function killed mid-way) —
+    // no printify_order_id, not already flagged. Flag them for review + alert; never auto-resubmit here.
+    await step.run("flag-stuck-paid-orders", async () => {
+      const cutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      const { data, error } = await supabase
+        .from("orders")
+        .select("order_ref, printify_status, created_at")
+        .eq("status", "paid")
+        .is("printify_order_id", null)
+        .lt("created_at", cutoff)
+        .limit(50);
+      if (error) throw new Error("[reconcile] Failed to query stuck paid orders: " + error.message);
+      const stuck = (data ?? []).filter(
+        (o) => o.printify_status !== "needs_manual_review" && o.printify_status !== "submit_uncertain"
+      );
+      if (stuck.length === 0) return { flagged: 0 };
+      for (const o of stuck) {
+        await supabase.from("orders").update({ printify_status: "needs_manual_review" }).eq("order_ref", o.order_ref);
+      }
+      await notifyFounders(
+        `Reconciliation: ${stuck.length} paid order(s) never reached Printify`,
+        [
+          `These orders are paid but have no Printify order id (fulfilment was interrupted):`,
+          ...stuck.map((o) => `  • ${o.order_ref} (printify_status=${o.printify_status ?? "null"})`),
+          ``,
+          `They are now flagged needs_manual_review and will be retried automatically.`,
+        ].join("\n"),
+        "critical"
+      );
+      return { flagged: stuck.length };
+    });
+
     // Step 4: Find and retry orders stuck in needs_manual_review
+    // (orders in submit_uncertain are deliberately excluded — Printify may already hold them)
     const manualReviewOrders = await step.run("fetch-manual-review-orders", async () => {
       const { data, error } = await supabase
         .from("orders")

@@ -51,6 +51,7 @@ export function minimalSanitize(input: string): { ok: true; prompt: string } | {
 }
 
 function parseDataUrl(dataUrl: string): { mimeType: string; imageBuffer: ArrayBuffer } | null {
+  // WebP/https sources are normalised to PNG/JPEG by lib/gen/sourceImage.ts before reaching here.
   const match = dataUrl.match(/^data:(image\/(?:png|jpeg));base64,(.+)$/);
   if (!match) return null;
   const [, mimeType, base64Payload] = match;

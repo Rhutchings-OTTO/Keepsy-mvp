@@ -10,7 +10,6 @@ import { MockupRenderer } from "@/components/MockupRenderer";
 import dynamic from "next/dynamic";
 import { GenerationLoadingOverlay } from "@/components/GenerationLoadingOverlay";
 import TrustBar from "@/components/TrustBar";
-import GiftingStep from "@/components/GiftingStep";
 const CheckoutSummaryEnhancer = dynamic(
   () => import("@/components/CheckoutSummaryEnhancer"),
   { ssr: false }
@@ -26,8 +25,6 @@ import { MagneticButton } from "@/components/ui/MagneticButton";
 import { KineticHeading } from "@/components/motion/KineticHeading";
 import PersonalisedStoryCopy from "@/components/PersonalisedStoryCopy";
 import MagicpathBackground from "@/components/skin/magicpath/MagicpathBackground";
-import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
-import { useConversionFlow } from "@/context/ConversionFlowContext";
 import { useGeneration } from "@/context/GenerationContext";
 import { FF } from "@/lib/featureFlags";
 import { getProductPreviewHref } from "@/lib/routes";
@@ -36,19 +33,38 @@ import { getRegion, type Region } from "@/lib/region";
 import {
   setInitialGeneration,
   applyRefinementResult,
-  applyVaultDesign,
+  addOriginalPhoto,
+  selectNode,
   canRefine,
   getRefinementsLeft,
   hasActiveSession,
+  getCreateSessionSnapshot,
 } from "@/lib/store/createSession";
 import { addToDesignVault } from "@/lib/store/designVault";
-import { DesignVaultSidebar } from "@/components/DesignVaultSidebar";
 import { useCreateSession } from "@/lib/store/useCreateSession";
+import { DesignHistoryPanel } from "@/components/create/DesignHistoryPanel";
+import { SizeQuantityPicker, totalQuantity, type SizeQuantities } from "@/components/create/SizeQuantityPicker";
+import { PrintQualityBadge } from "@/components/create/PrintQualityBadge";
+import { useCart } from "@/lib/cart/useCart";
+import {
+  addLines,
+  computeTotals,
+  linePrice,
+  removeFromCart,
+  updateQuantity,
+  type CartLine,
+  type SourceKind,
+} from "@/lib/cart/store";
+import { startCheckout } from "@/lib/cart/checkoutClient";
+import { currencyForRegion, formatMoney, getUnitPrice } from "@/lib/commerce/pricing";
+import { getSupportedSizes } from "@/lib/commerce/variants";
+import { uploadOriginalPhoto } from "@/lib/uploads/uploadOriginalClient";
+import { validateOriginalFile } from "@/lib/uploads/originalPhoto";
+import { getBrowserSupabase } from "@/lib/supabase/client";
 import type { MockupColor, MockupProductType } from "@/lib/mockups/mockupConfig";
 import {
   PRODUCT_LIST,
   PRODUCT_CATALOG_IDS,
-  getProductByCatalogId,
   getColorName,
   type Product,
   type ProductType,
@@ -64,7 +80,6 @@ import {
 } from "@/lib/canvas/sizes";
 import {
   Sparkles,
-  ShoppingCart,
   X,
   ArrowRight,
   ChevronLeft,
@@ -72,11 +87,12 @@ import {
   Heart,
   Check,
   Star,
+  Users,
 } from "lucide-react";
 
-/** Resize and compress an image file client-side before upload.
+/** Resize and compress an image file client-side before sending it to the AI.
  *  Max dimension 4096px on the longest side, JPEG quality 0.85.
- *  Brings any modern phone photo (~12MP, 4-10MB) down to <2MB. */
+ *  Used ONLY for the AI path — the "print as it is" path uploads the untouched file. */
 function compressImageFile(file: File): Promise<string> {
   const MAX_DIM = 4096;
   const QUALITY = 0.85;
@@ -104,33 +120,6 @@ function compressImageFile(file: File): Promise<string> {
   });
 }
 
-/** Types */
-interface CartItem {
-  id: string;
-  productId: string;
-  name: string;
-  color?: string;
-  size?: string; // ApparelSize for apparel, "WxH" for canvas
-  imageUrl: string;
-  designUrl?: string;
-  croppedImageUrl?: string; // canvas only — the user-cropped URL
-  unitPrice: number;
-  quantity: number;
-}
-
-type PersistedCartItem = {
-  id: string;
-  productId: string;
-  name: string;
-  color?: string;
-  size?: string;
-  imageUrl: string;
-  designUrl?: string;
-  croppedImageUrl?: string;
-  unitPrice: number;
-  quantity: number;
-};
-
 type InitialCreateQuery = {
   product?: string;
   prompt?: string;
@@ -142,64 +131,20 @@ type InitialCreateQuery = {
 
 type DesignShape = "square" | "portrait" | "landscape";
 
+type CardSubtype = "postcard" | "cardpack" | "uscard_1" | "uscard_10" | "uscard_30" | "uscard_50";
 
-const GBP_FORMATTER = new Intl.NumberFormat("en-GB", {
-  style: "currency",
-  currency: "GBP",
-});
-const USD_FORMATTER = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
-const CART_STORAGE_KEY = "keepsy_cart_v2";
+const US_CARD_NAMES: Record<string, string> = {
+  uscard_1: "Greeting Card (1 card)", uscard_10: "Greeting Cards (10 pack)",
+  uscard_30: "Greeting Cards (30 pack)", uscard_50: "Greeting Cards (50 pack)",
+};
 
-function gbp(n: number) {
-  return GBP_FORMATTER.format(n);
+function cardSubtypeName(subtype: CardSubtype): string {
+  if (subtype.startsWith("uscard")) return US_CARD_NAMES[subtype] ?? "Greeting Card";
+  return subtype === "cardpack" ? "Greeting Cards (7 pack)" : "Fine Art Postcard";
 }
 
 function getCatalogId(product: Product): string {
   return PRODUCT_CATALOG_IDS[product.id];
-}
-
-function toPersistedCart(cartItems: CartItem[]): PersistedCartItem[] {
-  return cartItems.map((item) => ({
-    id: item.id,
-    productId: item.productId,
-    name: item.name,
-    color: item.color,
-    size: item.size,
-    imageUrl: item.imageUrl,
-    designUrl: item.designUrl,
-    croppedImageUrl: item.croppedImageUrl,
-    unitPrice: item.unitPrice,
-    quantity: item.quantity,
-  }));
-}
-
-function fromPersistedCart(raw: string): CartItem[] {
-  const parsed = JSON.parse(raw) as PersistedCartItem[];
-  if (!Array.isArray(parsed)) return [];
-  const items: CartItem[] = [];
-    for (const item of parsed) {
-      const catalogProduct = getProductByCatalogId(item.productId);
-      if (!catalogProduct) continue;
-      if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 20) continue;
-      const imageUrl = typeof item.imageUrl === "string" && item.imageUrl ? item.imageUrl : "";
-      if (!imageUrl) continue;
-      items.push({
-        id: item.id,
-        productId: item.productId,
-        name: item.name,
-        ...(item.color && { color: item.color }),
-        ...(item.size && { size: item.size }),
-        imageUrl,
-        ...(typeof item.designUrl === "string" && item.designUrl && { designUrl: item.designUrl }),
-        ...(typeof item.croppedImageUrl === "string" && item.croppedImageUrl && { croppedImageUrl: item.croppedImageUrl }),
-        unitPrice: item.unitPrice,
-        quantity: item.quantity,
-      });
-    }
-    return items;
 }
 
 function getMockupProductType(type: ProductType): MockupProductType {
@@ -259,19 +204,12 @@ function getFriendlyGenerationError(error: unknown): string {
   if (lower.includes("safety system") || lower.includes("content policy")) {
     return "That image or prompt was blocked by safety checks. Please try a different photo or wording.";
   }
-
   if (lower.includes("daily generation limit")) {
     return "You reached today's generation limit. Please try again tomorrow.";
   }
-
-  if (
-    lower.includes("circular") ||
-    lower.includes("htmlbuttonelement") ||
-    lower.includes("converting circular structure")
-  ) {
+  if (lower.includes("circular") || lower.includes("htmlbuttonelement") || lower.includes("converting circular structure")) {
     return "We couldn't send that prompt. Please try again.";
   }
-
   return message;
 }
 
@@ -279,19 +217,28 @@ function getFriendlyGenerationError(error: unknown): string {
 async function generateViaKeepsyAPI(args: {
   prompt: string;
   sourceImageDataUrl?: string | null;
+  sourceImageUrl?: string | null;
   designShape: DesignShape;
   isRefinement?: boolean;
   signal?: AbortSignal;
 }) {
   const payloadPrompt = typeof args.prompt === "string" ? args.prompt : "";
-  const payloadImage =
-    typeof args.sourceImageDataUrl === "string" ? args.sourceImageDataUrl : args.sourceImageDataUrl ?? null;
-  const payload: { prompt: string; sourceImageDataUrl: string | null; designShape: DesignShape; isRefinement?: boolean } = {
+  const payload: {
+    prompt: string;
+    sourceImageDataUrl?: string | null;
+    sourceImageUrl?: string | null;
+    designShape: DesignShape;
+    isRefinement?: boolean;
+  } = {
     prompt: payloadPrompt,
-    sourceImageDataUrl: payloadImage,
     designShape: args.designShape,
     ...(args.isRefinement && { isRefinement: true }),
   };
+  if (typeof args.sourceImageUrl === "string" && args.sourceImageUrl.startsWith("https://")) {
+    payload.sourceImageUrl = args.sourceImageUrl;
+  } else if (typeof args.sourceImageDataUrl === "string" && args.sourceImageDataUrl) {
+    payload.sourceImageDataUrl = args.sourceImageDataUrl;
+  }
 
   let body: string;
   try {
@@ -342,9 +289,12 @@ async function generateViaKeepsyAPI(args: {
     }
     throw error;
   }
+  const designUrl = typeof data.designUrl === "string" && data.designUrl.startsWith("https://") ? data.designUrl : undefined;
   return {
     imageDataUrl: data.imageDataUrl as string,
-    designUrl: typeof data.designUrl === "string" && data.designUrl ? data.designUrl : undefined,
+    designUrl,
+    width: typeof data.width === "number" ? data.width : undefined,
+    height: typeof data.height === "number" ? data.height : undefined,
     appliedRewrite: Boolean(data.appliedRewrite),
     appliedPatches: (data.appliedPatches ?? []) as Array<{ from: string; to: string }>,
     patchedPrompt: data.patchedPrompt as string | undefined,
@@ -353,101 +303,30 @@ async function generateViaKeepsyAPI(args: {
   };
 }
 
-/** Uses YOUR real Stripe session route. Passes designUrl and productType for OrderSuccess handshake. */
-async function checkoutViaKeepsyAPI(args: {
-  cart: CartItem[];
-  imageDataUrl: string;
-  designUrl?: string | null;
-  croppedImageUrl?: string | null;
-  productType?: string;
-  currency?: "gbp" | "usd";
-}): Promise<string> {
-  const primaryDesignUrl = args.designUrl ?? args.cart[0]?.designUrl ?? "";
-  const primaryCroppedUrl = args.croppedImageUrl ?? args.cart[0]?.croppedImageUrl ?? "";
-  const primaryProduct = args.cart[0]?.name ?? args.productType ?? "";
-
-  // Only pass designUrl if it's a real HTTPS URL — strip base64 fallbacks to prevent 413
-  const safeDesignUrl = primaryDesignUrl && !primaryDesignUrl.startsWith("data:") ? primaryDesignUrl : undefined;
-  const safeCroppedUrl = primaryCroppedUrl && !primaryCroppedUrl.startsWith("data:") ? primaryCroppedUrl : undefined;
-  if (process.env.NODE_ENV !== "production" && !safeDesignUrl) {
-    console.warn("[checkout] WARNING: no valid designUrl — Printify fulfillment will be skipped for this order");
-  }
-
-  const payload = {
-    currency: args.currency ?? "gbp",
-    imageDataUrl: args.imageDataUrl ? "1" : undefined,
-    designUrl: safeDesignUrl,
-    croppedImageUrl: safeCroppedUrl,
-    productType: primaryProduct,
-    cart: args.cart.map((item) => ({
-      productId: item.productId,
-      name: item.name,
-      color: item.color,
-      size: item.size,
-      imageUrl: item.imageUrl ? "1" : undefined,
-      unitPrice: item.unitPrice,
-      quantity: item.quantity,
-    })),
-  };
-
-  if (process.env.NODE_ENV !== "production") {
-    const size = JSON.stringify(payload).length;
-    console.log(`[checkout] payload size: ${size} bytes (${(size / 1024).toFixed(1)} KB)`);
-  }
-
-  const res = await fetch("/api/create-checkout-session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  const text = await res.text();
-  let data: { url?: string; error?: string; message?: string };
-  try {
-    data = JSON.parse(text);
-  } catch {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("[checkout] Non-JSON response:", text.slice(0, 200));
-    }
-    throw new Error("Checkout couldn't start. Please try again.");
-  }
-
-  if (!res.ok) {
-    const msg = data?.message || data?.error || "Failed to create checkout session";
-    throw new Error(typeof msg === "string" ? msg : "Checkout couldn't start. Please try again.");
-  }
-
-  const url = data?.url;
-  if (!url || typeof url !== "string") {
-    throw new Error("Checkout couldn't start. Please try again.");
-  }
-  return url;
-}
+type OriginalUploadState = { status: "idle" | "uploading" | "error"; progress: number; error: string | null };
 
 export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?: InitialCreateQuery }) {
-  const { state: conversionFlow, updateState: updateConversionFlow } = useConversionFlow();
   const createSession = useCreateSession();
   const generationCtx = useGeneration();
   const generatedImage = createSession.currentImageUrl;
+  const currentNode = createSession.currentNode;
   const lastGenerationPrompt = createSession.currentPrompt;
 
   const [view, setView] = useState<"home" | "catalog" | "legal">("home");
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [region] = useState<Region>(() => getRegion() ?? "UK");
-  const fmt = (n: number) => region === "US" ? USD_FORMATTER.format(n) : GBP_FORMATTER.format(n);
+  const currency = currencyForRegion(region);
+  const fmt = useCallback((n: number) => formatMoney(n, currency), [currency]);
   const lenis = useLenis();
   const scrollToTop = useCallback(() => {
     if (lenis) {
       lenis.scrollTo(0, { immediate: true });
     }
-    // Always reset natively too — covers iOS Safari and any non-Lenis path.
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, [lenis]);
 
-  // Scroll to top on every step transition — covers back buttons, forward
-  // steps, and any path that calls setStep() without calling scrollToTop().
   useEffect(() => {
     scrollToTop();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -484,16 +363,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   }, []);
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [originalUpload, setOriginalUpload] = useState<OriginalUploadState>({ status: "idle", progress: 0, error: null });
   const [, setHasUserTypedPrompt] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const generateAbortRef = useRef<AbortController | null>(null);
 
-  const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCT_LIST[2]); // default: card
+  const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCT_LIST[2]); // default: mug (unchanged behaviour; ?product= overrides)
   const [selectedColor, setSelectedColor] = useState(PRODUCT_LIST[2].colors?.[0]?.hex ?? "#FFFFFF");
   const [selectedSize, setSelectedSize] = useState<ApparelSize | null>(null);
-  // Card sub-type: UK = "postcard" | "cardpack"; US = "uscard_1" | "uscard_10" | "uscard_30" | "uscard_50"
-  type CardSubtype = "postcard" | "cardpack" | "uscard_1" | "uscard_10" | "uscard_30" | "uscard_50";
+  const [sizeMode, setSizeMode] = useState<"single" | "multi">("single");
+  const [sizeQuantities, setSizeQuantities] = useState<SizeQuantities>({});
   const [selectedCardSubtype, setSelectedCardSubtype] = useState<CardSubtype>(
     region === "US" ? "uscard_1" : "postcard"
   );
@@ -504,71 +385,60 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const [isCropping, setIsCropping] = useState(false);
   const [isCompressingImage, setIsCompressingImage] = useState(false);
   const [addToCartConfirmation, setAddToCartConfirmation] = useState<string | null>(null);
+  const [saveConfirmation, setSaveConfirmation] = useState<string | null>(null);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const raw = window.localStorage.getItem(CART_STORAGE_KEY);
-      if (!raw) return [];
-      return fromPersistedCart(raw);
-    } catch {
-      return [];
-    }
-  });
+  const cartItems = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isGiftingSkipped, setIsGiftingSkipped] = useState(false);
   const [isUpsellOpen, setIsUpsellOpen] = useState(false);
-  const [pendingCheckoutMode, setPendingCheckoutMode] = useState<"single" | "cart" | null>(null);
   const [isSecuring, setIsSecuring] = useState(false);
   const [checkoutSuccess] = useState(false);
   const [checkoutStatus, setCheckoutStatus] = useState<"success" | "canceled" | null>(null);
   const didApplyInitialQuery = useRef(false);
   const isSecuringRef = useRef(false);
-  const cartCount = useMemo(
-    () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
-    [cartItems]
-  );
-  const cartSubtotal = useMemo(
-    () => cartItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0),
-    [cartItems]
-  );
+
+  const cartTotals = useMemo(() => computeTotals(cartItems, currency), [cartItems, currency]);
+  const cartCount = cartTotals.itemCount;
   const hasCartItems = cartItems.length > 0;
-  const FREE_SHIPPING_THRESHOLD = 75;
-  const SHIPPING_FEE = region === "US" ? 4.99 : 3.99;
-  const cartShipping = cartSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
-  const cartTotal = cartSubtotal + cartShipping;
-  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - cartSubtotal);
   const isCanvasProduct = selectedProduct.id === "canvas";
   const isCardProduct   = selectedProduct.id === "card";
+  const isApparelProduct = selectedProduct.id === "tshirt" || selectedProduct.id === "hoodie";
+  const colorName = getColorName(selectedProduct, selectedColor);
+  const supportedSizes = useMemo(
+    () => (isApparelProduct ? getSupportedSizes(getCatalogId(selectedProduct), colorName) : []),
+    [isApparelProduct, selectedProduct, colorName]
+  );
 
-  // Price for the selected card sub-type (or the canvas size), region-aware
-  const US_CARD_QTY_PRICES: Record<string, number> = {
-    uscard_1: 9.99, uscard_10: 29.99, uscard_30: 59.99, uscard_50: 89.99,
-  };
-  const cardSubtypePrice = selectedCardSubtype.startsWith("uscard")
-    ? (US_CARD_QTY_PRICES[selectedCardSubtype] ?? 9.99)
-    : selectedCardSubtype === "cardpack"
-    ? (region === "US" ? 39.99 : 29.99)
-    : (region === "US" ? 9.99 : 6.99);
-
-  const checkoutTotal = hasCartItems
-    ? cartSubtotal
-    : isCanvasProduct
-    ? (region === "US" ? selectedCanvasSize.priceUSD : selectedCanvasSize.priceGBP)
+  /** Catalogue id + unit price (region-aware, from the shared catalogue) for the current selection. */
+  const currentCatalogId = isCanvasProduct
+    ? selectedCanvasSize.catalogId
     : isCardProduct
-    ? cardSubtypePrice
-    : selectedProduct.basePrice;
-  const checkoutShipping = checkoutTotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
-  const checkoutGrandTotal = checkoutTotal + checkoutShipping;
+    ? selectedCardSubtype
+    : getCatalogId(selectedProduct);
+  const currentUnitPrice = getUnitPrice(currentCatalogId, currency) ?? selectedProduct.basePrice;
+  const productFromPrice = (prod: Product): string => {
+    if (prod.id === "card") return `from ${fmt(getUnitPrice(region === "US" ? "uscard_1" : "postcard", currency) ?? 6.99)}`;
+    if (prod.id === "canvas") return `from ${fmt(getUnitPrice("canvas_10x8", currency) ?? 29.99)}`;
+    return fmt(getUnitPrice(getCatalogId(prod), currency) ?? prod.basePrice);
+  };
+
+  const currentSourceKind: SourceKind = currentNode?.kind === "original" ? "original" : "ai";
+  const currentSourceWidth = currentNode?.width ?? null;
+  const currentSourceHeight = currentNode?.height ?? null;
+
+  const multiTotal = totalQuantity(sizeQuantities);
+  const sizeSatisfied = !selectedProduct.hasSize || (sizeMode === "multi" ? multiTotal > 0 : Boolean(selectedSize));
+  const canAddToCart = Boolean(generatedImage) && sizeSatisfied && !(isCanvasProduct && !croppedImageDataUrl);
+
+  const checkoutTotal = hasCartItems ? cartTotals.subtotal : currentUnitPrice;
+  const checkoutShipping = hasCartItems ? cartTotals.shipping : computeTotals([], currency).shipping;
+  const checkoutGrandTotal = hasCartItems ? cartTotals.total : currentUnitPrice;
   const checkoutItemDescription = hasCartItems
     ? `${cartCount} item${cartCount === 1 ? "" : "s"}`
     : selectedProduct.name;
   const checkoutPreviewImage = hasCartItems ? cartItems[0]?.imageUrl ?? null : generatedImage;
   const canProceedToCheckout = hasCartItems
-    ? cartItems.length > 0 && cartItems.every((item) => Boolean(item.imageUrl))
-    : Boolean(generatedImage) &&
-      !(selectedProduct.hasSize && !selectedSize) &&
-      !(isCanvasProduct && !croppedImageDataUrl);
+    ? cartItems.every((item) => Boolean(item.imageUrl || item.designUrl))
+    : canAddToCart;
   const selectedMockupProductType = getMockupProductType(selectedProduct.id);
   const selectedMockupColor = getMockupColor(selectedColor);
   const isMagicpathSkin = FF.magicpathSkin;
@@ -583,19 +453,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   // Disable browser scroll restoration for this SPA — we control scroll position.
   useEffect(() => {
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-    // Ensure we start at the top on mount (belt-and-suspenders for iOS Safari).
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, []);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toPersistedCart(cartItems)));
-    } catch {
-      // ignore storage write failures in restricted environments
-    }
-  }, [cartItems]);
 
   useEffect(() => {
     if (step === 2 && !generatedImage) setStep(1);
@@ -605,12 +466,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   useEffect(() => {
     if (typeof window === "undefined" || didRestoreSession.current) return;
     didRestoreSession.current = true;
-    if (hasActiveSession()) setStep(2);
+    if (hasActiveSession()) setStep(getCreateSessionSnapshot().currentNode?.kind === "original" ? 3 : 2);
   }, []);
 
   useEffect(() => {
     if (!selectedProduct.hasSize) {
       setSelectedSize(null);
+      setSizeQuantities({});
+      setSizeMode("single");
       setIsSizeGuideOpen(false);
     }
     // Reset canvas crop when switching away from canvas
@@ -621,11 +484,29 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
   }, [selectedProduct]);
 
+  // Keep chosen sizes valid for the colour (every colour we sell supports the same sizes today,
+  // but the blueprint maps are the source of truth).
+  useEffect(() => {
+    if (!isApparelProduct) return;
+    if (selectedSize && !supportedSizes.includes(selectedSize)) setSelectedSize(null);
+    setSizeQuantities((prev) => {
+      const next: SizeQuantities = {};
+      for (const [size, qty] of Object.entries(prev)) if (supportedSizes.includes(size)) next[size] = qty;
+      return Object.keys(next).length === Object.keys(prev).length ? prev : next;
+    });
+  }, [isApparelProduct, supportedSizes, selectedSize]);
+
   useEffect(() => {
     if (!addToCartConfirmation) return;
     const t = setTimeout(() => setAddToCartConfirmation(null), 3000);
     return () => clearTimeout(t);
   }, [addToCartConfirmation]);
+
+  useEffect(() => {
+    if (!saveConfirmation) return;
+    const t = setTimeout(() => setSaveConfirmation(null), 3000);
+    return () => clearTimeout(t);
+  }, [saveConfirmation]);
 
   useEffect(() => {
     if (!initialQuery || didApplyInitialQuery.current) return;
@@ -645,6 +526,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       uscard_30: "card",
       uscard_50: "card",
       hoodie: "hoodie",
+      canvas: "canvas",
     };
     const productType = normalizedProduct ? catalogToProduct[normalizedProduct] : null;
     const mappedProduct = productType ? PRODUCT_LIST.find((p) => p.id === productType) ?? null : null;
@@ -703,15 +585,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     setIsBusy(true);
     try {
       const basePrompt = effectivePrompt || "Create a design from this image.";
-      let result: {
-        imageDataUrl: string;
-        designUrl?: string;
-        appliedRewrite?: boolean;
-        originalPreview?: string;
-        safePreview?: string;
-        patchedPrompt?: string;
-        appliedPatches?: Array<{ from: string; to: string }>;
-      } | null = null;
+      let result: Awaited<ReturnType<typeof generateViaKeepsyAPI>> | null = null;
       const maxAttempts = 2;
 
       for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
@@ -735,13 +609,17 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       if (!result) throw new Error("Failed to generate image");
       setDailyGensUsed(incrementDailyGens());
       generationCtx?.markGenerated();
+      // The history tree keeps every earlier image; this becomes a new root design.
+      // Pixel size is recorded on the node for honest print-quality feedback.
       setInitialGeneration({
         prompt: basePrompt,
         imageUrl: result.imageDataUrl,
         designUrl: result.designUrl,
+        width: result.width,
+        height: result.height,
       });
       addToDesignVault({
-        imageUrl: result.imageDataUrl,
+        imageUrl: result.designUrl ?? result.imageDataUrl,
         designUrl: result.designUrl,
         prompt: basePrompt,
       });
@@ -781,10 +659,56 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
   };
 
+  /** Print the customer's photo exactly as uploaded. Never calls the AI. */
+  const handlePrintOriginal = async () => {
+    if (!uploadedFile) {
+      setOriginalUpload({ status: "error", progress: 0, error: "Choose a photo first." });
+      return;
+    }
+    const validation = validateOriginalFile(uploadedFile);
+    if (!validation.ok) {
+      setOriginalUpload({ status: "error", progress: 0, error: validation.message });
+      return;
+    }
+    setOriginalUpload({ status: "uploading", progress: 0, error: null });
+    setIsBusy(true);
+    try {
+      const result = await uploadOriginalPhoto(uploadedFile, {
+        productId: currentCatalogId,
+        size: isCanvasProduct ? selectedCanvasSize.code : selectedSize ?? undefined,
+        onProgress: (fraction) => setOriginalUpload({ status: "uploading", progress: fraction, error: null }),
+      });
+      addOriginalPhoto({
+        imageUrl: result.previewUrl,
+        designUrl: result.url,
+        width: result.width,
+        height: result.height,
+        fileName: uploadedFile.name,
+      });
+      addToDesignVault({ imageUrl: result.previewUrl, designUrl: result.url, prompt: `Your photo · ${uploadedFile.name}`, sourceKind: "original", width: result.width, height: result.height });
+      setOriginalUpload({ status: "idle", progress: 1, error: null });
+      setGenerationError(null);
+      setGenerationContentBlock(null);
+      setRefinementSuccess(false);
+      // No AI step to review — go straight to choosing the product.
+      setStep(3);
+      setView("home");
+      scrollToTop();
+    } catch (e) {
+      setOriginalUpload({
+        status: "error",
+        progress: 0,
+        error: e instanceof Error ? e.message : "We couldn't upload your photo. Please try again.",
+      });
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
   const handleRefine = async (refinementText: string) => {
     const trimmed = typeof refinementText === "string" ? refinementText.trim() : "";
     if (!trimmed) return;
-    if (!generatedImage) return;
+    if (!generatedImage || !currentNode) return;
     if (!canRefine()) return;
 
     const startedAt = Date.now();
@@ -800,15 +724,24 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     const controller = new AbortController();
     generateAbortRef.current = controller;
 
-    // Pass the current image as the source — this routes through callEdit() (images/edits endpoint)
-    // so the model modifies the existing image rather than generating a new one from scratch.
-    // The prompt describes ONLY the change; the edit endpoint preserves everything else from the base image.
+    // Edit the CURRENT node's exact image (persisted https URL when available, otherwise the
+    // fresh data URL). The prompt describes ONLY the change; the edit endpoint preserves the rest.
     const nextPrompt = `Apply only this change to the image: ${trimmed}. Preserve all other aspects exactly — the composition, style, colours, background, lighting, and all other elements must remain identical.`;
+    const sourceUrl = currentNode.designUrl && currentNode.designUrl.startsWith("https://") ? currentNode.designUrl : null;
+    const sourceDataUrl = !sourceUrl && currentNode.imageUrl.startsWith("data:") ? currentNode.imageUrl : null;
+    if (!sourceUrl && !sourceDataUrl) {
+      setGenerationError("This image can't be edited any more — please pick another one from your history or start fresh.");
+      setIsGenerating(false);
+      setGenerationStartedAt(null);
+      generationCtx?.endGeneration();
+      return;
+    }
 
     try {
       const result = await generateViaKeepsyAPI({
         prompt: nextPrompt,
-        sourceImageDataUrl: generatedImage,
+        sourceImageUrl: sourceUrl,
+        sourceImageDataUrl: sourceDataUrl,
         designShape: "square",
         isRefinement: true,
         signal: controller.signal,
@@ -818,9 +751,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         imageUrl: result.imageDataUrl,
         prompt: nextPrompt,
         designUrl: result.designUrl,
+        width: result.width,
+        height: result.height,
       });
       addToDesignVault({
-        imageUrl: result.imageDataUrl,
+        imageUrl: result.designUrl ?? result.imageDataUrl,
         designUrl: result.designUrl,
         prompt: nextPrompt,
       });
@@ -829,6 +764,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       setGenerationError(null);
       scrollToTop();
     } catch (e) {
+      // Failure leaves the history untouched and the current selection in place.
       const aborted = e instanceof Error && e.name === "AbortError";
       const err = e as Error & { contentBlock?: { title: string; message: string; suggestions: string[] } };
       setGenerationContentBlock(err.contentBlock ?? null);
@@ -842,207 +778,136 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
   };
 
+  const handleSelectHistoryNode = (id: string) => {
+    if (isGenerating) return;
+    if (selectNode(id)) {
+      setGenerationError(null);
+      setGenerationContentBlock(null);
+      setRefinementSuccess(false);
+      // A different image needs a fresh canvas crop.
+      setCroppedImageDataUrl(null);
+      setCroppedImageHttpsUrl(null);
+      setIsCropping(false);
+    }
+  };
+
+  /** Build the basket lines for the current selection (one per size in multi-size mode). */
+  const buildLinesForSelection = (): Omit<CartLine, "id">[] | null => {
+    if (!generatedImage || !currentNode) return null;
+    if (isCanvasProduct && !croppedImageDataUrl) return null;
+    if (!sizeSatisfied) return null;
+
+    const catalogId = currentCatalogId;
+    const effectiveImageUrl = isCanvasProduct ? (croppedImageDataUrl ?? generatedImage) : generatedImage;
+    const previewUrl = effectiveImageUrl.startsWith("data:") && currentNode.designUrl && !isCanvasProduct
+      ? currentNode.designUrl
+      : effectiveImageUrl;
+    const itemName = isCanvasProduct
+      ? `Canvas Print (${selectedCanvasSize.width}×${selectedCanvasSize.height} in)`
+      : isCardProduct
+      ? cardSubtypeName(selectedCardSubtype)
+      : selectedProduct.name;
+    const base: Omit<CartLine, "id" | "size" | "quantity"> = {
+      productId: catalogId,
+      name: itemName,
+      color: isApparelProduct ? colorName : undefined,
+      imageUrl: previewUrl,
+      designUrl: currentNode.designUrl ?? undefined,
+      croppedImageUrl: isCanvasProduct ? (croppedImageHttpsUrl ?? undefined) : undefined,
+      sourceKind: currentSourceKind,
+      sourceWidth: currentSourceWidth ?? undefined,
+      sourceHeight: currentSourceHeight ?? undefined,
+      designId: currentNode.id,
+      unitPrice: currentUnitPrice,
+      currency,
+    };
+
+    if (isCanvasProduct) return [{ ...base, size: selectedCanvasSize.code, quantity: 1 }];
+    if (!selectedProduct.hasSize) return [{ ...base, quantity: 1 }];
+    if (sizeMode === "multi") {
+      return Object.entries(sizeQuantities)
+        .filter(([, qty]) => qty > 0)
+        .map(([size, qty]) => ({ ...base, size, quantity: qty }));
+    }
+    return [{ ...base, size: selectedSize ?? undefined, quantity: 1 }];
+  };
+
   const handleAddToCart = () => {
     if (!generatedImage) {
       setGenerationContentBlock(null);
-      setGenerationError("Generate a design before adding an item to cart.");
+      setGenerationError("Generate a design or upload a photo before adding an item to cart.");
       setStep(1);
       return;
     }
-    if (isCanvasProduct && !croppedImageDataUrl) {
+    const lines = buildLinesForSelection();
+    if (!lines || lines.length === 0) {
       setAddToCartConfirmation(null);
       return;
     }
-    const colorName = getColorName(selectedProduct, selectedColor);
-    if (selectedProduct.hasSize && !selectedSize) {
-      setAddToCartConfirmation(null);
-      return;
-    }
-    // Determine catalog ID, price, and name based on product type
-    const isCard = isCardProduct;
-    const catalogId = isCanvasProduct
-      ? selectedCanvasSize.catalogId
-      : isCard
-      ? selectedCardSubtype
-      : getCatalogId(selectedProduct);
-    const canvasSizeCode = isCanvasProduct ? selectedCanvasSize.code : undefined;
-    const effectivePrice = isCanvasProduct
-      ? (region === "US" ? selectedCanvasSize.priceUSD : selectedCanvasSize.priceGBP)
-      : isCard
-      ? cardSubtypePrice
-      : selectedProduct.basePrice;
-    const effectiveImageUrl = isCanvasProduct ? (croppedImageDataUrl ?? generatedImage) : generatedImage;
-    const US_CARD_NAMES: Record<string, string> = {
-      uscard_1: "Greeting Card (1 card)", uscard_10: "Greeting Cards (10 pack)",
-      uscard_30: "Greeting Cards (30 pack)", uscard_50: "Greeting Cards (50 pack)",
-    };
-    const itemName = isCanvasProduct
-      ? `Canvas Print (${selectedCanvasSize.width}×${selectedCanvasSize.height} in)`
-      : isCard
-      ? (selectedCardSubtype.startsWith("uscard")
-          ? (US_CARD_NAMES[selectedCardSubtype] ?? "Greeting Card")
-          : selectedCardSubtype === "cardpack"
-          ? "Greeting Cards (7 pack)"
-          : "Fine Art Postcard")
-      : selectedProduct.name;
-    const variantKey = `${catalogId}-${selectedColor}-${selectedSize ?? canvasSizeCode ?? "na"}-${Date.now()}`;
-    const newItem: CartItem = {
-      id: `item-${variantKey}`,
-      productId: catalogId,
-      name: itemName,
-      color: (!isCard && selectedProduct.colors?.length) ? colorName : undefined,
-      size: isCanvasProduct ? canvasSizeCode : (selectedProduct.hasSize ? selectedSize ?? undefined : undefined),
-      imageUrl: effectiveImageUrl,
-      designUrl: isCanvasProduct ? (croppedImageHttpsUrl ?? createSession.currentDesignUrl ?? undefined) : (createSession.currentDesignUrl ?? undefined),
-      croppedImageUrl: isCanvasProduct ? (croppedImageHttpsUrl ?? undefined) : undefined,
-      unitPrice: effectivePrice,
-      quantity: 1,
-    };
-    setCartItems((prev) => {
-      const sameVariant = prev.find(
-        (i) =>
-          i.productId === newItem.productId &&
-          i.color === newItem.color &&
-          i.size === newItem.size &&
-          i.imageUrl === newItem.imageUrl
-      );
-      if (sameVariant) {
-        return prev.map((item) =>
-          item.id === sameVariant.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prev, newItem];
-    });
+    addLines(lines);
+    const total = lines.reduce((s, l) => s + l.quantity, 0);
     const sizeStr = isCanvasProduct
       ? ` – ${selectedCanvasSize.width}×${selectedCanvasSize.height} in`
+      : sizeMode === "multi" && selectedProduct.hasSize
+      ? ` – ${lines.map((l) => `${l.size}×${l.quantity}`).join(", ")}`
       : (selectedProduct.hasSize && selectedSize ? ` – ${selectedSize}` : "");
     setAddToCartConfirmation(
-      `Added ${isCanvasProduct ? "Canvas Print" : selectedProduct.name}${sizeStr} to your cart`
+      `Added ${total > 1 ? `${total} × ` : ""}${isCanvasProduct ? "Canvas Print" : selectedProduct.name}${sizeStr} to your cart`
     );
     setIsCartOpen(true);
     setStep(4);
   };
 
-  const handleRemoveCartItem = (id: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleAdjustQuantity = (id: string, delta: number) => {
-    setCartItems((prev) =>
-      prev
-        .map((item) =>
-          item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  };
-
-  const buildSingleCheckoutCart = (): CartItem[] | null => {
-    if (!generatedImage) return null;
-    if (isCanvasProduct) {
-      if (!croppedImageDataUrl) return null;
-      return [
-        {
-          id: `single-canvas-${Date.now()}`,
-          productId: selectedCanvasSize.catalogId,
-          name: `Canvas Print (${selectedCanvasSize.width}×${selectedCanvasSize.height} in)`,
-          size: selectedCanvasSize.code,
-          imageUrl: croppedImageDataUrl,
-          designUrl: createSession.currentDesignUrl ?? undefined,
-          croppedImageUrl: croppedImageHttpsUrl ?? undefined,
-          unitPrice: region === "US" ? selectedCanvasSize.priceUSD : selectedCanvasSize.priceGBP,
-          quantity: 1,
-        },
-      ];
-    }
-    // Card: use the selected sub-type catalog ID and price
-    if (isCardProduct) {
-      const US_CARD_NAMES_CHECKOUT: Record<string, string> = {
-        uscard_1: "Greeting Card (1 card)", uscard_10: "Greeting Cards (10 pack)",
-        uscard_30: "Greeting Cards (30 pack)", uscard_50: "Greeting Cards (50 pack)",
-      };
-      const cardName = selectedCardSubtype.startsWith("uscard")
-        ? (US_CARD_NAMES_CHECKOUT[selectedCardSubtype] ?? "Greeting Card")
-        : selectedCardSubtype === "cardpack"
-        ? "Greeting Cards (7 pack)"
-        : "Fine Art Postcard";
-      return [
-        {
-          id: `single-${Date.now()}`,
-          productId: selectedCardSubtype,
-          name: cardName,
-          imageUrl: generatedImage,
-          designUrl: createSession.currentDesignUrl ?? undefined,
-          unitPrice: cardSubtypePrice,
-          quantity: 1,
-        },
-      ];
-    }
-
-    if (selectedProduct.hasSize && !selectedSize) return null;
-    const catalogId = getCatalogId(selectedProduct);
-    const colorName = getColorName(selectedProduct, selectedColor);
-    return [
-      {
-        id: `single-${Date.now()}`,
-        productId: catalogId,
-        name: selectedProduct.name,
-        color: selectedProduct.colors?.length ? colorName : undefined,
-        size: selectedProduct.hasSize ? selectedSize ?? undefined : undefined,
-        imageUrl: generatedImage,
-        designUrl: createSession.currentDesignUrl ?? undefined,
-        unitPrice: selectedProduct.basePrice,
-        quantity: 1,
-      },
-    ];
-  };
-
-  const handleCheckout = async () => {
-    const cart = buildSingleCheckoutCart();
-    if (!cart) return;
-    setCheckoutError(null);
-    setIsSecuring(true);
-    setIsBusy(true);
-    try {
-      const url = await checkoutViaKeepsyAPI({
-        cart,
-        imageDataUrl: generatedImage!,
-        designUrl: createSession.currentDesignUrl,
-        croppedImageUrl: isCanvasProduct ? croppedImageHttpsUrl : undefined,
-        productType: isCanvasProduct
-          ? `Canvas Print (${selectedCanvasSize.width}×${selectedCanvasSize.height} in)`
-          : selectedProduct.name,
-        currency: region === "US" ? "usd" : "gbp",
-      });
-      window.location.href = url;
-    } catch (e) {
-      console.error(e);
-      setCheckoutError(e instanceof Error ? e.message : "Checkout failed. Please try again.");
-      setIsSecuring(false);
-      setIsBusy(false);
-    }
-  };
-
-  const handleCartCheckout = async () => {
-    if (cartItems.length === 0) return;
-    if (cartItems.some((item) => !item.imageUrl)) {
-      setCheckoutError("Please remove items missing generated designs before checking out.");
+  const handleSaveDesign = async () => {
+    if (!currentNode) return;
+    addToDesignVault({
+      imageUrl: currentNode.designUrl ?? currentNode.imageUrl,
+      designUrl: currentNode.designUrl ?? undefined,
+      prompt: currentNode.prompt,
+      sourceKind: currentSourceKind,
+      width: currentSourceWidth ?? undefined,
+      height: currentSourceHeight ?? undefined,
+    });
+    const supabase = getBrowserSupabase();
+    if (!supabase) {
+      setSaveConfirmation("Saved on this device. Sign in to keep designs in your account.");
       return;
     }
-    const checkoutImage = cartItems[0]?.imageUrl;
-    if (!checkoutImage) return;
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) {
+      setSaveConfirmation("Saved on this device. Sign in to keep designs in your account.");
+      return;
+    }
+    if (!currentNode.designUrl) {
+      setSaveConfirmation("Saved on this device (this image has no permanent copy yet).");
+      return;
+    }
+    try {
+      const res = await fetch("/api/account/designs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageUrl: currentNode.designUrl,
+          designUrl: currentNode.designUrl,
+          prompt: currentNode.prompt,
+          sourceKind: currentSourceKind,
+          width: currentSourceWidth ?? undefined,
+          height: currentSourceHeight ?? undefined,
+        }),
+      });
+      setSaveConfirmation(res.ok ? "Saved to your account." : "Saved on this device — couldn't reach your account just now.");
+    } catch {
+      setSaveConfirmation("Saved on this device — couldn't reach your account just now.");
+    }
+  };
+
+  const runCartCheckout = async () => {
+    if (cartItems.length === 0) return;
     setCheckoutError(null);
     setIsSecuring(true);
     setIsBusy(true);
     try {
-      const url = await checkoutViaKeepsyAPI({
-        cart: cartItems,
-        imageDataUrl: checkoutImage,
-        designUrl: cartItems[0]?.designUrl,
-        croppedImageUrl: cartItems[0]?.croppedImageUrl,
-        productType: cartItems[0]?.name,
-        currency: region === "US" ? "usd" : "gbp",
-      });
+      const { url } = await startCheckout(cartItems, region);
       window.location.href = url;
     } catch (e) {
       console.error(e);
@@ -1052,53 +917,60 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
     }
   };
 
-  const runCheckout = async (mode: "single" | "cart") => {
+  const runCheckout = async () => {
     if (isSecuringRef.current) return;
     isSecuringRef.current = true;
     try {
-      if (mode === "cart") {
-        await handleCartCheckout();
-        return;
-      }
-      await handleCheckout();
+      await runCartCheckout();
     } finally {
       isSecuringRef.current = false;
     }
   };
 
+  /**
+   * Checkout entry point. "single" mode (nothing in the basket yet) first adds the
+   * current selection so add-ons and the server see one consistent basket.
+   */
   const requestCheckout = (mode: "single" | "cart") => {
+    setCheckoutError(null);
+    if (mode === "single") {
+      const lines = buildLinesForSelection();
+      if (!lines || lines.length === 0) {
+        setCheckoutError(selectedProduct.hasSize && !sizeSatisfied ? "Please choose a size first." : "Please finish your design first.");
+        return;
+      }
+      addLines(lines);
+    }
     if (!FF.upsells) {
-      void runCheckout(mode);
+      void runCheckout();
       return;
     }
-    setPendingCheckoutMode(mode);
+    setIsCartOpen(false);
     setIsUpsellOpen(true);
   };
 
   const handleUploadFile = (file: File) => {
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/heic"];
-    if (!validTypes.includes(file.type)) {
-      alert("Please upload a JPG, PNG, or WebP image.");
-      return;
-    }
-    if (file.size > 25 * 1024 * 1024) {
-      alert("This photo is a bit too large — try a different one or take a screenshot of it to reduce the size.");
+    const validation = validateOriginalFile(file);
+    if (!validation.ok) {
+      setGenerationError(validation.message);
+      setOriginalUpload({ status: "idle", progress: 0, error: null });
       return;
     }
     setIsCompressingImage(true);
+    setOriginalUpload({ status: "idle", progress: 0, error: null });
     compressImageFile(file)
       .then((dataUrl) => {
         setUploadedImage(dataUrl);
+        setUploadedFile(file);
         setUploadedFileName(file.name);
         setGenerationError(null);
         setGenerationContentBlock(null);
       })
       .catch(() => {
-        alert("Could not process this photo — please try a different one.");
+        setGenerationError("Could not process this photo — please try a different one.");
       })
       .finally(() => setIsCompressingImage(false));
   };
-
 
   const handleDeleteMyData = async () => {
     const email = window.prompt("Optional: enter your email for the deletion confirmation");
@@ -1122,12 +994,23 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
   const clearUploadedImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     setUploadedImage(null);
+    setUploadedFile(null);
     setUploadedFileName(null);
+    setOriginalUpload({ status: "idle", progress: 0, error: null });
     setGenerationError(null);
     setGenerationContentBlock(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const historyPanel = (
+    <DesignHistoryPanel
+      nodes={createSession.nodes}
+      currentNodeId={createSession.currentNodeId}
+      onSelect={handleSelectHistoryNode}
+      disabled={isGenerating}
+      className="self-start"
+    />
+  );
 
   return (
     <div
@@ -1194,6 +1077,8 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   onGenerate={handleGenerate}
                   onUploadFile={handleUploadFile}
                   onClearUploadedImage={clearUploadedImage}
+                  onPrintOriginal={() => void handlePrintOriginal()}
+                  originalUpload={originalUpload}
                   onProductSelect={(type) => {
                     const product = PRODUCT_LIST.find((p) => p.id === type);
                     if (!product) return;
@@ -1207,35 +1092,43 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 />
               )}
 
-              {/* STEP 2 — Design confirmation */}
+              {/* STEP 2 — Design confirmation (with the history on the left) */}
               {step === 2 && generatedImage && (
-                <DesignConfirmation
-                  generatedImage={generatedImage}
-                  region={region}
-                  onContinue={() => { setStep(3); scrollToTop(); }}
-                  onRefine={handleRefine}
-                  onBackToPrompt={() => setStep(1)}
-                  onStartFresh={() => {
-                    setPrompt(lastGenerationPrompt);
-                    setStep(1);
-                    setGenerationError(null);
-                    setGenerationContentBlock(null);
-                  }}
-                  isRefining={isGenerating}
-                  refinementError={typeof generationError === "string" ? generationError : generationError ? String(generationError) : null}
-                  refinementContentBlock={generationContentBlock}
-                  refinementRewriteApplied={generationRewriteApplied}
-                  onRefinementSuggestionClick={(s) => {
-                    setPrompt(s);
-                    setStep(1);
-                    setGenerationError(null);
-                    setGenerationContentBlock(null);
-                    void handleGenerate(s);
-                  }}
-                  refinementSuccess={refinementSuccess}
-                  refinementsLeft={getRefinementsLeft()}
-                  canRefine={canRefine()}
-                />
+                <div className="flex flex-col gap-3 md:flex-row md:items-start md:gap-4">
+                  {createSession.nodes.length > 1 ? (
+                    <div className="md:sticky md:top-24">{historyPanel}</div>
+                  ) : null}
+                  <div className="min-w-0 flex-1">
+                    <DesignConfirmation
+                      generatedImage={generatedImage}
+                      isOriginal={currentSourceKind === "original"}
+                      region={region}
+                      onContinue={() => { setStep(3); scrollToTop(); }}
+                      onRefine={handleRefine}
+                      onBackToPrompt={() => setStep(1)}
+                      onStartFresh={() => {
+                        setPrompt(lastGenerationPrompt);
+                        setStep(1);
+                        setGenerationError(null);
+                        setGenerationContentBlock(null);
+                      }}
+                      isRefining={isGenerating}
+                      refinementError={typeof generationError === "string" ? generationError : generationError ? String(generationError) : null}
+                      refinementContentBlock={generationContentBlock}
+                      refinementRewriteApplied={generationRewriteApplied}
+                      onRefinementSuggestionClick={(s) => {
+                        setPrompt(s);
+                        setStep(1);
+                        setGenerationError(null);
+                        setGenerationContentBlock(null);
+                        void handleGenerate(s);
+                      }}
+                      refinementSuccess={refinementSuccess}
+                      refinementsLeft={getRefinementsLeft()}
+                      canRefine={canRefine()}
+                    />
+                  </div>
+                </div>
               )}
 
               {/* STEP 3 — Mockup placement */}
@@ -1248,17 +1141,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]"
                 >
                   <div className="sticky top-24 flex flex-col gap-2 md:flex-row md:gap-0">
-                    <DesignVaultSidebar
-                      currentImageUrl={generatedImage}
-                      onSelectDesign={(entry) => {
-                        const src = entry.designUrl || entry.imageUrl;
-                        applyVaultDesign({
-                          imageUrl: src,
-                          designUrl: entry.designUrl ?? null,
-                        });
-                      }}
-                      className="self-start shrink-0"
-                    />
+                    {historyPanel}
                     <div className="w-full min-w-0 md:w-auto md:mx-0 md:flex-1">
                       <div className="rounded-2xl bg-[#FAF9F7] border border-charcoal/8 p-4 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                         {/* Canvas: show crop tool or canvas mockup */}
@@ -1284,7 +1167,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </motion.div>
                         ) : isCanvasProduct ? (
                           <motion.div
-                            key={`canvas-${selectedCanvasSize.code}-${croppedImageDataUrl ?? "nocrop"}`}
+                            key={`canvas-${selectedCanvasSize.code}-${croppedImageDataUrl ? "crop" : "nocrop"}-${currentNode?.id ?? ""}`}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -1297,7 +1180,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </motion.div>
                         ) : isCardProduct && region === "US" ? (
                           <motion.div
-                            key={`uscard-${selectedCardSubtype}-${generatedImage ?? "empty"}`}
+                            key={`uscard-${selectedCardSubtype}-${currentNode?.id ?? "empty"}`}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -1307,7 +1190,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </motion.div>
                         ) : isCardProduct && selectedCardSubtype === "cardpack" ? (
                           <motion.div
-                            key={`cardpack-${generatedImage ?? "empty"}`}
+                            key={`cardpack-${currentNode?.id ?? "empty"}`}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -1317,7 +1200,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </motion.div>
                         ) : (
                           <motion.div
-                            key={generatedImage ?? "empty-reveal"}
+                            key={currentNode?.id ?? "empty-reveal"}
                             initial={FF.dynamicReveal ? "initial" : false}
                             animate={FF.dynamicReveal ? "animate" : false}
                             exit={{ opacity: 0 }}
@@ -1338,6 +1221,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                             Your design will appear on both sides of the mug
                           </p>
                         )}
+                        <div className="mt-3">
+                          <PrintQualityBadge
+                            productId={currentCatalogId}
+                            size={isCanvasProduct ? selectedCanvasSize.code : selectedSize}
+                            width={currentSourceWidth}
+                            height={currentSourceHeight}
+                          />
+                        </div>
                         <div className="mt-4 flex flex-wrap gap-2">
                           {isCanvasProduct && !isCropping && (
                             <button
@@ -1350,11 +1241,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           )}
                           {!isCanvasProduct && (
                             <div className="inline-flex min-h-[44px] items-center rounded-lg border border-charcoal/10 bg-[#F5EDE0] px-3 py-2 text-xs font-extrabold">
-                              <span className="inline-flex items-center gap-2 text-charcoal/70"><Sparkles size={14} /> Real product preview</span>
+                              <span className="inline-flex items-center gap-2 text-charcoal/70">
+                                <Sparkles size={14} /> {currentSourceKind === "original" ? "Your photo, printed as it is" : "Real product preview"}
+                              </span>
                             </div>
                           )}
                           <button
-                            onClick={() => setStep(2)}
+                            onClick={() => setStep(currentSourceKind === "original" ? 1 : 2)}
                             className="flex-1 sm:flex-none min-h-[44px] inline-flex items-center justify-center gap-2 rounded-lg border border-charcoal/10 bg-white px-3 py-2 text-xs font-extrabold text-charcoal/55 hover:text-charcoal transition"
                           >
                             <ChevronLeft size={16} />
@@ -1362,7 +1255,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           </button>
                         </div>
                       </div>
-                      {FF.beforeAfter ? (
+                      {FF.beforeAfter && currentSourceKind !== "original" ? (
                         <div className="mt-4">
                           <BeforeAfterSlider beforeSrc={uploadedImage} afterSrc={generatedImage} />
                         </div>
@@ -1374,9 +1267,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <div className="rounded-2xl bg-white border border-charcoal/8 p-6 shadow-[0_16px_40px_-20px_rgba(45,41,38,0.15)]">
                       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-charcoal/40">Customise your gift</p>
                       <KineticHeading as="h2" className="mb-2 mt-3 text-4xl font-black">
-                        {isCanvasProduct
-                          ? `Canvas Print`
-                          : selectedProduct.name}
+                        {isCanvasProduct ? `Canvas Print` : selectedProduct.name}
                       </KineticHeading>
                       <p className="font-semibold text-charcoal/55">{selectedProduct.description}</p>
                     </div>
@@ -1408,11 +1299,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           >
                             <div className="text-sm font-extrabold text-charcoal">{prod.name}</div>
                             <div className="text-xs mt-1 text-charcoal/55">
-                              {prod.id === "card" && selectedProduct.id === "card"
-                                ? fmt(cardSubtypePrice)
-                                : prod.id === "card"
-                                ? (region === "US" ? "from $9.99" : "from £6.99")
-                                : fmt(prod.basePrice)}
+                              {prod.id === selectedProduct.id && (prod.id === "card" || prod.id === "canvas")
+                                ? fmt(currentUnitPrice)
+                                : productFromPrice(prod)}
                             </div>
                           </motion.button>
                         ))}
@@ -1422,7 +1311,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                       {/* Canvas size selector */}
                       {isCanvasProduct && (
                         <section>
-                          {/* Workflow hint */}
                           <div className="mb-4 flex items-center gap-0 rounded-xl bg-[#F5EDE0] px-3 py-2.5 text-[11px] font-semibold text-charcoal/60">
                             <span className="font-extrabold text-charcoal/80">1&nbsp;</span><span>Choose size</span>
                             <span className="mx-1.5 text-charcoal/50">→</span>
@@ -1434,7 +1322,6 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           <CanvasSizeSelector
                             selected={selectedCanvasSize}
                             onChange={(size) => {
-                              // If user already cropped, reset crop when size changes
                               if (croppedImageDataUrl && size.code !== selectedCanvasSize.code) {
                                 setCroppedImageDataUrl(null);
                                 setCroppedImageHttpsUrl(null);
@@ -1478,26 +1365,60 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                         </section>
                       )}
 
-                      {selectedProduct.hasSize && selectedProduct.sizes && (
+                      {selectedProduct.hasSize && supportedSizes.length > 0 && (
                         <section>
-                          <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45 mb-3">Size</h3>
-                          <div className="flex flex-wrap gap-2" role="group" aria-label="Select size">
-                            {selectedProduct.sizes.map((size) => (
-                              <button
-                                key={size}
-                                type="button"
-                                onClick={() => setSelectedSize(size)}
-                                className={`min-h-[44px] min-w-[44px] px-3 py-2 rounded-xl text-sm font-bold transition ${
-                                  selectedSize === size
-                                    ? "bg-terracotta text-white"
-                                    : "bg-[#F5EDE0] text-charcoal/80 hover:bg-charcoal/5"
-                                }`}
-                                aria-pressed={selectedSize === size}
-                              >
-                                {size}
-                              </button>
-                            ))}
-                        </div>
+                          <div className="mb-3 flex items-center justify-between gap-2">
+                            <h3 className="text-xs font-extrabold uppercase tracking-widest text-charcoal/45">Size</h3>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSizeMode((m) => (m === "single" ? "multi" : "single"));
+                                if (sizeMode === "single" && selectedSize && !sizeQuantities[selectedSize]) {
+                                  setSizeQuantities((prev) => ({ ...prev, [selectedSize]: 1 }));
+                                }
+                              }}
+                              aria-pressed={sizeMode === "multi"}
+                              className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border px-2.5 text-xs font-bold transition ${
+                                sizeMode === "multi"
+                                  ? "border-terracotta bg-terracotta/10 text-terracotta"
+                                  : "border-charcoal/15 bg-white text-charcoal/70 hover:bg-charcoal/5"
+                              }`}
+                              data-size-mode-toggle
+                            >
+                              <Users size={14} />
+                              {sizeMode === "multi" ? "Buying several sizes" : "Buying for several people?"}
+                            </button>
+                          </div>
+                          {sizeMode === "multi" ? (
+                            <>
+                              <p className="mb-2 text-xs text-charcoal/55">Same design, same colour — choose how many of each size.</p>
+                              <SizeQuantityPicker
+                                sizes={supportedSizes}
+                                quantities={sizeQuantities}
+                                onChange={setSizeQuantities}
+                                unitPrice={currentUnitPrice}
+                                formatPrice={fmt}
+                              />
+                            </>
+                          ) : (
+                            <div className="flex flex-wrap gap-2" role="group" aria-label="Select size">
+                              {supportedSizes.map((size) => (
+                                <button
+                                  key={size}
+                                  type="button"
+                                  onClick={() => setSelectedSize(size as ApparelSize)}
+                                  className={`min-h-[44px] min-w-[44px] px-3 py-2 rounded-xl text-sm font-bold transition ${
+                                    selectedSize === size
+                                      ? "bg-terracotta text-white"
+                                      : "bg-[#F5EDE0] text-charcoal/80 hover:bg-charcoal/5"
+                                  }`}
+                                  aria-pressed={selectedSize === size}
+                                >
+                                  {size}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                           <button
                             type="button"
                             onClick={() => setIsSizeGuideOpen(true)}
@@ -1505,8 +1426,10 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           >
                             View size guide
                           </button>
-                          {selectedProduct.hasSize && !selectedSize && (
-                            <p className="mt-1 text-xs font-medium text-terracotta">Please select a size</p>
+                          {!sizeSatisfied && (
+                            <p className="mt-1 text-xs font-medium text-terracotta">
+                              {sizeMode === "multi" ? "Add at least one size" : "Please select a size"}
+                            </p>
                           )}
                         </section>
                       )}
@@ -1520,12 +1443,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                               <div className="grid grid-cols-2 gap-3">
                                 {(
                                   [
-                                    { value: "uscard_1",  label: "1 card",   price: "$9.99",  subtitle: "Perfect for sending to one special person." },
-                                    { value: "uscard_10", label: "10 cards", price: "$29.99", subtitle: "Great for sharing with close friends and family." },
-                                    { value: "uscard_30", label: "30 cards", price: "$59.99", subtitle: "Ideal for a larger celebration or event." },
-                                    { value: "uscard_50", label: "50 cards", price: "$89.99", subtitle: "Best value — perfect for big occasions." },
+                                    { value: "uscard_1",  label: "1 card",   subtitle: "Perfect for sending to one special person." },
+                                    { value: "uscard_10", label: "10 cards", subtitle: "Great for sharing with close friends and family." },
+                                    { value: "uscard_30", label: "30 cards", subtitle: "Ideal for a larger celebration or event." },
+                                    { value: "uscard_50", label: "50 cards", subtitle: "Best value — perfect for big occasions." },
                                   ] as const
-                                ).map(({ value, label, price, subtitle }) => {
+                                ).map(({ value, label, subtitle }) => {
                                   const active = selectedCardSubtype === value;
                                   return (
                                     <motion.button
@@ -1542,7 +1465,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                       style={active ? { borderColor: "var(--color-terracotta)" } : undefined}
                                     >
                                       <p className="text-sm font-extrabold text-charcoal">{label}</p>
-                                      <p className="mt-0.5 text-xs font-semibold" style={{ color: "var(--color-terracotta)" }}>{price}</p>
+                                      <p className="mt-0.5 text-xs font-semibold" style={{ color: "var(--color-terracotta)" }}>{fmt(getUnitPrice(value, currency) ?? 0)}</p>
                                       <p className="mt-1 text-xs leading-4 text-charcoal/50">{subtitle}</p>
                                     </motion.button>
                                   );
@@ -1559,16 +1482,14 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                       value: "postcard" as const,
                                       label: "Postcard",
                                       subtitle: "Premium fine art postcard on thick 280gsm giclée paper with a glossy finish.",
-                                      price: "£6.99",
                                     },
                                     {
                                       value: "cardpack" as const,
                                       label: "Greeting Card Pack",
                                       subtitle: "7 beautifully printed portrait cards on bright white matte paper. Each one comes with a craft paper envelope.",
-                                      price: "£29.99",
                                     },
                                   ] as const
-                                ).map(({ value, label, subtitle, price }) => {
+                                ).map(({ value, label, subtitle }) => {
                                   const active = selectedCardSubtype === value;
                                   return (
                                     <motion.button
@@ -1585,7 +1506,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                                       style={active ? { borderColor: "var(--color-terracotta)" } : undefined}
                                     >
                                       <p className="text-sm font-extrabold text-charcoal">{label}</p>
-                                      <p className="mt-0.5 text-xs font-semibold" style={{ color: "var(--color-terracotta)" }}>{price}</p>
+                                      <p className="mt-0.5 text-xs font-semibold" style={{ color: "var(--color-terracotta)" }}>{fmt(getUnitPrice(value, currency) ?? 0)}</p>
                                       <p className="mt-1 text-xs leading-4 text-charcoal/50">{subtitle}</p>
                                     </motion.button>
                                   );
@@ -1598,13 +1519,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
 
                       <section className="border-t border-charcoal/10 pt-4">
                         <div className="flex justify-between items-center mb-4">
-                          <span className="text-charcoal/55 font-semibold">Subtotal</span>
+                          <span className="text-charcoal/55 font-semibold">
+                            {sizeMode === "multi" && selectedProduct.hasSize ? `Subtotal (${multiTotal} ${multiTotal === 1 ? "item" : "items"})` : "Subtotal"}
+                          </span>
                           <span className="text-2xl font-black">
-                            {fmt(isCanvasProduct
-                              ? (region === "US" ? selectedCanvasSize.priceUSD : selectedCanvasSize.priceGBP)
-                              : isCardProduct
-                              ? cardSubtypePrice
-                              : selectedProduct.basePrice)}
+                            {fmt(sizeMode === "multi" && selectedProduct.hasSize ? currentUnitPrice * multiTotal : currentUnitPrice)}
                           </span>
                         </div>
                         <section>
@@ -1614,25 +1533,27 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                           {addToCartConfirmation && (
                             <p className="mb-3 text-sm font-semibold" style={{ color: "var(--color-forest)" }}>{addToCartConfirmation}</p>
                           )}
+                          {saveConfirmation && (
+                            <p className="mb-3 text-sm font-semibold" style={{ color: "var(--color-forest)" }}>{saveConfirmation}</p>
+                          )}
                         <div className="grid grid-cols-2 gap-3">
                           <motion.button
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={handleAddToCart}
-                              disabled={
-                                !generatedImage ||
-                                (selectedProduct.hasSize && !selectedSize) ||
-                                (isCanvasProduct && !croppedImageDataUrl)
-                              }
+                              disabled={!canAddToCart}
                               className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-bold text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                               style={{ backgroundColor: "var(--color-terracotta)" }}
+                              data-add-to-cart
                           >
                             Add to Cart <Plus size={18} />
                           </motion.button>
                           <motion.button
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.98 }}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl border border-charcoal/10 bg-white py-4 font-black text-charcoal"
+                            onClick={() => void handleSaveDesign()}
+                            disabled={!currentNode}
+                            className="flex w-full items-center justify-center gap-2 rounded-xl border border-charcoal/10 bg-white py-4 font-black text-charcoal disabled:opacity-60"
                           >
                             Save <Heart size={18} className="text-terracotta/70" />
                           </motion.button>
@@ -1658,15 +1579,11 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <motion.button
                       whileTap={{ scale: 0.98 }}
                       onClick={handleAddToCart}
-                      disabled={
-                        !generatedImage ||
-                        (selectedProduct.hasSize && !selectedSize) ||
-                        (isCanvasProduct && !croppedImageDataUrl)
-                      }
+                      disabled={!canAddToCart}
                       className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-bold text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.45)] transition disabled:cursor-not-allowed disabled:opacity-60"
                       style={{ backgroundColor: "var(--color-terracotta)" }}
                     >
-                      Add to Cart — {fmt(isCanvasProduct ? selectedCanvasSize.priceGBP : selectedProduct.basePrice)}
+                      Add to Cart — {fmt(sizeMode === "multi" && selectedProduct.hasSize ? currentUnitPrice * multiTotal : currentUnitPrice)}
                       <Plus size={18} />
                     </motion.button>
                   </div>
@@ -1739,21 +1656,42 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                     <div className="flex items-center gap-4">
                       <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-charcoal/10 bg-white">
                         {checkoutPreviewImage ? (
-                          <Image src={checkoutPreviewImage} className="h-full w-full object-contain p-1.5" alt="thumb" fill />
+                          <Image src={checkoutPreviewImage} className="h-full w-full object-contain p-1.5" alt="thumb" fill unoptimized={checkoutPreviewImage.startsWith("data:")} />
                         ) : null}
                       </div>
                       <div>
                         <div className="font-extrabold">{checkoutItemDescription}</div>
                         <div className="text-sm text-charcoal/55 font-semibold">
-                          {hasCartItems ? "Mixed cart with custom AI-generated designs" : "Custom AI-generated design"}
+                          {hasCartItems
+                            ? cartItems.some((l) => l.sourceKind === "original") && cartItems.every((l) => l.sourceKind === "original")
+                              ? "Your photos, printed as they are"
+                              : "Custom designs made just for you"
+                            : currentSourceKind === "original"
+                            ? "Your photo, printed as it is"
+                            : "Custom AI-generated design"}
                       </div>
                       </div>
                       <div className="ml-auto font-black">{fmt(checkoutTotal)}</div>
                     </div>
 
+                    {hasCartItems ? (
+                      <ul className="mt-4 divide-y divide-charcoal/8 text-sm">
+                        {cartItems.map((line) => (
+                          <li key={line.id} className="flex items-center justify-between gap-3 py-2">
+                            <span className="min-w-0 truncate text-charcoal/75">
+                              {line.name}
+                              {line.size || line.color ? <span className="text-charcoal/45"> · {[line.size, line.color].filter(Boolean).join(" · ")}</span> : null}
+                              <span className="text-charcoal/45"> × {line.quantity}</span>
+                            </span>
+                            <span className="font-semibold text-charcoal">{fmt(linePrice(line, currency) * line.quantity)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+
                     <div className="mt-6 pt-5 border-t border-charcoal/10 space-y-2 text-sm font-semibold text-charcoal/60">
                       <div className="flex justify-between"><span>Shipping</span><span>{checkoutShipping === 0 ? "FREE" : fmt(checkoutShipping)}</span></div>
-                      <div className="flex justify-between text-charcoal font-black text-base pt-2"><span>Total</span><span>{fmt(checkoutGrandTotal)}</span></div>
+                      <div className="flex justify-between text-charcoal font-black text-base pt-2"><span>Total</span><span>{fmt(hasCartItems ? checkoutGrandTotal : checkoutTotal + checkoutShipping)}</span></div>
                     </div>
 
                     <div className="mt-6 flex items-center gap-2 text-xs text-charcoal/45 font-semibold">
@@ -1827,13 +1765,12 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   >
                     <div className="text-lg font-black">{p.name}</div>
                     <div className="text-sm text-charcoal/55 font-semibold mt-1">{p.description}</div>
-                    <div className="text-sm font-black mt-3">{fmt(p.basePrice)}</div>
+                    <div className="text-sm font-black mt-3">{productFromPrice(p)}</div>
                   </Link>
                 ))}
               </div>
             </motion.div>
           )}
-
 
           {view === "legal" && (
             <motion.div key="legal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto space-y-6">
@@ -1841,7 +1778,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               <section className="space-y-2 text-charcoal/70">
                 <KineticHeading as="h2" className="text-xl font-bold text-charcoal">1. Intellectual Property</KineticHeading>
                 <p>
-                  AI-generated designs created on Keepsy remain the property of the creator. By placing an order, you grant Keepsy
+                  Designs created on Keepsy remain the property of the creator. By placing an order, you grant Keepsy
                   permission to produce and ship products featuring that design.
                 </p>
               </section>
@@ -1883,10 +1820,13 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
               exit={{ x: 420 }}
               transition={{ type: "spring", stiffness: 260, damping: 28 }}
               className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-l border-charcoal/8 bg-white p-6 shadow-[0_0_80px_-26px_rgba(45,41,38,0.25)]"
+              aria-label="Your cart"
+              role="dialog"
+              aria-modal="true"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-2xl font-black">Your Cart</h3>
-                <button onClick={() => setIsCartOpen(false)} className="text-charcoal/50 hover:text-charcoal">
+                <button onClick={() => setIsCartOpen(false)} className="text-charcoal/50 hover:text-charcoal" aria-label="Close cart">
                   <X size={20} />
                 </button>
               </div>
@@ -1898,39 +1838,39 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                   </div>
                 ) : (
                   cartItems.map((item) => (
-                    <div key={item.id} className="rounded-2xl border border-charcoal/8 bg-white p-3 shadow-[0_8px_20px_-12px_rgba(45,41,38,0.12)]">
+                    <div key={item.id} className="rounded-2xl border border-charcoal/8 bg-white p-3 shadow-[0_8px_20px_-12px_rgba(45,41,38,0.12)]" data-cart-line={item.id}>
                       <div className="flex items-center gap-3">
                         <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-[#F5EDE0] border border-charcoal/10">
                           {item.imageUrl ? (
-                            <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1.5" />
+                            <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1.5" unoptimized={item.imageUrl.startsWith("data:")} />
                           ) : (
                             <Image src="/keepsy-logo-transparent.png" alt={item.name} fill className="object-contain p-2" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="font-bold text-sm">{item.name}</div>
-                          {(item.size || item.color) && (
+                          {(item.size || item.color || item.addonId || item.sourceKind === "original") && (
                             <div className="text-charcoal/55 text-xs mt-0.5">
-                              {[item.size, item.color].filter(Boolean).join(" · ")}
+                              {[item.size, item.color, item.sourceKind === "original" ? "Your photo" : null, item.addonId ? "Add-on" : null].filter(Boolean).join(" · ")}
                             </div>
                           )}
-                          <div className="text-charcoal/55 text-sm">{fmt(item.unitPrice)}</div>
+                          <div className="text-charcoal/55 text-sm">{fmt(linePrice(item, currency))}</div>
                         </div>
-                        <button onClick={() => handleRemoveCartItem(item.id)} className="text-charcoal/40 hover:text-terracotta shrink-0">
+                        <button onClick={() => removeFromCart(item.id)} className="text-charcoal/40 hover:text-terracotta shrink-0" aria-label={`Remove ${item.name}`}>
                           <X size={16} />
                         </button>
                       </div>
                       <div className="mt-3 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <button onClick={() => handleAdjustQuantity(item.id, -1)} className="px-2 py-1 border border-charcoal/10 rounded-md">
+                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 border border-charcoal/10 rounded-md" aria-label="Decrease quantity">
                             -
                           </button>
                           <span className="font-semibold text-sm w-6 text-center">{item.quantity}</span>
-                          <button onClick={() => handleAdjustQuantity(item.id, 1)} className="px-2 py-1 border border-charcoal/10 rounded-md">
+                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-2 py-1 border border-charcoal/10 rounded-md" aria-label="Increase quantity">
                             +
                           </button>
                         </div>
-                        <div className="font-bold">{fmt(item.unitPrice * item.quantity)}</div>
+                        <div className="font-bold">{fmt(linePrice(item, currency) * item.quantity)}</div>
                       </div>
                     </div>
                   ))
@@ -1940,37 +1880,27 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
                 <div className="space-y-1 mb-3 text-sm font-semibold">
                   <div className="flex items-center justify-between text-charcoal/55">
                     <span>Subtotal</span>
-                    <span>{fmt(cartSubtotal)}</span>
+                    <span>{fmt(cartTotals.subtotal)}</span>
                   </div>
                   <div className="flex items-center justify-between text-charcoal/55">
                     <span>Shipping</span>
-                    <span className={cartShipping === 0 ? "text-green-600" : ""}>{cartShipping === 0 ? "FREE" : fmt(cartShipping)}</span>
+                    <span className={cartTotals.shipping === 0 ? "text-green-600" : ""}>{cartTotals.shipping === 0 ? "FREE" : fmt(cartTotals.shipping)}</span>
                   </div>
-                  {amountToFreeShipping > 0 && (
+                  {cartTotals.amountToFreeShipping > 0 && hasCartItems && (
                     <p className="text-xs text-charcoal/40 text-right">
-                      Spend {fmt(amountToFreeShipping)} more for free shipping
+                      Spend {fmt(cartTotals.amountToFreeShipping)} more for free shipping
                     </p>
                   )}
                   <div className="flex items-center justify-between text-charcoal font-black text-base pt-1 border-t border-charcoal/10">
                     <span>Total</span>
-                    <span>{fmt(cartTotal)}</span>
+                    <span>{fmt(cartTotals.total)}</span>
                   </div>
                 </div>
                 <button
                   onClick={() => requestCheckout("cart")}
                   disabled={isBusy || cartItems.length === 0}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    padding: "12px 0",
-                    borderRadius: "12px",
-                    backgroundColor: isBusy || cartItems.length === 0 ? "#d4957a" : "#C4714A",
-                    color: "#FFFFFF",
-                    fontSize: "16px",
-                    fontWeight: "800",
-                    cursor: isBusy || cartItems.length === 0 ? "not-allowed" : "pointer",
-                    border: "none",
-                  }}
+                  className="block w-full rounded-xl py-3 text-base font-extrabold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                  style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
                   {isBusy ? "Securing…" : "Checkout"}
                 </button>
@@ -1982,20 +1912,18 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       {FF.upsells ? (
         <UpsellDrawer
           open={isUpsellOpen}
-          selectedUpsells={conversionFlow.selectedUpsells}
-          bundleChoice={conversionFlow.bundleChoice}
-          onChange={(patch) => updateConversionFlow(patch)}
+          region={region}
+          onClose={() => {
+            setIsUpsellOpen(false);
+            setIsCartOpen(true);
+          }}
           onNoThanks={() => {
             setIsUpsellOpen(false);
-            const mode = pendingCheckoutMode;
-            setPendingCheckoutMode(null);
-            if (mode) void runCheckout(mode);
+            void runCheckout();
           }}
           onContinue={() => {
             setIsUpsellOpen(false);
-            const mode = pendingCheckoutMode;
-            setPendingCheckoutMode(null);
-            if (mode) void runCheckout(mode);
+            void runCheckout();
           }}
         />
       ) : null}

@@ -71,7 +71,7 @@ export default function SubjectAccessRequestPage() {
           <ul className="mt-2 space-y-1">
             <li>• <strong>Right of access (Art. 15)</strong> — receive a copy of all personal data we hold about you</li>
             <li>• <strong>Right to rectification (Art. 16)</strong> — ask us to correct inaccurate or incomplete data</li>
-            <li>• <strong>Right to erasure (Art. 17)</strong> — ask us to delete your personal data ("right to be forgotten")</li>
+            <li>• <strong>Right to erasure (Art. 17)</strong> — ask us to delete your personal data (&quot;right to be forgotten&quot;)</li>
             <li>• <strong>Right to data portability (Art. 20)</strong> — receive your data in a structured, machine-readable format</li>
           </ul>
         </div>

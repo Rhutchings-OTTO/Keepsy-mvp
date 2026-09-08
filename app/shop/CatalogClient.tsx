@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, SlidersHorizontal } from "lucide-react";
-import { getRegion, type Region } from "@/lib/region";
+import { useRegion } from "@/lib/hooks/useRegion";
+import type { Region } from "@/lib/region";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -38,7 +39,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 412,
     soldThisWeek: 18,
     badge: "Bestseller",
-    image: "/images/collections/collection-newbaby-hoodie-white.png",
+    image: "/images/refresh/newbaby-hoodie.webp",
   },
   {
     id: "hoodie-black",
@@ -50,7 +51,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 347,
     soldThisWeek: 14,
     badge: null,
-    image: "/images/collections/collection-pet-hoodie-black.png",
+    image: "/images/refresh/pet-hoodie.webp",
   },
   {
     id: "hoodie-blue",
@@ -62,7 +63,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 198,
     soldThisWeek: 9,
     badge: "New",
-    image: "/images/collections/collection-wedding-hoodie-blue.png",
+    image: "/images/refresh/wedding-hoodie-blue.webp",
   },
   {
     id: "tee-white",
@@ -74,7 +75,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 856,
     soldThisWeek: 34,
     badge: "Bestseller",
-    image: "/images/collections/collection-friends-tshirt-white.png",
+    image: "/images/refresh/friends-tee.webp",
   },
   {
     id: "tee-black",
@@ -86,7 +87,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 621,
     soldThisWeek: 27,
     badge: null,
-    image: "/images/collections/collection-bulldog-tshirt-black.png",
+    image: "/images/refresh/bulldog-tee.webp",
   },
   {
     id: "tee-blue",
@@ -98,7 +99,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 289,
     soldThisWeek: 11,
     badge: "New",
-    image: "/images/collections/collection-golf-tshirt-blue.png",
+    image: "/images/refresh/golf-tee.webp",
   },
   {
     id: "mug-white",
@@ -110,7 +111,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 1847,
     soldThisWeek: 72,
     badge: "Bestseller",
-    image: "/images/collections/collection-pet-mug.png",
+    image: "/images/refresh/pet-mug.webp",
   },
   {
     id: "card-white",
@@ -122,7 +123,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 2341,
     soldThisWeek: 98,
     badge: "Bestseller",
-    image: "/images/collections/collection-newbaby-card.png",
+    image: "/images/refresh/newbaby-card.webp",
   },
   {
     id: "canvas-family",
@@ -133,7 +134,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 64,
     soldThisWeek: 12,
     badge: "New",
-    image: "/images/collections/collection-family-canvas.png",
+    image: "/images/refresh/family-canvas.webp",
   },
   {
     id: "canvas-pet",
@@ -144,7 +145,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 41,
     soldThisWeek: 8,
     badge: "New",
-    image: "/images/collections/collection-pet-canvas.png",
+    image: "/images/refresh/pet-canvas.webp",
   },
   {
     id: "canvas-house",
@@ -155,7 +156,7 @@ const PRODUCTS: CatalogProduct[] = [
     reviewCount: 29,
     soldThisWeek: 6,
     badge: "New",
-    image: "/images/collections/collection-newhome-canvas.png",
+    image: "/images/refresh/newhome-canvas.webp",
   },
 ];
 
@@ -271,11 +272,7 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 export function CatalogClient() {
   const [activeCategory, setActiveCategory] = useState<Category>("all");
   const [sortKey, setSortKey] = useState<SortKey>("popular");
-  const [region, setRegion] = useState<Region | null>(null);
-
-  useEffect(() => {
-    setRegion(getRegion());
-  }, []);
+  const region = useRegion();
 
   // Filter
   const filtered =
@@ -311,7 +308,7 @@ export function CatalogClient() {
                 Our Collection
               </h1>
               <p className="mt-2 text-sm text-white/70 sm:text-base sm:mt-3">
-                Personalised gifts she&apos;ll treasure forever
+                Personalised gifts they&apos;ll treasure forever
               </p>
             </motion.div>
 
@@ -340,9 +337,9 @@ export function CatalogClient() {
         style={{ backgroundColor: "var(--color-cream)" }}
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex items-center justify-between gap-4 py-4">
+          <div className="flex flex-col items-stretch justify-between gap-3 py-4 sm:flex-row sm:items-center sm:gap-4">
             {/* Category pills — horizontally scrollable on mobile */}
-            <div className="-mx-4 flex flex-1 items-center gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 sm:pb-0">
+            <div className="flex w-full min-w-0 items-center gap-2 overflow-x-auto pb-1 sm:w-auto sm:flex-1 sm:pb-0">
               {CATEGORIES.map(({ key, label }) => (
                 <button
                   key={key}
@@ -365,7 +362,7 @@ export function CatalogClient() {
             </div>
 
             {/* Sort dropdown */}
-            <div className="relative flex flex-shrink-0 items-center gap-1.5">
+            <div className="relative flex flex-shrink-0 items-center gap-1.5 self-end sm:self-auto">
               <SlidersHorizontal size={14} className="text-charcoal/40" />
               <select
                 value={sortKey}

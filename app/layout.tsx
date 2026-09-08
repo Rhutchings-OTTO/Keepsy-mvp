@@ -88,7 +88,7 @@ const organizationJsonLd = {
       "@id": "https://keepsy.store/#organization",
       "name": "Keepsy",
       "url": "https://keepsy.store",
-      "logo": "https://keepsy.store/images/logo.png",
+      "logo": "https://keepsy.store/android-chrome-512x512.png",
       "email": "hello@keepsy.store",
       "sameAs": [
         "https://www.instagram.com/wearekeepsy",

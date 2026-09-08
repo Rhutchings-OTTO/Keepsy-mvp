@@ -1,18 +1,11 @@
 "use client";
-
-import { useEffect, useState } from "react";
-
-/** Returns true when viewport width is below 768px (mobile). SSR-safe. */
+import { useSyncExternalStore } from "react";
+const query = "(max-width: 767px)";
+function subscribe(callback: () => void) {
+  const media = window.matchMedia(query);
+  media.addEventListener("change", callback);
+  return () => media.removeEventListener("change", callback);
+}
 export function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const handler = () => setIsMobile(mq.matches);
-    setIsMobile(mq.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  return isMobile;
+  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => false);
 }

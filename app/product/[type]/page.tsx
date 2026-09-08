@@ -61,27 +61,27 @@ const PRODUCT_META: Record<string, { name: string; price: string; image: string 
   hoodie: {
     name: "Personalised Hoodie",
     price: "44.99",
-    image: "https://keepsy.store/images/mockups/hoodie-preview.jpg",
+    image: "https://keepsy.store/product-tiles/hoodie-white.png",
   },
   mug: {
     name: "Personalised Mug",
     price: "14.99",
-    image: "https://keepsy.store/images/mockups/mug-preview.jpg",
+    image: "https://keepsy.store/product-tiles/plain-mug-front.png",
   },
   tee: {
     name: "Personalised T-Shirt",
     price: "29.99",
-    image: "https://keepsy.store/images/mockups/tee-preview.jpg",
+    image: "https://keepsy.store/product-tiles/tee-white.png",
   },
   card: {
     name: "Personalised Greeting Card",
     price: "6.99",
-    image: "https://keepsy.store/images/mockups/card-preview.jpg",
+    image: "https://keepsy.store/product-tiles/plain-card.png",
   },
   canvas: {
     name: "Personalised Canvas Print",
     price: "29.99",
-    image: "https://keepsy.store/images/mockups/canvas-preview.jpg",
+    image: "https://keepsy.store/product-tiles/plain-canvas.png",
   },
 };
 

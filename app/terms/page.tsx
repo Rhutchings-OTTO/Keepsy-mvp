@@ -41,7 +41,7 @@ export default function TermsPage() {
           <section className="reveal-on-scroll">
             <h2 className="font-serif text-xl font-semibold" style={{ color: "var(--color-charcoal)" }}>1. About Us</h2>
             <p className="mt-3 text-sm leading-7" style={{ color: "rgba(45,41,38,0.75)" }}>
-              These terms and conditions govern your use of keepsy.store and any purchase you make from Keepsy ("we", "us", "our"). For enquiries, please contact us at{" "}
+              These terms and conditions govern your use of keepsy.store and any purchase you make from Keepsy (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). For enquiries, please contact us at{" "}
               <a href="mailto:support@keepsy.store" className="underline underline-offset-2" style={{ color: "var(--color-terracotta)" }}>
                 support@keepsy.store
               </a>.

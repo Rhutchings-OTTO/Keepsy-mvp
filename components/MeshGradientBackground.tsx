@@ -1,4 +1,5 @@
 "use client";
+import { useClientReady } from "@/lib/hooks/useClientReady";
 
 import { MeshGradient } from "@paper-design/shaders-react";
 import { useEffect, useState } from "react";
@@ -35,11 +36,10 @@ export function MeshGradientBackground({
   className = "",
 }: MeshGradientBackgroundProps) {
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
-  const [mounted, setMounted] = useState(false);
+  const mounted = useClientReady();
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    setMounted(true);
     const update = () =>
       setDimensions({
         width: window.innerWidth,

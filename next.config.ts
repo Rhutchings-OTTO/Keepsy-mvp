@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: "picsum.photos" },
+      // Supabase Storage (signed URLs) when Cloudinary is not configured
+      { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "*.supabase.in" },
     ],
   },
   compiler: {

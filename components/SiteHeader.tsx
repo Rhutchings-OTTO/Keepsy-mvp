@@ -1,10 +1,11 @@
 "use client";
+import { useStoredFlag, storeFlag } from "@/lib/hooks/useStoredFlag";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { ShoppingCart, Menu, X, User } from "lucide-react";
 import { DynamicLogo } from "@/components/DynamicLogo";
 
 const CONTAINER = "mx-auto w-full max-w-6xl px-4 sm:px-6";
@@ -50,17 +51,8 @@ function useCartCount() {
 }
 
 function AnnouncementBar() {
-  const [dismissed, setDismissed] = useState(true); // start hidden to avoid SSR flash
-
-  useEffect(() => {
-    const val = localStorage.getItem("keepsy_announce_dismissed");
-    setDismissed(val === "true");
-  }, []);
-
-  function dismiss() {
-    localStorage.setItem("keepsy_announce_dismissed", "true");
-    setDismissed(true);
-  }
+  const dismissed = useStoredFlag("keepsy_announce_dismissed");
+  function dismiss() { storeFlag("keepsy_announce_dismissed", true); }
 
   return (
     <AnimatePresence>
@@ -222,7 +214,15 @@ function MobileOverlay({
           </nav>
 
           {/* CTA — last focusable element, used as focus-trap anchor */}
-          <div className="px-8 pb-16">
+          <div className="px-8 pb-16 space-y-3">
+            <Link
+              href="/account"
+              onClick={onClose}
+              className="flex min-h-[48px] items-center justify-center gap-2 rounded-full border text-base font-semibold transition hover:bg-black/5"
+              style={{ borderColor: "var(--border)", color: "var(--color-charcoal)" }}
+            >
+              <User size={18} /> Your account
+            </Link>
             <Link
               ref={lastNavLinkRef}
               href="/create"
@@ -306,8 +306,16 @@ export function SiteHeader() {
             })}
           </nav>
 
-          {/* ── Right side: cart + CTA ── */}
+          {/* ── Right side: account + cart + CTA ── */}
           <div className="flex items-center gap-2">
+            {/* Account */}
+            <Link
+              href="/account"
+              aria-label="Your account"
+              className="hidden h-10 w-10 items-center justify-center rounded-full transition hover:bg-black/5 md:flex"
+            >
+              <User size={20} style={{ color: "var(--color-charcoal)" }} />
+            </Link>
             {/* Cart icon — opens CartDrawer via custom event */}
             <button
               type="button"

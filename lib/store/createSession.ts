@@ -328,7 +328,7 @@ export function setNodeDesignUrl(id: string, designUrl: string): void {
 }
 
 /** Legacy API: apply a saved design (from the vault) as a new root node. */
-export function applyVaultDesign(args: { imageUrl: string; designUrl?: string | null; prompt?: string }): DesignNode {
+export function applyVaultDesign(args: { imageUrl: string; designUrl?: string | null; prompt?: string; sourceKind?: "original" | "ai"; width?: number; height?: number }): DesignNode {
   const existing = state.nodes.find(
     (n) => n.designUrl === (args.designUrl ?? null) && (n.designUrl || n.imageUrl === args.imageUrl)
   );
@@ -338,10 +338,12 @@ export function applyVaultDesign(args: { imageUrl: string; designUrl?: string | 
   }
   return pushNode({
     parentId: null,
-    kind: "generation",
+    kind: args.sourceKind === "original" ? "original" : "generation",
     prompt: args.prompt ?? "Saved design",
     imageUrl: args.imageUrl,
     designUrl: args.designUrl || null,
+    width: args.width,
+    height: args.height,
   });
 }
 

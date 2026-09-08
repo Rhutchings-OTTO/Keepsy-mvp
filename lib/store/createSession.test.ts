@@ -88,6 +88,13 @@ describe("design history tree", () => {
     expect(reloaded.getRefinementsLeft()).toBe(2);
   });
 
+  it("reuses an account photo in a fresh session without losing its original status or print dimensions", async () => {
+    const s = await freshModule();
+    s.applyVaultDesign({ imageUrl: https("saved-photo"), designUrl: https("saved-photo"), sourceKind: "original", width: 4032, height: 3024 });
+    const reloaded = await freshModule();
+    expect(reloaded.getCreateSessionSnapshot().currentNode).toMatchObject({ kind: "original", width: 4032, height: 3024, designUrl: https("saved-photo") });
+  });
+
   it("migrates the legacy v1 single-image session into a one-node tree", async () => {
     window.sessionStorage.setItem(
       "keepsy_create_session_v1",

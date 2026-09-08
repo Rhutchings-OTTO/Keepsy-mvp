@@ -685,7 +685,7 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
         height: result.height,
         fileName: uploadedFile.name,
       });
-      addToDesignVault({ imageUrl: result.previewUrl, designUrl: result.url, prompt: `Your photo · ${uploadedFile.name}` });
+      addToDesignVault({ imageUrl: result.previewUrl, designUrl: result.url, prompt: `Your photo · ${uploadedFile.name}`, sourceKind: "original", width: result.width, height: result.height });
       setOriginalUpload({ status: "idle", progress: 1, error: null });
       setGenerationError(null);
       setGenerationContentBlock(null);
@@ -864,6 +864,9 @@ export default function MerchGeneratorPlatform({ initialQuery }: { initialQuery?
       imageUrl: currentNode.designUrl ?? currentNode.imageUrl,
       designUrl: currentNode.designUrl ?? undefined,
       prompt: currentNode.prompt,
+      sourceKind: currentSourceKind,
+      width: currentSourceWidth ?? undefined,
+      height: currentSourceHeight ?? undefined,
     });
     const supabase = getBrowserSupabase();
     if (!supabase) {

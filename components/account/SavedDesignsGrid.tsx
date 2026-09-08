@@ -11,12 +11,15 @@ export type SavedDesign = {
   design_url: string | null;
   prompt: string | null;
   source_kind: "ai" | "original" | null;
+  width: number | null;
+  height: number | null;
   created_at: string;
 };
 
 export function SavedDesignsGrid({ initialDesigns }: { initialDesigns: SavedDesign[] }) {
   const router = useRouter();
-  const [designs, setDesigns] = useState(initialDesigns);
+  const [removedIds, setRemovedIds] = useState<string[]>([]);
+  const designs = initialDesigns.filter((d) => !removedIds.includes(d.id));
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +29,8 @@ export function SavedDesignsGrid({ initialDesigns }: { initialDesigns: SavedDesi
     try {
       const res = await fetch(`/api/account/designs?id=${encodeURIComponent(id)}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Couldn't remove that design. Please try again.");
-      setDesigns((prev) => prev.filter((d) => d.id !== id));
+      setRemovedIds((prev) => [...prev, id]);
+      router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't remove that design.");
     } finally {
@@ -39,6 +43,9 @@ export function SavedDesignsGrid({ initialDesigns }: { initialDesigns: SavedDesi
       imageUrl: design.design_url ?? design.image_url,
       designUrl: design.design_url,
       prompt: design.prompt ?? undefined,
+      sourceKind: design.source_kind ?? undefined,
+      width: design.width ?? undefined,
+      height: design.height ?? undefined,
     });
     router.push("/create");
   }

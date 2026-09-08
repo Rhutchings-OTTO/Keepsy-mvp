@@ -64,7 +64,7 @@ export default async function AccountPage() {
       .limit(50),
     supabase
       .from("saved_designs")
-      .select("id, image_url, design_url, prompt, source_kind, created_at")
+      .select("id, image_url, design_url, prompt, source_kind, width, height, created_at")
       .order("created_at", { ascending: false })
       .limit(60),
   ]);

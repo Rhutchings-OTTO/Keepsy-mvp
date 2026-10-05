@@ -1,8 +1,8 @@
 # Keepsy premium storefront and owner tools
-Release candidate, 4 October 2026. Repository: Rhutchings-OTTO/Keepsy-mvp. Site: https://www.keepsy.store/.
+Release candidate, 5 October 2026. Repository: Rhutchings-OTTO/Keepsy-mvp. Site: https://www.keepsy.store/.
 
 ## Release status
-This branch is a release candidate. The earlier shopping/account repair is on main (721a767). These premium UI, CRM, marketing and owner-operations changes have not been deployed or migrated to production. Do not merge directly into production before the rollout checks below.
+This branch is a release candidate. The earlier shopping/account repair is on main (721a767). The premium UI, CRM, marketing and owner-operations changes are uploaded in PR https://github.com/Rhutchings-OTTO/Keepsy-mvp/pull/3 and verified in the Vercel preview https://keepsy-4e7bacccz-rhutchings-ottos-projects.vercel.app/. Production remains on the main commit until the Supabase migration and server-only environment rollout checks below are completed.
 
 ## What changed
 - Roomier storefront, simpler navigation, a static background, restrained motion and photo/idea walkthroughs. Existing Fraunces/Manrope fonts and cream, terracotta and forest colours are preserved. Fonts are self-hosted with their OFL licences.
@@ -43,4 +43,4 @@ No Stripe payout schedule, bank/card configuration or Stripe-to-Monzo transfer w
 ## Verification limits
 Local automated tests, type checking, lint, the production build, secret scan and mockup geometry audit are run for this candidate; exact results are recorded in the accompanying handover. Unit tests use provider/database fakes and do not validate deployed SQL, real email delivery, browser layout, a physical print or phone delivery.
 
-The October 4 execution session can write the local Keepsy workspace and use the GitHub connector, but terminal networking and local listening sockets are restricted, no browser is connected, and Supabase/Vercel controls are not available. Production migrations, environment changes, preview/phone testing and new supplier-route validation are therefore pending.
+The October 5 release session uploaded the branch through the GitHub connector and verified a READY Vercel preview. Production migrations, server-only environment changes, live email/phone testing and new supplier-route validation remain pending; the live Supabase project currently has only the earlier migration set applied.

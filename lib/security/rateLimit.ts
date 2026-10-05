@@ -16,8 +16,13 @@ const ATELIER_CAPACITY_MSG =
 function checkInMemory(
   key: string,
   limit: number,
-  windowSec: number
-): { allowed: boolean; remaining: number; resetAt: number; retryAfter?: number } {
+  windowSec: number,
+): {
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;
+  retryAfter?: number;
+} {
   const now = Date.now();
   const resetAt = now + windowSec * 1000;
   const current = windows.get(key);
@@ -35,9 +40,18 @@ function checkInMemory(
   current.count += 1;
   if (current.count > limit) {
     const retryAfter = Math.ceil((current.resetAt - now) / 1000);
-    return { allowed: false, remaining: 0, resetAt: current.resetAt, retryAfter };
+    return {
+      allowed: false,
+      remaining: 0,
+      resetAt: current.resetAt,
+      retryAfter,
+    };
   }
-  return { allowed: true, remaining: limit - current.count, resetAt: current.resetAt };
+  return {
+    allowed: true,
+    remaining: limit - current.count,
+    resetAt: current.resetAt,
+  };
 }
 
 export type RateLimitConfig = {
@@ -59,16 +73,30 @@ const ENDPOINT_CONFIG: Record<string, RateLimitConfig> = {
   "/api/health": { windowSec: 60, limit: 30 },
   "/api/admin/mockup-placement": { windowSec: 60, limit: 30 },
   "/api/admin/mockup-placements": { windowSec: 60, limit: 30 },
+  "/api/discounts/validate": { windowSec: 60, limit: 12 },
   "post-default": { windowSec: 60, limit: 30 },
   "get-default": { windowSec: 60, limit: 120 },
 };
 
-export function getConfigForEndpoint(pathname: string, method: string): RateLimitConfig {
-  if ((pathname === "/api/generate-image" || pathname === "/api/generate") && method === "POST") {
+export function getConfigForEndpoint(
+  pathname: string,
+  method: string,
+): RateLimitConfig {
+  if (
+    (pathname === "/api/generate-image" || pathname === "/api/generate") &&
+    method === "POST"
+  ) {
     return ENDPOINT_CONFIG[pathname] ?? ENDPOINT_CONFIG["/api/generate-image"];
   }
-  if ((pathname === "/api/create-checkout-session" || pathname === "/api/checkout") && method === "POST") {
-    return ENDPOINT_CONFIG[pathname] ?? ENDPOINT_CONFIG["/api/create-checkout-session"];
+  if (
+    (pathname === "/api/create-checkout-session" ||
+      pathname === "/api/checkout") &&
+    method === "POST"
+  ) {
+    return (
+      ENDPOINT_CONFIG[pathname] ??
+      ENDPOINT_CONFIG["/api/create-checkout-session"]
+    );
   }
   if (pathname.includes("/api/upload") && method === "POST") {
     return ENDPOINT_CONFIG["/api/upload"];
@@ -91,20 +119,36 @@ export function getConfigForEndpoint(pathname: string, method: string): RateLimi
   if (pathname === "/api/admin/mockup-placements" && method === "POST") {
     return ENDPOINT_CONFIG["/api/admin/mockup-placements"];
   }
+  if (pathname === "/api/discounts/validate" && method === "POST") {
+    return ENDPOINT_CONFIG["/api/discounts/validate"];
+  }
   if (method === "GET") return ENDPOINT_CONFIG["get-default"];
   return ENDPOINT_CONFIG["post-default"];
 }
 
 export function getClientKey(req: Request): string {
   const visitorId = req.headers.get("x-visitor-id")?.trim();
-  const forwardedFor = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const forwardedFor = req.headers
+    .get("x-forwarded-for")
+    ?.split(",")[0]
+    ?.trim();
   const realIp = req.headers.get("x-real-ip");
   return visitorId || forwardedFor || realIp || "anonymous";
 }
 
 export type RateLimitResult =
-  | { allowed: true; remaining: number; resetAt: number; headers: Record<string, string> }
-  | { allowed: false; retryAfter: number; headers: Record<string, string>; atelierMessage?: string };
+  | {
+      allowed: true;
+      remaining: number;
+      resetAt: number;
+      headers: Record<string, string>;
+    }
+  | {
+      allowed: false;
+      retryAfter: number;
+      headers: Record<string, string>;
+      atelierMessage?: string;
+    };
 
 const GENERATION_ENDPOINTS = ["/api/generate-image", "/api/generate"];
 
@@ -115,10 +159,11 @@ function isGenerationEndpoint(pathname: string, method: string): boolean {
 export async function rateLimit(
   req: Request,
   pathname: string,
-  method: string
+  method: string,
 ): Promise<RateLimitResult> {
   const clientKey = getClientKey(req);
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || clientKey;
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || clientKey;
 
   if (isGenerationEndpoint(pathname, method)) {
     const atelier = await checkAtelierCapacity(ip);
@@ -127,12 +172,27 @@ export async function rateLimit(
         "RateLimit-Limit": "5",
         "RateLimit-Reset": String(atelier.reset),
       };
-      if (atelier.remaining != null) headers["RateLimit-Remaining"] = String(atelier.remaining);
-      if (atelier.success) return { allowed: true, remaining: atelier.remaining ?? 4, resetAt: atelier.reset, headers };
-      const retryAfter = Math.max(1, Math.ceil((atelier.reset - Date.now()) / 1000));
+      if (atelier.remaining != null)
+        headers["RateLimit-Remaining"] = String(atelier.remaining);
+      if (atelier.success)
+        return {
+          allowed: true,
+          remaining: atelier.remaining ?? 4,
+          resetAt: atelier.reset,
+          headers,
+        };
+      const retryAfter = Math.max(
+        1,
+        Math.ceil((atelier.reset - Date.now()) / 1000),
+      );
       headers["Retry-After"] = String(retryAfter);
       headers["X-RateLimit-Reset"] = String(atelier.reset);
-      return { allowed: false, retryAfter, headers, atelierMessage: ATELIER_CAPACITY_MSG };
+      return {
+        allowed: false,
+        retryAfter,
+        headers,
+        atelierMessage: ATELIER_CAPACITY_MSG,
+      };
     }
     const config = getConfigForEndpoint(pathname, method);
     const key = `${pathname}:${method}:${clientKey}`;
@@ -142,9 +202,20 @@ export async function rateLimit(
       "RateLimit-Remaining": String(result.remaining),
       "RateLimit-Reset": String(Math.ceil(result.resetAt / 1000)),
     };
-    if (result.allowed) return { allowed: true, remaining: result.remaining, resetAt: result.resetAt, headers: memHeaders };
-    if (result.retryAfter != null) memHeaders["Retry-After"] = String(result.retryAfter);
-    return { allowed: false, retryAfter: result.retryAfter ?? 60, headers: memHeaders };
+    if (result.allowed)
+      return {
+        allowed: true,
+        remaining: result.remaining,
+        resetAt: result.resetAt,
+        headers: memHeaders,
+      };
+    if (result.retryAfter != null)
+      memHeaders["Retry-After"] = String(result.retryAfter);
+    return {
+      allowed: false,
+      retryAfter: result.retryAfter ?? 60,
+      headers: memHeaders,
+    };
   }
 
   const config = getConfigForEndpoint(pathname, method);
@@ -158,7 +229,12 @@ export async function rateLimit(
   };
 
   if (result.allowed) {
-    return { allowed: true, remaining: result.remaining, resetAt: result.resetAt, headers };
+    return {
+      allowed: true,
+      remaining: result.remaining,
+      resetAt: result.resetAt,
+      headers,
+    };
   }
   if (result.retryAfter != null) {
     headers["Retry-After"] = String(result.retryAfter);

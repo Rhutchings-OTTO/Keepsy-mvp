@@ -2,27 +2,27 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { useReducedMotionPref } from "@/lib/motion/useReducedMotionPref";
 
 type MagneticButtonProps = React.ComponentProps<typeof motion.button> & {
   children: React.ReactNode;
 };
 
+/**
+ * Historical name kept for existing call sites. This is now a plain button:
+ * no magnetic pull, no hover scale. Any `whileHover` / `whileTap` a caller
+ * passes is dropped so motion stays restrained everywhere.
+ */
 export function MagneticButton({
   children,
   className = "",
+  whileHover: _whileHover,
+  whileTap: _whileTap,
   ...props
 }: MagneticButtonProps) {
-  const reduceMotion = useReducedMotionPref();
-
+  void _whileHover;
+  void _whileTap;
   return (
-    <motion.button
-      className={className}
-      whileHover={reduceMotion ? undefined : { y: -1, scale: 1.01 }}
-      whileTap={reduceMotion ? undefined : { scale: 0.985 }}
-      transition={{ duration: 0.18, ease: "easeOut" }}
-      {...props}
-    >
+    <motion.button className={className} {...props}>
       {children}
     </motion.button>
   );

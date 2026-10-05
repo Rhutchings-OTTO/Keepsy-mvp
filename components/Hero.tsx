@@ -49,7 +49,8 @@ export function Hero() {
           className="mt-5 max-w-xl text-base leading-relaxed text-black/65 sm:text-lg"
           variants={fadeIn}
         >
-          Upload a photo, choose a style, and we help you create gift-ready cards, mugs, tees, and hoodies for the people you love.
+          Upload a photo, choose a style, and we help you create gift-ready
+          cards, mugs, tees, and hoodies for the people you love.
         </motion.p>
         <motion.div
           className="mt-7 flex flex-wrap items-center gap-3"
@@ -74,10 +75,34 @@ export function Hero() {
         variants={slideUp}
       >
         {/* Plain realistic product mockups */}
-        <Image src="/product-tiles/plain-card.png" alt="Family card gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
-        <Image src="/product-tiles/plain-mug-front.png" alt="Pet mug gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
-        <Image src="/product-tiles/tee-white.png" alt="Premium tee gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
-        <Image src="/product-tiles/hoodie-white.png" alt="Anniversary hoodie gift example" width={520} height={520} className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm" />
+        <Image
+          src="/mockups/premium-v2/plain-card.webp"
+          alt="Family card gift example"
+          width={520}
+          height={520}
+          className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm"
+        />
+        <Image
+          src="/mockups/premium-v2/mug-white.webp"
+          alt="Pet mug gift example"
+          width={520}
+          height={520}
+          className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm"
+        />
+        <Image
+          src="/mockups/premium-v2/tee-white.webp"
+          alt="Premium tee gift example"
+          width={520}
+          height={520}
+          className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm"
+        />
+        <Image
+          src="/mockups/premium-v2/hoodie-white.webp"
+          alt="Anniversary hoodie gift example"
+          width={520}
+          height={520}
+          className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm"
+        />
       </motion.div>
     </motion.section>
   );

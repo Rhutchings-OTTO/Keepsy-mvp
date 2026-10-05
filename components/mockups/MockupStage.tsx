@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import PerspT from "perspective-transform";
-import { fitArtworkToBoundary, type PixelRect } from "@/lib/placement/fitArtworkToBoundary";
+import {
+  fitArtworkToBoundary,
+  type PixelRect,
+} from "@/lib/placement/fitArtworkToBoundary";
 import {
   getPlacement,
   placements as staticPlacements,
@@ -14,6 +17,8 @@ import {
 } from "@/lib/mockups/placements";
 import { BaseMockupLayer } from "./BaseMockupLayer";
 import { ArtworkLayer } from "./ArtworkLayer";
+import { GreetingCardMockup } from "./GreetingCardMockup";
+import { useDestination } from "@/lib/hooks/useDestination";
 import { TopLayer } from "./TopLayer";
 
 const DEBUG_PLACEMENT = process.env.NODE_ENV === "development";
@@ -21,10 +26,16 @@ const DEBUG_PLACEMENT = process.env.NODE_ENV === "development";
 function rectToQuad(rect: PlacementRect): PlacementQuad {
   const boundary = rect.boundary;
   const derivedHalfW = boundary
-    ? Math.max(0, Math.min(rect.xPct - boundary.leftPct, boundary.rightPct - rect.xPct))
+    ? Math.max(
+        0,
+        Math.min(rect.xPct - boundary.leftPct, boundary.rightPct - rect.xPct),
+      )
     : rect.wPct / 2;
   const derivedHalfH = boundary
-    ? Math.max(0, Math.min(rect.yPct - boundary.topPct, boundary.bottomPct - rect.yPct))
+    ? Math.max(
+        0,
+        Math.min(rect.yPct - boundary.topPct, boundary.bottomPct - rect.yPct),
+      )
     : rect.hPct / 2;
   const hw = derivedHalfW;
   const hh = derivedHalfH;
@@ -68,10 +79,15 @@ export function MockupStage({
   hasArtwork,
   className = "",
 }: MockupStageProps) {
-  const [runtimePlacements, setRuntimePlacements] = useState<PlacementMap | null>(null);
+  const destination = useDestination();
+  const [runtimePlacements, setRuntimePlacements] =
+    useState<PlacementMap | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  const [artNaturalSize, setArtNaturalSize] = useState({ width: 1024, height: 1024 });
+  const [artNaturalSize, setArtNaturalSize] = useState({
+    width: 1024,
+    height: 1024,
+  });
   const prevColorRef = useRef<MockupColor>(color);
   const prevImageRef = useRef<string | null>(generatedImage);
 
@@ -79,7 +95,9 @@ export function MockupStage({
     let active = true;
     const load = async () => {
       try {
-        const res = await fetch("/api/mockup-placements", { next: { revalidate: 60 } });
+        const res = await fetch("/api/mockup-placements", {
+          next: { revalidate: 60 },
+        });
         if (!res.ok) return;
         const json = (await res.json()) as { placements?: PlacementMap };
         if (active && json.placements) setRuntimePlacements(json.placements);
@@ -88,7 +106,9 @@ export function MockupStage({
       }
     };
     load();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -97,18 +117,24 @@ export function MockupStage({
     const obs = new ResizeObserver((entries) => {
       const e = entries[0];
       if (!e) return;
-      setContainerSize({ width: e.contentRect.width, height: e.contentRect.height });
+      setContainerSize({
+        width: e.contentRect.width,
+        height: e.contentRect.height,
+      });
     });
     obs.observe(node);
     return () => obs.disconnect();
-  }, []);
+  }, [productType]);
 
   const activeMap = runtimePlacements ?? staticPlacements;
   const byProduct = activeMap[productType];
-  const entry = byProduct?.[color] || byProduct?.white || getPlacement(productType, color);
+  const entry =
+    byProduct?.[color] || byProduct?.white || getPlacement(productType, color);
   const artworkPresent = hasArtwork ?? Boolean(generatedImage);
   const activeQuad =
-    entry.placement.kind === "quad" ? entry.placement.quad : rectToQuad(entry.placement.rect);
+    entry.placement.kind === "quad"
+      ? entry.placement.quad
+      : rectToQuad(entry.placement.rect);
 
   useEffect(() => {
     if (!DEBUG_PLACEMENT) {
@@ -116,8 +142,15 @@ export function MockupStage({
       prevImageRef.current = generatedImage;
       return;
     }
-    if (prevColorRef.current !== color && prevImageRef.current !== generatedImage && prevImageRef.current && generatedImage) {
-      console.error("[MockupStage] Artwork source changed when color switched. Expected same image src.");
+    if (
+      prevColorRef.current !== color &&
+      prevImageRef.current !== generatedImage &&
+      prevImageRef.current &&
+      generatedImage
+    ) {
+      console.error(
+        "[MockupStage] Artwork source changed when color switched. Expected same image src.",
+      );
     }
     prevColorRef.current = color;
     prevImageRef.current = generatedImage;
@@ -150,16 +183,20 @@ export function MockupStage({
     if (containerSize.width <= 0 || containerSize.height <= 0) return null;
     const rect = entry.placement.rect;
     const boundary: PixelRect = {
-      x: (rect.xPct / 100) * containerSize.width - (rect.wPct / 100) * containerSize.width / 2,
-      y: (rect.yPct / 100) * containerSize.height - (rect.hPct / 100) * containerSize.height / 2,
+      x:
+        (rect.xPct / 100) * containerSize.width -
+        ((rect.wPct / 100) * containerSize.width) / 2,
+      y:
+        (rect.yPct / 100) * containerSize.height -
+        ((rect.hPct / 100) * containerSize.height) / 2,
       w: (rect.wPct / 100) * containerSize.width,
       h: (rect.hPct / 100) * containerSize.height,
     };
     const artworkBoundary =
       productType === "card"
-        // Use boundary.h for both axes so the pixel border is equal on all 4 sides
-        // regardless of the card container's landscape aspect ratio
-        ? insetRect(boundary, boundary.h * 0.08, boundary.h * 0.08)
+        ? // Use boundary.h for both axes so the pixel border is equal on all 4 sides
+          // regardless of the card container's landscape aspect ratio
+          insetRect(boundary, boundary.h * 0.08, boundary.h * 0.08)
         : boundary;
     const artworkRect = fitArtworkToBoundary({
       boundary: artworkBoundary,
@@ -174,12 +211,23 @@ export function MockupStage({
     if (!DEBUG_PLACEMENT || !rectPlacementPx) return;
     const bcx = rectPlacementPx.boundary.x + rectPlacementPx.boundary.w / 2;
     const bcy = rectPlacementPx.boundary.y + rectPlacementPx.boundary.h / 2;
-    const acx = rectPlacementPx.artworkRect.x + rectPlacementPx.artworkRect.w / 2;
-    const acy = rectPlacementPx.artworkRect.y + rectPlacementPx.artworkRect.h / 2;
+    const acx =
+      rectPlacementPx.artworkRect.x + rectPlacementPx.artworkRect.w / 2;
+    const acy =
+      rectPlacementPx.artworkRect.y + rectPlacementPx.artworkRect.h / 2;
     if (Math.abs(bcx - acx) > 1 || Math.abs(bcy - acy) > 1) {
       console.error("[MockupStage] Artwork center mismatch >1px");
     }
   }, [rectPlacementPx]);
+
+  if (productType === "card")
+    return (
+      <GreetingCardMockup
+        imageSrc={generatedImage}
+        variant={destination === "US" ? "us" : "uk"}
+        className={className}
+      />
+    );
 
   return (
     <div
@@ -248,7 +296,11 @@ export function MockupStage({
         )}
 
         {/* LAYER 3 (Top): Drawstrings, mug reflections, shadows - FIXED, never re-renders on prompt change */}
-        <TopLayer productType={productType} color={color} baseMockupSrc={entry.baseMockupSrc} />
+        <TopLayer
+          productType={productType}
+          color={color}
+          baseMockupSrc={entry.baseMockupSrc}
+        />
 
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/[0.06]"

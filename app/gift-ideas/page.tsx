@@ -1,157 +1,121 @@
-import { OccasionTiles } from "@/components/OccasionTiles";
-import { PromoBanner } from "@/components/PromoBanner";
-import { Reveal } from "@/components/motion/Reveal";
-import Link from "next/link";
-
 import type { Metadata } from "next";
+import Link from "next/link";
+import { OccasionTiles } from "@/components/OccasionTiles";
 
 export const metadata: Metadata = {
-  title: "Personalised Gift Ideas | Gift Guides by Occasion — Keepsy",
+  title: "Personalised Gift Ideas by Occasion — Keepsy",
   description:
-    "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do gifts and more — all custom printed and previewed before you order.",
+    "Gift ideas for Mother's Day, Father's Day, birthdays, anniversaries, Christmas and pets. Every gift is printed with your own photo or idea and previewed before you order.",
   alternates: {
     canonical: "https://keepsy.store/gift-ideas",
   },
   openGraph: {
-    title: "Personalised Gift Ideas | Gift Guides by Occasion — Keepsy",
+    title: "Personalised Gift Ideas by Occasion — Keepsy",
     description:
-      "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do gifts and more — all custom printed and previewed before you order.",
+      "Gift ideas for Mother's Day, Father's Day, birthdays, anniversaries, Christmas and pets. Printed with your own photo or idea and previewed before you order.",
     type: "website",
     url: "https://keepsy.store/gift-ideas",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Personalised Gift Ideas | Gift Guides by Occasion — Keepsy",
+    title: "Personalised Gift Ideas by Occasion — Keepsy",
     description:
-      "Discover personalised gift ideas for every occasion. Mother's Day gifts, Father's Day presents, birthday gifts, wedding gifts, hen do gifts and more — all custom printed and previewed before you order.",
+      "Gift ideas for Mother's Day, Father's Day, birthdays, anniversaries, Christmas and pets. Printed with your own photo or idea and previewed before you order.",
   },
 };
+
+const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-8";
 
 export default function GiftIdeasPage() {
   return (
     <>
-      <nav aria-label="Breadcrumb" className="mx-auto max-w-6xl px-4 pt-4 pb-2 text-sm text-charcoal/50 sm:px-6">
+      <nav
+        aria-label="Breadcrumb"
+        className={`${CONTAINER} pt-5 text-sm text-charcoal/50`}
+      >
         <ol className="flex items-center gap-1.5">
-          <li><Link href="/" className="hover:text-charcoal">Home</Link></li>
+          <li>
+            <Link href="/" className="hover:text-charcoal">
+              Home
+            </Link>
+          </li>
           <li aria-hidden>/</li>
-          <li className="text-charcoal font-medium">Gift Ideas</li>
+          <li className="font-medium text-charcoal">Gift ideas</li>
         </ol>
       </nav>
-      <PromoBanner />
 
-      {/* Hero — forest green full-bleed */}
-      <section
-        className="py-20 sm:py-28"
-        style={{ backgroundColor: "var(--color-forest)" }}
-      >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
-            <Reveal variant="fadeUp">
-              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
-                Shop by Occasion
-              </p>
-              <h1 className="mt-4 font-serif font-bold tracking-[-0.04em] text-white leading-none"
-                style={{ fontSize: "clamp(2.8rem, 6vw, 5rem)" }}>
-                The Perfect Gift<br />Starts Here.
-              </h1>
-              <p className="mt-6 max-w-md text-base leading-8 text-white/65">
-                Every keepsake made for the moment that matters. Browse by occasion and find something they&apos;ll never forget.
-              </p>
-            </Reveal>
-
-            <Reveal variant="fadeUp" delay={0.15}>
-              <div className="flex gap-8 lg:flex-col lg:text-right">
-                {[
-                  { value: "Hundreds", label: "Happy customers" },
-                  { value: "★★★★★", label: "Top rated" },
-                ].map((stat) => (
-                  <div key={stat.label}>
-                    <p className="font-serif text-3xl font-bold text-white">{stat.value}</p>
-                    <p className="mt-1 text-sm text-white/50">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </div>
+      <section className={`${CONTAINER} py-10 sm:py-14`}>
+        <p
+          className="text-[11px] font-bold uppercase tracking-[0.2em]"
+          style={{ color: "var(--color-terracotta)" }}
+        >
+          Gift ideas
+        </p>
+        <h1 className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
+          Pick the occasion. We&apos;ll suggest a starting point.
+        </h1>
+        <p className="mt-3 max-w-xl text-base leading-7 text-charcoal/65">
+          Each occasion opens the creator with a style and product already
+          chosen. You can change anything.
+        </p>
       </section>
 
-      {/* Occasion tiles grid */}
       <OccasionTiles />
 
-      {/* How it works strip */}
       <section
-        className="py-16 sm:py-20"
-        style={{ backgroundColor: "#F5EDE0" }}
+        className="border-t border-charcoal/8 py-14 sm:py-20"
+        style={{ backgroundColor: "var(--color-cream-dark)" }}
       >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <Reveal variant="fadeUp">
-            <p
-              className="text-[11px] font-bold uppercase tracking-[0.22em]"
-              style={{ color: "var(--color-terracotta)" }}
-            >
-              How It Works
-            </p>
-          </Reveal>
-
-          <div className="mt-8 grid gap-0 sm:grid-cols-3">
+        <div className={CONTAINER}>
+          <p
+            className="text-[11px] font-bold uppercase tracking-[0.2em]"
+            style={{ color: "var(--color-terracotta)" }}
+          >
+            How it works
+          </p>
+          <ol className="mt-6 grid gap-5 md:grid-cols-3">
             {[
               {
-                step: "01",
-                title: "Choose your occasion",
-                body: "Browse categories that match the moment — birthdays, anniversaries, holidays, and more.",
+                title: "Choose the occasion",
+                body: "Birthday, anniversary, new baby, a pet — pick the one that fits.",
               },
               {
-                step: "02",
-                title: "We suggest a direction",
-                body: "Our AI generates design suggestions tailored to the occasion and your personal touch.",
+                title: "Add your photo or idea",
+                body: "Upload a picture or describe what you have in mind in plain words.",
               },
               {
-                step: "03",
-                title: "Personalise and order",
-                body: "Tweak it until it's perfect, then we print and ship it straight to your door.",
+                title: "See it, then order",
+                body: "Your design appears on the product. Happy with it? Order and we print and deliver it.",
               },
             ].map((item, i) => (
-              <Reveal key={item.step} variant="fadeUp" delay={i * 0.1}>
-                <div className="border-b border-charcoal/10 py-8 sm:border-b-0 sm:border-r sm:px-8 first:pl-0 last:border-r-0 last:pr-0">
-                  <span
-                    className="font-serif text-4xl font-bold leading-none"
-                    style={{ color: "rgba(196,113,74,0.25)" }}
-                  >
-                    {item.step}
-                  </span>
-                  <h3 className="mt-4 font-serif text-xl font-bold text-charcoal">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-7 text-charcoal/60">{item.body}</p>
-                </div>
-              </Reveal>
+              <li
+                key={item.title}
+                className="rounded-3xl border border-charcoal/8 bg-white p-6"
+              >
+                <p
+                  className="font-serif text-3xl font-bold leading-none"
+                  style={{ color: "rgba(196,113,74,0.5)" }}
+                >
+                  {i + 1}
+                </p>
+                <h2 className="mt-3 font-serif text-xl font-bold tracking-tight text-charcoal">
+                  {item.title}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-charcoal/65">
+                  {item.body}
+                </p>
+              </li>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA banner */}
-      <section
-        className="py-16 sm:py-20"
-        style={{ backgroundColor: "var(--color-terracotta)" }}
-      >
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <Reveal variant="fadeUp">
-            <h2 className="font-serif text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
-              Not Sure Where to Start?
-            </h2>
-            <p className="mx-auto mt-4 max-w-sm text-base leading-7 text-white/70">
-              Our AI will suggest the perfect design based on who you&apos;re gifting for.
-            </p>
+          </ol>
+          <div className="mt-8">
             <Link
               href="/create"
-              className="mt-8 inline-flex min-h-[52px] items-center justify-center rounded-xl px-10 text-base font-semibold transition hover:opacity-90"
-              style={{ backgroundColor: "var(--color-charcoal)", color: "white" }}
+              className="inline-flex min-h-[48px] items-center justify-center rounded-xl px-6 text-sm font-semibold text-white transition hover:opacity-90"
+              style={{ backgroundColor: "var(--color-terracotta)" }}
             >
-              Start Creating →
+              Start creating
             </Link>
-          </Reveal>
+          </div>
         </div>
       </section>
     </>

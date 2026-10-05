@@ -1,16 +1,7 @@
-// SiteChrome — Server Component (Phase 3 fix 3.14)
+// SiteChrome — Server Component.
 //
-// Previously this was "use client" solely because of usePathname(). That hook
-// has been extracted into SiteChromeLayout (a small "use client" island) which
-// handles the landing vs. standard layout switch. All interactive children
-// (SiteHeader, SiteFooter, BottomSheetNav, CartDrawer, CookieBanner,
-// MeshGradientBackground, EasterEggProvider) already carry their own
-// "use client" declarations and are unaffected by this change.
-//
-// The static shell — skip-to-content link, fixed background wrapper, CartDrawer
-// portal mount point, CookieBanner — now renders as pure HTML on the server,
-// reducing the client JavaScript that must be downloaded and hydrated before the
-// page is interactive.
+// Static shell: skip link, static background, the pathname-aware layout island,
+// the always-mounted CartDrawer and the cookie notice.
 
 import { SiteChromeLayout } from "@/components/SiteChromeLayout";
 import { MeshGradientBackground } from "@/components/MeshGradientBackground";
@@ -36,12 +27,10 @@ export function SiteChrome({ children }: SiteChromeProps) {
         <MeshGradientBackground />
       </div>
 
-      {/* Client island: handles pathname-dependent layout switching */}
       <SiteChromeLayout>{children}</SiteChromeLayout>
 
       {/* CartDrawer is always mounted; it opens via "open-cart-drawer" event */}
       <CartDrawer />
-      {/* Cookie notice banner — shown once until dismissed */}
       <CookieBanner />
     </>
   );

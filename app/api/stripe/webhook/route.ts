@@ -1,3 +1,8 @@
+import { after } from "next/server";
+import { paidOperations } from "@/lib/orders/paidOperations";
+import { recordOrderEvent } from "@/lib/orders/events";
+import { releaseWelcomeLock } from "@/lib/commerce/discountServer";
+import { drainOwnerNotifications } from "@/lib/notifications/outbox";
 import Stripe from "stripe";
 import { schemas } from "@/lib/http/validate";
 import { logSecurityEvent } from "@/lib/security/auditLog";
@@ -6,7 +11,11 @@ import { sendOrderConfirmationEmail } from "@/lib/emails/orderEmails";
 import { clearDesignCacheForOrder } from "@/lib/cache/designCache";
 import { splitName, type PrintifyAddress } from "@/lib/printify";
 import { notifyFounders } from "@/lib/notifications";
-import { fulfilOrderLines, SubmitUncertainError, type FulfilmentLine } from "@/lib/fulfilment/printifyFulfilment";
+import {
+  fulfilOrderLines,
+  SubmitUncertainError,
+  type FulfilmentLine,
+} from "@/lib/fulfilment/printifyFulfilment";
 import {
   linesFromOrderItems,
   linesFromStripeLineItems,
@@ -32,7 +41,9 @@ function regionFromCountry(country: string | null | undefined): "US" | "UK" {
   return country === "GB" ? "UK" : "US";
 }
 
-function buildPrintifyAddress(session: Stripe.Checkout.Session): PrintifyAddress {
+function buildPrintifyAddress(
+  session: Stripe.Checkout.Session,
+): PrintifyAddress {
   const shipping = session.collected_information?.shipping_details;
   const billing = session.customer_details;
   const addr = shipping?.address ?? billing?.address;
@@ -40,7 +51,9 @@ function buildPrintifyAddress(session: Stripe.Checkout.Session): PrintifyAddress
   const email = billing?.email ?? "";
 
   if (!addr?.line1 || !addr?.city || !addr?.country || !addr?.postal_code) {
-    throw new Error("No complete shipping/billing address on Stripe session — cannot fulfil order.");
+    throw new Error(
+      "No complete shipping/billing address on Stripe session — cannot fulfil order.",
+    );
   }
 
   const { first_name, last_name } = splitName(name);
@@ -65,35 +78,60 @@ export async function POST(req: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!process.env.STRIPE_SECRET_KEY || !webhookSecret) {
-    return new Response(JSON.stringify({ error: "Missing Stripe webhook configuration." }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: "Missing Stripe webhook configuration." }),
+      { status: 500 },
+    );
   }
 
   const signature = req.headers.get("stripe-signature");
   if (!signature) {
-    return new Response(JSON.stringify({ error: "Missing Stripe signature." }), { status: 400 });
+    return new Response(
+      JSON.stringify({ error: "Missing Stripe signature." }),
+      { status: 400 },
+    );
   }
 
   const contentLength = req.headers.get("content-length");
   if (contentLength) {
     const len = parseInt(contentLength, 10);
     if (!Number.isNaN(len) && len > MAX_WEBHOOK_BODY) {
-      logSecurityEvent({ type: "body_too_large", endpoint: "/api/stripe/webhook", size: len });
-      return new Response(JSON.stringify({ error: "Webhook payload too large." }), { status: 413 });
+      logSecurityEvent({
+        type: "body_too_large",
+        endpoint: "/api/stripe/webhook",
+        size: len,
+      });
+      return new Response(
+        JSON.stringify({ error: "Webhook payload too large." }),
+        { status: 413 },
+      );
     }
   }
 
   const payload = await req.text();
   if (payload.length > MAX_WEBHOOK_BODY) {
-    logSecurityEvent({ type: "body_too_large", endpoint: "/api/stripe/webhook", size: payload.length });
-    return new Response(JSON.stringify({ error: "Webhook payload too large." }), { status: 413 });
+    logSecurityEvent({
+      type: "body_too_large",
+      endpoint: "/api/stripe/webhook",
+      size: payload.length,
+    });
+    return new Response(
+      JSON.stringify({ error: "Webhook payload too large." }),
+      { status: 413 },
+    );
   }
 
   let event: Stripe.Event;
   try {
-    event = await stripe.webhooks.constructEventAsync(payload, signature, webhookSecret);
+    event = await stripe.webhooks.constructEventAsync(
+      payload,
+      signature,
+      webhookSecret,
+    );
   } catch (error) {
     logSecurityEvent({ type: "webhook_sig_fail", reason: "Invalid signature" });
-    const message = error instanceof Error ? error.message : "Invalid webhook signature.";
+    const message =
+      error instanceof Error ? error.message : "Invalid webhook signature.";
     return new Response(JSON.stringify({ error: message }), { status: 400 });
   }
 
@@ -104,15 +142,27 @@ export async function POST(req: Request) {
   try {
     const outcome = await processEvent(event, stripe, payload);
     if (outcome === "dedup_unavailable") {
-      return new Response(JSON.stringify({ error: "Event store unavailable, retry later." }), { status: 500 });
+      return new Response(
+        JSON.stringify({ error: "Event store unavailable, retry later." }),
+        { status: 500 },
+      );
     }
   } catch (err) {
-    console.error("[stripe-webhook] Unhandled error processing event:", event.id, event.type, err instanceof Error ? err.message : err);
+    console.error(
+      "[stripe-webhook] Unhandled error processing event:",
+      event.id,
+      event.type,
+      err instanceof Error ? err.message : err,
+    );
     // Release this event's claim on a transient failure. The order-level claim
     // and submit_uncertain state independently prevent duplicate print orders.
     const db = getSupabaseAdmin();
-    if (db) await db.from("stripe_events").delete().eq("stripe_event_id", event.id);
-    return new Response(JSON.stringify({ error: "Processing unavailable, retry later." }), { status: 500 });
+    if (db)
+      await db.from("stripe_events").delete().eq("stripe_event_id", event.id);
+    return new Response(
+      JSON.stringify({ error: "Processing unavailable, retry later." }),
+      { status: 500 },
+    );
   }
 
   return new Response(JSON.stringify({ received: true }), { status: 200 });
@@ -120,10 +170,17 @@ export async function POST(req: Request) {
 
 // ─── Event processor ──────────────────────────────────────────────────────────
 
-async function processEvent(event: Stripe.Event, stripe: Stripe, rawPayload: string): Promise<"ok" | "dedup_unavailable"> {
+async function processEvent(
+  event: Stripe.Event,
+  stripe: Stripe,
+  rawPayload: string,
+): Promise<"ok" | "dedup_unavailable"> {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
-    console.warn("[stripe-webhook] Supabase not configured, retry event:", event.id);
+    console.warn(
+      "[stripe-webhook] Supabase not configured, retry event:",
+      event.id,
+    );
     return "dedup_unavailable";
   }
 
@@ -147,23 +204,48 @@ async function processEvent(event: Stripe.Event, stripe: Stripe, rawPayload: str
 
   if (insertErr) {
     if (insertErr.code === "23505") {
-      console.log("[stripe-webhook] Duplicate event (race condition), skipping:", event.id);
+      console.log(
+        "[stripe-webhook] Duplicate event (race condition), skipping:",
+        event.id,
+      );
       return "ok";
     }
     // Without a dedup record a redelivery would fulfil twice — let Stripe retry later instead.
-    console.error("[stripe-webhook] Failed to persist event record:", insertErr.message);
+    console.error(
+      "[stripe-webhook] Failed to persist event record:",
+      insertErr.message,
+    );
     return "dedup_unavailable";
   }
 
-  if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
+  if (
+    event.type === "checkout.session.completed" ||
+    event.type === "checkout.session.async_payment_succeeded"
+  ) {
     const session = event.data.object as Stripe.Checkout.Session;
-    if (session.payment_status && session.payment_status !== "paid" && session.payment_status !== "no_payment_required") {
+    if (
+      session.payment_status &&
+      session.payment_status !== "paid" &&
+      session.payment_status !== "no_payment_required"
+    ) {
       // Delayed-notification payment methods: the money has not arrived yet. Record, don't ship.
-      const orderRef = session.metadata?.order_ref || session.client_reference_id;
-      console.log("[stripe-webhook] Session completed but unpaid — waiting for async_payment_succeeded:", session.id);
-      const q = supabase.from("orders").update({ status: "pending", stripe_session_id: session.id });
-      const { error } = orderRef ? await q.eq("order_ref", orderRef) : await q.eq("stripe_session_id", session.id);
-      if (error) console.error("[stripe-webhook] Failed to record unpaid session:", error.message);
+      const orderRef =
+        session.metadata?.order_ref || session.client_reference_id;
+      console.log(
+        "[stripe-webhook] Session completed but unpaid — waiting for async_payment_succeeded:",
+        session.id,
+      );
+      const q = supabase
+        .from("orders")
+        .update({ status: "pending", stripe_session_id: session.id });
+      const { error } = orderRef
+        ? await q.eq("order_ref", orderRef)
+        : await q.eq("stripe_session_id", session.id);
+      if (error)
+        console.error(
+          "[stripe-webhook] Failed to record unpaid session:",
+          error.message,
+        );
       return "ok";
     }
     await handleCheckoutCompleted(session, stripe, supabase);
@@ -173,18 +255,52 @@ async function processEvent(event: Stripe.Event, stripe: Stripe, rawPayload: str
   if (event.type === "checkout.session.async_payment_failed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const orderRef = session.metadata?.order_ref || session.client_reference_id;
-    const q = supabase.from("orders").update({ status: "failed", stripe_session_id: session.id });
-    const { error } = orderRef ? await q.eq("order_ref", orderRef) : await q.eq("stripe_session_id", session.id);
-    if (error) console.error("[stripe-webhook] Failed to mark order failed:", error.message);
+    const q = supabase
+      .from("orders")
+      .update({ status: "failed", stripe_session_id: session.id });
+    const { error } = orderRef
+      ? await q.eq("order_ref", orderRef)
+      : await q.eq("stripe_session_id", session.id);
+    if (error)
+      console.error(
+        "[stripe-webhook] Failed to mark order failed:",
+        error.message,
+      );
+    if (orderRef) {
+      await releaseWelcomeLock(supabase, orderRef);
+      await recordOrderEvent(supabase, {
+        orderRef,
+        type: "payment_failed",
+        source: "stripe",
+        idempotencyKey: event.id,
+      });
+    }
     return "ok";
   }
 
   if (event.type === "checkout.session.expired") {
     const session = event.data.object as Stripe.Checkout.Session;
     const orderRef = session.metadata?.order_ref || session.client_reference_id;
-    const q = supabase.from("orders").update({ status: "cancelled", stripe_session_id: session.id });
-    const { error } = orderRef ? await q.eq("order_ref", orderRef) : await q.eq("stripe_session_id", session.id);
-    if (error) console.error("[stripe-webhook] Failed to mark order cancelled:", error.message);
+    const q = supabase
+      .from("orders")
+      .update({ status: "cancelled", stripe_session_id: session.id });
+    const { error } = orderRef
+      ? await q.eq("order_ref", orderRef)
+      : await q.eq("stripe_session_id", session.id);
+    if (error)
+      console.error(
+        "[stripe-webhook] Failed to mark order cancelled:",
+        error.message,
+      );
+    if (orderRef) {
+      await releaseWelcomeLock(supabase, orderRef);
+      await recordOrderEvent(supabase, {
+        orderRef,
+        type: "session_expired",
+        source: "stripe",
+        idempotencyKey: event.id,
+      });
+    }
     return "ok";
   }
   return "ok";
@@ -195,9 +311,12 @@ async function processEvent(event: Stripe.Event, stripe: Stripe, rawPayload: str
 async function handleCheckoutCompleted(
   session: Stripe.Checkout.Session,
   stripe: Stripe,
-  supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>,
 ): Promise<void> {
-  const orderRef = session.metadata?.order_ref || session.client_reference_id || `order_${session.id}`;
+  const orderRef =
+    session.metadata?.order_ref ||
+    session.client_reference_id ||
+    `order_${session.id}`;
   const prompt = session.metadata?.prompt || "";
   const sessionDesignUrl = session.metadata?.design_url || null;
 
@@ -211,30 +330,58 @@ async function handleCheckoutCompleted(
       .select("cropped_image_url, generated_image_url, printify_order_id")
       .eq("order_ref", orderRef)
       .maybeSingle();
-    if (assetError) throw new Error("Cannot read order state: " + assetError.message);
+    if (assetError)
+      throw new Error("Cannot read order state: " + assetError.message);
     if (orderAsset?.printify_order_id) return;
-    if (orderAsset?.cropped_image_url) croppedImageUrl = orderAsset.cropped_image_url as string;
-    if (orderAsset?.generated_image_url) designUrl = orderAsset.generated_image_url as string;
+    if (orderAsset?.cropped_image_url)
+      croppedImageUrl = orderAsset.cropped_image_url as string;
+    if (orderAsset?.generated_image_url)
+      designUrl = orderAsset.generated_image_url as string;
   }
   const amountTotal = (session.amount_total ?? 0) / 100;
 
-  const customerEmail = (session.customer_details?.email as string) || (session.customer_email as string) || null;
+  const customerEmail =
+    (session.customer_details?.email as string) ||
+    (session.customer_email as string) ||
+    null;
 
   const logEmail =
     process.env.NODE_ENV === "production"
       ? (customerEmail?.replace(/(.{2}).*(@.*)/, "$1***$2") ?? "unknown")
       : customerEmail;
-  console.log("[webhook] Processing checkout.session.completed for order:", orderRef, "email:", logEmail);
+  console.log(
+    "[webhook] Processing checkout.session.completed for order:",
+    orderRef,
+    "email:",
+    logEmail,
+  );
 
-  const customerName = session.collected_information?.shipping_details?.name ?? session.customer_details?.name ?? null;
-  const shippingAddr = session.collected_information?.shipping_details?.address ?? session.customer_details?.address ?? null;
+  const customerName =
+    session.collected_information?.shipping_details?.name ??
+    session.customer_details?.name ??
+    null;
+  const shippingAddr =
+    session.collected_information?.shipping_details?.address ??
+    session.customer_details?.address ??
+    null;
 
   // Fetch line items with expanded product metadata
-  let lineItems: Stripe.ApiList<Stripe.LineItem> = { object: "list", data: [], has_more: false, url: "" };
+  let lineItems: Stripe.ApiList<Stripe.LineItem> = {
+    object: "list",
+    data: [],
+    has_more: false,
+    url: "",
+  };
   try {
-    lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 100, expand: ["data.price.product"] });
+    lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+      limit: 100,
+      expand: ["data.price.product"],
+    });
   } catch (err) {
-    throw new Error("Failed to fetch line items: " + (err instanceof Error ? err.message : String(err)));
+    throw new Error(
+      "Failed to fetch line items: " +
+        (err instanceof Error ? err.message : String(err)),
+    );
   }
 
   // Upsert order. user_id comes from Stripe metadata (set at checkout from the server session) so an
@@ -252,25 +399,38 @@ async function handleCheckoutCompleted(
       customer_email: customerEmail,
       customer_name: customerName,
       shipping_address: shippingAddr ? JSON.stringify(shippingAddr) : null,
-      ...(metadataUserId && /^[0-9a-f-]{36}$/i.test(metadataUserId) ? { user_id: metadataUserId } : {}),
+      ...(metadataUserId && /^[0-9a-f-]{36}$/i.test(metadataUserId)
+        ? { user_id: metadataUserId }
+        : {}),
     },
-    { onConflict: "order_ref" }
+    { onConflict: "order_ref" },
   );
   if (orderErr) throw new Error("Failed to upsert order: " + orderErr.message);
+
+  const mayFulfil = await paidOperations(supabase, session, orderRef);
+  after(async () => {
+    await drainOwnerNotifications(supabase);
+  });
+  if (!mayFulfil) return;
 
   // Order items: keep the rich rows written at checkout; only rebuild from Stripe when they are missing.
   const { data: existingItems } = await supabase
     .from("order_items")
-    .select("product_id, size, color, quantity, design_url, cropped_image_url, source_kind")
+    .select(
+      "product_id, size, color, quantity, design_url, cropped_image_url, source_kind",
+    )
     .eq("order_ref", orderRef);
-  const richRows = ((existingItems ?? []) as OrderItemRow[]).filter((r) => r.product_id);
+  const richRows = ((existingItems ?? []) as OrderItemRow[]).filter(
+    (r) => r.product_id,
+  );
 
   if (richRows.length === 0 && lineItems.data.length > 0) {
     await supabase.from("order_items").delete().eq("order_ref", orderRef);
     const { error: itemsErr } = await supabase
       .from("order_items")
       .insert(orderItemRowsFromStripeLineItems(orderRef, lineItems.data));
-    if (itemsErr) throw new Error("Failed to upsert order items: " + itemsErr.message);
+    if (itemsErr)
+      throw new Error("Failed to upsert order items: " + itemsErr.message);
   }
 
   // Send confirmation email
@@ -283,7 +443,12 @@ async function handleCheckoutCompleted(
       designPrompt: prompt || undefined,
     });
     if (!emailResult.ok) {
-      console.error("[email] order confirmation email failed for", logEmail, "error:", emailResult.error);
+      console.error(
+        "[email] order confirmation email failed for",
+        logEmail,
+        "error:",
+        emailResult.error,
+      );
     }
   }
 
@@ -300,26 +465,59 @@ async function handleCheckoutCompleted(
     return;
   }
   if (lines.length === 0 || lines.some((l) => !l.designUrl)) {
-    const msg = lines.length === 0 ? "no fulfilable lines found" : "one or more lines have no print image URL";
+    const msg =
+      lines.length === 0
+        ? "no fulfilable lines found"
+        : "one or more lines have no print image URL";
     console.warn(`[printify] Order ${orderRef} needs manual review — ${msg}`);
-    await supabase.from("orders").update({ printify_status: "needs_manual_review" }).eq("order_ref", orderRef);
+    await supabase
+      .from("orders")
+      .update({ printify_status: "needs_manual_review" })
+      .eq("order_ref", orderRef);
     notifyFounders(
       `Order ${orderRef} needs manual fulfilment`,
       `Order: ${orderRef}\nReason: ${msg}\nCustomer email: ${customerEmail ?? "unknown"}`,
-      "critical"
+      "critical",
     ).catch(() => {});
     await clearDesignCacheForOrder(designUrl);
     return;
   }
 
   const shippingCountry =
-    session.collected_information?.shipping_details?.address?.country ?? session.customer_details?.address?.country;
+    session.collected_information?.shipping_details?.address?.country ??
+    session.customer_details?.address?.country;
   const region = regionFromCountry(shippingCountry);
 
   try {
     const address = buildPrintifyAddress(session);
-    const result = await fulfilOrderLines({ orderRef, region, lines, address, supabase });
-    console.log("[printify] Order submitted successfully:", orderRef, "printifyOrderId:", result.printifyOrderId, "lines:", result.lines.length);
+    await recordOrderEvent(supabase, {
+      orderRef,
+      type: "fulfilment_started",
+      source: "system",
+      idempotencyKey: "fulfilment_started",
+    });
+    const result = await fulfilOrderLines({
+      orderRef,
+      region,
+      lines,
+      address,
+      supabase,
+    });
+    await recordOrderEvent(supabase, {
+      orderRef,
+      type: "printify_order_submitted",
+      source: "printify",
+      externalId: result.printifyOrderId,
+      idempotencyKey: "submitted:" + result.printifyOrderId,
+    });
+    console.log(
+      "[printify] Order submitted successfully:",
+      orderRef,
+      "printifyOrderId:",
+      result.printifyOrderId,
+      "lines:",
+      result.lines.length,
+    );
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[printify] Fulfilment pipeline failed:", msg);
@@ -329,12 +527,15 @@ async function handleCheckoutCompleted(
         .from("orders")
         .update({ printify_status: "needs_manual_review" })
         .eq("order_ref", orderRef)
-        .then(() => {}, () => {});
+        .then(
+          () => {},
+          () => {},
+        );
     }
     notifyFounders(
       `Printify fulfilment ${err instanceof SubmitUncertainError ? "UNCERTAIN" : "failed"} for order ${orderRef}`,
       `Order: ${orderRef}\nError: ${msg}\nCustomer email: ${customerEmail ?? "unknown"}\nAction needed: check https://app.printify.com for external_id=${orderRef} before re-submitting.`,
-      "critical"
+      "critical",
     ).catch(() => {});
   }
 

@@ -34,9 +34,11 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
       <div className="absolute inset-[1px] overflow-hidden rounded-[22px] bg-[#F5F4F2]">
         {/* Base mockup photo */}
         <Image
-          src={isUS
-            ? "/product-tiles/us-greeting-card-mockup.png"
-            : "/product-tiles/uk-greeting-card-mockup.png"}
+          src={
+            isUS
+              ? "/mockups/premium-v2/card-us.webp"
+              : "/mockups/premium-v2/card-uk.webp"
+          }
           alt={isUS ? "US greeting card" : "UK greeting card pack"}
           fill
           className="object-contain"
@@ -52,17 +54,21 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
                  Outer box adds ~1% margin: left 28%, top 22%, right 83%, bottom 73%. */}
         <div
           className="absolute overflow-hidden"
-          style={isUS ? {
-            left: "28%",
-            top: "22%",
-            width: "55%",
-            height: "51%",
-          } : {
-            left: "29%",
-            top: "24%",
-            width: "54%",
-            height: "47%",
-          }}
+          style={
+            isUS
+              ? {
+                  left: "28%",
+                  top: "22%",
+                  width: "55%",
+                  height: "51%",
+                }
+              : {
+                  left: "29%",
+                  top: "24%",
+                  width: "54%",
+                  height: "47%",
+                }
+          }
         >
           {/* Layer 2: 8% safe-zone inset on all 4 sides — image sits within an 84%×84% area.
               contain fit maximises within that zone without ever cropping or distorting. */}
@@ -99,7 +105,8 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
                     position: "absolute",
                     inset: 0,
                     pointerEvents: "none",
-                    backgroundImage: "repeating-linear-gradient(47deg, rgba(255,255,255,0.09) 0px, rgba(255,255,255,0.09) 2px, rgba(0,0,0,0.045) 2px, rgba(0,0,0,0.045) 4px)",
+                    backgroundImage:
+                      "repeating-linear-gradient(47deg, rgba(255,255,255,0.09) 0px, rgba(255,255,255,0.09) 2px, rgba(0,0,0,0.045) 2px, rgba(0,0,0,0.045) 4px)",
                     opacity: 0.28,
                     mixBlendMode: "multiply",
                   }}

@@ -1,156 +1,153 @@
-import { TestimonialGrid } from "@/components/TestimonialGrid";
-import { Reveal } from "@/components/motion/Reveal";
-import Link from "next/link";
-
 import type { Metadata } from "next";
+import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Customer Reviews — Keepsy Personalised Gifts",
+  title: "Share Your Keepsy Gift — Keepsy",
   description:
-    "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from hundreds of happy customers.",
+    "Made something with Keepsy? Tell us how it went. We share customer gifts (with permission) and use your feedback to make the products better.",
   alternates: {
     canonical: "https://keepsy.store/community",
   },
   openGraph: {
-    title: "Customer Reviews — Keepsy Personalised Gifts",
-    description:
-      "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from hundreds of happy customers.",
+    title: "Share Your Keepsy Gift — Keepsy",
+    description: "Made something with Keepsy? Tell us how it went.",
     type: "website",
     url: "https://keepsy.store/community",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Customer Reviews — Keepsy Personalised Gifts",
-    description:
-      "See what our customers say about Keepsy personalised gifts. Real reviews from people who've ordered custom hoodies, mugs, t-shirts and cards. Rated 4.8/5 from hundreds of happy customers.",
-  },
 };
 
-const PULL_QUOTES = [
+const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-8";
+
+const EXAMPLES = [
   {
-    quote: "She cried. Genuinely the most personal gift I've ever given.",
-    name: "Fiona R.",
-    occasion: "Birthday Card",
+    src: "/images/refresh/pet-mug.webp",
+    alt: "Mug printed with a cat portrait",
   },
   {
-    quote: "Our dog is on a mug. That's it. That's the review.",
-    name: "Marcus T.",
-    occasion: "Pet Portrait Mug",
+    src: "/images/refresh/friends-tee.webp",
+    alt: "T-shirt printed with a photo of friends",
   },
   {
-    quote: "Ordered Thursday, arrived Saturday. Beautiful quality too.",
-    name: "Becky M.",
-    occasion: "Anniversary Print",
+    src: "/images/refresh/newbaby-card.webp",
+    alt: "Card printed with a photo of a newborn",
+  },
+  {
+    src: "/images/refresh/family-canvas.webp",
+    alt: "Canvas print of a family photo",
   },
 ];
 
 export default function CommunityPage() {
   return (
     <>
-      {/* Hero — terracotta full-bleed */}
-      <section
-        className="py-20 sm:py-28"
-        style={{ backgroundColor: "var(--color-terracotta)" }}
-      >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
-            <Reveal variant="fadeUp">
-              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
-                Customer Reviews
-              </p>
-              <h1
-                className="mt-4 font-serif font-bold tracking-[-0.04em] text-white leading-none"
-                style={{ fontSize: "clamp(2.8rem, 6vw, 5rem)" }}
-              >
-                Real Gifts.<br />Real Reactions.
-              </h1>
-              <p className="mt-6 max-w-md text-base leading-8 text-white/65">
-                Every review below is from a real Keepsy customer. No scripts, no filters — just honest words from people who found the perfect gift.
-              </p>
-            </Reveal>
-
-            <Reveal variant="fadeUp" delay={0.15}>
-              <div className="flex gap-8 lg:flex-col lg:text-right">
-                {[
-                  { value: "★★★★★", label: "Top rated" },
-                  { value: "Hundreds", label: "Verified reviews" },
-                ].map((stat) => (
-                  <div key={stat.label}>
-                    <p className="font-serif text-3xl font-bold text-white">{stat.value}</p>
-                    <p className="mt-1 text-sm text-white/50">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* Pull-quote trio — cream background */}
-      <section className="py-16 sm:py-20" style={{ backgroundColor: "var(--color-cream)" }}>
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-0 sm:grid-cols-3">
-            {PULL_QUOTES.map((item, i) => (
-              <Reveal key={item.name} variant="fadeUp" delay={i * 0.1}>
-                <div className="border-b border-charcoal/10 py-8 sm:border-b-0 sm:border-r sm:px-8 first:pl-0 last:border-r-0 last:pr-0">
-                  <span
-                    className="font-serif text-6xl font-bold leading-none select-none"
-                    style={{ color: "rgba(196,113,74,0.20)" }}
-                    aria-hidden="true"
-                  >
-                    &ldquo;
-                  </span>
-                  <p className="mt-1 font-serif text-lg font-bold leading-snug text-charcoal">
-                    {item.quote}
-                  </p>
-                  <div className="mt-4">
-                    <p className="text-sm font-semibold text-charcoal">{item.name}</p>
-                    <p className="text-xs text-charcoal/50">{item.occasion}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Full review grid */}
-      <div style={{ backgroundColor: "#F5EDE0" }}>
-        <TestimonialGrid />
-      </div>
-
-      {/* Share Your Story CTA — forest green */}
-      <section
-        className="py-16 sm:py-20"
-        style={{ backgroundColor: "var(--color-forest)" }}
-      >
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <Reveal variant="fadeUp">
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/50">
-              Share Your Story
+      <section className={`${CONTAINER} py-14 sm:py-20`}>
+        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+          <div>
+            <p
+              className="text-[11px] font-bold uppercase tracking-[0.2em]"
+              style={{ color: "var(--color-terracotta)" }}
+            >
+              Share your gift
             </p>
-            <h2 className="mt-4 font-serif text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl">
-              Made Something Special?
-            </h2>
-            <p className="mx-auto mt-4 max-w-sm text-base leading-7 text-white/65">
-              We&apos;d love to hear about it. Tag us on Instagram or leave a review and inspire the next gift-giver.
+            <h1 className="mt-3 font-serif text-4xl font-bold tracking-[-0.03em] text-charcoal sm:text-5xl">
+              Made something with Keepsy?
+            </h1>
+            <p className="mt-4 max-w-lg text-base leading-7 text-charcoal/70">
+              We&apos;re a small business and we&apos;d love to see how your
+              gift landed. Tag us on Instagram or TikTok, or email a photo —
+              with your permission we may feature it here and on our social
+              pages.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link
-                href="/create"
-                className="inline-flex min-h-[52px] items-center justify-center rounded-xl px-10 text-base font-semibold transition hover:opacity-90"
-                style={{ backgroundColor: "var(--color-terracotta)", color: "white" }}
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="https://www.instagram.com/wearekeepsy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-xl px-6 text-sm font-semibold text-white transition hover:opacity-90"
+                style={{ backgroundColor: "var(--color-terracotta)" }}
               >
-                Start Creating →
-              </Link>
-              <Link
-                href="/shop"
-                className="inline-flex min-h-[52px] items-center justify-center rounded-xl border-2 border-white bg-white/10 px-10 text-base font-semibold text-white transition hover:bg-white/20"
+                @wearekeepsy on Instagram
+              </a>
+              <a
+                href="mailto:hello@keepsy.store?subject=My%20Keepsy%20gift"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-xl border border-charcoal/15 bg-white px-6 text-sm font-semibold text-charcoal transition hover:border-charcoal/35"
               >
-                Browse Shop
-              </Link>
+                Email us a photo
+              </a>
             </div>
-          </Reveal>
+            <p className="mt-6 text-sm text-charcoal/55">
+              Something not right with your order? Go to{" "}
+              <Link href="/refunds" className="underline underline-offset-2">
+                refunds &amp; returns
+              </Link>{" "}
+              — we&apos;ll sort it.
+            </p>
+          </div>
+
+          <ul
+            className="grid grid-cols-2 gap-3 sm:gap-4"
+            aria-label="Example Keepsy gifts"
+          >
+            {EXAMPLES.map((img) => (
+              <li
+                key={img.src}
+                className="relative overflow-hidden rounded-2xl bg-[#F5EDE0]"
+                style={{ aspectRatio: "1 / 1" }}
+              >
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 280px"
+                  className="object-cover"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section
+        className="border-t border-charcoal/8 py-14 sm:py-20"
+        style={{ backgroundColor: "var(--color-cream-dark)" }}
+      >
+        <div className={`${CONTAINER} grid gap-8 md:grid-cols-3`}>
+          {[
+            {
+              title: "Post it",
+              body: "Share a photo of your gift and tag @wearekeepsy. We repost our favourites.",
+            },
+            {
+              title: "Tell us what to improve",
+              body: "Honest feedback helps. Email support@keepsy.store with anything that could be better.",
+            },
+            {
+              title: "Make another",
+              body: "Every design is made to order, so the next one can be completely different.",
+            },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="rounded-3xl border border-charcoal/8 bg-white p-6"
+            >
+              <h2 className="font-serif text-xl font-bold tracking-tight text-charcoal">
+                {item.title}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-charcoal/65">
+                {item.body}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className={`${CONTAINER} mt-8`}>
+          <Link
+            href="/create"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-xl px-6 text-sm font-semibold text-white transition hover:opacity-90"
+            style={{ backgroundColor: "var(--color-terracotta)" }}
+          >
+            Start creating
+          </Link>
         </div>
       </section>
     </>

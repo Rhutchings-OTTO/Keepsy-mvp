@@ -10,11 +10,41 @@ export type ProductCard = {
 };
 
 export const PRODUCT_CARDS: ProductCard[] = [
-  { type: "card", name: "Greeting Card", price: 6.99, image: "/product-tiles/plain-card.png", valueFrame: "Less than a bunch of flowers" },
-  { type: "hoodie", name: "Premium Hoodie", price: 44.99, image: "/product-tiles/hoodie-white.png", valueFrame: "A gift they'll wear every day" },
-  { type: "mug", name: "Ceramic Mug", price: 14.99, image: "/product-tiles/plain-mug-front.png", valueFrame: "They'll think of you every morning" },
-  { type: "tee", name: "Premium Tee", price: 29.99, image: "/product-tiles/tee-white.png", valueFrame: "Less than a dinner out" },
-  { type: "canvas", name: "Canvas Print", price: 29.99, image: "/product-tiles/plain-canvas.png", valueFrame: "Wall art they'll love for a lifetime" },
+  {
+    type: "card",
+    name: "Greeting Card",
+    price: 6.99,
+    image: "/mockups/premium-v2/plain-card.webp",
+    valueFrame: "Less than a bunch of flowers",
+  },
+  {
+    type: "hoodie",
+    name: "Premium Hoodie",
+    price: 44.99,
+    image: "/mockups/premium-v2/hoodie-white.webp",
+    valueFrame: "A gift they'll wear every day",
+  },
+  {
+    type: "mug",
+    name: "Ceramic Mug",
+    price: 14.99,
+    image: "/mockups/premium-v2/mug-white.webp",
+    valueFrame: "They'll think of you every morning",
+  },
+  {
+    type: "tee",
+    name: "Premium Tee",
+    price: 29.99,
+    image: "/mockups/premium-v2/tee-white.webp",
+    valueFrame: "Less than a dinner out",
+  },
+  {
+    type: "canvas",
+    name: "Canvas Print",
+    price: 29.99,
+    image: "/product-tiles/plain-canvas.png",
+    valueFrame: "Wall art they'll love for a lifetime",
+  },
 ];
 
 type ProductGridProps = {
@@ -32,10 +62,19 @@ export function ProductGrid({ selected, onSelect }: ProductGridProps) {
           aria-label={`Choose ${product.name}`}
           onClick={() => onSelect?.(product.type)}
           className={`rounded-2xl border p-3 text-left transition-transform duration-200 ease-out hover:-translate-y-0.5 ${selected === product.type ? "border-black !text-white" : "border-black/10"}`}
-          style={selected === product.type ? { backgroundColor: "var(--color-charcoal)" } : { backgroundColor: "var(--color-cream)" }}
+          style={
+            selected === product.type
+              ? { backgroundColor: "var(--color-charcoal)" }
+              : { backgroundColor: "var(--color-cream)" }
+          }
         >
-          <div className={`rounded-xl border ${selected === product.type ? "border-white/10 bg-white/5" : "border-black/6"} p-2`}
-            style={selected !== product.type ? { backgroundColor: "rgba(253,246,238,0.6)" } : undefined}
+          <div
+            className={`rounded-xl border ${selected === product.type ? "border-white/10 bg-white/5" : "border-black/6"} p-2`}
+            style={
+              selected !== product.type
+                ? { backgroundColor: "rgba(253,246,238,0.6)" }
+                : undefined
+            }
           >
             {/* Image: verify this mockup looks consistent with other product selector images */}
             <Image
@@ -48,8 +87,16 @@ export function ProductGrid({ selected, onSelect }: ProductGridProps) {
             />
           </div>
           <p className="mt-2 font-bold">{product.name}</p>
-          <p className={`${selected === product.type ? "text-white/80" : "text-black/65"}`}>from £{product.price}</p>
-          <p className={`mt-0.5 text-[11px] ${selected === product.type ? "text-white/50" : "text-black/40"}`}>{product.valueFrame}</p>
+          <p
+            className={`${selected === product.type ? "text-white/80" : "text-black/65"}`}
+          >
+            from £{product.price}
+          </p>
+          <p
+            className={`mt-0.5 text-[11px] ${selected === product.type ? "text-white/50" : "text-black/40"}`}
+          >
+            {product.valueFrame}
+          </p>
         </button>
       ))}
     </div>

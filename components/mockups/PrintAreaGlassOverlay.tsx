@@ -10,14 +10,12 @@ type Props = {
   className?: string;
 };
 
-const COPY: Record<ProductType, string> = {
-  card: "Your message / artwork here",
-  hoodie: "Your design will appear here",
-  tshirt: "Your design will appear here",
-  mug: "Your design will appear here",
-};
-
-export function PrintAreaGlassOverlay({ productType, isActive, hasArtwork, className = "" }: Props) {
+export function PrintAreaGlassOverlay({
+  productType,
+  isActive,
+  hasArtwork,
+  className = "",
+}: Props) {
   const reduceMotion = useReducedMotion();
   const area = PRINT_AREAS[productType];
   const isVisible = isActive && !hasArtwork;
@@ -27,12 +25,12 @@ export function PrintAreaGlassOverlay({ productType, isActive, hasArtwork, class
       key={`${productType}-${isVisible ? "on" : "off"}`}
       aria-hidden="true"
       className={`pointer-events-none absolute inset-0 z-20 ${className}`}
-      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985 }}
-      animate={isVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.99 }}
-      transition={{ duration: reduceMotion ? 0.15 : 0.28, ease: "easeOut" }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isVisible ? 1 : 0 }}
+      transition={{ duration: reduceMotion ? 0.1 : 0.25, ease: "easeOut" }}
     >
       <div
-        className="absolute rounded-2xl border border-white/30 bg-white/[0.12] backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_8px_24px_rgba(0,0,0,0.06)]"
+        className="absolute rounded-xl border border-white/40 bg-white/[0.14] backdrop-blur-sm shadow-[inset_0_1px_0_0_rgba(255,255,255,0.3)]"
         style={{
           left: `${area.x - area.w / 2}%`,
           top: `${area.y - area.h / 2}%`,
@@ -44,22 +42,9 @@ export function PrintAreaGlassOverlay({ productType, isActive, hasArtwork, class
       >
         <div className="flex h-full flex-col items-center justify-center gap-1 px-2 text-center">
           <span
-            className={
-              productType === "tshirt"
-                ? "text-[10px] font-semibold leading-[1.2] tracking-wide text-black/70"
-                : "text-xs font-semibold leading-[1.2] tracking-wide text-black/70"
-            }
+            className={`${productType === "tshirt" ? "text-[10px]" : "text-xs"} font-medium leading-tight text-(--color-charcoal)/70`}
           >
-            {COPY[productType]}
-          </span>
-          <span
-            className={
-              productType === "tshirt"
-                ? "text-[9px] font-medium leading-[1.2] text-black/45"
-                : "text-[10px] font-medium leading-[1.2] text-black/45"
-            }
-          >
-            Generate or upload to preview
+            Your design appears here
           </span>
         </div>
       </div>

@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, ShoppingBag, Sparkles, User } from "lucide-react";
-import { getRegion } from "@/lib/region";
 
 const TABS = [
   { href: "/", label: "Home", Icon: Home },
@@ -13,27 +11,22 @@ const TABS = [
   { href: "/account", label: "Account", Icon: User },
 ];
 
+/**
+ * Mobile bottom navigation. Always shown on small screens (it no longer waits
+ * for a region cookie). Pages that need the full viewport can add
+ * `data-hide-bottom-nav` to <body> — see agent notes.
+ */
 export function BottomSheetNav() {
   const pathname = usePathname();
-  const [hasRegion, setHasRegion] = useState(false);
-
-  useEffect(() => {
-    const check = () => setHasRegion(!!getRegion());
-    check();
-    window.addEventListener("keepsy-region-set", check);
-    return () => window.removeEventListener("keepsy-region-set", check);
-  }, []);
-
-  if (!hasRegion) return null;
 
   return (
     <nav
       aria-label="Bottom navigation"
       className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
       style={{
-        backgroundColor: "rgba(253, 246, 238, 0.92)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        backgroundColor: "rgba(253, 246, 238, 0.94)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
         borderTop: "1px solid var(--border)",
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
@@ -42,34 +35,23 @@ export function BottomSheetNav() {
         {TABS.map(({ href, label, Icon }) => {
           const active =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
-
           return (
             <Link
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
-              className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 transition"
+              className="relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-terracotta/40"
               style={{
-                minHeight: "56px",
-                color: active
-                  ? "var(--color-terracotta)"
-                  : "var(--ink-muted)",
+                color: active ? "var(--color-terracotta)" : "var(--ink-muted)",
               }}
             >
-              <Icon size={22} strokeWidth={active ? 2.2 : 1.8} />
+              <Icon size={22} strokeWidth={active ? 2.2 : 1.8} aria-hidden />
               <span
-                className="text-[10px] font-semibold tracking-wide"
+                className="text-[11px] font-semibold tracking-wide"
                 style={{ lineHeight: 1 }}
               >
                 {label}
               </span>
-              {/* Active indicator dot */}
-              {active && (
-                <span
-                  className="absolute bottom-1.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full"
-                  style={{ backgroundColor: "var(--color-terracotta)" }}
-                />
-              )}
             </Link>
           );
         })}

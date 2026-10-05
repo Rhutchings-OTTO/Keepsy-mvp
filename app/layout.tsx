@@ -1,23 +1,31 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Manrope } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { SiteChrome } from "@/components/SiteChrome";
 import { AtelierModeProvider } from "@/context/AtelierModeContext";
 import { ScrollRestoreToTop } from "@/components/ScrollRestoreToTop";
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
+const fraunces = localFont({
+  src: [
+    {
+      path: "../public/fonts/fraunces-normal.woff2",
+      weight: "400 900",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/fraunces-italic.woff2",
+      weight: "400 900",
+      style: "italic",
+    },
+  ],
   variable: "--font-serif",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
 });
-
-const manrope = Manrope({
-  subsets: ["latin"],
+const manrope = localFont({
+  src: "../public/fonts/manrope.woff2",
+  weight: "400 700",
   variable: "--font-sans",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
 });
 
 export const viewport: Viewport = {
@@ -28,11 +36,20 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
+    default:
+      "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
     template: "%s — Keepsy",
   },
-  description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £6.99.",
-  keywords: ["personalised gifts", "custom mugs", "custom hoodies", "keepsake gifts", "photo gifts", "personalised cards"],
+  description:
+    "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £6.99.",
+  keywords: [
+    "personalised gifts",
+    "custom mugs",
+    "custom hoodies",
+    "keepsake gifts",
+    "photo gifts",
+    "personalised cards",
+  ],
   metadataBase: new URL("https://keepsy.store"),
   alternates: {
     canonical: "https://keepsy.store",
@@ -44,8 +61,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "https://keepsy.store",
-    title: "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
-    description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £6.99.",
+    title:
+      "Keepsy — Personalised Gifts | Custom Hoodies, Mugs, T-Shirts & Canvas Prints",
+    description:
+      "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy. Free UK & US shipping over £75. From £6.99.",
     siteName: "Keepsy",
     images: [
       {
@@ -59,7 +78,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Keepsy — Personalised Gifts",
-    description: "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy.",
+    description:
+      "Create personalised gifts they'll never forget. Describe your idea or upload a photo — see it on a hoodie, mug, t-shirt, card or canvas before you buy.",
     images: ["https://keepsy.store/og-image.png"],
   },
   verification: {
@@ -74,9 +94,7 @@ export const metadata: Metadata = {
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
-    other: [
-      { rel: "manifest", url: "/site.webmanifest" },
-    ],
+    other: [{ rel: "manifest", url: "/site.webmanifest" }],
   },
 };
 
@@ -86,36 +104,36 @@ const organizationJsonLd = {
     {
       "@type": "Organization",
       "@id": "https://keepsy.store/#organization",
-      "name": "Keepsy",
-      "url": "https://keepsy.store",
-      "logo": "https://keepsy.store/android-chrome-512x512.png",
-      "email": "hello@keepsy.store",
-      "sameAs": [
+      name: "Keepsy",
+      url: "https://keepsy.store",
+      logo: "https://keepsy.store/android-chrome-512x512.png",
+      email: "hello@keepsy.store",
+      sameAs: [
         "https://www.instagram.com/wearekeepsy",
         "https://www.facebook.com/wearekeepsy",
         "https://www.tiktok.com/@wearekeepsy",
       ],
-      "contactPoint": {
+      contactPoint: {
         "@type": "ContactPoint",
-        "contactType": "customer support",
-        "email": "support@keepsy.store",
-        "availableLanguage": ["English"],
-        "areaServed": ["GB", "US"],
+        contactType: "customer support",
+        email: "support@keepsy.store",
+        availableLanguage: ["English"],
+        areaServed: ["GB", "US"],
       },
     },
     {
       "@type": "WebSite",
       "@id": "https://keepsy.store/#website",
-      "url": "https://keepsy.store",
-      "name": "Keepsy",
-      "description":
+      url: "https://keepsy.store",
+      name: "Keepsy",
+      description:
         "Personalised gifts they'll never forget — custom hoodies, mugs, t-shirts, greeting cards and canvas prints made just for you.",
-      "publisher": { "@id": "https://keepsy.store/#organization" },
-      "potentialAction": {
+      publisher: { "@id": "https://keepsy.store/#organization" },
+      potentialAction: {
         "@type": "SearchAction",
-        "target": {
+        target: {
           "@type": "EntryPoint",
-          "urlTemplate": "https://keepsy.store/shop?q={search_term_string}",
+          urlTemplate: "https://keepsy.store/shop?q={search_term_string}",
         },
         "query-input": "required name=search_term_string",
       },
@@ -123,28 +141,50 @@ const organizationJsonLd = {
     {
       "@type": ["Organization", "OnlineStore"],
       "@id": "https://keepsy.store/#store",
-      "name": "Keepsy",
-      "url": "https://keepsy.store",
-      "description": "Keepsy is an online personalised gift store selling custom printed hoodies, t-shirts, mugs, greeting cards and canvas prints to customers in the UK and United States.",
-      "areaServed": [
-        { "@type": "Country", "name": "United Kingdom" },
-        { "@type": "Country", "name": "United States" },
+      name: "Keepsy",
+      url: "https://keepsy.store",
+      description:
+        "Keepsy is an online personalised gift store selling custom printed hoodies, t-shirts, mugs, greeting cards and canvas prints to customers in the UK and United States.",
+      areaServed: [
+        { "@type": "Country", name: "United Kingdom" },
+        { "@type": "Country", name: "United States" },
       ],
-      "hasOfferCatalog": {
+      hasOfferCatalog: {
         "@type": "OfferCatalog",
-        "name": "Personalised Gifts",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Personalised Hoodie" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Personalised T-Shirt" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Personalised Mug" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Personalised Greeting Card" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Personalised Canvas Print" } },
+        name: "Personalised Gifts",
+        itemListElement: [
+          {
+            "@type": "Offer",
+            itemOffered: { "@type": "Product", name: "Personalised Hoodie" },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: { "@type": "Product", name: "Personalised T-Shirt" },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: { "@type": "Product", name: "Personalised Mug" },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Product",
+              name: "Personalised Greeting Card",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Product",
+              name: "Personalised Canvas Print",
+            },
+          },
         ],
       },
-      "priceRange": "££",
-      "currenciesAccepted": "GBP, USD",
-      "paymentAccepted": "Credit Card, Debit Card, PayPal",
-      "parentOrganization": { "@id": "https://keepsy.store/#organization" },
+      priceRange: "££",
+      currenciesAccepted: "GBP, USD",
+      paymentAccepted: "Credit Card, Debit Card, PayPal",
+      parentOrganization: { "@id": "https://keepsy.store/#organization" },
     },
   ],
 };
@@ -155,15 +195,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${fraunces.variable} ${manrope.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${fraunces.variable} ${manrope.variable}`}
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <link rel="dns-prefetch" href="https://js.stripe.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
         />
       </head>
       <body className="antialiased font-sans">

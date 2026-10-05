@@ -6,11 +6,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
-const state = vi.hoisted(() => ({ user: null as null | { id: string }, configured: true }));
+const state = vi.hoisted(() => ({
+  user: null as null | { id: string },
+  configured: true,
+}));
 vi.mock("@/lib/supabase/middleware", async () => {
   const { NextResponse } = await import("next/server");
   return {
-    refreshSupabaseSession: async (req: NextRequest) => ({ response: NextResponse.next({ request: req }), user: state.user, configured: state.configured }),
+    refreshSupabaseSession: async (req: NextRequest) => ({
+      response: NextResponse.next({ request: req }),
+      user: state.user,
+      configured: state.configured,
+    }),
   };
 });
 
@@ -29,11 +36,18 @@ describe("middleware", () => {
   it("redirects guests away from the account dashboard to sign-in with a return path", async () => {
     const res = await run("/account");
     expect(res.status).toBe(307);
-    expect(res.headers.get("location")).toBe("https://keepsy.store/account/sign-in?next=%2Faccount");
+    expect(res.headers.get("location")).toBe(
+      "https://keepsy.store/account/sign-in?next=%2Faccount",
+    );
   });
 
   it("lets guests reach the public auth screens", async () => {
-    for (const p of ["/account/sign-in", "/account/sign-up", "/account/forgot-password", "/account/reset-password"]) {
+    for (const p of [
+      "/account/sign-in",
+      "/account/sign-up",
+      "/account/forgot-password",
+      "/account/reset-password",
+    ]) {
       const res = await run(p);
       expect(res.status, p).toBe(200);
     }
@@ -43,7 +57,9 @@ describe("middleware", () => {
     state.user = { id: "u1" };
     const res = await run("/account");
     expect(res.status).toBe(200);
-    expect(res.headers.get("content-security-policy")).toContain("https://api.cloudinary.com");
+    expect(res.headers.get("content-security-policy")).toContain(
+      "https://api.cloudinary.com",
+    );
     expect(res.headers.get("x-frame-options")).toBe("SAMEORIGIN");
   });
 
@@ -56,5 +72,47 @@ describe("middleware", () => {
   it("never touches guest checkout routes", async () => {
     const res = await run("/create");
     expect(res.status).toBe(200);
+  });
+});
+
+describe("middleware — owner area", () => {
+  it("redirects anonymous visitors from /admin to sign-in", async () => {
+    const res = await run("/admin/orders");
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe(
+      "https://keepsy.store/account/sign-in?next=%2Fadmin%2Forders",
+    );
+  });
+
+  it("returns 404 for signed-in customers who are not owners", async () => {
+    process.env.OWNER_EMAILS = "owner@keepsy.store";
+    state.user = {
+      id: "u1",
+      email: "customer@example.com",
+      email_confirmed_at: "2026-01-01T00:00:00Z",
+    } as never;
+    const res = await run("/admin");
+    expect(res.status).toBe(404);
+  });
+
+  it("lets confirmed owners through and blocks unconfirmed owner emails", async () => {
+    process.env.OWNER_EMAILS = "Owner@keepsy.store, dan@keepsy.store";
+    state.user = {
+      id: "u2",
+      email: "owner@keepsy.store",
+      email_confirmed_at: "2026-01-01T00:00:00Z",
+    } as never;
+    expect((await run("/admin/crm")).status).toBe(200);
+    state.user = {
+      id: "u3",
+      email: "owner@keepsy.store",
+      email_confirmed_at: null,
+    } as never;
+    expect((await run("/admin/crm")).status).toBe(404);
+  });
+
+  it("hides the owner area entirely when auth is not configured", async () => {
+    state.configured = false;
+    expect((await run("/admin")).status).toBe(404);
   });
 });

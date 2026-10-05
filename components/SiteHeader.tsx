@@ -1,20 +1,25 @@
 "use client";
-import { useStoredFlag, storeFlag } from "@/lib/hooks/useStoredFlag";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Menu, X, User } from "lucide-react";
+import { ShoppingBag, Menu, X } from "lucide-react";
 import { DynamicLogo } from "@/components/DynamicLogo";
+import { DestinationButton } from "@/components/DestinationSelector";
 
-const CONTAINER = "mx-auto w-full max-w-6xl px-4 sm:px-6";
+const CONTAINER = "mx-auto w-full max-w-6xl px-5 sm:px-8";
 
 const NAV_ITEMS = [
   { href: "/shop", label: "Shop" },
-  { href: "/gift-ideas", label: "Gift Ideas" },
-  { href: "/create", label: "Personalise" },
-  { href: "/community", label: "Reviews" },
+  { href: "/gift-ideas", label: "Gift ideas" },
+  { href: "/create", label: "Create" },
+  { href: "/account", label: "Account" },
+];
+
+const MENU_EXTRAS = [
+  { href: "/about", label: "About Keepsy" },
+  { href: "/shipping", label: "Delivery" },
+  { href: "/faq", label: "Help & FAQ" },
 ];
 
 function useCartCount() {
@@ -30,7 +35,7 @@ function useCartCount() {
           const total = items.reduce(
             (sum: number, item: { quantity?: number }) =>
               sum + (item.quantity ?? 1),
-            0
+            0,
           );
           setCount(total);
         }
@@ -50,43 +55,7 @@ function useCartCount() {
   return count;
 }
 
-function AnnouncementBar() {
-  const dismissed = useStoredFlag("keepsy_announce_dismissed");
-  function dismiss() { storeFlag("keepsy_announce_dismissed", true); }
-
-  return (
-    <AnimatePresence>
-      {!dismissed && (
-        <motion.div
-          key="announcement-bar"
-          initial={{ height: "auto", opacity: 1 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.25, ease: "easeInOut" }}
-          className="overflow-hidden"
-        >
-          <div
-            className="relative flex items-center justify-center gap-2 px-10 py-1.5 text-xs font-medium text-white"
-            style={{ backgroundColor: "var(--color-terracotta)" }}
-          >
-            <span className="truncate sm:hidden">⚡ Free shipping over £75 / $75</span>
-            <span className="hidden truncate sm:inline">⚡ Fast shipping on every order · Free shipping over £75 (UK) / $75 (US)</span>
-            <button
-              type="button"
-              onClick={dismiss}
-              aria-label="Dismiss announcement"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2.5 hover:bg-white/20 transition"
-            >
-              <X size={12} />
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-function MobileOverlay({
+function MobileMenu({
   open,
   onClose,
   pathname,
@@ -98,144 +67,132 @@ function MobileOverlay({
   triggerRef: React.RefObject<HTMLButtonElement | null>;
 }) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const lastNavLinkRef = useRef<HTMLAnchorElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  // Prevent body scroll when open
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
-  // Focus first item (close button) when menu opens
   useEffect(() => {
     if (open) {
-      // Small delay so AnimatePresence has rendered the element
-      const id = setTimeout(() => closeButtonRef.current?.focus(), 50);
+      const id = setTimeout(() => closeButtonRef.current?.focus(), 30);
       return () => clearTimeout(id);
-    } else {
-      // Return focus to hamburger button when menu closes
-      triggerRef.current?.focus();
     }
+    triggerRef.current?.focus();
   }, [open, triggerRef]);
 
-  // Close on Escape
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "Escape") {
         onClose();
         return;
       }
-      // Focus trap: Tab from last focusable item wraps to close button;
-      // Shift+Tab from close button wraps to last focusable item.
-      if (e.key === "Tab") {
-        if (e.shiftKey) {
-          if (document.activeElement === closeButtonRef.current) {
-            e.preventDefault();
-            lastNavLinkRef.current?.focus();
-          }
-        } else {
-          if (document.activeElement === lastNavLinkRef.current) {
-            e.preventDefault();
-            closeButtonRef.current?.focus();
-          }
+      if (e.key === "Tab" && panelRef.current) {
+        const focusables = panelRef.current.querySelectorAll<HTMLElement>(
+          "a[href], button:not([disabled])",
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
         }
       }
     },
-    [onClose]
+    [onClose],
   );
 
+  if (!open) return null;
+
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          key="mobile-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigation menu"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.22 }}
-          className="fixed inset-0 z-[200] flex flex-col"
-          style={{ backgroundColor: "var(--color-cream)" }}
-          onKeyDown={handleKeyDown}
+    <div
+      ref={panelRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu"
+      id="mobile-nav"
+      className="fixed inset-0 z-[200] flex flex-col"
+      style={{ backgroundColor: "var(--color-cream)" }}
+      onKeyDown={handleKeyDown}
+    >
+      <div className="flex items-center justify-between px-5 py-4">
+        <Link href="/" onClick={onClose} aria-label="Keepsy homepage">
+          <DynamicLogo
+            href={null}
+            width={100}
+            className="h-8 w-auto text-[#2D2926]"
+          />
+        </Link>
+        <button
+          ref={closeButtonRef}
+          type="button"
+          onClick={onClose}
+          aria-label="Close menu"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-charcoal/10 transition hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40"
         >
-          {/* Top bar */}
-          <div className="flex items-center justify-between px-5 py-5">
-            <Link href="/" onClick={onClose} aria-label="Keepsy homepage">
-              <DynamicLogo
-                href={null}
-                width={100}
-                className="h-8 w-auto text-[#2D2926]"
-              />
-            </Link>
-            <button
-              ref={closeButtonRef}
-              type="button"
-              onClick={onClose}
-              aria-label="Close menu"
-              className="flex h-10 w-10 items-center justify-center rounded-full border transition hover:bg-black/5"
-              style={{ borderColor: "var(--border)" }}
-            >
-              <X size={20} style={{ color: "var(--color-charcoal)" }} />
-            </button>
-          </div>
+          <X size={20} style={{ color: "var(--color-charcoal)" }} />
+        </button>
+      </div>
 
-          {/* Nav links */}
-          <nav
-            aria-label="Mobile navigation"
-            className="flex flex-1 flex-col justify-center px-8 gap-2"
-          >
-            {NAV_ITEMS.map(({ href, label }, i) => {
-              const active = href.startsWith("/") && pathname === href;
-              return (
-                <motion.div
-                  key={href}
-                  initial={{ opacity: 0, x: -24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.06 + i * 0.07, duration: 0.28 }}
-                >
-                  <Link
-                    href={href}
-                    onClick={onClose}
-                    className="flex min-h-[64px] items-center font-serif text-4xl font-bold tracking-tight transition"
-                    style={{
-                      color: active
-                        ? "var(--color-terracotta)"
-                        : "var(--color-charcoal)",
-                    }}
-                  >
-                    {label}
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </nav>
+      <nav
+        aria-label="Mobile navigation"
+        className="flex flex-1 flex-col justify-center gap-1 px-8"
+      >
+        {NAV_ITEMS.map(({ href, label }) => {
+          const active = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={onClose}
+              aria-current={active ? "page" : undefined}
+              className="flex min-h-[56px] items-center font-serif text-3xl font-bold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40"
+              style={{
+                color: active
+                  ? "var(--color-terracotta)"
+                  : "var(--color-charcoal)",
+              }}
+            >
+              {label}
+            </Link>
+          );
+        })}
+        <div className="mt-6 flex flex-col gap-1 border-t border-charcoal/10 pt-6">
+          {MENU_EXTRAS.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={onClose}
+              className="flex min-h-[44px] items-center text-base font-medium text-charcoal/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40"
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+      </nav>
 
-          {/* CTA — last focusable element, used as focus-trap anchor */}
-          <div className="px-8 pb-16 space-y-3">
-            <Link
-              href="/account"
-              onClick={onClose}
-              className="flex min-h-[48px] items-center justify-center gap-2 rounded-full border text-base font-semibold transition hover:bg-black/5"
-              style={{ borderColor: "var(--border)", color: "var(--color-charcoal)" }}
-            >
-              <User size={18} /> Your account
-            </Link>
-            <Link
-              ref={lastNavLinkRef}
-              href="/create"
-              onClick={onClose}
-              className="flex min-h-[52px] items-center justify-center rounded-full text-base font-semibold text-white transition hover:opacity-90"
-              style={{ backgroundColor: "var(--color-terracotta)" }}
-            >
-              Make a Gift
-            </Link>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+      <div className="space-y-3 px-8 pb-12">
+        <div className="flex justify-center">
+          <DestinationButton className="border border-charcoal/15" />
+        </div>
+        <Link
+          href="/create"
+          onClick={onClose}
+          className="flex min-h-[52px] items-center justify-center rounded-xl text-base font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40"
+          style={{ backgroundColor: "var(--color-terracotta)" }}
+        >
+          Start creating
+        </Link>
+      </div>
+    </div>
   );
 }
 
@@ -247,33 +204,31 @@ export function SiteHeader() {
 
   return (
     <>
-      <AnnouncementBar />
       <header
         className="sticky top-0 z-50 border-b"
         style={{
-          backgroundColor: "rgba(253, 246, 238, 0.85)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
+          backgroundColor: "rgba(253, 246, 238, 0.92)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
           borderColor: "var(--border)",
         }}
       >
-        <div className={`${CONTAINER} flex items-center justify-between py-3`}>
-          {/* ── Mobile: hamburger left ── */}
-          <button
-            ref={hamburgerRef}
-            type="button"
-            className="flex items-center justify-center rounded-full p-2 transition hover:bg-black/5 md:hidden"
-            aria-label="Open menu"
-            aria-expanded={menuOpen}
-            aria-controls="mobile-nav-overlay"
-            onClick={() => setMenuOpen(true)}
-          >
-            <Menu size={22} style={{ color: "var(--color-charcoal)" }} />
-          </button>
-
-          {/* ── Logo ── */}
-          {/* Mobile: centered absolutely; Desktop: left-aligned */}
-          <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
+        <div
+          className={`${CONTAINER} flex h-16 items-center justify-between gap-4`}
+        >
+          {/* Left: menu (mobile) + logo */}
+          <div className="flex items-center gap-2">
+            <button
+              ref={hamburgerRef}
+              type="button"
+              className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40 md:hidden"
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav"
+              onClick={() => setMenuOpen(true)}
+            >
+              <Menu size={22} style={{ color: "var(--color-charcoal)" }} />
+            </button>
             <DynamicLogo
               href="/"
               width={110}
@@ -281,24 +236,30 @@ export function SiteHeader() {
             />
           </div>
 
-          {/* ── Desktop center pill nav ── */}
+          {/* Centre: primary nav (desktop) */}
           <nav
             aria-label="Primary"
-            className="hidden items-center gap-1 rounded-full border border-charcoal/10 bg-white px-2 py-1.5 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] md:flex"
+            className="hidden items-center gap-1 md:flex"
           >
             {NAV_ITEMS.map(({ href, label }) => {
-              const active = href.startsWith("/") && pathname === href;
+              const active =
+                pathname === href ||
+                (href !== "/" && pathname.startsWith(`${href}/`));
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`min-h-9 rounded-full border px-3 py-1.5 text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 ${
+                  aria-current={active ? "page" : undefined}
+                  className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40 ${
                     active
-                      ? "bg-transparent"
-                      : "border-transparent hover:bg-black/5"
+                      ? "text-charcoal"
+                      : "text-charcoal/65 hover:bg-black/5 hover:text-charcoal"
                   }`}
-                  style={active ? { borderColor: "var(--color-terracotta)" } : undefined}
-                  data-active-nav={active ? "true" : undefined}
+                  style={
+                    active
+                      ? { boxShadow: "inset 0 -2px 0 var(--color-terracotta)" }
+                      : undefined
+                  }
                 >
                   {label}
                 </Link>
@@ -306,50 +267,46 @@ export function SiteHeader() {
             })}
           </nav>
 
-          {/* ── Right side: account + cart + CTA ── */}
-          <div className="flex items-center gap-2">
-            {/* Account */}
-            <Link
-              href="/account"
-              aria-label="Your account"
-              className="hidden h-10 w-10 items-center justify-center rounded-full transition hover:bg-black/5 md:flex"
-            >
-              <User size={20} style={{ color: "var(--color-charcoal)" }} />
-            </Link>
-            {/* Cart icon — opens CartDrawer via custom event */}
+          {/* Right: destination + cart + CTA */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            <DestinationButton className="hidden sm:inline-flex" />
             <button
               type="button"
-              aria-label={`Cart${cartCount > 0 ? `, ${cartCount} items` : ""}`}
-              onClick={() => window.dispatchEvent(new Event("open-cart-drawer"))}
-              className="relative flex h-10 w-10 items-center justify-center rounded-full transition hover:bg-black/5"
+              aria-label={
+                cartCount > 0
+                  ? `Basket, ${cartCount} ${cartCount === 1 ? "item" : "items"}`
+                  : "Basket"
+              }
+              onClick={() =>
+                window.dispatchEvent(new Event("open-cart-drawer"))
+              }
+              className="relative flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40"
             >
-              <ShoppingCart
+              <ShoppingBag
                 size={20}
                 style={{ color: "var(--color-charcoal)" }}
               />
               {cartCount > 0 && (
                 <span
-                  className="absolute -right-0.5 -top-0.5 flex min-w-[20px] h-[20px] items-center justify-center rounded-full px-1 text-[10px] leading-none font-bold text-white"
+                  className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-bold leading-none text-white"
                   style={{ backgroundColor: "var(--color-terracotta)" }}
                 >
                   {cartCount > 99 ? "99+" : cartCount}
                 </span>
               )}
             </button>
-
-            {/* Desktop CTA */}
             <Link
               href="/create"
-              className="hidden items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-[0_16px_32px_-20px_rgba(196,113,74,0.5)] transition-opacity duration-150 hover:opacity-90 md:inline-flex"
+              className="hidden min-h-[44px] items-center justify-center rounded-xl px-4 text-sm font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40 md:inline-flex"
               style={{ backgroundColor: "var(--color-terracotta)" }}
             >
-              Make a Gift
+              Start creating
             </Link>
           </div>
         </div>
       </header>
 
-      <MobileOverlay
+      <MobileMenu
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         pathname={pathname}

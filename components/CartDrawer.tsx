@@ -5,16 +5,41 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, Gift, ShoppingBag } from "lucide-react";
 import { getRegion, type Region } from "@/lib/region";
-import { getEstimatedDelivery, type DeliveryRegion } from "@/lib/deliveryEstimate";
+import {
+  getEstimatedDelivery,
+  type DeliveryRegion,
+} from "@/lib/deliveryEstimate";
 import { useCart } from "@/lib/cart/useCart";
-import { computeTotals, linePrice, removeFromCart, updateQuantity, type CartLine } from "@/lib/cart/store";
-import { currencyForRegion, formatMoney, FREE_SHIPPING_THRESHOLD } from "@/lib/commerce/pricing";
+import {
+  computeTotals,
+  linePrice,
+  removeFromCart,
+  updateQuantity,
+  type CartLine,
+} from "@/lib/cart/store";
+import {
+  currencyForRegion,
+  formatMoney,
+  FREE_SHIPPING_THRESHOLD,
+} from "@/lib/commerce/pricing";
+import {
+  CheckoutPreferences,
+  checkoutOptions,
+  EMPTY_CHECKOUT_PREFERENCES,
+} from "@/components/CheckoutPreferences";
+import { getDestination } from "@/lib/hooks/useDestination";
 import { startCheckout } from "@/lib/cart/checkoutClient";
 import { PrintQualityBadge } from "@/components/create/PrintQualityBadge";
 
 /* ─── Sub-components ────────────────────────────────────────────────────── */
 
-function FreeShippingBar({ subtotal, currency }: { subtotal: number; currency: "gbp" | "usd" }) {
+function FreeShippingBar({
+  subtotal,
+  currency,
+}: {
+  subtotal: number;
+  currency: "gbp" | "usd";
+}) {
   const pct = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
   const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
@@ -23,10 +48,19 @@ function FreeShippingBar({ subtotal, currency }: { subtotal: number; currency: "
       <p className="mb-2.5 text-xs text-charcoal/55">
         {remaining > 0 ? (
           <>
-            Add <span className="font-semibold text-charcoal/80">{formatMoney(remaining, currency)}</span> more for free shipping
+            Add{" "}
+            <span className="font-semibold text-charcoal/80">
+              {formatMoney(remaining, currency)}
+            </span>{" "}
+            more for free shipping
           </>
         ) : (
-          <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free shipping unlocked!</span>
+          <span
+            className="font-semibold"
+            style={{ color: "var(--color-forest)" }}
+          >
+            Free shipping unlocked!
+          </span>
         )}
       </p>
       <div className="h-1 w-full overflow-hidden rounded-sm bg-charcoal/8">
@@ -42,35 +76,74 @@ function FreeShippingBar({ subtotal, currency }: { subtotal: number; currency: "
   );
 }
 
-function CartItemRow({ item, currency }: { item: CartLine; currency: "gbp" | "usd" }) {
+function CartItemRow({
+  item,
+  currency,
+}: {
+  item: CartLine;
+  currency: "gbp" | "usd";
+}) {
   const price = linePrice(item, currency);
   const thumb = item.imageUrl || item.designUrl;
 
   return (
-    <div className="flex gap-4 border-b border-charcoal/8 py-5 last:border-b-0" data-cart-line={item.id}>
-      <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl" style={{ backgroundColor: "#F5EDE0" }}>
+    <div
+      className="flex gap-4 border-b border-charcoal/8 py-5 last:border-b-0"
+      data-cart-line={item.id}
+    >
+      <div
+        className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl"
+        style={{ backgroundColor: "#F5EDE0" }}
+      >
         {thumb ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumb} alt={item.name} className="h-full w-full object-cover" />
+          <img
+            src={thumb}
+            alt={item.name}
+            className="h-full w-full object-cover"
+          />
         ) : null}
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <p className="truncate font-serif text-sm font-bold leading-snug text-charcoal">{item.name}</p>
-        {(item.color || item.size || item.addonId || item.sourceKind === "original") && (
+        <p className="truncate font-serif text-sm font-bold leading-snug text-charcoal">
+          {item.name}
+        </p>
+        {(item.color ||
+          item.size ||
+          item.addonId ||
+          item.sourceKind === "original") && (
           <p className="text-xs text-charcoal/45">
-            {[item.size, item.color, item.sourceKind === "original" ? "Your photo" : null, item.addonId ? "Add-on" : null]
+            {[
+              item.size,
+              item.color,
+              item.sourceKind === "original" ? "Your photo" : null,
+              item.addonId ? "Add-on" : null,
+            ]
               .filter(Boolean)
               .join(" · ")}
           </p>
         )}
-        <p className="text-xs text-charcoal/55">{formatMoney(price, currency)} each</p>
-        {item.sourceKind === "original" && item.sourceWidth && item.sourceHeight ? (
-          <PrintQualityBadge productId={item.productId} size={item.size} width={item.sourceWidth} height={item.sourceHeight} compact />
+        <p className="text-xs text-charcoal/55">
+          {formatMoney(price, currency)} each
+        </p>
+        {item.sourceKind === "original" &&
+        item.sourceWidth &&
+        item.sourceHeight ? (
+          <PrintQualityBadge
+            productId={item.productId}
+            size={item.size}
+            width={item.sourceWidth}
+            height={item.sourceHeight}
+            compact
+          />
         ) : null}
 
         <div className="mt-1.5 flex items-center justify-between">
-          <div className="flex items-center gap-0.5 rounded-lg border border-charcoal/20" style={{ backgroundColor: "var(--color-cream)" }}>
+          <div
+            className="flex items-center gap-0.5 rounded-lg border border-charcoal/20"
+            style={{ backgroundColor: "var(--color-cream)" }}
+          >
             <button
               type="button"
               aria-label="Decrease quantity"
@@ -79,7 +152,9 @@ function CartItemRow({ item, currency }: { item: CartLine; currency: "gbp" | "us
             >
               −
             </button>
-            <span className="w-5 text-center text-xs font-semibold text-charcoal">{item.quantity}</span>
+            <span className="w-5 text-center text-xs font-semibold text-charcoal">
+              {item.quantity}
+            </span>
             <button
               type="button"
               aria-label="Increase quantity"
@@ -91,7 +166,9 @@ function CartItemRow({ item, currency }: { item: CartLine; currency: "gbp" | "us
           </div>
 
           <div className="flex items-center gap-3">
-            <p className="text-sm font-bold text-charcoal">{formatMoney(price * item.quantity, currency)}</p>
+            <p className="text-sm font-bold text-charcoal">
+              {formatMoney(price * item.quantity, currency)}
+            </p>
             <button
               type="button"
               aria-label="Remove item"
@@ -110,12 +187,19 @@ function CartItemRow({ item, currency }: { item: CartLine; currency: "gbp" | "us
 function EmptyState({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6 px-8 py-16 text-center">
-      <div className="flex h-20 w-20 items-center justify-center rounded-2xl" style={{ backgroundColor: "#F5EDE0" }}>
+      <div
+        className="flex h-20 w-20 items-center justify-center rounded-2xl"
+        style={{ backgroundColor: "#F5EDE0" }}
+      >
         <Gift size={32} style={{ color: "var(--color-terracotta)" }} />
       </div>
       <div>
-        <p className="font-serif text-xl font-bold text-charcoal">Your bag is empty</p>
-        <p className="mt-1 text-sm leading-6 text-charcoal/50">Start creating something beautiful for the people you love.</p>
+        <p className="font-serif text-xl font-bold text-charcoal">
+          Your bag is empty
+        </p>
+        <p className="mt-1 text-sm leading-6 text-charcoal/50">
+          Start creating something beautiful for the people you love.
+        </p>
       </div>
       <Link
         href="/create"
@@ -167,15 +251,24 @@ export function CartDrawer() {
 
   const close = useCallback(() => setIsOpen(false), []);
 
+  const [checkoutPreferences, setCheckoutPreferences] = useState(
+    EMPTY_CHECKOUT_PREFERENCES,
+  );
+
   async function handleCheckout() {
     if (isCheckingOut || items.length === 0) return;
     setIsCheckingOut(true);
     setCheckoutError(null);
     try {
-      const { url } = await startCheckout(items, region);
+      const { url } = await startCheckout(
+        items,
+        checkoutOptions(checkoutPreferences, getDestination()),
+      );
       window.location.href = url;
     } catch (e) {
-      setCheckoutError(e instanceof Error ? e.message : "Checkout failed. Please try again.");
+      setCheckoutError(
+        e instanceof Error ? e.message : "Checkout failed. Please try again.",
+      );
       setIsCheckingOut(false);
     }
   }
@@ -209,10 +302,18 @@ export function CartDrawer() {
           >
             <div className="flex items-center justify-between border-b border-charcoal/8 px-6 py-5">
               <div className="flex items-center gap-2.5">
-                <ShoppingBag size={18} style={{ color: "var(--color-forest)" }} />
-                <h2 className="font-serif text-xl font-bold text-charcoal">Your Bag</h2>
+                <ShoppingBag
+                  size={18}
+                  style={{ color: "var(--color-forest)" }}
+                />
+                <h2 className="font-serif text-xl font-bold text-charcoal">
+                  Your Bag
+                </h2>
                 {totals.itemCount > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold text-white" style={{ backgroundColor: "var(--color-terracotta)" }}>
+                  <span
+                    className="flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-bold text-white"
+                    style={{ backgroundColor: "var(--color-terracotta)" }}
+                  >
                     {totals.itemCount > 99 ? "99+" : totals.itemCount}
                   </span>
                 )}
@@ -231,23 +332,42 @@ export function CartDrawer() {
               <EmptyState onClose={close} />
             ) : (
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                <FreeShippingBar subtotal={totals.subtotal} currency={currency} />
+                <FreeShippingBar
+                  subtotal={totals.subtotal}
+                  currency={currency}
+                />
 
                 <div className="min-h-0 flex-1 overflow-y-auto px-6">
                   {items.map((item) => (
-                    <CartItemRow key={item.id} item={item} currency={currency} />
+                    <CartItemRow
+                      key={item.id}
+                      item={item}
+                      currency={currency}
+                    />
                   ))}
 
+                  <CheckoutPreferences
+                    value={checkoutPreferences}
+                    onChange={setCheckoutPreferences}
+                    lines={items}
+                  />
                   <div className="space-y-1.5 border-t border-charcoal/8 pb-4 pt-3">
                     <div className="flex items-center justify-between text-sm text-charcoal/65">
                       <span>Subtotal</span>
-                      <span className="font-medium">{formatMoney(totals.subtotal, currency)}</span>
+                      <span className="font-medium">
+                        {formatMoney(totals.subtotal, currency)}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm text-charcoal/65">
                       <span>Shipping</span>
                       <span className="font-medium">
                         {totals.shipping === 0 ? (
-                          <span className="font-semibold" style={{ color: "var(--color-forest)" }}>Free</span>
+                          <span
+                            className="font-semibold"
+                            style={{ color: "var(--color-forest)" }}
+                          >
+                            Free
+                          </span>
                         ) : (
                           formatMoney(totals.shipping, currency)
                         )}
@@ -258,18 +378,30 @@ export function CartDrawer() {
                     </p>
                     <p className="text-[11px] leading-relaxed text-charcoal/50">
                       Secure Checkout · Handmade With Care ·{" "}
-                      <Link href="/refunds" className="underline underline-offset-2">30-Day Returns</Link>
+                      <Link
+                        href="/refunds"
+                        className="underline underline-offset-2"
+                      >
+                        30-Day Returns
+                      </Link>
                     </p>
                   </div>
                 </div>
 
                 <div
                   className="flex-shrink-0 border-t-2 border-charcoal/12 bg-white px-6 pt-4"
-                  style={{ paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))" }}
+                  style={{
+                    paddingBottom:
+                      "calc(24px + env(safe-area-inset-bottom, 0px))",
+                  }}
                 >
                   <div className="mb-3 flex items-center justify-between">
-                    <span className="text-base font-bold text-charcoal">Total</span>
-                    <span className="text-base font-bold text-charcoal">{formatMoney(totals.total, currency)}</span>
+                    <span className="text-base font-bold text-charcoal">
+                      Total
+                    </span>
+                    <span className="text-base font-bold text-charcoal">
+                      {formatMoney(totals.total, currency)}
+                    </span>
                   </div>
                   <button
                     type="button"
@@ -281,7 +413,14 @@ export function CartDrawer() {
                     {isCheckingOut ? "Taking you to checkout…" : "Checkout"}
                   </button>
                   {checkoutError && (
-                    <p role="alert" className="mt-3 rounded-lg px-3 py-2 text-center text-xs font-semibold" style={{ backgroundColor: "rgba(196,113,74,0.10)", color: "var(--color-terra-dark)" }}>
+                    <p
+                      role="alert"
+                      className="mt-3 rounded-lg px-3 py-2 text-center text-xs font-semibold"
+                      style={{
+                        backgroundColor: "rgba(196,113,74,0.10)",
+                        color: "var(--color-terra-dark)",
+                      }}
+                    >
                       {checkoutError}
                     </p>
                   )}

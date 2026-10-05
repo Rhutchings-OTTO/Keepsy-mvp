@@ -1,8 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useReducedMotionPref } from "@/lib/motion/useReducedMotionPref";
-
 type InteractiveCardProps = {
   title?: string;
   subtitle?: string;
@@ -13,6 +10,7 @@ type InteractiveCardProps = {
   href?: string;
 };
 
+/** Simple card with optional link/button wrapper. No hover tilt or scale. */
 export function InteractiveCard({
   title,
   subtitle,
@@ -22,32 +20,39 @@ export function InteractiveCard({
   className = "",
   href,
 }: InteractiveCardProps) {
-  const reduceMotion = useReducedMotionPref();
-
   const content = (
-    <motion.div
-      className={`group relative overflow-hidden rounded-2xl border border-white/25 bg-white/10 p-3 shadow-lg backdrop-blur-md ${className}`}
-      whileHover={reduceMotion ? undefined : { y: -4, boxShadow: "0 12px 28px rgba(0,0,0,0.08)" }}
-      whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    <div
+      className={`relative overflow-hidden rounded-2xl border border-(--color-charcoal)/8 bg-white p-3 shadow-[0_1px_2px_rgba(45,41,38,0.04),0_12px_28px_-22px_rgba(45,41,38,0.25)] ${className}`}
     >
       {image && <div className="overflow-hidden rounded-xl">{image}</div>}
-      {title && <div className="mt-2 font-bold text-black/85">{title}</div>}
-      {subtitle && <div className="text-sm text-black/55">{subtitle}</div>}
+      {title && (
+        <div className="mt-2 font-semibold text-(--color-charcoal)">
+          {title}
+        </div>
+      )}
+      {subtitle && (
+        <div className="text-sm text-(--color-charcoal)/60">{subtitle}</div>
+      )}
       {children}
-    </motion.div>
+    </div>
   );
 
+  const focusRing =
+    "block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-(--color-terracotta)/40 focus-visible:ring-offset-2";
   if (href) {
     return (
-      <a href={href} className="block outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-2 rounded-2xl">
+      <a href={href} className={focusRing}>
         {content}
       </a>
     );
   }
   if (onClick) {
     return (
-      <button type="button" onClick={onClick} className="block w-full text-left outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-2 rounded-2xl">
+      <button
+        type="button"
+        onClick={onClick}
+        className={`${focusRing} w-full text-left`}
+      >
         {content}
       </button>
     );

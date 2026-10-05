@@ -30,12 +30,15 @@ export function generateStaticParams() {
   return PRODUCT_CARDS.map((p) => ({ type: p.type }));
 }
 
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
   const { type } = await params;
   const product = PRODUCT_CARDS.find((p) => p.type === type);
   if (!product) return {};
   const title =
-    PRODUCT_TITLES[type] ?? `Personalised ${product.name} — Custom ${product.name} Gift | Keepsy`;
+    PRODUCT_TITLES[type] ??
+    `Personalised ${product.name} — Custom ${product.name} Gift | Keepsy`;
   const description =
     PRODUCT_DESCRIPTIONS[type] ??
     `Design a personalised ${product.name.toLowerCase()} with your own photo or memory. Starting from £${product.price.toFixed(2)} — made to order, shipped to UK & US.`;
@@ -57,26 +60,29 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
-const PRODUCT_META: Record<string, { name: string; price: string; image: string }> = {
+const PRODUCT_META: Record<
+  string,
+  { name: string; price: string; image: string }
+> = {
   hoodie: {
     name: "Personalised Hoodie",
     price: "44.99",
-    image: "https://keepsy.store/product-tiles/hoodie-white.png",
+    image: "https://keepsy.store/mockups/premium-v2/hoodie-white.webp",
   },
   mug: {
     name: "Personalised Mug",
     price: "14.99",
-    image: "https://keepsy.store/product-tiles/plain-mug-front.png",
+    image: "https://keepsy.store/mockups/premium-v2/mug-white.webp",
   },
   tee: {
     name: "Personalised T-Shirt",
     price: "29.99",
-    image: "https://keepsy.store/product-tiles/tee-white.png",
+    image: "https://keepsy.store/mockups/premium-v2/tee-white.webp",
   },
   card: {
     name: "Personalised Greeting Card",
     price: "6.99",
-    image: "https://keepsy.store/product-tiles/plain-card.png",
+    image: "https://keepsy.store/mockups/premium-v2/plain-card.webp",
   },
   canvas: {
     name: "Personalised Canvas Print",
@@ -85,7 +91,13 @@ const PRODUCT_META: Record<string, { name: string; price: string; image: string 
   },
 };
 
-function buildProductJsonLd(type: string, name: string, description: string, price: string, image: string) {
+function buildProductJsonLd(
+  type: string,
+  name: string,
+  description: string,
+  price: string,
+  image: string,
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -141,7 +153,8 @@ function buildProductJsonLd(type: string, name: string, description: string, pri
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",
         applicableCountry: ["GB", "US"],
-        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        returnPolicyCategory:
+          "https://schema.org/MerchantReturnFiniteReturnWindow",
         merchantReturnDays: 30,
         returnMethod: "https://schema.org/ReturnByMail",
         returnFees: "https://schema.org/FreeReturn",
@@ -157,15 +170,29 @@ function buildProductJsonLd(type: string, name: string, description: string, pri
   };
 }
 
-
 function buildBreadcrumbJsonLd(type: string, name: string) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://keepsy.store" },
-      { "@type": "ListItem", position: 2, name: "Shop", item: "https://keepsy.store/shop" },
-      { "@type": "ListItem", position: 3, name, item: `https://keepsy.store/product/${type}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://keepsy.store",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Shop",
+        item: "https://keepsy.store/shop",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name,
+        item: `https://keepsy.store/product/${type}`,
+      },
     ],
   };
 }
@@ -185,7 +212,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
     PRODUCT_DESCRIPTIONS[type] ??
     `A personalised ${product.name.toLowerCase()} made to order at Keepsy.`;
 
-  const productSchema = buildProductJsonLd(type, meta.name, description, meta.price, meta.image);
+  const productSchema = buildProductJsonLd(
+    type,
+    meta.name,
+    description,
+    meta.price,
+    meta.image,
+  );
   const breadcrumbSchema = buildBreadcrumbJsonLd(type, meta.name);
 
   return (

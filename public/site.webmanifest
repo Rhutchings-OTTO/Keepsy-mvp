@@ -1,11 +1,22 @@
 {
-  "name": "Keepsy",
+  "name": "Keepsy Studio",
   "short_name": "Keepsy",
-  "icons": [
-    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
-  ],
-  "theme_color": "#C4714A",
+  "id": "/admin",
+  "start_url": "/admin/orders",
+  "scope": "/",
+  "display": "standalone",
   "background_color": "#FDF6EE",
-  "display": "standalone"
+  "theme_color": "#2C4A3E",
+  "icons": [
+    {
+      "src": "/icons/keepsy-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/keepsy-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }

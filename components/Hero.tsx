@@ -58,7 +58,7 @@ export function Hero() {
         >
           <MagneticLink
             href="/create"
-            className="inline-block min-h-11 rounded-2xl bg-terracotta px-6 py-3 text-sm font-bold text-white shadow-terra-glow hover:bg-terracotta-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/30"
+            className="inline-block min-h-11 rounded-2xl bg-(--color-terracotta) px-6 py-3 text-sm font-bold text-white shadow-terra-glow hover:bg-terracotta-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/30"
           >
             Create your gift
           </MagneticLink>

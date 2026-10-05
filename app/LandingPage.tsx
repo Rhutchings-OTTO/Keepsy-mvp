@@ -35,7 +35,7 @@ const EYEBROW = "text-[11px] font-bold uppercase tracking-[0.2em]";
 const H2 =
   "mt-3 font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-4xl";
 const PRIMARY_BTN =
-  "inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl px-7 text-base font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40";
+  "inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl px-7 text-base font-semibold text-(--color-cream) transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40";
 const SECONDARY_BTN =
   "inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl border border-charcoal/20 bg-white px-7 text-base font-semibold text-charcoal transition hover:border-charcoal/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40";
 

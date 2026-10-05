@@ -132,7 +132,7 @@ export default function GuidedPromptPanel({ currentPrompt, onApplyPrompt }: Guid
         <button
           type="button"
           onClick={() => onApplyPrompt(builtPrompt)}
-          className="rounded-full bg-terracotta px-4 py-2 text-xs font-semibold text-white shadow-terra-glow transition hover:opacity-90"
+          className="rounded-full bg-(--color-terracotta) px-4 py-2 text-xs font-semibold text-white shadow-terra-glow transition hover:opacity-90"
         >
           Use this prompt
         </button>

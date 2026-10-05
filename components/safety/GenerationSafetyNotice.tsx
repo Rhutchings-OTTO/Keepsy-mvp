@@ -59,7 +59,7 @@ export function GenerationSafetyNotice({
               <button
                 type="button"
                 onClick={() => onUseSuggestedPromptClick(hardBlock.suggestedPrompt!)}
-                className="px-4 py-2 rounded-full text-sm font-semibold bg-terracotta text-white shadow-terra-glow transition hover:opacity-90"
+                className="px-4 py-2 rounded-full text-sm font-semibold bg-(--color-terracotta) text-white shadow-terra-glow transition hover:opacity-90"
               >
                 Try again with suggested wording
               </button>

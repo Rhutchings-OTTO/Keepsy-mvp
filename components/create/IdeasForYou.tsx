@@ -101,7 +101,7 @@ export const IdeasForYou = React.memo(function IdeasForYou({
             <button
               type="button"
               onClick={() => onReplaceConfirm(pendingReplace)}
-              className="rounded-full bg-terracotta px-3 py-1.5 font-bold text-white shadow-terra-glow transition hover:opacity-90"
+              className="rounded-full bg-(--color-terracotta) px-3 py-1.5 font-bold text-white shadow-terra-glow transition hover:opacity-90"
             >
               Replace
             </button>

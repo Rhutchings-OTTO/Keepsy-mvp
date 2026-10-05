@@ -25,7 +25,7 @@ const schema = z
     consent: z.literal(true),
     consentTextVersion: z.literal(CURRENT_NEWSLETTER_CONSENT_VERSION),
     source: z.enum(["homepage", "footer", "create-exit", "checkout"]),
-    honeypot: z.string().max(0).optional(),
+    website: z.string().max(0).optional(), // honeypot sent by NewsletterSignup
   })
   .strict();
 export async function POST(req: Request) {

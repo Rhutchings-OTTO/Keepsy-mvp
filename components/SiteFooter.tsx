@@ -124,117 +124,126 @@ export function SiteFooter() {
   const symbol = currency === "usd" ? "$" : "£";
 
   return (
-    <footer
-      className="border-t"
-      style={{ backgroundColor: "#2D2926", borderColor: BORDER }}
-    >
-      {/* Newsletter */}
-      <div className="border-b py-12 sm:py-16" style={{ borderColor: BORDER }}>
+    <>
+      {/* Newsletter — the single site-wide signup (cream card style) */}
+      <section
+        className="py-16 sm:py-24"
+        style={{ backgroundColor: "var(--color-cream-dark)" }}
+      >
         <div
-          className={`${CONTAINER} grid gap-8 lg:grid-cols-[1fr_minmax(0,460px)] lg:items-start lg:gap-16`}
+          className={`${CONTAINER} grid gap-8 lg:grid-cols-[1fr_minmax(0,480px)] lg:items-start lg:gap-16`}
         >
           <div>
             <p
-              className="text-[11px] font-bold uppercase tracking-[0.18em]"
-              style={{ color: HEADER }}
+              className="text-[11px] font-bold uppercase tracking-[0.2em]"
+              style={{ color: "var(--color-terracotta)" }}
             >
-              Keepsy newsletter
+              Newsletter
             </p>
-            <h2 className="mt-3 font-serif text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            <h2 className="mt-3 font-serif text-3xl font-bold tracking-[-0.03em] text-charcoal sm:text-4xl">
               10% off your first order
             </h2>
+            <p className="mt-3 max-w-md text-base leading-7 text-charcoal/65">
+              Join the list and we&apos;ll email you a welcome code, plus
+              occasional gift ideas and new products. No spam, and you can stop
+              any time.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-charcoal/8 bg-white p-6 sm:p-8">
+            <NewsletterSignup
+              source="footer"
+              currency={currency}
+              tone="light"
+            />
+          </div>
+        </div>
+      </section>
+
+      <footer
+        className="border-t"
+        style={{ backgroundColor: "#2D2926", borderColor: BORDER }}
+      >
+        {/* Links */}
+        <div
+          className={`${CONTAINER} grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr] sm:py-16`}
+        >
+          <div>
+            <p className="font-serif text-2xl font-bold tracking-tight text-white">
+              Keepsy
+            </p>
             <p
-              className="mt-2 max-w-md text-sm leading-6"
+              className="mt-2 max-w-xs text-sm leading-6"
               style={{ color: LINK }}
             >
-              Occasional gift ideas and new products. We only email people who
-              ask us to, and you can stop any time.
+              Personalised gifts, made to order. Upload a photo or describe an
+              idea, see it on the product, then we print and deliver it.
             </p>
-          </div>
-          <NewsletterSignup source="footer" currency={currency} tone="dark" />
-        </div>
-      </div>
-
-      {/* Links */}
-      <div
-        className={`${CONTAINER} grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr] sm:py-16`}
-      >
-        <div>
-          <p className="font-serif text-2xl font-bold tracking-tight text-white">
-            Keepsy
-          </p>
-          <p
-            className="mt-2 max-w-xs text-sm leading-6"
-            style={{ color: LINK }}
-          >
-            Personalised gifts, made to order. Upload a photo or describe an
-            idea, see it on the product, then we print and deliver it.
-          </p>
-          <p className="mt-4 text-xs leading-5" style={{ color: FAINT }}>
-            Delivering to the United Kingdom and United States. Free delivery
-            over {symbol}
-            {FREE_SHIPPING_THRESHOLD}.
-          </p>
-          <div className="mt-5 flex items-center gap-2">
-            {SOCIAL.map(({ href, label, Icon }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Keepsy on ${label}`}
-                className="flex h-11 w-11 items-center justify-center rounded-full border transition hover:border-white/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                style={{ borderColor: BORDER, color: LINK }}
-              >
-                <Icon />
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {COLUMNS.map((col) => (
-          <nav key={col.title} aria-label={col.title}>
-            <p
-              className="text-[11px] font-bold uppercase tracking-[0.18em]"
-              style={{ color: HEADER }}
-            >
-              {col.title}
+            <p className="mt-4 text-xs leading-5" style={{ color: FAINT }}>
+              Delivering to the United Kingdom and United States. Free delivery
+              over {symbol}
+              {FREE_SHIPPING_THRESHOLD}.
             </p>
-            <ul className="mt-4 space-y-2.5">
-              {col.links.map((l) => (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className="inline-flex min-h-[32px] items-center text-sm transition hover:text-white focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                    style={{ color: LINK }}
-                  >
-                    {l.label}
-                  </Link>
-                </li>
+            <div className="mt-5 flex items-center gap-2">
+              {SOCIAL.map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Keepsy on ${label}`}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border transition hover:border-white/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                  style={{ borderColor: BORDER, color: LINK }}
+                >
+                  <Icon />
+                </a>
               ))}
-            </ul>
-          </nav>
-        ))}
-      </div>
+            </div>
+          </div>
 
-      {/* Legal line */}
-      <div className="border-t py-6" style={{ borderColor: BORDER }}>
-        <div
-          className={`${CONTAINER} flex flex-col gap-2 text-xs sm:flex-row sm:items-center sm:justify-between`}
-          style={{ color: FAINT }}
-        >
-          <p>© {new Date().getFullYear()} Keepsy. All rights reserved.</p>
-          <p>
-            Payments by Stripe · Printed with Printify partners ·{" "}
-            <a
-              href="mailto:support@keepsy.store"
-              className="underline underline-offset-2 hover:text-white"
-            >
-              support@keepsy.store
-            </a>
-          </p>
+          {COLUMNS.map((col) => (
+            <nav key={col.title} aria-label={col.title}>
+              <p
+                className="text-[11px] font-bold uppercase tracking-[0.18em]"
+                style={{ color: HEADER }}
+              >
+                {col.title}
+              </p>
+              <ul className="mt-4 space-y-2.5">
+                {col.links.map((l) => (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      className="inline-flex min-h-[32px] items-center text-sm transition hover:text-white focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                      style={{ color: LINK }}
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
         </div>
-      </div>
-    </footer>
+
+        {/* Legal line */}
+        <div className="border-t py-6" style={{ borderColor: BORDER }}>
+          <div
+            className={`${CONTAINER} flex flex-col gap-2 text-xs sm:flex-row sm:items-center sm:justify-between`}
+            style={{ color: FAINT }}
+          >
+            <p>© {new Date().getFullYear()} Keepsy. All rights reserved.</p>
+            <p>
+              Payments by Stripe · Printed with Printify partners ·{" "}
+              <a
+                href="mailto:support@keepsy.store"
+                className="underline underline-offset-2 hover:text-white"
+              >
+                support@keepsy.store
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }

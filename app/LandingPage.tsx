@@ -28,7 +28,7 @@ import {
   DestinationSuggestionStrip,
   DEFAULT_DESTINATION,
 } from "@/components/DestinationSelector";
-import { NewsletterSignup } from "@/components/landing/NewsletterSignup";
+import { HeroPromptVisual } from "@/components/landing/HeroPromptVisual";
 
 const CONTAINER = "mx-auto w-full max-w-7xl px-5 sm:px-8";
 const EYEBROW = "text-[11px] font-bold uppercase tracking-[0.2em]";
@@ -195,6 +195,9 @@ export default function LandingPage({
               Delivering to the UK and US · Free delivery over {symbol}
               {FREE_SHIPPING_THRESHOLD} · Secure checkout by Stripe
             </p>
+            <div className="mt-8 max-w-md">
+              <HeroPromptVisual />
+            </div>
           </div>
 
           <div
@@ -657,34 +660,6 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* ── Newsletter ── */}
-      <section
-        className="py-16 sm:py-24"
-        style={{ backgroundColor: "var(--color-cream-dark)" }}
-      >
-        <div
-          className={`${CONTAINER} grid gap-8 lg:grid-cols-[1fr_minmax(0,480px)] lg:items-start lg:gap-16`}
-        >
-          <div>
-            <p className={EYEBROW} style={{ color: "var(--color-terracotta)" }}>
-              Newsletter
-            </p>
-            <h2 className={H2}>10% off your first order</h2>
-            <p className="mt-3 max-w-md text-base leading-7 text-charcoal/65">
-              Join the list and we&apos;ll email you a welcome code, plus
-              occasional gift ideas and new products. No spam, and you can stop
-              any time.
-            </p>
-          </div>
-          <div className="rounded-3xl border border-charcoal/8 bg-white p-6 sm:p-8">
-            <NewsletterSignup
-              source="homepage"
-              currency={currency}
-              tone="light"
-            />
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

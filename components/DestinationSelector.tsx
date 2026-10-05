@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown, X } from "lucide-react";
 import {
   SHIP_COUNTRIES,
@@ -89,7 +90,7 @@ export function DestinationSelector({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
   const enabled = enabledCountries();
   const comingSoon = SHIP_COUNTRIES.filter((c) => !c.enabled);
@@ -100,7 +101,9 @@ export function DestinationSelector({
     onClose();
   };
 
-  return (
+  // Portal to <body>: the sticky header uses backdrop-filter, which would
+  // otherwise become the containing block for this fixed overlay and clip it.
+  return createPortal(
     <div className="fixed inset-0 z-[90]">
       <button
         type="button"
@@ -203,7 +206,8 @@ export function DestinationSelector({
           </div>
         ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

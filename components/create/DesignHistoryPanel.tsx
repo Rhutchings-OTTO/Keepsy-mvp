@@ -82,7 +82,7 @@ export function DesignHistoryPanel({ nodes, currentNodeId, onSelect, disabled = 
           <img src={node.imageUrl} alt="" className="h-full w-full object-cover" />
           <span className="absolute left-0.5 top-0.5 rounded-full bg-white/90 px-1 text-[9px] font-black text-charcoal">{number}</span>
           {isActive ? (
-            <span className="absolute bottom-0.5 right-0.5 rounded-full bg-terracotta p-0.5 text-white">
+            <span className="absolute bottom-0.5 right-0.5 rounded-full bg-(--color-terracotta) p-0.5 text-white">
               <Check size={10} />
             </span>
           ) : null}

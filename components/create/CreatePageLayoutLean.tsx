@@ -691,7 +691,7 @@ export function CreatePageLayoutLean({
                             onClick={() => onCardSubtypeSelect(value)}
                             className={`rounded-xl border p-3 text-left transition ${
                               active
-                                ? "border-terracotta bg-terracotta text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
+                                ? "border-(--color-terracotta) bg-(--color-terracotta) text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
                                 : "border-charcoal/10 bg-white text-charcoal hover:border-terracotta/40"
                             }`}
                           >
@@ -745,7 +745,7 @@ export function CreatePageLayoutLean({
                             onClick={() => onCardSubtypeSelect(value)}
                             className={`rounded-xl border p-3 text-left transition ${
                               active
-                                ? "border-terracotta bg-terracotta text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
+                                ? "border-(--color-terracotta) bg-(--color-terracotta) text-white shadow-[0_8px_20px_-10px_rgba(196,113,74,0.4)]"
                                 : "border-charcoal/10 bg-white text-charcoal hover:border-terracotta/40"
                             }`}
                           >

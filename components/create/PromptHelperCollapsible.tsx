@@ -97,7 +97,7 @@ export const PromptHelperCollapsible = React.memo(function PromptHelperCollapsib
           <button
             type="button"
             onClick={() => onUsePrompt(builtPrompt)}
-            className="w-full rounded-full bg-terracotta px-4 py-3 text-sm font-bold text-white shadow-terra-glow transition hover:opacity-90"
+            className="w-full rounded-full bg-(--color-terracotta) px-4 py-3 text-sm font-bold text-white shadow-terra-glow transition hover:opacity-90"
           >
             Use this description
           </button>

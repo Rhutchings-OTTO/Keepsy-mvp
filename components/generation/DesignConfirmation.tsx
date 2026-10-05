@@ -230,7 +230,7 @@ export function DesignConfirmation({
                     <MagneticButton
                       type="button"
                       onClick={onStartFresh}
-                      className="px-4 py-2 rounded-xl bg-terracotta text-white text-sm font-bold hover:opacity-90"
+                      className="px-4 py-2 rounded-xl bg-(--color-terracotta) text-white text-sm font-bold hover:opacity-90"
                     >
                       Start a fresh design
                     </MagneticButton>

@@ -422,7 +422,7 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
                   onClick={() => handleProductChange(prod)}
                   className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 border ${
                     selectedProduct.id === prod.id
-                      ? "bg-terracotta border-terracotta text-white shadow-warm-sm"
+                      ? "bg-(--color-terracotta) border-(--color-terracotta) text-white shadow-warm-sm"
                       : "bg-cream border-charcoal/15 text-charcoal hover:bg-[#F5EDE0] hover:border-terracotta/40"
                   }`}
                 >
@@ -482,7 +482,7 @@ export function ProductPreviewClient({ initialSlug }: { initialSlug: string }) {
                     onClick={() => setSelectedSize(size)}
                     className={`px-3.5 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                       selectedSize === size
-                        ? "bg-terracotta border-terracotta text-white"
+                        ? "bg-(--color-terracotta) border-(--color-terracotta) text-white"
                         : "bg-cream border-charcoal/20 text-charcoal hover:border-terracotta/40"
                     }`}
                   >

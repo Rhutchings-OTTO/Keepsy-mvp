@@ -1,6 +1,6 @@
 "use client";
 
-// HeroPromptVisual — homepage hero right-side visual hook.
+// HeroPromptVisual — homepage hero visual hook (typed-out example prompts).
 //
 // Visual-only mimic of CreateModePanel (the real "Describe / Upload" tabs on
 // /create). Click anywhere on this card routes the visitor to /create.
@@ -18,19 +18,48 @@ const ROTATING_EXAMPLES = [
   "A watercolour portrait of our cat Bella",
 ];
 
-const ROTATION_MS = 3500;
+// Typewriter timings (ms): type each prompt out, hold, erase, then the next.
+const TYPE_MS = 55;
+const ERASE_MS = 22;
+const HOLD_MS = 1900;
+const GAP_MS = 350;
+
+type Phase = "typing" | "holding" | "erasing";
 
 export function HeroPromptVisual() {
   const reduceMotion = useReducedMotion();
+  // Start with the first prompt fully shown so the server HTML has text and
+  // matches the client's first render (reduced motion included); the
+  // typewriter loop begins after the first hold.
   const [exampleIndex, setExampleIndex] = useState(0);
+  const [typed, setTyped] = useState(ROTATING_EXAMPLES[0].length);
+  const [phase, setPhase] = useState<Phase>("holding");
+
+  const full = ROTATING_EXAMPLES[exampleIndex];
 
   useEffect(() => {
     if (reduceMotion) return;
-    const id = setInterval(() => {
-      setExampleIndex((prev) => (prev + 1) % ROTATING_EXAMPLES.length);
-    }, ROTATION_MS);
-    return () => clearInterval(id);
-  }, [reduceMotion]);
+    let id: ReturnType<typeof setTimeout>;
+    if (phase === "typing") {
+      id =
+        typed < full.length
+          ? setTimeout(() => setTyped((n) => n + 1), TYPE_MS)
+          : setTimeout(() => setPhase("holding"), 0);
+    } else if (phase === "holding") {
+      id = setTimeout(() => setPhase("erasing"), HOLD_MS);
+    } else if (typed > 0) {
+      id = setTimeout(() => setTyped((n) => n - 1), ERASE_MS);
+    } else {
+      id = setTimeout(() => {
+        setExampleIndex((i) => (i + 1) % ROTATING_EXAMPLES.length);
+        setPhase("typing");
+      }, GAP_MS);
+    }
+    return () => clearTimeout(id);
+  }, [reduceMotion, phase, typed, full.length]);
+
+  // Reduced motion: the effect never runs, so the first prompt stays in full.
+  const shown = full.slice(0, typed);
 
   return (
     <Link
@@ -54,19 +83,20 @@ export function HeroPromptVisual() {
         </span>
       </div>
 
-      {/* Fake textarea with rotating placeholder */}
+      {/* Fake textarea with a typed-out example prompt */}
       <div
         className="mt-4 min-h-[112px] rounded-2xl border border-charcoal/10 bg-white px-4 py-3 transition-colors group-hover:border-charcoal/20 sm:min-h-[128px]"
         style={{ backgroundColor: "rgba(253,246,238,0.65)" }}
       >
         <p
-          key={exampleIndex}
-          className="hero-prompt-placeholder text-base leading-7 text-charcoal/45 sm:text-[17px]"
+          aria-hidden
+          className="text-base leading-7 text-charcoal/45 sm:text-[17px]"
         >
-          {ROTATING_EXAMPLES[exampleIndex]}
+          {shown}
           <span
-            aria-hidden
-            className="hero-prompt-caret ml-0.5 inline-block h-[1.05em] w-[2px] -translate-y-[1px] align-middle"
+            className={`ml-0.5 inline-block h-[1.05em] w-[2px] -translate-y-[1px] align-middle ${
+              phase === "holding" ? "hero-prompt-caret" : ""
+            }`}
             style={{ backgroundColor: "var(--color-terracotta)" }}
           />
         </p>
@@ -78,14 +108,14 @@ export function HeroPromptVisual() {
           2 free designs every day. No card required.
         </p>
         <span
-          className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold text-white shadow-sm transition-opacity group-hover:opacity-90"
+          className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold text-white shadow-sm transition-opacity group-hover:opacity-90"
           style={{ backgroundColor: "var(--color-terracotta)" }}
         >
           Try it →
         </span>
       </div>
 
-      {/* Local styles — caret blink + placeholder fade-in on rotate */}
+      {/* Local styles — caret blinks while a prompt is held */}
       <style>{`
         @keyframes hero-prompt-caret-blink {
           0%, 49% { opacity: 1; }
@@ -94,16 +124,8 @@ export function HeroPromptVisual() {
         .hero-prompt-caret {
           animation: hero-prompt-caret-blink 1.05s steps(1) infinite;
         }
-        @keyframes hero-prompt-fade {
-          from { opacity: 0; transform: translateY(3px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .hero-prompt-placeholder {
-          animation: hero-prompt-fade 0.32s ease-out;
-        }
         @media (prefers-reduced-motion: reduce) {
-          .hero-prompt-caret,
-          .hero-prompt-placeholder {
+          .hero-prompt-caret {
             animation: none;
           }
         }

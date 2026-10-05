@@ -1228,13 +1228,13 @@ export default function MerchGeneratorPlatform({
                   <div className="flex gap-2 md:hidden">
                     <button
                       onClick={() => setView("home")}
-                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${currentView === "home" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${currentView === "home" ? "border-(--color-terracotta) bg-(--color-terracotta) text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
                     >
                       How it works
                     </button>
                     <button
                       onClick={() => setView("catalog")}
-                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${currentView === "catalog" ? "border-terracotta bg-terracotta text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${currentView === "catalog" ? "border-(--color-terracotta) bg-(--color-terracotta) text-white" : "border-charcoal/15 bg-white text-charcoal"}`}
                     >
                       Catalog
                     </button>
@@ -1722,7 +1722,7 @@ export default function MerchGeneratorPlatform({
                                   }
                                   className={`min-h-[44px] min-w-[44px] px-3 py-2 rounded-xl text-sm font-bold transition ${
                                     selectedSize === size
-                                      ? "bg-terracotta text-white"
+                                      ? "bg-(--color-terracotta) text-white"
                                       : "bg-[#F5EDE0] text-charcoal/80 hover:bg-charcoal/5"
                                   }`}
                                   aria-pressed={selectedSize === size}

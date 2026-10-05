@@ -143,7 +143,7 @@ export default function UpsellDrawer({ open, region, onClose, onNoThanks, onCont
                               onClick={() => changeSize(offer, size)}
                               aria-pressed={active}
                               className={`min-h-[32px] rounded-lg px-2.5 text-xs font-bold transition ${
-                                active ? "bg-terracotta text-white" : "bg-[#F5EDE0] text-charcoal/80 hover:bg-charcoal/5"
+                                active ? "bg-(--color-terracotta) text-white" : "bg-[#F5EDE0] text-charcoal/80 hover:bg-charcoal/5"
                               }`}
                             >
                               {size}

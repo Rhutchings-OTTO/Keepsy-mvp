@@ -204,7 +204,7 @@ export default function LandingPage({
             {HERO_IMAGES.map((img, i) => (
               <div
                 key={img.src}
-                className={`relative overflow-hidden rounded-2xl bg-[#F5EDE0] ${i === 1 || i === 2 ? "translate-y-4 sm:translate-y-6" : ""}`}
+                className={`relative overflow-hidden rounded-2xl bg-[#F5EDE0] ${i % 2 === 1 ? "translate-y-4 sm:translate-y-6" : ""}`}
                 style={{ aspectRatio: "1 / 1" }}
               >
                 <Image
@@ -449,8 +449,8 @@ export default function LandingPage({
                 style={{ aspectRatio: "3 / 2" }}
               >
                 <Image
-                  src="/mockup-previews/preview-hoodie-white.png"
-                  alt="A design shown on a white hoodie"
+                  src="/images/refresh/how-it-works-mug.webp"
+                  alt="A golden retriever photo previewed on a white mug"
                   fill
                   sizes="(max-width: 768px) 90vw, 360px"
                   className="object-cover"

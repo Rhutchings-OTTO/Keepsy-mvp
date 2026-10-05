@@ -11,7 +11,8 @@ const TONE: Record<PrintQualityRating, { bg: string; fg: string; label: string }
 
 /**
  * Honest print-quality indicator for the image that will actually be printed.
- * Renders nothing when dimensions are unknown.
+ * Renders nothing when dimensions are unknown, and never shows a
+ * low-resolution warning under a mockup (owner decision, Oct 2026).
  */
 export function PrintQualityBadge({
   productId,
@@ -28,7 +29,7 @@ export function PrintQualityBadge({
 }) {
   if (!width || !height) return null;
   const q = assessPrintQuality({ productId, size, imageWidth: width, imageHeight: height });
-  if (!q) return null;
+  if (!q || q.rating === "poor") return null;
   const tone = TONE[q.rating];
   return (
     <div

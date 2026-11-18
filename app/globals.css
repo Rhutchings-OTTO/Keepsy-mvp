@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Register the existing brand palette with Tailwind v4 so utilities such as
+   text-charcoal/70 and bg-terracotta are generated throughout the site. */
+@theme {
+  --color-cream: #fdf6ee;
+  --color-cream-dark: #f5ede0;
+  --color-terracotta: #c4714a;
+  --color-terra-light: #e8967a;
+  --color-terra-dark: #a05a38;
+  --color-forest: #2c4a3e;
+  --color-forest-light: #3d6357;
+  --color-gold: #c9a84c;
+  --color-gold-light: #dfc275;
+  --color-charcoal: #2d2926;
+}
+
 /* ===== Design System — Keepsy ===== */
 :root {
   /* Brand palette */

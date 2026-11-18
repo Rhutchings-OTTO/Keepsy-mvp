@@ -144,6 +144,10 @@ function productHref(item: CatalogItem): string {
   return item.color ? `${base}&color=${item.color}` : base;
 }
 
+function detailsHref(item: CatalogItem): string {
+  return `/product/${item.slug}${item.color ? `?color=${encodeURIComponent(item.color)}` : ""}`;
+}
+
 const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "All" },
   { key: "hoodie", label: "Hoodies" },
@@ -177,7 +181,7 @@ function ProductCard({
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-charcoal/8 bg-white transition hover:border-charcoal/20">
       <Link
-        href={`/product/${item.slug}`}
+        href={detailsHref(item)}
         className="relative block bg-[#F5EDE0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-terracotta/40"
         style={{ aspectRatio: "4 / 5" }}
       >
@@ -222,7 +226,7 @@ function ProductCard({
             Personalise
           </Link>
           <Link
-            href={`/product/${item.slug}`}
+            href={detailsHref(item)}
             className="inline-flex min-h-[40px] items-center justify-center rounded-xl text-sm font-medium text-charcoal/70 transition hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40"
           >
             Details

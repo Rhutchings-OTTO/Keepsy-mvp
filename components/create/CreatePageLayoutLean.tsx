@@ -16,11 +16,11 @@ import {
   Coffee,
   Printer,
   Sparkles,
+  Image as ImageIcon,
 } from "lucide-react";
 import { MagicpathFrame } from "@/components/skin/magicpath/MagicpathFrame";
 import { IdeasForYou } from "./IdeasForYou";
 import BeforeAfterCarousel from "@/components/BeforeAfterCarousel";
-import { Carousel } from "@/components/ui/Carousel";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { GenerationSafetyNotice } from "@/components/safety/GenerationSafetyNotice";
 import type { Region } from "@/lib/region";
@@ -54,6 +54,12 @@ const PRODUCTS = [
     description:
       "Soft, cosy hoodie with a classic fit. A quality feel that makes it a go-to favourite.",
   },
+  {
+    type: "canvas" as const,
+    Icon: ImageIcon,
+    label: "Canvas print",
+    description: "Stretched canvas on a wooden frame, ready to hang.",
+  },
 ];
 
 const PRODUCT_PREVIEW_IMAGES: Record<
@@ -64,27 +70,11 @@ const PRODUCT_PREVIEW_IMAGES: Record<
   mug: "/mockups/premium-v2/mug-white.webp",
   card: "/mockups/premium-v2/plain-card.webp",
   hoodie: "/mockups/premium-v2/hoodie-white.webp",
+  canvas: "/product-tiles/plain-canvas.png",
 };
 
-const REVIEWS = [
-  {
-    name: "Helen",
-    quote: "It felt simple and clear from the first screen.",
-    initials: "H",
-  },
-  {
-    name: "Rachel",
-    quote: "The preview made it much easier to trust the final gift.",
-    initials: "R",
-  },
-  {
-    name: "Louise",
-    quote: "I liked that it guided me without overwhelming me.",
-    initials: "L",
-  },
-];
-
 export type CreatePageLayoutLeanProps = {
+  initialMode?: "describe" | "upload";
   region: Region;
   isMagicpathSkin: boolean;
   prompt: string;
@@ -121,9 +111,9 @@ export type CreatePageLayoutLeanProps = {
     progress: number;
     error: string | null;
   };
-  onProductSelect: (type: "tshirt" | "mug" | "card" | "hoodie") => void;
+  onProductSelect: (type: "tshirt" | "mug" | "card" | "hoodie" | "canvas") => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
-  selectedProductType?: "tshirt" | "mug" | "card" | "hoodie";
+  selectedProductType?: "tshirt" | "mug" | "card" | "hoodie" | "canvas";
   selectedCardSubtype?: string;
   onCardSubtypeSelect?: (subtype: string) => void;
 };
@@ -138,6 +128,7 @@ const fadeInUp = {
 };
 
 export function CreatePageLayoutLean({
+  initialMode = "describe",
   region,
   isMagicpathSkin,
   prompt,
@@ -166,7 +157,7 @@ export function CreatePageLayoutLean({
   onCardSubtypeSelect,
 }: CreatePageLayoutLeanProps) {
   const [createMode, setCreateMode] = useState<"describe" | "upload">(
-    "describe",
+    initialMode,
   );
   const [pendingReplace, setPendingReplace] = useState<string | null>(null);
 
@@ -601,15 +592,16 @@ export function CreatePageLayoutLean({
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">
             Choose your product
           </p>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-5">
             {PRODUCTS.map(({ type, Icon, label, description }) => (
               <motion.button
                 key={type}
                 type="button"
                 onClick={() => onProductSelect(type)}
+                aria-pressed={selectedProductType === type}
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.985 }}
-                className="rounded-xl border border-charcoal/10 bg-[#F5EDE0] p-4 text-left text-charcoal transition sm:p-5 pointer-events-none md:pointer-events-auto"
+                className={`rounded-xl border bg-[#F5EDE0] p-4 text-left text-charcoal transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/40 sm:p-5 ${selectedProductType === type ? "border-terracotta ring-2 ring-terracotta/30" : "border-charcoal/10"}`}
               >
                 <div className="relative mb-4 overflow-hidden rounded-xl border border-charcoal/8 bg-white">
                   <Image
@@ -776,42 +768,6 @@ export function CreatePageLayoutLean({
         </div>
       </motion.section>
 
-      <motion.section
-        variants={fadeInUp}
-        className="hidden md:block rounded-2xl border border-charcoal/8 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(45,41,38,0.10)] sm:p-6"
-      >
-        <div className="flex flex-col gap-2 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal/45">
-            Customer feedback
-          </p>
-          <h2 className="font-serif text-3xl tracking-[-0.03em] text-charcoal">
-            Designed to feel reassuring, not confusing.
-          </h2>
-        </div>
-        <div className="mt-6">
-          <Carousel showArrows showDots>
-            {REVIEWS.map((review) => (
-              <article
-                key={review.name}
-                className="rounded-2xl bg-[#F5EDE0] p-6 text-center"
-              >
-                <div
-                  className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl text-sm font-semibold text-white"
-                  style={{ backgroundColor: "var(--color-terracotta)" }}
-                >
-                  {review.initials}
-                </div>
-                <p className="mt-4 text-base leading-7 text-charcoal/70">
-                  &quot;{review.quote}&quot;
-                </p>
-                <p className="mt-4 text-sm font-semibold text-charcoal/55">
-                  {review.name}
-                </p>
-              </article>
-            ))}
-          </Carousel>
-        </div>
-      </motion.section>
     </motion.div>
   );
 }

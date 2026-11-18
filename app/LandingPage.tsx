@@ -99,7 +99,7 @@ const PRODUCTS: Array<{
   {
     slug: "card",
     name: "Greeting card",
-    blurb: "Printed card, blank inside for your message.",
+    blurb: "Personalised cards for the moments worth sharing.",
     image: "/mockups/premium-v2/plain-card.webp",
     alt: "Plain greeting card",
     priceId: (r) => (r === "US" ? "uscard_1" : "postcard"),
@@ -147,7 +147,6 @@ export default function LandingPage({
   const currency = country.currency;
   const region = country.region;
   const rate = SHIPPING_TABLE[country.market];
-  const symbol = currency === "usd" ? "$" : "£";
 
   const price = (p: (typeof PRODUCTS)[number]) => {
     const id = typeof p.priceId === "function" ? p.priceId(region) : p.priceId;
@@ -162,7 +161,7 @@ export default function LandingPage({
       {/* ── Hero ── */}
       <section className="page-enter">
         <div
-          className={`${CONTAINER} grid items-center gap-10 py-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-24`}
+          className={`${CONTAINER} grid items-center gap-10 pb-16 pt-12 sm:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-24 lg:pt-20`}
         >
           <div>
             <p className={EYEBROW} style={{ color: "var(--color-terracotta)" }}>
@@ -172,11 +171,12 @@ export default function LandingPage({
               className="mt-4 font-serif font-black leading-[1.0] tracking-[-0.035em] text-charcoal"
               style={{ fontSize: "clamp(2.4rem, 5.4vw, 4.4rem)" }}
             >
-              A gift only they could get.
+              Your memories, made into gifts.
             </h1>
             <p className="mt-5 max-w-md text-lg leading-8 text-charcoal/70">
-              Upload a photo or describe an idea. See it on a hoodie, mug, card
-              or canvas, then order — we print it and deliver it.
+              Turn a photo or an idea into a one-of-a-kind gift. Choose a
+              hoodie, T-shirt, mug, card or canvas, and see your design before
+              you order.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -184,16 +184,15 @@ export default function LandingPage({
                 className={PRIMARY_BTN}
                 style={{ backgroundColor: "var(--color-terracotta)" }}
               >
-                Start creating
+              Create your gift
                 <ArrowRight size={18} aria-hidden />
               </Link>
               <Link href="/shop" className={SECONDARY_BTN}>
                 Browse the shop
               </Link>
             </div>
-            <p className="mt-6 text-sm text-charcoal/60">
-              Delivering to the UK and US · Free delivery over {symbol}
-              {FREE_SHIPPING_THRESHOLD} · Secure checkout by Stripe
+            <p className="mt-6 text-sm leading-6 text-charcoal/65">
+              Free to create · Preview before you order · Secure checkout
             </p>
             <div className="mt-8 max-w-md">
               <HeroPromptVisual />
@@ -410,10 +409,40 @@ export default function LandingPage({
             <p className={EYEBROW} style={{ color: "var(--color-terracotta)" }}>
               How it works
             </p>
-            <h2 className={H2}>Three steps, about five minutes.</h2>
+            <h2 className={H2}>A thoughtful gift, made simple.</h2>
+            <p className="mt-3 text-base leading-7 text-charcoal/65">
+              From your first idea to a gift ready to give, we&apos;ll guide you through it.
+            </p>
           </div>
 
           <ol className="mt-10 grid gap-5 md:grid-cols-3">
+            <li className="flex flex-col rounded-3xl border border-charcoal/8 bg-white p-5 sm:p-6">
+              <div
+                className="relative overflow-hidden rounded-2xl bg-[#FDF6EE]"
+                style={{ aspectRatio: "3 / 2" }}
+              >
+                <Image
+                  src="/images/refresh/how-it-works-mug.webp"
+                  alt="A golden retriever photo previewed on a white mug"
+                  fill
+                  sizes="(max-width: 768px) 90vw, 360px"
+                  className="object-cover"
+                />
+              </div>
+              <p
+                className="mt-5 font-serif text-3xl font-bold leading-none"
+                style={{ color: "rgba(196,113,74,0.5)" }}
+              >
+                1
+              </p>
+              <h3 className="mt-2 font-serif text-xl font-bold tracking-tight">
+                Make your design
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-charcoal/65">
+                Upload a photo or describe your idea. Keep your photo as it is,
+                or turn it into artwork.
+              </p>
+            </li>
             <li className="flex flex-col rounded-3xl border border-charcoal/8 bg-white p-5 sm:p-6">
               <div className="grid grid-cols-5 gap-1.5 rounded-2xl bg-[#FDF6EE] p-3">
                 {PRODUCT_TILES.map((t) => (
@@ -436,41 +465,14 @@ export default function LandingPage({
                 className="mt-5 font-serif text-3xl font-bold leading-none"
                 style={{ color: "rgba(196,113,74,0.5)" }}
               >
-                1
-              </p>
-              <h3 className="mt-2 font-serif text-xl font-bold tracking-tight">
-                Choose a product and size
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-charcoal/65">
-                Hoodie, t-shirt, mug, card or canvas. Pick a colour and size
-                where it applies.
-              </p>
-            </li>
-            <li className="flex flex-col rounded-3xl border border-charcoal/8 bg-white p-5 sm:p-6">
-              <div
-                className="relative overflow-hidden rounded-2xl bg-[#FDF6EE]"
-                style={{ aspectRatio: "3 / 2" }}
-              >
-                <Image
-                  src="/images/refresh/how-it-works-mug.webp"
-                  alt="A golden retriever photo previewed on a white mug"
-                  fill
-                  sizes="(max-width: 768px) 90vw, 360px"
-                  className="object-cover"
-                />
-              </div>
-              <p
-                className="mt-5 font-serif text-3xl font-bold leading-none"
-                style={{ color: "rgba(196,113,74,0.5)" }}
-              >
                 2
               </p>
               <h3 className="mt-2 font-serif text-xl font-bold tracking-tight">
-                See it on the product
+                Choose your gift
               </h3>
               <p className="mt-2 text-sm leading-6 text-charcoal/65">
-                Preview the placement, then change the style, colour or wording
-                until it&apos;s right.
+                Pick a hoodie, T-shirt, mug, card or canvas. Choose a colour and
+                size where available before you order.
               </p>
             </li>
             <li className="flex flex-col rounded-3xl border border-charcoal/8 bg-white p-5 sm:p-6">
@@ -493,10 +495,11 @@ export default function LandingPage({
                 3
               </p>
               <h3 className="mt-2 font-serif text-xl font-bold tracking-tight">
-                Order, we print and deliver
+                Preview, then order
               </h3>
               <p className="mt-2 text-sm leading-6 text-charcoal/65">
-                Made to order in 2–4 working days, then delivered
+                Check your design on the gift before you pay. We print to order
+                in 2–4 working days, then deliver
                 {rate
                   ? ` in ${rate.eta.min}–${rate.eta.max} working days`
                   : ""}{" "}
@@ -657,6 +660,25 @@ export default function LandingPage({
               </div>
             </li>
           </ul>
+        </div>
+      </section>
+
+      <section className="pb-16 pt-4 sm:pb-24" aria-labelledby="final-create-heading">
+        <div className={CONTAINER}>
+          <div className="flex flex-col items-start justify-between gap-8 rounded-3xl bg-(--color-forest) px-7 py-10 text-(--color-cream) sm:px-12 sm:py-12 lg:flex-row lg:items-center">
+            <div className="max-w-2xl">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-(--color-cream)/70">Ready when you are</p>
+              <h2 id="final-create-heading" className="mt-3 font-serif text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
+                Let&apos;s make something they&apos;ll love.
+              </h2>
+              <p className="mt-3 max-w-lg text-base leading-7 text-(--color-cream)/80">
+                Start with a photo, a memory, or just an idea. You can preview your gift before ordering.
+              </p>
+            </div>
+            <Link href="/create" className="inline-flex min-h-[52px] shrink-0 items-center justify-center gap-2 rounded-xl bg-(--color-cream) px-7 text-base font-semibold text-(--color-forest) transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-forest)">
+              Create your gift <ArrowRight size={18} aria-hidden />
+            </Link>
+          </div>
         </div>
       </section>
 

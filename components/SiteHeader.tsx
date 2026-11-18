@@ -68,21 +68,27 @@ function MobileMenu({
 }) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
-    if (open) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
     };
   }, [open]);
 
   useEffect(() => {
     if (open) {
+      wasOpenRef.current = true;
       const id = setTimeout(() => closeButtonRef.current?.focus(), 30);
       return () => clearTimeout(id);
     }
-    triggerRef.current?.focus();
+    if (wasOpenRef.current) {
+      triggerRef.current?.focus();
+      wasOpenRef.current = false;
+    }
   }, [open, triggerRef]);
 
   const handleKeyDown = useCallback(

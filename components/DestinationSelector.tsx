@@ -15,7 +15,7 @@
  * Source of truth: lib/commerce/markets.ts + lib/hooks/useDestination.ts.
  */
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, ChevronDown, X } from "lucide-react";
 import {
@@ -61,6 +61,7 @@ export function DestinationSelector({
   useEffect(() => {
     if (!open) return;
     const previous = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
     const t = setTimeout(() => firstRef.current?.focus(), 30);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -85,7 +86,7 @@ export function DestinationSelector({
     return () => {
       clearTimeout(t);
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
       previous?.focus?.();
     };
   }, [open, onClose]);
@@ -104,7 +105,7 @@ export function DestinationSelector({
   // Portal to <body>: the sticky header uses backdrop-filter, which would
   // otherwise become the containing block for this fixed overlay and clip it.
   return createPortal(
-    <div className="fixed inset-0 z-[90]">
+    <div className="fixed inset-0 z-[400]" data-destination-dialog>
       <button
         type="button"
         aria-label="Close"
@@ -215,8 +216,9 @@ export function DestinationSelector({
 
 export function DestinationButton({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
-  const current = useDisplayDestination();
-  const country = getCountry(current);
+  const chosen = useDestination();
+  const country = getCountry(chosen);
+  const close = useCallback(() => setOpen(false), []);
   return (
     <>
       <button
@@ -232,7 +234,7 @@ export function DestinationButton({ className = "" }: { className?: string }) {
         </span>
         <ChevronDown size={14} aria-hidden />
       </button>
-      <DestinationSelector open={open} onClose={() => setOpen(false)} />
+      <DestinationSelector open={open} onClose={close} />
     </>
   );
 }

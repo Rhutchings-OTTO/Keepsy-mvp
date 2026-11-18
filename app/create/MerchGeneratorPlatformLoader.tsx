@@ -1,15 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-
-type InitialCreateQuery = {
-  product?: string;
-  prompt?: string;
-  style?: string;
-  occasion?: string;
-  success?: boolean;
-  canceled?: boolean;
-};
+import type { InitialCreateQuery } from "./createQuery";
 
 const MerchGeneratorPlatform = dynamic(
   () => import("@/app/MerchGeneratorPlatform"),

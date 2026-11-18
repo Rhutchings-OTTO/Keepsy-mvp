@@ -3,9 +3,11 @@ import { notFound } from "next/navigation";
 import { PRODUCT_CARDS } from "@/components/ProductGrid";
 import { ProductPreviewClient } from "@/components/product/ProductPreviewClient";
 import { JsonLd } from "@/components/JsonLd";
+import { getUnitPrice } from "@/lib/commerce/pricing";
 
 type ProductPageProps = {
   params: Promise<{ type: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 const PRODUCT_TITLES: Record<string, string> = {
@@ -123,49 +125,6 @@ function buildProductJsonLd(
         name: "Keepsy",
         url: "https://keepsy.store",
       },
-      shippingDetails: {
-        "@type": "OfferShippingDetails",
-        shippingRate: {
-          "@type": "MonetaryAmount",
-          value: "0",
-          currency: "GBP",
-        },
-        shippingDestination: {
-          "@type": "DefinedRegion",
-          addressCountry: ["GB", "US"],
-        },
-        deliveryTime: {
-          "@type": "ShippingDeliveryTime",
-          handlingTime: {
-            "@type": "QuantitativeValue",
-            minValue: 1,
-            maxValue: 2,
-            unitCode: "DAY",
-          },
-          transitTime: {
-            "@type": "QuantitativeValue",
-            minValue: 3,
-            maxValue: 7,
-            unitCode: "DAY",
-          },
-        },
-      },
-      hasMerchantReturnPolicy: {
-        "@type": "MerchantReturnPolicy",
-        applicableCountry: ["GB", "US"],
-        returnPolicyCategory:
-          "https://schema.org/MerchantReturnFiniteReturnWindow",
-        merchantReturnDays: 30,
-        returnMethod: "https://schema.org/ReturnByMail",
-        returnFees: "https://schema.org/FreeReturn",
-      },
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      reviewCount: "247",
-      bestRating: "5",
-      worstRating: "1",
     },
   };
 }
@@ -197,8 +156,10 @@ function buildBreadcrumbJsonLd(type: string, name: string) {
   };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({ params, searchParams }: ProductPageProps) {
   const { type } = await params;
+  const query = await searchParams;
+  const initialColor = typeof query?.color === "string" ? query.color : undefined;
   const product = PRODUCT_CARDS.find((item) => item.type === type);
   if (!product) return notFound();
 
@@ -216,7 +177,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     type,
     meta.name,
     description,
-    meta.price,
+    (getUnitPrice(type === "card" ? "postcard" : type === "canvas" ? "canvas_10x8" : type, "gbp") ?? Number(meta.price)).toFixed(2),
     meta.image,
   );
   const breadcrumbSchema = buildBreadcrumbJsonLd(type, meta.name);
@@ -225,7 +186,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <>
       <JsonLd data={productSchema} />
       <JsonLd data={breadcrumbSchema} />
-      <ProductPreviewClient key={type} initialSlug={type} />
+      <ProductPreviewClient key={`${type}-${initialColor ?? ""}`} initialSlug={type} initialColor={initialColor} />
     </>
   );
 }

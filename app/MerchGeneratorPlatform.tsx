@@ -71,6 +71,7 @@ import {
   getUnitPrice,
 } from "@/lib/commerce/pricing";
 import { getSupportedSizes } from "@/lib/commerce/variants";
+import { resolveCreateMode, resolveProductSelection, type InitialCreateQuery } from "@/app/create/createQuery";
 import { uploadOriginalPhoto } from "@/lib/uploads/uploadOriginalClient";
 import { validateOriginalFile } from "@/lib/uploads/originalPhoto";
 import { getBrowserSupabase } from "@/lib/supabase/client";
@@ -138,15 +139,6 @@ function compressImageFile(file: File): Promise<string> {
     img.src = url;
   });
 }
-
-type InitialCreateQuery = {
-  product?: string;
-  prompt?: string;
-  style?: string;
-  occasion?: string;
-  success?: boolean;
-  canceled?: boolean;
-};
 
 type DesignShape = "square" | "portrait" | "landscape";
 
@@ -619,36 +611,16 @@ export default function MerchGeneratorPlatform({
     if (!initialQuery || didApplyInitialQuery.current) return;
     didApplyInitialQuery.current = true;
 
-    const normalizedProduct = initialQuery.product?.toLowerCase();
-    const catalogToProduct: Record<string, ProductType> = {
-      tee: "tshirt",
-      tshirt: "tshirt",
-      "t-shirt": "tshirt",
-      mug: "mug",
-      card: "card",
-      postcard: "card",
-      cardpack: "card",
-      uscard_1: "card",
-      uscard_10: "card",
-      uscard_30: "card",
-      uscard_50: "card",
-      hoodie: "hoodie",
-      canvas: "canvas",
-    };
-    const productType = normalizedProduct
-      ? catalogToProduct[normalizedProduct]
-      : null;
-    const mappedProduct = productType
-      ? (PRODUCT_LIST.find((p) => p.id === productType) ?? null)
-      : null;
-
-    if (mappedProduct) {
-      setSelectedProduct(mappedProduct);
-      setSelectedColor(mappedProduct.colors?.[0]?.hex ?? "#FFFFFF");
+    const normalizedProduct = initialQuery.product?.trim().toLowerCase();
+    const selection = resolveProductSelection(initialQuery);
+    if (selection) {
+      setSelectedProduct(selection.product);
+      setSelectedColor(selection.color);
+      setSelectedSize(selection.size);
     }
     if (normalizedProduct === "postcard") setSelectedCardSubtype("postcard");
     if (normalizedProduct === "cardpack") setSelectedCardSubtype("cardpack");
-    if (normalizedProduct?.startsWith("uscard"))
+    if (["uscard_1", "uscard_10", "uscard_30", "uscard_50"].includes(normalizedProduct ?? ""))
       setSelectedCardSubtype(normalizedProduct as CardSubtype);
 
     const promptPrefill = initialQuery.prompt?.trim();
@@ -1244,6 +1216,7 @@ export default function MerchGeneratorPlatform({
               {/* STEP 1 - Lean layout */}
               {step === 1 && (
                 <CreatePageLayoutLean
+                  initialMode={resolveCreateMode(initialQuery?.mode)}
                   region={region}
                   isMagicpathSkin={isMagicpathSkin}
                   prompt={prompt}
@@ -1288,15 +1261,7 @@ export default function MerchGeneratorPlatform({
                     setSelectedColor(product.colors?.[0]?.hex ?? "#FFFFFF");
                   }}
                   fileInputRef={fileInputRef}
-                  selectedProductType={
-                    selectedProduct.id === "canvas"
-                      ? "card"
-                      : (selectedProduct.id as
-                          | "tshirt"
-                          | "mug"
-                          | "card"
-                          | "hoodie")
-                  }
+                  selectedProductType={selectedProduct.id}
                   selectedCardSubtype={selectedCardSubtype}
                   onCardSubtypeSelect={(v) =>
                     setSelectedCardSubtype(v as CardSubtype)
@@ -1451,6 +1416,11 @@ export default function MerchGeneratorPlatform({
                             </motion.div>
                           )}
                         </AnimatePresence>
+                        {isCardProduct && region === "UK" && selectedCardSubtype === "postcard" && (
+                          <p className="mt-2 text-center text-xs leading-5 text-charcoal/70">
+                            This is an illustrative card preview. Your order will be one flat postcard; the preview is not an exact representation of its shape or placement.
+                          </p>
+                        )}
                         {selectedProduct.id === "mug" && (
                           <p className="mt-2 text-center text-[11px] text-charcoal/45">
                             Your design will appear on both sides of the mug

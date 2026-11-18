@@ -47,6 +47,9 @@ export default async function CreatePage({ searchParams }: CreatePageProps) {
         <MerchGeneratorPlatform
         initialQuery={{
           product: readParam(resolvedParams, "product"),
+          color: readParam(resolvedParams, "color"),
+          size: readParam(resolvedParams, "size"),
+          mode: readParam(resolvedParams, "mode"),
           prompt: readParam(resolvedParams, "prompt"),
           style: readParam(resolvedParams, "style"),
           occasion: readParam(resolvedParams, "occasion"),

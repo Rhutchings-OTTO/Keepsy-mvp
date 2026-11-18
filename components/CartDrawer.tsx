@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, Gift, ShoppingBag } from "lucide-react";
@@ -221,6 +221,8 @@ export function CartDrawer() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [region, setRegionState] = useState<Region>("UK");
+  const panelRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const sync = () => setRegionState(getRegion() ?? "UK");
@@ -242,14 +244,53 @@ export function CartDrawer() {
     return () => window.removeEventListener("open-cart-drawer", handleOpen);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
   const close = useCallback(() => setIsOpen(false), []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => {
+      if (!document.querySelector("[data-destination-dialog]"))
+        closeButtonRef.current?.focus();
+    }, 30);
+    const onKey = (event: KeyboardEvent) => {
+      // The country selector is a nested, portalled dialog and owns focus
+      // until it closes. Escape should close that dialog first, not the cart.
+      if (document.querySelector("[data-destination-dialog]")) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+      } else if (event.key === "Tab" && panelRef.current) {
+        const focusable = Array.from(
+          panelRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((element) => element.getClientRects().length > 0);
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (!panelRef.current.contains(document.activeElement)) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+        } else if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [isOpen, close]);
 
   const [checkoutPreferences, setCheckoutPreferences] = useState(
     EMPTY_CHECKOUT_PREFERENCES,
@@ -289,6 +330,7 @@ export function CartDrawer() {
           />
 
           <motion.aside
+            ref={panelRef}
             key="cart-panel"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -319,6 +361,7 @@ export function CartDrawer() {
                 )}
               </div>
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={close}
                 aria-label="Close cart"
@@ -377,12 +420,12 @@ export function CartDrawer() {
                       Estimated delivery: {delivery.from} – {delivery.to}
                     </p>
                     <p className="text-[11px] leading-relaxed text-charcoal/50">
-                      Secure Checkout · Handmade With Care ·{" "}
+                      Secure checkout · Made with care ·{" "}
                       <Link
                         href="/refunds"
                         className="underline underline-offset-2"
                       >
-                        30-Day Returns
+                        Help with damaged or misprinted items
                       </Link>
                     </p>
                   </div>

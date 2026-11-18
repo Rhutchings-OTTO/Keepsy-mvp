@@ -12,7 +12,14 @@ import { fetchWithBackoff } from "@/app/api/generate-image/guardrails";
 import { uploadImageToCloudinary } from "@/lib/uploadImage";
 
 const PROMPT_MAX_LEN = 1000;
+const DEFAULT_IMAGE_MODEL = "gpt-image-2.5-sunburst";
 type Size = "1024x1024" | "1024x1536" | "1536x1024";
+
+// Existing deployments may still explicitly configure the retired model.
+function getImageModel(): string {
+  const configured = process.env.OPENAI_IMAGE_MODEL?.trim();
+  return !configured || configured === "gpt-image-1" ? DEFAULT_IMAGE_MODEL : configured;
+}
 
 export type BaselineGenerateInput = {
   prompt: string;
@@ -73,7 +80,7 @@ function mapSizeToDalle3(size: Size): "1024x1024" | "1024x1792" | "1792x1024" {
 }
 
 async function callGenerate(prompt: string, size: Size): Promise<string> {
-  const model = process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1";
+  const model = getImageModel();
   const isDalle = model.startsWith("dall-e");
   const requestSize = isDalle ? mapSizeToDalle3(size) : size;
 
@@ -131,7 +138,7 @@ async function callEdit(
   }
   const extension = parsed.mimeType === "image/png" ? "png" : "jpg";
   const formData = new FormData();
-  formData.set("model", process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1");
+  formData.set("model", getImageModel());
   formData.set("prompt", prompt);
   formData.set("size", size);
   formData.set("image", new Blob([parsed.imageBuffer], { type: parsed.mimeType }), `upload.${extension}`);

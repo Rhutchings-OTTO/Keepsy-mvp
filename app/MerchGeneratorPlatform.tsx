@@ -1377,13 +1377,12 @@ export default function MerchGeneratorPlatform({
                             >
                               <GreetingCardMockup
                                 imageSrc={generatedImage}
-                                variant="us"
+                                variant={selectedCardSubtype === "uscard_1" ? "us-single" : "us"}
                               />
                             </motion.div>
-                          ) : isCardProduct &&
-                            selectedCardSubtype === "cardpack" ? (
+                          ) : isCardProduct ? (
                             <motion.div
-                              key={`cardpack-${currentNode?.id ?? "empty"}`}
+                              key={`${selectedCardSubtype}-${currentNode?.id ?? "empty"}`}
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
@@ -1391,7 +1390,7 @@ export default function MerchGeneratorPlatform({
                             >
                               <GreetingCardMockup
                                 imageSrc={generatedImage}
-                                variant="uk"
+                                variant={selectedCardSubtype === "cardpack" ? "uk" : "postcard"}
                               />
                             </motion.div>
                           ) : (
@@ -1416,9 +1415,9 @@ export default function MerchGeneratorPlatform({
                             </motion.div>
                           )}
                         </AnimatePresence>
-                        {isCardProduct && region === "UK" && selectedCardSubtype === "postcard" && (
+                        {isCardProduct && (
                           <p className="mt-2 text-center text-xs leading-5 text-charcoal/70">
-                            This is an illustrative card preview. Your order will be one flat postcard; the preview is not an exact representation of its shape or placement.
+                            Illustrative preview. {cardSubtypeName(selectedCardSubtype)}.
                           </p>
                         )}
                         {selectedProduct.id === "mug" && (

@@ -69,17 +69,17 @@ const PRODUCT_META: Record<
   hoodie: {
     name: "Personalised Hoodie",
     price: "44.99",
-    image: "https://keepsy.store/mockups/premium-v2/hoodie-white.webp",
+    image: "https://keepsy.store/mockups/premium-v3/hoodie-white.webp",
   },
   mug: {
     name: "Personalised Mug",
     price: "14.99",
-    image: "https://keepsy.store/mockups/premium-v2/mug-white.webp",
+    image: "https://keepsy.store/mockups/premium-v3/mug-white.webp",
   },
   tee: {
     name: "Personalised T-Shirt",
     price: "29.99",
-    image: "https://keepsy.store/mockups/premium-v2/tee-white.webp",
+    image: "https://keepsy.store/mockups/premium-v3/tee-white.webp",
   },
   card: {
     name: "Personalised Greeting Card",

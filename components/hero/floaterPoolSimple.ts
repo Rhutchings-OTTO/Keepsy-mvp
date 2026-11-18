@@ -75,7 +75,7 @@ export const FLOATER_POOL_SIMPLE: FloaterItem[] = [
     type: "mockup",
     title: "Plain Mug Mockup",
     subtitle: "Mug preview",
-    imageSrc: "/mockups/premium-v2/mug-white.webp",
+    imageSrc: "/mockups/premium-v3/mug-white.webp",
     productSlug: "mug",
   },
   {
@@ -83,7 +83,7 @@ export const FLOATER_POOL_SIMPLE: FloaterItem[] = [
     type: "mockup",
     title: "Premium Tee Mockup",
     subtitle: "T-Shirt preview",
-    imageSrc: "/mockups/premium-v2/tee-white.webp",
+    imageSrc: "/mockups/premium-v3/tee-white.webp",
     productSlug: "tee",
   },
   {
@@ -91,7 +91,7 @@ export const FLOATER_POOL_SIMPLE: FloaterItem[] = [
     type: "mockup",
     title: "Plain Hoodie Mockup",
     subtitle: "Hoodie preview",
-    imageSrc: "/mockups/premium-v2/hoodie-white.webp",
+    imageSrc: "/mockups/premium-v3/hoodie-white.webp",
     productSlug: "hoodie",
   },
   {
@@ -107,7 +107,7 @@ export const FLOATER_POOL_SIMPLE: FloaterItem[] = [
     type: "mockup",
     title: "Tee Blue Mockup",
     subtitle: "T-Shirt preview",
-    imageSrc: "/mockups/premium-v2/tee-blue.webp",
+    imageSrc: "/mockups/premium-v3/tee-blue.webp",
     productSlug: "tee",
   },
   {
@@ -115,7 +115,7 @@ export const FLOATER_POOL_SIMPLE: FloaterItem[] = [
     type: "mockup",
     title: "Hoodie Blue Mockup",
     subtitle: "Hoodie preview",
-    imageSrc: "/mockups/premium-v2/hoodie-blue.webp",
+    imageSrc: "/mockups/premium-v3/hoodie-blue.webp",
     productSlug: "hoodie",
   },
   {

@@ -83,21 +83,21 @@ export function Hero() {
           className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm"
         />
         <Image
-          src="/mockups/premium-v2/mug-white.webp"
+          src="/mockups/premium-v3/mug-white.webp"
           alt="Pet mug gift example"
           width={520}
           height={520}
           className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm"
         />
         <Image
-          src="/mockups/premium-v2/tee-white.webp"
+          src="/mockups/premium-v3/tee-white.webp"
           alt="Premium tee gift example"
           width={520}
           height={520}
           className="h-full w-full rounded-2xl border border-black/10 object-cover shadow-sm"
         />
         <Image
-          src="/mockups/premium-v2/hoodie-white.webp"
+          src="/mockups/premium-v3/hoodie-white.webp"
           alt="Anniversary hoodie gift example"
           width={520}
           height={520}

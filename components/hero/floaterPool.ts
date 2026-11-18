@@ -87,7 +87,7 @@ const PRODUCT_MOCKUPS: FloaterDef[] = [
     type: "mockup",
     title: "Plain Mug Mockup",
     subtitle: "Mug preview",
-    image: "/mockups/premium-v2/mug-white.webp",
+    image: "/mockups/premium-v3/mug-white.webp",
     priority: 2,
   },
   {
@@ -95,7 +95,7 @@ const PRODUCT_MOCKUPS: FloaterDef[] = [
     type: "mockup",
     title: "Premium Tee Mockup",
     subtitle: "T-Shirt preview",
-    image: "/mockups/premium-v2/tee-white.webp",
+    image: "/mockups/premium-v3/tee-white.webp",
     priority: 3,
   },
   {
@@ -103,7 +103,7 @@ const PRODUCT_MOCKUPS: FloaterDef[] = [
     type: "mockup",
     title: "Plain Hoodie Mockup",
     subtitle: "Hoodie preview",
-    image: "/mockups/premium-v2/hoodie-white.webp",
+    image: "/mockups/premium-v3/hoodie-white.webp",
     priority: 4,
   },
   {
@@ -119,7 +119,7 @@ const PRODUCT_MOCKUPS: FloaterDef[] = [
     type: "mockup",
     title: "Tee Blue Mockup",
     subtitle: "T-Shirt preview",
-    image: "/mockups/premium-v2/tee-blue.webp",
+    image: "/mockups/premium-v3/tee-blue.webp",
     priority: 6,
   },
   {
@@ -127,7 +127,7 @@ const PRODUCT_MOCKUPS: FloaterDef[] = [
     type: "mockup",
     title: "Hoodie Blue Mockup",
     subtitle: "Hoodie preview",
-    image: "/mockups/premium-v2/hoodie-blue.webp",
+    image: "/mockups/premium-v3/hoodie-blue.webp",
     priority: 7,
   },
   {

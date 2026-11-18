@@ -1,7 +1,7 @@
 {
   "tshirt": {
     "white": {
-      "baseMockupSrc": "/mockups/premium-v2/tee-white.webp",
+      "baseMockupSrc": "/mockups/premium-v3/tee-white.webp",
       "aspectRatio": 1.8333,
       "opacity": 1.0,
       "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
@@ -18,7 +18,7 @@
       }
     },
     "blue": {
-      "baseMockupSrc": "/mockups/premium-v2/tee-blue.webp",
+      "baseMockupSrc": "/mockups/premium-v3/tee-blue.webp",
       "aspectRatio": 1.8333,
       "opacity": 1.0,
       "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
@@ -35,7 +35,7 @@
       }
     },
     "black": {
-      "baseMockupSrc": "/mockups/premium-v2/tee-black.webp",
+      "baseMockupSrc": "/mockups/premium-v3/tee-black.webp",
       "aspectRatio": 1.5015,
       "opacity": 1.0,
       "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
@@ -54,7 +54,7 @@
   },
   "hoodie": {
     "white": {
-      "baseMockupSrc": "/mockups/premium-v2/hoodie-white.webp",
+      "baseMockupSrc": "/mockups/premium-v3/hoodie-white.webp",
       "aspectRatio": 1.4993,
       "opacity": 1.0,
       "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
@@ -71,7 +71,7 @@
       }
     },
     "blue": {
-      "baseMockupSrc": "/mockups/premium-v2/hoodie-blue.webp",
+      "baseMockupSrc": "/mockups/premium-v3/hoodie-blue.webp",
       "aspectRatio": 1.5059,
       "opacity": 1.0,
       "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
@@ -88,7 +88,7 @@
       }
     },
     "black": {
-      "baseMockupSrc": "/mockups/premium-v2/hoodie-black.webp",
+      "baseMockupSrc": "/mockups/premium-v3/hoodie-black.webp",
       "aspectRatio": 1.5015,
       "opacity": 1.0,
       "dropShadow": "0 3px 10px rgba(0,0,0,0.2)",
@@ -107,7 +107,7 @@
   },
   "mug": {
     "white": {
-      "baseMockupSrc": "/mockups/premium-v2/mug-white.webp",
+      "baseMockupSrc": "/mockups/premium-v3/mug-white.webp",
       "aspectRatio": 1.8333,
       "opacity": 0.93,
       "dropShadow": "0 2px 8px rgba(0,0,0,0.12)",

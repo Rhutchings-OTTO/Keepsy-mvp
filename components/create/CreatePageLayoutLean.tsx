@@ -66,10 +66,10 @@ const PRODUCT_PREVIEW_IMAGES: Record<
   (typeof PRODUCTS)[number]["type"],
   string
 > = {
-  tshirt: "/mockups/premium-v2/tee-white.webp",
-  mug: "/mockups/premium-v2/mug-white.webp",
+  tshirt: "/mockups/premium-v3/tee-white.webp",
+  mug: "/mockups/premium-v3/mug-white.webp",
   card: "/mockups/premium-v2/plain-card.webp",
-  hoodie: "/mockups/premium-v2/hoodie-white.webp",
+  hoodie: "/mockups/premium-v3/hoodie-white.webp",
   canvas: "/product-tiles/plain-canvas.png",
 };
 

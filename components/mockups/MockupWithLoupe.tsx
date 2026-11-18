@@ -91,6 +91,7 @@ export function MockupWithLoupe({
 
         {showLoupe && loupeActive && rect.width > 0 && (
           <motion.div
+            aria-hidden="true"
             style={{
               left: 0,
               top: 0,
@@ -143,7 +144,7 @@ export function MockupWithLoupe({
 
       {loupeActive && (
         <p className="mt-3 text-center text-xs font-medium tracking-wide text-black/45">
-          Hover to inspect material detail
+          Hover to zoom in
         </p>
       )}
     </div>

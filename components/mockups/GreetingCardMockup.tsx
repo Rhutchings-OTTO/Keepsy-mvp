@@ -7,8 +7,8 @@ type GreetingCardMockupProps = {
   /** AI-generated image to show on the front card face. null = placeholder. */
   imageSrc: string | null;
   className?: string;
-  /** "uk" = portrait 7-pack stack mockup (default); "us" = portrait single-card stack mockup (BP 1094) */
-  variant?: "uk" | "us";
+  /** Existing pack previews plus individually calibrated single-card previews. */
+  variant?: "uk" | "us" | "us-single" | "postcard";
 };
 
 /**
@@ -24,22 +24,27 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
   className = "",
   variant = "uk",
 }: GreetingCardMockupProps) {
-  const isUS = variant === "us";
+  const isUS = variant === "us" || variant === "us-single";
+  const isPostcard = variant === "postcard";
+  const isNewSingle = isPostcard || variant === "us-single";
+  const baseSrc = isPostcard
+    ? "/mockups/premium-v3/postcard-uk.webp"
+    : variant === "us-single"
+      ? "/mockups/premium-v3/card-us-single.webp"
+      : isUS
+        ? "/mockups/premium-v2/card-us.webp"
+        : "/mockups/premium-v2/card-uk.webp";
 
   return (
     <div
       className={`relative w-full overflow-hidden rounded-3xl border border-black/[0.06] bg-[#FAF9F7] shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_0_0_rgba(255,255,255,0.8)_inset] ${className}`}
-      style={{ aspectRatio: "2 / 3" }}
+      style={{ aspectRatio: isPostcard ? "3 / 2" : "2 / 3" }}
     >
       <div className="absolute inset-[1px] overflow-hidden rounded-[22px] bg-[#F5F4F2]">
         {/* Base mockup photo */}
         <Image
-          src={
-            isUS
-              ? "/mockups/premium-v2/card-us.webp"
-              : "/mockups/premium-v2/card-uk.webp"
-          }
-          alt={isUS ? "US greeting card" : "UK greeting card pack"}
+          src={baseSrc}
+          alt={isPostcard ? "UK postcard" : isUS ? "US greeting card" : "UK greeting card pack"}
           fill
           className="object-contain"
           quality={90}
@@ -55,7 +60,21 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
         <div
           className="absolute overflow-hidden"
           style={
-            isUS
+            isPostcard
+              ? {
+                  left: "15.104%",
+                  top: "14.941%",
+                  width: "69.596%",
+                  height: "70.020%",
+                }
+              : variant === "us-single"
+                ? {
+                    left: "27.734%",
+                    top: "24.154%",
+                    width: "51.660%",
+                    height: "48.958%",
+                  }
+              : isUS
               ? {
                   left: "28%",
                   top: "22%",
@@ -70,12 +89,14 @@ export const GreetingCardMockup = memo(function GreetingCardMockup({
                 }
           }
         >
-          {/* Layer 2: 8% safe-zone inset on all 4 sides — image sits within an 84%×84% area.
-              contain fit maximises within that zone without ever cropping or distorting. */}
+          {/* New single variants mirror the fulfilment pipeline's centred 80% safe area
+              on each axis. Keep the existing pack inset unchanged. */}
           <div
             style={{
               position: "absolute",
-              inset: "8%",
+              ...(isNewSingle
+                ? { left: "10%", top: "10%", width: "80%", height: "80%" }
+                : { inset: "8%" }),
             }}
           >
             {imageSrc ? (
